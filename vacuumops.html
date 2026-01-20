@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PBL VacuumOps | Ultimate Pro</title>
+    
+    <!-- ✅ Favicon -->
+    <link rel="icon" type="image/png" href="pbl-logo.png">
+    
+    <!-- Dependencies -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;800&family=Outfit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark_bg: '#0f172a'
+                    },
+                    fontFamily: { sans: ['Outfit', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    animation: { 'slide-up': 'slideUp 0.3s ease-out forwards' },
+                    keyframes: { slideUp: { 'from': { opacity: 0, transform: 'translateY(10px)' }, 'to': { opacity: 1, transform: 'translateY(0)' } } }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        [x-cloak] { display: none !important; }
+        body { background-color: #f8fafc; -webkit-tap-highlight-color: transparent; }
+        
+        /* 🔥 DYNAMIC THEMES */
+        .bg-gradient-noida { background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); } /* Blue */
+        .bg-gradient-ddn { background: linear-gradient(135deg, #10b981 0%, #047857 100%); }   /* Green */
+
+        /* Glass Card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 30px -5px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .dark .glass-card {
+            background: rgba(30, 41, 59, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px -5px rgba(0,0,0,0.5);
+        }
+        .glass-card:active { transform: scale(0.98); }
+
+        /* Input Fields */
+        .input-box {
+            width: 100%; padding: 14px; background: #f1f5f9; border: 2px solid transparent;
+            border-radius: 14px; font-size: 0.9rem; outline: none; transition: 0.2s; font-weight: 700;
+        }
+        .dark .input-box { background: #0f172a; color: white; }
+        .input-box:focus { background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+
+<body class="text-slate-800 transition-colors duration-300 min-h-screen font-sans bg-slate-50 dark:bg-dark_bg dark:text-slate-200" x-data="vacuumTracker()">
+
+    <!-- =========================================================
+         📱 MOBILE LAYOUT
+    ========================================================== -->
+    <div class="block lg:hidden pb-32">
+        
+        <!-- HEADER -->
+        <header class="relative pt-8 pb-28 px-5 overflow-hidden rounded-b-[3rem] shadow-xl z-30 transition-all duration-300"
+                :class="[headerGradient, showSearchInput ? 'pb-32' : 'pb-28']">
+            <div class="absolute top-[-20px] left-[-20px] w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-[-10px] right-[-10px] w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+
+            <div class="relative z-10">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-inner border border-white/20">
+                            <img src="pbl-logo.png" alt="Logo" class="w-6 h-6 object-contain">
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-black text-white leading-none tracking-tight">VacuumOps</h1>
+                            <span class="text-[10px] text-white/90 font-bold uppercase tracking-wider flex items-center gap-1 mt-0.5">
+                                <i class="fa-solid fa-user-shield"></i> <span x-text="currentOperator">...</span>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-2">
+                        <!-- Mobile Location Dropdown -->
+                        <div class="relative">
+                            <select x-model="activeLocation" class="appearance-none bg-white/20 text-white text-xs font-bold py-2.5 pl-3 pr-7 rounded-xl border border-white/20 outline-none backdrop-blur-md cursor-pointer">
+                                <option value="Noida" class="text-slate-800">Noida</option>
+                                <option value="Dehradun" class="text-slate-800">Dehradun</option>
+                            </select>
+                            <i class="fa-solid fa-caret-down absolute right-2.5 top-1/2 -translate-y-1/2 text-white/80 text-[10px] pointer-events-none"></i>
+                        </div>
+                        <button @click="showSearchInput = !showSearchInput; if(!showSearchInput) search='';" class="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/10 active:scale-95 transition">
+                            <i class="fa-solid" :class="showSearchInput ? 'fa-xmark' : 'fa-magnifying-glass'"></i>
+                        </button>
+                    </div>
+                </div>
+                <div x-show="showSearchInput" x-collapse x-cloak class="mt-4 animate-slide-up">
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-white/60"></i>
+                        <input type="text" x-model="search" placeholder="Search Asset ID..." class="w-full pl-11 pr-4 py-3 bg-white/20 text-white placeholder-white/70 border border-white/30 rounded-2xl outline-none font-bold text-sm backdrop-blur-md shadow-inner">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- DASHBOARD STRIP -->
+        <main class="px-4 -mt-16 relative z-40 max-w-lg mx-auto space-y-2">
+            <div class="glass-card relative px-5 py-6 rounded-[2.5rem] flex items-center justify-between shadow-xl overflow-visible">
+                <div class="flex flex-col gap-1.5">
+                    <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+                        <i class="fa-solid fa-calendar-days text-sm" :class="themeText"></i>
+                        <p class="text-[10px] font-black uppercase tracking-widest">Current</p>
+                    </div>
+                    <p class="text-xl font-black leading-none" :class="themeText" x-text="currentCycleName">...</p>
+                    <div class="flex items-center gap-1.5 mt-1 bg-slate-100 dark:bg-white/10 px-3 py-1 rounded-full w-fit border border-slate-200 dark:border-white/5">
+                        <span class="text-[9px] font-bold text-slate-400 uppercase">Next:</span>
+                        <span class="text-[10px] font-bold text-slate-700 dark:text-white" x-text="nextCycleName">...</span>
+                    </div>
+                </div>
+                <div class="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-white dark:bg-[#1e293b] rounded-full p-2 shadow-2xl flex items-center justify-center z-50 border-4 border-slate-50 dark:border-slate-700">
+                    <div class="relative w-full h-full">
+                        <svg class="w-full h-full transform -rotate-90">
+                            <circle cx="50%" cy="50%" r="32" stroke="#e2e8f0" stroke-width="6" fill="transparent" />
+                            <circle cx="50%" cy="50%" r="32" :stroke="themeColorHex" stroke-width="6" fill="transparent" :stroke-dasharray="200" :stroke-dashoffset="200 - (200 * percentage) / 100" stroke-linecap="round" class="transition-all duration-1000"/>
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center leading-none">
+                            <span class="text-xl font-black" :class="themeText" x-text="percentage + '%'">0%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button @click="toggleFilter('DONE')" class="flex flex-col items-center justify-center w-14 h-14 rounded-2xl transition-all shadow-md active:scale-95" :class="filterStatus === 'DONE' ? 'bg-emerald-500 text-white shadow-emerald-200' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'">
+                        <i class="fa-solid fa-check text-sm mb-0.5"></i> <span class="text-xs font-black" x-text="doneCount">0</span>
+                    </button>
+                    <button @click="toggleFilter('PENDING')" class="flex flex-col items-center justify-center w-14 h-14 rounded-2xl transition-all shadow-md active:scale-95" :class="filterStatus === 'PENDING' ? 'bg-rose-500 text-white shadow-rose-200' : 'bg-rose-50 text-rose-500 hover:bg-rose-100'">
+                        <i class="fa-regular fa-clock text-sm mb-0.5"></i> <span class="text-xs font-black" x-text="pendingCount">0</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <div x-show="loading" class="py-8 text-center">
+                <div class="w-10 h-10 border-4 border-slate-200 rounded-full animate-spin mx-auto mb-2" :class="themeBorderT"></div>
+                <p class="text-[10px] font-bold uppercase tracking-widest animate-pulse" :class="themeText">Syncing Data...</p>
+            </div>
+
+            <!-- Mobile List -->
+            <div class="space-y-3 pb-28 pt-1">
+                <template x-for="(pc, index) in filteredList" :key="pc.systemName + index">
+                    <div class="glass-card p-4 rounded-[1.2rem] relative overflow-hidden group animate-slide-up flex items-center justify-between shadow-sm active:scale-[0.99] transition-transform"
+                         :class="pc.status === 'DONE' ? 'border-l-[5px] border-l-emerald-500' : 'border-l-[5px] border-l-rose-500'"
+                         @click="openModal('edit', pc)">
+                        <div class="flex items-center gap-4 w-full overflow-hidden">
+                            <div class="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shadow-sm transition-colors shrink-0" :class="pc.status === 'DONE' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-600'">
+                                <i class="fa-solid" :class="pc.status === 'DONE' ? 'fa-check' : 'fa-hourglass-half'"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h3 class="font-extrabold text-base text-slate-800 dark:text-white truncate" x-text="pc.systemName"></h3>
+                                <div class="mt-1 flex flex-wrap gap-2">
+                                    <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 w-fit max-w-full">
+                                        <i class="fa-solid fa-barcode text-[10px] text-slate-400"></i>
+                                        <span class="text-[10px] font-mono font-bold text-slate-600 dark:text-slate-300 break-all" x-text="pc.assetId ? pc.assetId : 'No ID'"></span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1.5 mt-1 text-slate-400"><i :class="getOsIcon(pc.os)"></i> <span class="text-[9px] font-bold uppercase tracking-wide whitespace-nowrap" x-text="pc.os"></span></div>
+                            </div>
+                        </div>
+                        <div class="text-right shrink-0 pl-2">
+                            <template x-if="pc.status === 'DONE'"><div class="flex flex-col items-end"><span class="text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">CLEAN</span><p class="text-[9px] font-bold text-slate-400 mt-0.5 whitespace-nowrap" x-text="formatDateDisplay(pc.date)"></p></div></template>
+                            <template x-if="pc.status !== 'DONE'"><i class="fa-solid fa-chevron-right text-slate-300 text-sm"></i></template>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </main>
+        
+        <button @click="openModal('add')" class="fixed bottom-24 right-5 w-14 h-14 rounded-full text-white shadow-xl flex items-center justify-center active:scale-90 transition-transform z-40" :class="themeGradient"><i class="fa-solid fa-plus text-xl"></i></button>
+
+        <footer class="fixed bottom-0 left-0 w-full bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-lg border-t border-slate-100 dark:border-white/5 px-5 py-4 z-50 flex justify-between items-center">
+            <div><p class="text-[9px] font-bold opacity-60 uppercase tracking-widest" :class="themeText">Operator</p><p class="text-xs font-black text-slate-800 dark:text-white" x-text="currentOperator">...</p></div>
+            <div class="flex gap-2"><button @click="fetchData(true)" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-500 dark:text-slate-300 active:scale-95 transition"><i class="fa-solid fa-rotate" :class="{'fa-spin': isSyncing}"></i></button><button @click="openConfirmModal()" class="px-4 h-10 rounded-xl text-white font-bold text-[10px] flex items-center gap-2 shadow-lg active:scale-95 transition" :class="themeBtn"><i class="fa-solid fa-file-export"></i> Report</button></div>
+        </footer>
+    </div>
+
+    <!-- =======================================================
+         🖥️ DESKTOP LAYOUT (Visible only on lg: screens)
+    ======================================================== -->
+    <div class="hidden lg:flex h-screen bg-slate-50 dark:bg-dark_bg text-slate-800 dark:text-slate-200 overflow-hidden">
+        <aside class="w-72 bg-white dark:bg-[#111827] border-r border-slate-200 dark:border-white/5 flex flex-col shadow-xl z-20">
+            <div class="p-8 pb-4">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg" :class="themeGradient">
+                        <img src="pbl-logo.png" alt="Logo" class="w-7 h-7 object-contain">
+                    </div>
+                    <div><h1 class="text-xl font-black leading-none">Vacuum<span :class="themeText">Ops</span></h1><p class="text-[10px] font-bold text-slate-400 tracking-widest mt-1">DESKTOP PANEL</p></div>
+                </div>
+
+                <!-- Desktop Location Switcher -->
+                <div class="mb-6">
+                    <p class="px-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Location</p>
+                    <div class="grid grid-cols-2 bg-slate-100 dark:bg-white/5 p-1 rounded-xl">
+                        <!-- Fix: Explicitly setting filterStatus to ALL and fetching data -->
+                        <button @click="activeLocation='Noida'; filterStatus='ALL'; fetchData(false)" class="py-2 text-xs font-bold rounded-lg transition-all" :class="activeLocation === 'Noida' ? 'bg-white shadow text-blue-600' : 'text-slate-500'">Noida</button>
+                        <button @click="activeLocation='Dehradun'; filterStatus='ALL'; fetchData(false)" class="py-2 text-xs font-bold rounded-lg transition-all" :class="activeLocation === 'Dehradun' ? 'bg-white shadow text-emerald-600' : 'text-slate-500'">Dehradun</button>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5 mb-6">
+                    <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-xl border border-slate-200 shadow-sm" :class="themeText"><i class="fa-solid fa-user-tie"></i></div><div><p class="text-[10px] font-bold text-slate-400 uppercase">Operator</p><p class="text-sm font-black text-slate-800 dark:text-white" x-text="currentOperator">...</p></div></div>
+                </div>
+
+                <nav class="space-y-2">
+                    <p class="px-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Filters</p>
+                    <button @click="filterStatus='ALL'" class="w-full text-left px-4 py-3 rounded-xl font-bold text-sm flex items-center justify-between transition-all" :class="filterStatus === 'ALL' ? (activeLocation === 'Noida' ? 'bg-blue-600 text-white' : 'bg-emerald-600 text-white') : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5'"><span><i class="fa-solid fa-list-ul mr-2"></i> All Assets</span><span class="bg-white/20 px-2 py-0.5 rounded text-[10px]" x-text="pcs.filter(p => p.location === activeLocation).length">0</span></button>
+                    <button @click="filterStatus='DONE'" class="w-full text-left px-4 py-3 rounded-xl font-bold text-sm flex items-center justify-between transition-all" :class="filterStatus === 'DONE' ? 'bg-emerald-500 text-white' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5'"><span><i class="fa-solid fa-check mr-2"></i> Completed</span><span class="bg-white/20 px-2 py-0.5 rounded text-[10px]" x-text="doneCount">0</span></button>
+                    <button @click="filterStatus='PENDING'" class="w-full text-left px-4 py-3 rounded-xl font-bold text-sm flex items-center justify-between transition-all" :class="filterStatus === 'PENDING' ? 'bg-rose-500 text-white' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5'"><span><i class="fa-regular fa-clock mr-2"></i> Pending</span><span class="bg-white/20 px-2 py-0.5 rounded text-[10px]" x-text="pendingCount">0</span></button>
+                </nav>
+            </div>
+            <div class="mt-auto p-6 border-t border-slate-100 dark:border-white/5">
+                <button @click="openConfirmModal()" class="w-full py-3 bg-slate-900 dark:bg-white dark:text-slate-900 text-white rounded-xl font-bold text-sm shadow-xl hover:scale-[1.02] transition-transform"><i class="fa-solid fa-paper-plane mr-2"></i> Send Report</button>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col h-full relative">
+            <header class="h-20 bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md border-b border-slate-200 dark:border-white/5 px-8 flex items-center justify-between z-10">
+                <div class="flex items-center gap-4"><h2 class="text-2xl font-black text-slate-800 dark:text-white" :class="themeText" x-text="activeLocation + ' Dashboard'"></h2><span class="px-3 py-1 bg-slate-100 text-slate-500 text-xs font-bold rounded-full border border-slate-200" x-text="currentCycleName"></span></div>
+                <div class="flex items-center gap-4">
+                    <div class="relative w-80"><i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i><input type="text" x-model="search" placeholder="Search Assets..." class="w-full pl-10 pr-4 py-2.5 bg-slate-100 dark:bg-white/5 rounded-xl text-sm font-bold border border-transparent focus:bg-white focus:border-brand_primary focus:ring-4 focus:ring-slate-100 transition-all outline-none"></div>
+                    <button @click="openModal('add')" class="w-10 h-10 text-white rounded-xl flex items-center justify-center hover:opacity-90 transition shadow-lg" :class="themeBtn"><i class="fa-solid fa-plus"></i></button>
+                    <button @click="fetchData(true)" class="w-10 h-10 bg-white border border-slate-200 rounded-xl flex items-center justify-center text-slate-500 hover:text-brand_primary hover:border-brand_primary transition"><i class="fa-solid fa-rotate" :class="{'fa-spin': isSyncing}"></i></button>
+                    <button @click="toggleTheme()" class="w-10 h-10 bg-white border border-slate-200 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-50 transition"><i class="fa-solid" :class="isDark ? 'fa-sun' : 'fa-moon'"></i></button>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-8 relative">
+                <div class="grid grid-cols-4 gap-6 mb-8">
+                    <div class="col-span-1 rounded-2xl p-6 text-white shadow-xl relative overflow-hidden" :class="themeGradient">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                        <p class="text-xs font-bold opacity-80 uppercase tracking-widest">Total Progress</p>
+                        <div class="flex items-end gap-2 mt-2"><h3 class="text-5xl font-black"><span x-text="percentage">0</span>%</h3></div>
+                        <div class="w-full bg-black/20 h-1.5 rounded-full mt-4 overflow-hidden"><div class="bg-white h-full transition-all duration-1000" :style="`width: ${percentage}%`"></div></div>
+                    </div>
+                    <div class="col-span-1 bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-sm"><div class="w-10 h-10 bg-teal-50 text-teal-600 rounded-xl flex items-center justify-center text-xl mb-3"><i class="fa-solid fa-calendar-check"></i></div><p class="text-xs text-slate-400 font-bold uppercase">Next Due</p><h3 class="text-2xl font-black text-slate-800 dark:text-white" x-text="nextCycleName">...</h3></div>
+                    <div class="col-span-1 bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-sm"><div class="w-10 h-10 bg-rose-50 text-brand_primary rounded-xl flex items-center justify-center text-xl mb-3"><i class="fa-regular fa-clock"></i></div><p class="text-xs text-slate-400 font-bold uppercase">Pending</p><h3 class="text-2xl font-black text-brand_primary" x-text="pendingCount">0</h3></div>
+                    <div class="col-span-1 bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/5 rounded-2xl p-6 shadow-sm"><div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xl mb-3"><i class="fa-solid fa-check"></i></div><p class="text-xs text-slate-400 font-bold uppercase">Completed</p><h3 class="text-2xl font-black text-emerald-600" x-text="doneCount">0</h3></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    <template x-for="pc in filteredList" :key="pc.systemName">
+                        <div class="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700/50 rounded-2xl p-5 hover:shadow-lg hover:scale-[1.02] transition-all cursor-pointer group relative overflow-hidden" :class="pc.status === 'DONE' ? 'border-b-4 border-b-emerald-500' : 'border-b-4 border-b-rose-500'" @click="openModal('edit', pc)">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg" :class="pc.status === 'DONE' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'"><i class="fa-solid" :class="pc.status === 'DONE' ? 'fa-check' : 'fa-hourglass-half'"></i></div>
+                                <template x-if="pc.status === 'DONE'"><span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded border border-emerald-100" x-text="formatDateDisplay(pc.date)"></span></template>
+                            </div>
+                            <h3 class="font-bold text-slate-800 dark:text-white truncate" x-text="pc.systemName"></h3>
+                            <div class="mt-2 flex items-center gap-2"><span class="text-[10px] font-mono font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded border border-slate-200 dark:border-slate-700 flex items-center gap-1"><i class="fa-solid fa-barcode"></i> <span x-text="pc.assetId ? pc.assetId : 'No ID'"></span></span></div>
+                            <div class="mt-3 flex items-center gap-2 text-xs text-slate-400 font-bold uppercase"><i :class="getOsIcon(pc.os)"></i> <span x-text="pc.os"></span></div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Edit/Add Modal -->
+    <div x-show="showModal" x-cloak class="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4">
+        <div class="bg-white dark:bg-[#1e293b] w-full max-w-md rounded-t-[2.5rem] sm:rounded-[2.5rem] p-8 shadow-2xl relative" @click.away="showModal = false">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-black text-slate-800 dark:text-white" x-text="mode === 'add' ? 'New Entry' : 'Edit Details'"></h3>
+                <button @click="showModal = false" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-white/10 text-slate-500 flex items-center justify-center hover:text-brand_primary transition"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-4">
+                <div><label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Location</label><select x-model="form.location" class="input-box uppercase"><option value="Noida">Noida</option><option value="Dehradun">Dehradun</option></select></div>
+                <div><label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">System Name</label><input type="text" x-model="form.systemName" class="input-box uppercase"></div>
+                <div><label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Asset Tag</label><input type="text" x-model="form.assetId" class="input-box font-mono text-sm"></div>
+                <div><label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">OS</label><select x-model="form.os" class="input-box appearance-none"><option value="Windows 11 Pro">Windows 11 Pro</option><option value="Windows 10">Windows 10</option><option value="Windows XP">Windows XP</option><option value="Windows Server 2019">Windows Server 2019</option><option value="Windows Server 2008">Windows Server 2008</option><option value="Windows Server 2003">Windows Server 2003</option><option value="OpenSuse">OpenSuse</option><option value="Opensuse 15">OpenSuse 15</option><option value="Opensuse 13.1">OpenSuse 13.1</option><option value="Opensuse 12.1">OpenSuse 12.1</option><option value="Opensuse 11.1">OpenSuse 11.1</option><option value="N/A">N/A</option></select></div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Status</label><select x-model="form.status" @change="handleStatusChange()" class="input-box appearance-none" :class="form.status === 'DONE' ? 'text-emerald-600 bg-emerald-50' : 'text-brand_primary bg-teal-50'"><option value="PENDING">Pending</option><option value="DONE">Cleaned</option></select></div>
+                    <div><label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Date</label><input type="date" x-model="form.date" class="input-box" :disabled="form.status !== 'DONE'"></div>
+                </div>
+                <div><label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Passkey</label><input type="password" x-model="form.secret" class="input-box border-dashed" placeholder="Required to Save"></div>
+                <div class="flex gap-3 pt-4"><button x-show="mode === 'edit'" @click="performAction('delete')" class="w-14 h-14 bg-rose-50 text-rose-500 rounded-xl flex items-center justify-center"><i class="fa-solid fa-trash"></i></button><button @click="performAction('save')" class="flex-1 h-14 text-white rounded-xl font-bold text-sm shadow-xl flex items-center justify-center gap-2" :class="themeBtn"><span>Save</span> <i x-show="submitting" class="fa-solid fa-circle-notch fa-spin"></i></button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Modal (FIXED BUTTON) -->
+    <div x-show="showConfirmModal" x-cloak class="fixed inset-0 z-[110] flex items-center justify-center bg-black/70 backdrop-blur-md p-6">
+        <div class="bg-white w-full max-w-xs rounded-3xl p-6 text-center shadow-2xl">
+            <h3 class="text-xl font-black text-slate-800 dark:text-white mb-2">Send Report?</h3>
+            <p class="text-xs text-slate-500 mb-6">Send status summary to IT Head.</p>
+            <div class="flex gap-3"><button @click="showConfirmModal = false" class="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold text-xs">Cancel</button>
+            <button @click="sendEmailReport(); showConfirmModal = false" class="flex-1 py-3 text-white rounded-xl font-bold text-xs shadow-lg" :class="themeBtn">Confirm</button></div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div x-show="showReportModal" x-cloak class="fixed inset-0 z-[110] flex items-center justify-center bg-black/80 backdrop-blur-md p-6">
+        <div class="bg-white w-full max-w-sm rounded-[2rem] p-8 text-center shadow-2xl relative overflow-hidden">
+            <div class="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl animate-bounce">🎉</div>
+            <h3 class="text-2xl font-black text-slate-800 dark:text-white">Complete!</h3>
+            <p class="text-xs text-slate-500 mb-6">Cycle <span x-text="currentCycleName" class="font-bold text-brand_primary"></span> finished.</p>
+            <button @click="sendEmailReport()" class="w-full py-4 text-white rounded-xl font-bold text-xs shadow-lg" :class="themeBtn">Send Closure Report</button>
+            <button @click="showReportModal = false" class="mt-4 text-xs font-bold text-slate-400">Close</button>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-5 py-2.5 rounded-full shadow-2xl flex items-center gap-3 z-[120] transition-all duration-300 opacity-0 pointer-events-none transform -translate-y-10">
+        <i class="fa-solid fa-check-circle text-emerald-400"></i><span id="toast-msg" class="text-xs font-bold">Action Done</span>
+    </div>
+
+    <!-- LOGIC -->
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbzsNLX2RUgPvp0pCpPE0VH0ckqccBjwaaH7wj55-_2ySSTv30ewBsvvRP0_JYHLJEDMpA/exec";  
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast'); document.getElementById('toast-msg').innerText = msg;
+            toast.querySelector('i').className = isError ? 'fa-solid fa-circle-exclamation text-amber-400' : 'fa-solid fa-check-circle text-emerald-400';
+            toast.classList.remove('opacity-0', '-translate-y-10'); setTimeout(() => toast.classList.add('opacity-0', '-translate-y-10'), 3000);
+        }
+        function vibrateDevice(pattern = [50]) { if ("vibrate" in navigator) navigator.vibrate(pattern); }
+
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('vacuumTracker', () => ({
+                pcs: [], search: '', loading: false, isSyncing: false, submitting: false, showModal: false, showReportModal: false, showConfirmModal: false, emailSending: false, isDark: false, mode: 'add', filterStatus: 'ALL', showSearchInput: false,
+                form: { systemName: '', assetId: '', os: 'Windows 11 Pro', status: 'PENDING', date: '', secret: '', location: 'Noida' },
+                currentCycleName: '', nextCycleName: '', cycleStartDate: null,
+                activeLocation: 'Noida',
+
+                // 🟢 Dynamic Theme
+                get headerGradient() { return this.activeLocation === 'Noida' ? 'bg-gradient-noida' : 'bg-gradient-ddn'; },
+                get themeText() { return this.activeLocation === 'Noida' ? 'text-blue-600' : 'text-emerald-600'; },
+                get themeColorHex() { return this.activeLocation === 'Noida' ? '#2563eb' : '#10b981'; },
+                get themeGradient() { return this.activeLocation === 'Noida' ? 'bg-gradient-to-br from-blue-600 to-indigo-600 shadow-blue-500/40' : 'bg-gradient-to-br from-emerald-500 to-teal-600 shadow-emerald-500/40'; },
+                get themeBtn() { return this.activeLocation === 'Noida' ? 'bg-blue-600 shadow-blue-500/30' : 'bg-emerald-600 shadow-emerald-500/30'; },
+                get themeBorderT() { return this.activeLocation === 'Noida' ? 'border-t-blue-600' : 'border-t-emerald-500'; },
+                get currentOperator() { return this.activeLocation === 'Noida' ? 'Ashok Singh' : 'Deependra Singh'; },
+
+                init() { 
+                    if(localStorage.getItem('theme') === 'dark') { this.isDark = true; document.documentElement.classList.add('dark'); }
+                    this.calculateCycle(); 
+                    const cached = localStorage.getItem('vacuum_data');
+                    if (cached) { try { this.pcs = JSON.parse(cached); this.loading = false; } catch (e) { this.loading = true; } } else { this.loading = true; }
+                    this.fetchData(false); 
+                },
+
+                haptic() { vibrateDevice(15); },
+                toggleTheme() { this.haptic(); this.isDark = !this.isDark; if(this.isDark) document.documentElement.classList.add('dark'); else document.documentElement.classList.remove('dark'); },
+                toggleFilter(status) { this.haptic(); if (this.filterStatus === status) { this.filterStatus = 'ALL'; } else { this.filterStatus = status; } },
+                handleLocationChange() { this.haptic(); this.fetchData(false); },
+
+                calculateCycle() {
+                    const now = new Date(); const year = now.getFullYear(); const month = now.getMonth(); 
+                    let startMonth; if (month >= 0 && month < 4) { startMonth = 0; this.currentCycleName = `JAN ${year}`; this.nextCycleName = `MAY ${year}`; } else if (month >= 4 && month < 8) { startMonth = 4; this.currentCycleName = `MAY ${year}`; this.nextCycleName = `SEPT ${year}`; } else { startMonth = 8; this.currentCycleName = `SEPT ${year}`; this.nextCycleName = `JAN ${year + 1}`; } this.cycleStartDate = new Date(year, startMonth, 1); 
+                },
+
+                async fetchData(forceRefresh = false) {
+                    if (forceRefresh) { this.isSyncing = true; this.loading = true; } 
+                    try {
+                        const res = await fetch(API_URL + '?action=getVacuumData');
+                        const data = await res.json();
+                        const processedData = data.pcs.map(p => {
+                            let isDone = (p.status && String(p.status).trim().toUpperCase() === 'DONE');
+                            if (isDone && p.date) { const recordDate = new Date(p.date); if (recordDate < this.cycleStartDate) isDone = false; }
+                            return { systemName: p.id, assetId: p.assetId || '', os: p.os, status: isDone ? 'DONE' : 'PENDING', date: isDone ? p.date : '', location: p.location || 'Noida', updating: false };
+                        });
+                        this.pcs = processedData; localStorage.setItem('vacuum_data', JSON.stringify(this.pcs));
+                        if(forceRefresh) showToast("Synced");
+                    } catch (e) { if(forceRefresh) showToast("Sync Error", true); } 
+                    finally { this.loading = false; this.isSyncing = false; }
+                },
+
+                formatDateDisplay(dateStr) { if (!dateStr || dateStr === "N/A") return ''; let d = new Date(dateStr); return !isNaN(d.getTime()) ? d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' }) : dateStr; },
+                convertDateForInput(dateStr) { if (!dateStr) return ''; let d = new Date(dateStr); return !isNaN(d.getTime()) ? d.toISOString().split('T')[0] : ''; },
+				getOsIcon(osName) { if (!osName) return 'fa-solid fa-desktop'; const os = osName.toLowerCase(); if (os.includes('server')) return 'fa-solid fa-server'; if (os.includes('opensuse') || os.includes('linux')) return 'fa-brands fa-linux'; if (os.includes('windows')) return 'fa-brands fa-windows'; return 'fa-solid fa-desktop'; },
+
+                openModal(mode, item = null) {
+                    this.haptic(); this.mode = mode; this.form.secret = ''; 
+                    if (mode === 'edit' && item) { this.form = { systemName: item.systemName, assetId: item.assetId, os: item.os, status: item.status, date: item.status === 'PENDING' ? '' : this.convertDateForInput(item.date), location: item.location || this.activeLocation, secret: '' }; } 
+                    else { this.form = { systemName: '', assetId: '', os: 'Windows 11 Pro', status: 'PENDING', date: '', secret: '', location: this.activeLocation }; }
+                    this.showModal = true;
+                },
+
+                openConfirmModal() { this.haptic(); this.showConfirmModal = true; },
+                handleStatusChange() { if (this.form.status === 'DONE') { this.form.date = new Date().toISOString().split('T')[0]; } else { this.form.date = ''; } },
+
+                async sendEmailReport() {
+                    this.emailSending = true; this.haptic(); showToast("Sending...");
+                    const locData = this.pcs.filter(p => p.location === this.activeLocation);
+                    const totalLoc = locData.length;
+                    const doneLoc = locData.filter(p => p.status === 'DONE').length;
+                    const pendingLoc = locData.filter(p => p.status !== 'DONE').length;
+                    const payload = { action: 'sendReport', cycle: this.currentCycleName, totalCount: totalLoc, doneCount: doneLoc, pendingCount: pendingLoc, location: this.activeLocation };
+                    try { await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); showToast("Report Sent!"); this.showReportModal = false; } catch(e) { showToast("Error", true); } finally { this.emailSending = false; }
+                },
+
+                async performAction(type) {
+                    if (this.form.secret !== 'PBL2026') { vibrateDevice([50, 50, 50]); showToast("Wrong Key", true); return; }
+                    this.haptic(); this.submitting = true;
+                    let payloadDate = this.form.date;
+                    if (this.form.status === 'DONE' && this.form.date) { const d = new Date(this.form.date); const m = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]; payloadDate = `${d.getDate()} ${m[d.getMonth()]} ${d.getFullYear()}`; }
+                    const payload = { action: 'handleVacuum', type: type === 'delete' ? 'delete' : 'save', systemName: this.form.systemName, realAssetId: this.form.assetId, os: this.form.os, status: this.form.status, date: payloadDate, secret: this.form.secret, location: this.form.location };
+                    try { const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); const result = await res.json(); if (result.status === 'success') { vibrateDevice([100, 50, 100]); this.showModal = false; showToast(type === 'delete' ? "Deleted" : "Saved"); await this.fetchData(true); const currentLocPending = this.pcs.filter(p => p.location === this.activeLocation && p.status !== 'DONE').length; if (currentLocPending === 0 && type === 'save') { setTimeout(() => { this.showReportModal = true; }, 500); } } else { showToast(result.message, true); } } catch (e) { showToast("Network Error", true); } finally { this.submitting = false; }
+                },
+
+                get filteredList() {
+                    let result = this.pcs.filter(p => p.location === this.activeLocation);
+                    if (this.filterStatus === 'DONE') result = result.filter(p => p.status === 'DONE');
+                    else if (this.filterStatus === 'PENDING') result = result.filter(p => p.status !== 'DONE');
+                    if (this.search) { const s = this.search.toLowerCase(); result = result.filter(p => (p.systemName && p.systemName.toLowerCase().includes(s)) || (p.assetId && p.assetId.toLowerCase().includes(s))); }
+                    return result;
+                },
+                get doneCount() { return this.pcs.filter(p => p.location === this.activeLocation && p.status === 'DONE').length; },
+                get pendingCount() { return this.pcs.filter(p => p.location === this.activeLocation && p.status !== 'DONE').length; },
+                get percentage() { const total = this.pcs.filter(p => p.location === this.activeLocation).length; if(total === 0) return 0; return Math.round((this.doneCount / total) * 100); }
+            }))
+        })
+    </script>
+</body>
+</html>
