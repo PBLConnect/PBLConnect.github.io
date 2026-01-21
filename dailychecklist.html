@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PBL Ops | Live</title>
+    <title>PBL ChecklistITOps | Live</title>
     <link rel="icon" type="image/png" href="pbl-logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -60,7 +60,8 @@
         </div>
         <div class="relative z-10">
             <div class="flex justify-between items-center mb-6">
-                <div class="flex items-center gap-3"><div class="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-lg border border-white/20" @click="haptic()"><i class="fa-solid fa-shield-cat text-white text-2xl"></i></div><div><h1 class="text-2xl font-black text-white leading-none tracking-tight">PBL Daily Ops</h1><div class="flex items-center gap-2 mt-1.5 opacity-90"><span class="text-[10px] bg-white/20 backdrop-blur-md px-2 py-0.5 rounded text-white font-bold border border-white/10" x-text="todayDate"></span><span class="text-[10px] font-bold text-white uppercase tracking-wider" x-text="shiftConfig[currentShift].branch"></span></div></div></div>
+                <div class="flex items-center gap-3"><div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-xl border border-white/50" @click="haptic()">
+				<img src="pbl-logo.png" alt="PBL" class="w-7 h-7 object-contain"></div><div><h1 class="text-2xl font-black text-white leading-none tracking-tight">PBL Daily Ops</h1><div class="flex items-center gap-2 mt-1.5 opacity-90"><span class="text-[10px] bg-white/20 backdrop-blur-md px-2 py-0.5 rounded text-white font-bold border border-white/10" x-text="todayDate"></span><span class="text-[10px] font-bold text-white uppercase tracking-wider" x-text="shiftConfig[currentShift].branch"></span></div></div></div>
                 <div class="flex flex-col items-end"><div class="px-3 py-1.5 rounded-full bg-black/20 backdrop-blur-md border border-white/10 flex items-center gap-2 shadow-inner mb-1"><div class="w-2 h-2 rounded-full shadow-[0_0_10px_currentColor]" :class="isLateEntry ? 'bg-white text-white animate-pulse' : 'bg-emerald-400 text-emerald-400'"></div><span class="text-[10px] font-bold text-white uppercase tracking-wide" x-text="isLateEntry ? 'LATE' : 'ACTIVE'"></span></div><span class="text-[10px] font-mono text-white/90 font-bold tracking-wide" x-show="!isLateEntry"><i class="fa-solid fa-hourglass-half mr-1"></i><span x-text="timeLeft">Syncing...</span></span></div>
             </div>
             <div class="bg-black/20 p-1.5 rounded-2xl flex backdrop-blur-md border border-white/10 overflow-x-auto no-scrollbar gap-1 relative z-50">
