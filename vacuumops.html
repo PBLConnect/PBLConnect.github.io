@@ -72,6 +72,134 @@
         
         /* Custom Dropdown Scroll */
         .custom-dropdown-list { max-height: 200px; overflow-y: auto; scrollbar-width: thin; }
+		
+		/* ✈️ ANIMATED REPORT BUTTON STYLES */
+        .btn-fly {
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            border: none;
+            overflow: hidden;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .btn-fly span {
+            display: block;
+            margin-left: 0.3em;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .btn-fly svg {
+            display: block;
+            transform-origin: center center;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .btn-fly:hover .svg-wrapper {
+            animation: fly-1 0.6s ease-in-out infinite alternate;
+        }
+
+        .btn-fly:hover svg {
+            transform: translateX(1.5em) rotate(45deg) scale(1.1);
+        }
+
+        .btn-fly:hover span {
+            transform: translateX(7em); /* Text flies away */
+            opacity: 0;
+        }
+
+        .btn-fly:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes fly-1 {
+            from { transform: translateY(0.1em); }
+            to { transform: translateY(-0.1em); }
+        }
+		
+		/* 📡 WIFI LOADER STYLES (UPDATED) */
+        #wifi-loader {
+            --background: #62abff;
+            --front-color: #2563eb;
+            --back-color: #cbd5e1;
+            --text-color: #64748b;
+            width: 64px;
+            height: 64px;
+            border-radius: 50px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #wifi-loader.theme-green { --front-color: #10b981; }
+
+        #wifi-loader svg {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* 📉 Animation Size Reduced by 25% */
+            transform: scale(0.75); 
+        }
+
+        /* ... Circles CSS same as before ... */
+        #wifi-loader svg circle {
+            position: absolute;
+            fill: none;
+            stroke-width: 6px;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transform: rotate(-100deg);
+            transform-origin: center;
+        }
+        #wifi-loader svg circle.back { stroke: var(--back-color); }
+        #wifi-loader svg circle.front { stroke: var(--front-color); }
+        
+        /* Keep Animations Same */
+        #wifi-loader svg.circle-outer { height: 86px; width: 86px; }
+        #wifi-loader svg.circle-outer circle { stroke-dasharray: 62.75 188.25; }
+        #wifi-loader svg.circle-outer circle.back { animation: circle-outer135 1.8s ease infinite 0.3s; }
+        #wifi-loader svg.circle-outer circle.front { animation: circle-outer135 1.8s ease infinite 0.15s; }
+        #wifi-loader svg.circle-middle { height: 60px; width: 60px; }
+        #wifi-loader svg.circle-middle circle { stroke-dasharray: 42.5 127.5; }
+        #wifi-loader svg.circle-middle circle.back { animation: circle-middle6123 1.8s ease infinite 0.25s; }
+        #wifi-loader svg.circle-middle circle.front { animation: circle-middle6123 1.8s ease infinite 0.1s; }
+        #wifi-loader svg.circle-inner { height: 34px; width: 34px; }
+        #wifi-loader svg.circle-inner circle { stroke-dasharray: 22 66; }
+        #wifi-loader svg.circle-inner circle.back { animation: circle-inner162 1.8s ease infinite 0.2s; }
+        #wifi-loader svg.circle-inner circle.front { animation: circle-inner162 1.8s ease infinite 0.05s; }
+
+        /* 📈 Text Made Bigger, Bolder & Pushed Down */
+        #wifi-loader .text {
+            position: absolute;
+            bottom: -48px; /* Thoda aur neeche khiskaya */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-transform: uppercase; /* Lowercase hatake Uppercase */
+            font-weight: 900; /* Bold font */
+            font-size: 15px; /* Size badhaya (12px -> 15px) */
+            letter-spacing: 2px;
+            color: var(--text-color);
+        }
+        /* ... Text Animation CSS same ... */
+        #wifi-loader .text::before, #wifi-loader .text::after { content: attr(data-text); }
+        #wifi-loader .text::before { color: var(--text-color); }
+        #wifi-loader .text::after {
+            color: var(--front-color);
+            animation: text-animation76 3.6s ease infinite;
+            position: absolute;
+            left: 0;
+        }
+        /* ... Keyframes same ... */
+        @keyframes circle-outer135 { 0% { stroke-dashoffset: 25; } 25% { stroke-dashoffset: 0; } 65% { stroke-dashoffset: 301; } 80% { stroke-dashoffset: 276; } 100% { stroke-dashoffset: 276; } }
+        @keyframes circle-middle6123 { 0% { stroke-dashoffset: 17; } 25% { stroke-dashoffset: 0; } 65% { stroke-dashoffset: 204; } 80% { stroke-dashoffset: 187; } 100% { stroke-dashoffset: 187; } }
+        @keyframes circle-inner162 { 0% { stroke-dashoffset: 9; } 25% { stroke-dashoffset: 0; } 65% { stroke-dashoffset: 106; } 80% { stroke-dashoffset: 97; } 100% { stroke-dashoffset: 97; } }
+        @keyframes text-animation76 { 0% { clip-path: inset(0 100% 0 0); } 50% { clip-path: inset(0); } 100% { clip-path: inset(0 0 0 100%); } }
+		
+		
     </style>
 </head>
 
@@ -102,9 +230,10 @@
             <div>
                 <div class="flex justify-between items-center mb-4">
                     <div class="flex items-center gap-3">
-                        <div class="w-11 h-11 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-inner border border-white/20">
-                            <img src="pbl-logo.png" alt="Logo" class="w-6 h-6 object-contain">
-                        </div>
+                        <!-- Background White + Shadow + Rounded Corners -->
+						<div class="w-11 h-11 bg-white rounded-2xl flex items-center justify-center shadow-lg shadow-black/10 border border-white/50">
+							<img src="pbl-logo.png" alt="Logo" class="w-6 h-6 object-contain">
+						</div>
                         <div>
                             <h1 class="text-2xl font-black text-white leading-none tracking-tight">VacuumOps</h1>
                             <span class="text-[10px] text-white/90 font-bold uppercase tracking-wider flex items-center gap-1 mt-0.5">
@@ -181,21 +310,38 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex gap-2">
-                    <button @click="toggleFilter('DONE')" class="flex flex-col items-center justify-center w-14 h-14 rounded-2xl transition-all shadow-md active:scale-95" :class="filterStatus === 'DONE' ? 'bg-emerald-500 text-white shadow-emerald-200' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'">
-                        <i class="fa-solid fa-check text-sm mb-0.5"></i> <span class="text-xs font-black" x-text="doneCount">0</span>
-                    </button>
-                    <button @click="toggleFilter('PENDING')" class="flex flex-col items-center justify-center w-14 h-14 rounded-2xl transition-all shadow-md active:scale-95" :class="filterStatus === 'PENDING' ? 'bg-rose-500 text-white shadow-rose-200' : 'bg-rose-50 text-rose-500 hover:bg-rose-100'">
-                        <i class="fa-regular fa-clock text-sm mb-0.5"></i> <span class="text-xs font-black" x-text="pendingCount">0</span>
-                    </button>
-                </div>
+                <!-- 🔥 Added 'mt-8' and 'self-end' to push buttons down -->
+				<div class="flex gap-2 mt-8 self-end">
+					
+					<!-- Today Button (Amber) -->
+					<button @click="toggleFilter('TODAY')" class="flex flex-col items-center justify-center w-14 h-14 rounded-2xl transition-all shadow-md active:scale-95" :class="filterStatus === 'TODAY' ? 'bg-amber-500 text-white shadow-amber-200' : 'bg-amber-50 text-amber-600 hover:bg-amber-100'">
+						<i class="fa-solid fa-calendar-day text-sm mb-0.5"></i> <span class="text-xs font-black" x-text="todayCount">0</span>
+					</button>
+
+					<!-- Done Button (Green) -->
+					<button @click="toggleFilter('DONE')" class="flex flex-col items-center justify-center w-14 h-14 rounded-2xl transition-all shadow-md active:scale-95" :class="filterStatus === 'DONE' ? 'bg-emerald-500 text-white shadow-emerald-200' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'">
+						<i class="fa-solid fa-check text-sm mb-0.5"></i> <span class="text-xs font-black" x-text="doneCount">0</span>
+					</button>
+
+					<!-- Pending Button (Red) -->
+					<button @click="toggleFilter('PENDING')" class="flex flex-col items-center justify-center w-14 h-14 rounded-2xl transition-all shadow-md active:scale-95" :class="filterStatus === 'PENDING' ? 'bg-rose-500 text-white shadow-rose-200' : 'bg-rose-50 text-rose-500 hover:bg-rose-100'">
+						<i class="fa-regular fa-clock text-sm mb-0.5"></i> <span class="text-xs font-black" x-text="pendingCount">0</span>
+					</button>
+
+				</div>
             </div>
 
-            <!-- Loading -->
-            <div x-show="loading" class="py-8 text-center">
-                <div class="w-10 h-10 border-4 border-slate-200 rounded-full animate-spin mx-auto mb-2" :class="themeBorderT"></div>
-                <p class="text-[10px] font-bold uppercase tracking-widest animate-pulse" :class="themeText">Syncing Data...</p>
-            </div>
+            <!-- Increased py-14 to py-20 to push it down towards center -->
+			<div x-show="loading" class="w-full flex justify-center items-center py-20 animate-fade-in">
+				<div id="wifi-loader" :class="activeLocation === 'Dehradun' ? 'theme-green' : ''">
+					<!-- SVGs same as before -->
+					<svg class="circle-outer" viewBox="0 0 86 86"><circle class="back" cx="43" cy="43" r="40"></circle><circle class="front" cx="43" cy="43" r="40"></circle><circle class="new" cx="43" cy="43" r="40"></circle></svg>
+					<svg class="circle-middle" viewBox="0 0 60 60"><circle class="back" cx="30" cy="30" r="27"></circle><circle class="front" cx="30" cy="30" r="27"></circle></svg>
+					<svg class="circle-inner" viewBox="0 0 34 34"><circle class="back" cx="17" cy="17" r="14"></circle><circle class="front" cx="17" cy="17" r="14"></circle></svg>
+					<!-- Uppercase Text -->
+					<div class="text" data-text="SYNCING..."></div>
+				</div>
+			</div>
 
             <!-- Mobile List -->
             <div class="space-y-3 pb-28 pt-1">
@@ -231,7 +377,17 @@
 
         <footer class="fixed bottom-0 left-0 w-full bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-lg border-t border-slate-100 dark:border-white/5 px-5 py-4 z-50 flex justify-between items-center">
             <div><p class="text-[9px] font-bold opacity-60 uppercase tracking-widest" :class="themeText">Operator</p><p class="text-xs font-black text-slate-800 dark:text-white" x-text="currentOperator">...</p></div>
-            <div class="flex gap-2"><button @click="fetchData(true)" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-500 dark:text-slate-300 active:scale-95 transition"><i class="fa-solid fa-rotate" :class="{'fa-spin': isSyncing}"></i></button><button @click="openConfirmModal()" class="px-4 h-10 rounded-xl text-white font-bold text-[10px] flex items-center gap-2 shadow-lg active:scale-95 transition" :class="themeBtn"><i class="fa-solid fa-file-export"></i> Report</button></div>
+            <div class="flex gap-2"><button @click="fetchData(true)" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-500 dark:text-slate-300 active:scale-95 transition"><i class="fa-solid fa-rotate" :class="{'fa-spin': isSyncing}"></i></button><button @click="openConfirmModal()" class="btn-fly h-10 px-5 rounded-xl text-white font-bold text-[10px] shadow-lg" :class="themeBtn">
+    <div class="svg-wrapper-1">
+        <div class="svg-wrapper">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
+                <path fill="none" d="M0 0h24v24H0z"></path>
+                <path fill="currentColor" d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"></path>
+            </svg>
+        </div>
+    </div>
+    <span>Report</span>
+</button></div>
         </footer>
     </div>
 
@@ -242,9 +398,10 @@
         <aside class="w-72 bg-white dark:bg-[#111827] border-r border-slate-200 dark:border-white/5 flex flex-col shadow-xl z-20">
             <div class="p-8 pb-4">
                 <div class="flex items-center gap-3 mb-8">
-                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg" :class="themeGradient">
-                        <img src="pbl-logo.png" alt="Logo" class="w-7 h-7 object-contain">
-                    </div>
+                    <!-- Removed themeGradient, Added White BG & Border -->
+					<div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-xl ring-1 ring-slate-900/5 border border-slate-100">
+						<img src="pbl-logo.png" alt="Logo" class="w-7 h-7 object-contain">
+					</div>
                     <div><h1 class="text-xl font-black leading-none">Vacuum<span :class="themeText">Ops</span></h1><p class="text-[10px] font-bold text-slate-400 tracking-widest mt-1">DESKTOP PANEL</p></div>
                 </div>
 
@@ -264,12 +421,23 @@
                 <nav class="space-y-2">
                     <p class="px-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Filters</p>
                     <button @click="filterStatus='ALL'" class="w-full text-left px-4 py-3 rounded-xl font-bold text-sm flex items-center justify-between transition-all" :class="filterStatus === 'ALL' ? (activeLocation === 'Noida' ? 'bg-blue-600 text-white' : 'bg-emerald-600 text-white') : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5'"><span><i class="fa-solid fa-list-ul mr-2"></i> All Assets</span><span class="bg-white/20 px-2 py-0.5 rounded text-[10px]" x-text="pcs.filter(p => p.location === activeLocation).length">0</span></button>
+					<button @click="filterStatus='TODAY'" class="w-full text-left px-4 py-3 rounded-xl font-bold text-sm flex items-center justify-between transition-all" :class="filterStatus === 'TODAY' ? 'bg-amber-500 text-white' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5'"><span><i class="fa-solid fa-calendar-day mr-2"></i> Today's Work</span><span class="bg-white/20 px-2 py-0.5 rounded text-[10px]" x-text="todayCount">0</span></button>
                     <button @click="filterStatus='DONE'" class="w-full text-left px-4 py-3 rounded-xl font-bold text-sm flex items-center justify-between transition-all" :class="filterStatus === 'DONE' ? 'bg-emerald-500 text-white' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5'"><span><i class="fa-solid fa-check mr-2"></i> Completed</span><span class="bg-white/20 px-2 py-0.5 rounded text-[10px]" x-text="doneCount">0</span></button>
                     <button @click="filterStatus='PENDING'" class="w-full text-left px-4 py-3 rounded-xl font-bold text-sm flex items-center justify-between transition-all" :class="filterStatus === 'PENDING' ? 'bg-rose-500 text-white' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5'"><span><i class="fa-regular fa-clock mr-2"></i> Pending</span><span class="bg-white/20 px-2 py-0.5 rounded text-[10px]" x-text="pendingCount">0</span></button>
                 </nav>
             </div>
             <div class="mt-auto p-6 border-t border-slate-100 dark:border-white/5">
-                <button @click="openConfirmModal()" class="w-full py-3 bg-slate-900 dark:bg-white dark:text-slate-900 text-white rounded-xl font-bold text-sm shadow-xl hover:scale-[1.02] transition-transform"><i class="fa-solid fa-paper-plane mr-2"></i> Send Report</button>
+                <button @click="openConfirmModal()" class="btn-fly w-full py-3 justify-center rounded-xl font-bold text-sm shadow-xl text-white" :class="themeBtn">
+    <div class="svg-wrapper-1">
+        <div class="svg-wrapper">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                <path fill="none" d="M0 0h24v24H0z"></path>
+                <path fill="currentColor" d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"></path>
+            </svg>
+        </div>
+    </div>
+    <span>Report</span>
+</button>
             </div>
         </aside>
 
@@ -314,68 +482,99 @@
         </main>
     </div>
 
-    <!-- Edit/Add Modal (Updated) -->
-    <div x-show="showModal" x-cloak class="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4">
-        <div class="bg-white dark:bg-[#1e293b] w-full max-w-md rounded-t-[2.5rem] sm:rounded-[2.5rem] p-8 shadow-2xl relative" @click.away="showModal = false">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-black text-slate-800 dark:text-white" x-text="mode === 'add' ? 'New Entry' : 'Edit Details'"></h3>
-                <button @click="showModal = false" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-white/10 text-slate-500 flex items-center justify-center hover:text-brand_primary transition"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="space-y-4">
-                
-                <!-- Custom Location Dropdown -->
-                <div class="relative" x-data="{ open: false }">
-                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Location</label>
-                    <div @click="open = !open" @click.away="open = false" class="input-box uppercase cursor-pointer flex items-center justify-between">
-                        <span x-text="form.location"></span>
-                        <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
-                    </div>
-                    <!-- Dropdown List -->
-                    <div x-show="open" class="absolute left-0 top-full mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-xl z-50 overflow-hidden">
-                        <div @click="form.location = 'Noida'; open = false" class="p-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer font-bold text-sm">Noida</div>
-                        <div @click="form.location = 'Dehradun'; open = false" class="p-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer font-bold text-sm">Dehradun</div>
-                    </div>
-                </div>
+    <!-- Edit/Add Modal (Slide Up Animation) -->
+	<div x-show="showModal" class="fixed inset-0 z-[100] flex items-end sm:items-center justify-center pointer-events-none">
+		
+		<!-- 1. Backdrop (Fade In/Out) -->
+		<!-- Pointer events auto here to catch clicks -->
+		<div x-show="showModal" 
+			 x-transition:enter="transition ease-out duration-300"
+			 x-transition:enter-start="opacity-0"
+			 x-transition:enter-end="opacity-100"
+			 x-transition:leave="transition ease-in duration-200"
+			 x-transition:leave-start="opacity-100"
+			 x-transition:leave-end="opacity-0"
+			 @click="showModal = false"
+			 class="absolute inset-0 bg-black/60 backdrop-blur-sm pointer-events-auto">
+		</div>
 
-                <div><label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">System Name</label><input type="text" x-model="form.systemName" class="input-box uppercase"></div>
-                <div><label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Asset Tag</label><input type="text" x-model="form.assetId" class="input-box font-mono text-sm"></div>
-                
-                <!-- Custom OS Dropdown (Scrollable) -->
-                <div class="relative" x-data="{ open: false, options: ['Windows 11 Pro', 'Windows 10', 'Windows XP', 'Windows Server 2019', 'Windows Server 2008', 'Windows Server 2003', 'OpenSuse', 'Opensuse 15', 'Opensuse 13.1', 'Opensuse 12.1', 'Opensuse 11.1', 'N/A'] }">
-                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">OS</label>
-                    <div @click="open = !open" @click.away="open = false" class="input-box cursor-pointer flex items-center justify-between">
-                        <span x-text="form.os"></span>
-                        <i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
-                    </div>
-                    <div x-show="open" class="absolute left-0 top-full mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-xl z-50 custom-dropdown-list">
-                        <template x-for="opt in options">
-                            <div @click="form.os = opt; open = false" class="p-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer font-bold text-sm" x-text="opt"></div>
-                        </template>
-                    </div>
-                </div>
+		<!-- 2. Modal Card (Slide Up/Down) -->
+		<div x-show="showModal"
+			 x-transition:enter="transition ease-out duration-300 transform"
+			 x-transition:enter-start="translate-y-full"
+			 x-transition:enter-end="translate-y-0"
+			 x-transition:leave="transition ease-in duration-200 transform"
+			 x-transition:leave-start="translate-y-0"
+			 x-transition:leave-end="translate-y-full"
+			 class="bg-white dark:bg-[#1e293b] w-full max-w-md rounded-t-[2.5rem] sm:rounded-[2.5rem] p-8 shadow-2xl relative z-10 pointer-events-auto pb-10 sm:pb-8">
+			
+			<!-- Header -->
+			<div class="flex justify-between items-center mb-6">
+				<h3 class="text-2xl font-black text-slate-800 dark:text-white" x-text="mode === 'add' ? 'New Entry' : 'Edit Details'"></h3>
+				<button @click="showModal = false" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-white/10 text-slate-500 flex items-center justify-center hover:text-brand_primary transition"><i class="fa-solid fa-xmark"></i></button>
+			</div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <!-- Custom Status Dropdown -->
-                    <div class="relative" x-data="{ open: false }">
-                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Status</label>
-                        <div @click="open = !open" @click.away="open = false" class="input-box cursor-pointer flex items-center justify-between"
-                             :class="form.status === 'DONE' ? 'text-emerald-600 bg-emerald-50' : 'text-brand_primary bg-teal-50'">
-                            <span x-text="form.status === 'DONE' ? 'Cleaned' : 'Pending'"></span>
-                            <i class="fa-solid fa-chevron-down text-xs opacity-50"></i>
-                        </div>
-                        <div x-show="open" class="absolute left-0 top-full mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-xl z-50 overflow-hidden">
-                            <div @click="form.status = 'PENDING'; handleStatusChange(); open = false" class="p-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer font-bold text-sm text-brand_primary">Pending</div>
-                            <div @click="form.status = 'DONE'; handleStatusChange(); open = false" class="p-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer font-bold text-sm text-emerald-600">Cleaned</div>
-                        </div>
-                    </div>
+			<!-- Form Fields -->
+			<div class="space-y-4">
+				<!-- Custom Location Dropdown -->
+				<div class="relative" x-data="{ open: false }">
+					<label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Location</label>
+					<div @click="open = !open" @click.away="open = false" class="input-box uppercase cursor-pointer flex items-center justify-between">
+						<span x-text="form.location"></span>
+						<i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
+					</div>
+					<div x-show="open" class="absolute left-0 top-full mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-xl z-50 overflow-hidden">
+						<div @click="form.location = 'Noida'; open = false" class="p-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer font-bold text-sm">Noida</div>
+						<div @click="form.location = 'Dehradun'; open = false" class="p-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer font-bold text-sm">Dehradun</div>
+					</div>
+				</div>
 
-                    <div><label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Date</label><input type="date" x-model="form.date" class="input-box" :disabled="form.status !== 'DONE'"></div>
-                </div>
-                <div><label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Passkey</label><input type="password" x-model="form.secret" class="input-box border-dashed" placeholder="Required to Save"></div>
-                <div class="flex gap-3 pt-4"><button x-show="mode === 'edit'" @click="performAction('delete')" class="w-14 h-14 bg-rose-50 text-rose-500 rounded-xl flex items-center justify-center"><i class="fa-solid fa-trash"></i></button><button @click="performAction('save')" class="flex-1 h-14 text-white rounded-xl font-bold text-sm shadow-xl flex items-center justify-center gap-2" :class="themeBtn"><span>Save</span> <i x-show="submitting" class="fa-solid fa-circle-notch fa-spin"></i></button></div>
-            </div>
-        </div>
-    </div>
+				<div><label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">System Name</label><input type="text" x-model="form.systemName" class="input-box uppercase"></div>
+				<div><label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Asset Tag</label><input type="text" x-model="form.assetId" class="input-box font-mono text-sm"></div>
+				
+				<!-- Custom OS Dropdown -->
+				<div class="relative" x-data="{ open: false, options: ['Windows 11 Pro', 'Windows 10', 'Windows XP', 'Windows Server 2019', 'Windows Server 2008', 'Windows Server 2003', 'OpenSuse', 'Opensuse 15', 'Opensuse 13.1', 'Opensuse 12.1', 'Opensuse 11.1', 'N/A'] }">
+					<label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">OS</label>
+					<div @click="open = !open" @click.away="open = false" class="input-box cursor-pointer flex items-center justify-between">
+						<span x-text="form.os"></span>
+						<i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i>
+					</div>
+					<div x-show="open" class="absolute left-0 top-full mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-xl z-50 custom-dropdown-list">
+						<template x-for="opt in options">
+							<div @click="form.os = opt; open = false" class="p-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer font-bold text-sm" x-text="opt"></div>
+						</template>
+					</div>
+				</div>
+
+				<div class="grid grid-cols-2 gap-4">
+					<!-- Status Dropdown -->
+					<div class="relative" x-data="{ open: false }">
+						<label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Status</label>
+						<div @click="open = !open" @click.away="open = false" class="input-box cursor-pointer flex items-center justify-between"
+							 :class="form.status === 'DONE' ? 'text-emerald-600 bg-emerald-50' : 'text-brand_primary bg-teal-50'">
+							<span x-text="form.status === 'DONE' ? 'Cleaned' : 'Pending'"></span>
+							<i class="fa-solid fa-chevron-down text-xs opacity-50"></i>
+						</div>
+						<div x-show="open" class="absolute left-0 top-full mt-1 w-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-xl z-50 overflow-hidden">
+							<div @click="form.status = 'PENDING'; handleStatusChange(); open = false" class="p-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer font-bold text-sm text-brand_primary">Pending</div>
+							<div @click="form.status = 'DONE'; handleStatusChange(); open = false" class="p-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer font-bold text-sm text-emerald-600">Cleaned</div>
+						</div>
+					</div>
+
+					<div><label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Date</label><input type="date" x-model="form.date" class="input-box" :disabled="form.status !== 'DONE'"></div>
+				</div>
+				<div><label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 block">Passkey</label><input type="password" x-model="form.secret" class="input-box border-dashed" placeholder="Required to Save"></div>
+				
+				<!-- Actions -->
+				<div class="flex gap-3 pt-4">
+					<button x-show="mode === 'edit'" @click="performAction('delete')" class="w-14 h-14 bg-rose-50 text-rose-500 rounded-xl flex items-center justify-center active:scale-95 transition"><i class="fa-solid fa-trash"></i></button>
+					<button @click="performAction('save')" class="flex-1 h-14 text-white rounded-xl font-bold text-sm shadow-xl flex items-center justify-center gap-2 active:scale-95 transition" :class="themeBtn">
+						<span>Save</span> <i x-show="submitting" class="fa-solid fa-circle-notch fa-spin"></i>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
     <!-- Confirm Modal -->
     <div x-show="showConfirmModal" x-cloak class="fixed inset-0 z-[110] flex items-center justify-center bg-black/70 backdrop-blur-md p-6">
@@ -536,13 +735,32 @@
                     try { const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); const result = await res.json(); if (result.status === 'success') { vibrateDevice([100, 50, 100]); this.showModal = false; showToast(type === 'delete' ? "Deleted" : "Saved"); await this.fetchData(true); const currentLocPending = this.pcs.filter(p => p.location === this.activeLocation && p.status !== 'DONE').length; if (currentLocPending === 0 && type === 'save') { setTimeout(() => { this.showReportModal = true; }, 500); } } else { showToast(result.message, true); } } catch (e) { showToast("Network Error", true); } finally { this.submitting = false; }
                 },
 
-                get filteredList() {
-                    let result = this.pcs.filter(p => p.location === this.activeLocation);
-                    if (this.filterStatus === 'DONE') result = result.filter(p => p.status === 'DONE');
-                    else if (this.filterStatus === 'PENDING') result = result.filter(p => p.status !== 'DONE');
-                    if (this.search) { const s = this.search.toLowerCase(); result = result.filter(p => (p.systemName && p.systemName.toLowerCase().includes(s)) || (p.assetId && p.assetId.toLowerCase().includes(s))); }
-                    return result;
-                },
+                // Naya 'todayCount' getter add karo 'pendingCount' ke paas
+				get todayCount() { 
+					const todayStr = new Date().toDateString();
+					return this.pcs.filter(p => p.location === this.activeLocation && p.status === 'DONE' && p.date && new Date(p.date).toDateString() === todayStr).length; 
+				},
+
+				get filteredList() {
+					let result = this.pcs.filter(p => p.location === this.activeLocation);
+					
+					// Existing Filters
+					if (this.filterStatus === 'DONE') result = result.filter(p => p.status === 'DONE');
+					else if (this.filterStatus === 'PENDING') result = result.filter(p => p.status !== 'DONE');
+					
+					// 🔥 NEW: Today Filter Logic
+					else if (this.filterStatus === 'TODAY') {
+						const todayStr = new Date().toDateString(); // Aaj ki date string (e.g., "Wed Jan 21 2026")
+						result = result.filter(p => {
+							if (p.status !== 'DONE' || !p.date) return false;
+							// Record ki date ko aaj ki date se compare karo
+							return new Date(p.date).toDateString() === todayStr;
+						});
+					}
+
+					if (this.search) { const s = this.search.toLowerCase(); result = result.filter(p => (p.systemName && p.systemName.toLowerCase().includes(s)) || (p.assetId && p.assetId.toLowerCase().includes(s))); }
+					return result;
+				},
                 get doneCount() { return this.pcs.filter(p => p.location === this.activeLocation && p.status === 'DONE').length; },
                 get pendingCount() { return this.pcs.filter(p => p.location === this.activeLocation && p.status !== 'DONE').length; },
                 get percentage() { const total = this.pcs.filter(p => p.location === this.activeLocation).length; if(total === 0) return 0; return Math.round((this.doneCount / total) * 100); }
