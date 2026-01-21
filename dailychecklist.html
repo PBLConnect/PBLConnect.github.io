@@ -193,7 +193,7 @@
     <div x-show="modals.sophos.show" x-cloak class="fixed inset-0 z-[105] flex items-center justify-center bg-black/80 backdrop-blur-sm p-6"><div class="bg-white w-full max-w-sm rounded-3xl p-6 text-center animate-float"><i class="fa-solid fa-shield-virus text-4xl text-cyan-500 mb-4 block"></i><h3 class="text-lg font-black text-slate-800">Antivirus Check</h3><p class="text-xs text-slate-500 mb-6">Verify Sophos is green on 1 Random PC.</p><div class="flex gap-3"><button @click="modals.sophos.show=false" class="flex-1 py-3 rounded-xl bg-slate-100 text-xs font-bold clickable">Cancel</button><button @click="confirmSophos()" class="flex-1 py-3 rounded-xl bg-cyan-600 text-white text-xs font-bold shadow-lg clickable">Verified</button></div></div></div>
 
     <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbxRV2dKK78O5GUEprxgKvOG6610viS_sUx9E7kT40mM0XUZwvSeD5Y9enxj8X7hqoTlvg/exec"; 
+    const API_URL = "https://script.google.com/macros/s/AKfycbyvIkwSZ5gdIBc_GHbXXMgadnBHU19twANppiq-nK8D3cGb8B6efZLix1Cxe2FPPsqyJw/exec"; 
 
     document.addEventListener('alpine:init', () => {
         Alpine.data('dailyOpsApp', () => ({
