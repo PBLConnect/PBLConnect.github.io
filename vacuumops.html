@@ -504,163 +504,185 @@
     </div>
 
    <!-- ==========================================
-     ℹ️ NEW GUIDE / INFO MODAL (Fixed Full Height Content)
-	=========================================== -->
-	<div x-show="showInfoModal" x-cloak class="fixed inset-0 z-[150] flex items-end sm:items-center justify-center pointer-events-none">
-		
-		<!-- 🌑 Backdrop with Blur -->
-		<div x-show="showInfoModal" 
-			 x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-			 x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-			 @click="showInfoModal = false"
-			 class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm pointer-events-auto">
-		</div>
+     ℹ️ NEW GUIDE / INFO MODAL (With Report Step)
+=========================================== -->
+<div x-show="showInfoModal" x-cloak class="fixed inset-0 z-[150] flex items-end sm:items-center justify-center pointer-events-none">
+    
+    <!-- 🌑 Backdrop with Blur -->
+    <div x-show="showInfoModal" 
+         x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+         @click="showInfoModal = false"
+         class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm pointer-events-auto">
+    </div>
 
-		<!-- 📱 Content Card (Half-Screen Sheet) -->
-		<div x-show="showInfoModal"
-			 x-transition:enter="transition ease-out duration-500 cubic-bezier(0.16, 1, 0.3, 1)" 
-			 x-transition:enter-start="translate-y-full" 
-			 x-transition:enter-end="translate-y-0"
-			 x-transition:leave="transition ease-in duration-300" 
-			 x-transition:leave-start="translate-y-0" 
-			 x-transition:leave-end="translate-y-full"
-			 class="bg-white dark:bg-[#0f172a] w-full max-w-lg rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl relative z-10 pointer-events-auto h-[65vh] sm:h-auto sm:max-h-[85vh] flex flex-col border-t border-white/20 overflow-hidden">
-			
-			<!-- 🎨 Header (Sticky Top) -->
-			<div class="px-6 py-5 flex justify-between items-center border-b border-slate-100 dark:border-white/5 bg-white/80 dark:bg-[#0f172a]/90 backdrop-blur-xl z-20 shrink-0">
-				<div class="flex items-center gap-3">
-					<div class="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 shadow-sm border border-blue-100 dark:border-blue-500/20">
-						<i class="fa-solid fa-book-open text-lg"></i>
-					</div>
-					<div>
-						<p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Documentation</p>
-						<h3 class="text-xl font-black text-slate-800 dark:text-white leading-none">VacuumOps Guide</h3>
-					</div>
-				</div>
-				<button @click="showInfoModal = false" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-white/10 text-slate-500 hover:bg-rose-50 hover:text-rose-500 transition-colors flex items-center justify-center active:scale-90">
-					<i class="fa-solid fa-xmark text-lg"></i>
-				</button>
-			</div>
+    <!-- 📱 Content Card (Half-Screen Sheet) -->
+    <div x-show="showInfoModal"
+         x-transition:enter="transition ease-out duration-500 cubic-bezier(0.16, 1, 0.3, 1)" 
+         x-transition:enter-start="translate-y-full" 
+         x-transition:enter-end="translate-y-0"
+         x-transition:leave="transition ease-in duration-300" 
+         x-transition:leave-start="translate-y-0" 
+         x-transition:leave-end="translate-y-full"
+         class="bg-white dark:bg-[#0f172a] w-full max-w-lg rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl relative z-10 pointer-events-auto h-[65vh] sm:h-auto sm:max-h-[85vh] flex flex-col border-t border-white/20 overflow-hidden">
+        
+        <!-- 🎨 Header (Sticky Top) -->
+        <div class="px-6 py-5 flex justify-between items-center border-b border-slate-100 dark:border-white/5 bg-white/80 dark:bg-[#0f172a]/90 backdrop-blur-xl z-20 shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 shadow-sm border border-blue-100 dark:border-blue-500/20">
+                    <i class="fa-solid fa-book-open text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Documentation</p>
+                    <h3 class="text-xl font-black text-slate-800 dark:text-white leading-none">VacuumOps Guide</h3>
+                </div>
+            </div>
+            <button @click="showInfoModal = false" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-white/10 text-slate-500 hover:bg-rose-50 hover:text-rose-500 transition-colors flex items-center justify-center active:scale-90">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
 
-			<!-- 📜 Scrollable Body (Fixed: Removed custom-dropdown-list class) -->
-			<div class="flex-1 overflow-y-auto bg-slate-50/50 dark:bg-[#0f172a] p-6 space-y-8 pb-20">
-				
-				<!-- Section 1: Workflow -->
-				<div class="relative">
-					<h4 class="font-black text-sm uppercase tracking-wider text-slate-400 mb-4 flex items-center gap-2">
-						<span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Operating Procedure
-					</h4>
-					
-					<div class="space-y-4">
-						<!-- Step 1 -->
-						<div class="flex gap-4 group">
-							<div class="flex flex-col items-center">
-								<div class="w-8 h-8 rounded-full bg-white dark:bg-slate-800 border-2 border-blue-500 shadow-lg shadow-blue-500/20 flex items-center justify-center z-10">
-									<span class="text-xs font-black text-blue-600 dark:text-blue-400">1</span>
-								</div>
-								<div class="w-0.5 h-full bg-slate-200 dark:bg-slate-700 -my-2 group-last:hidden"></div>
-							</div>
-							<div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5 flex-1 relative top-[-5px]">
-								<h5 class="font-bold text-slate-800 dark:text-white text-sm">Select Location 📍</h5>
-								<p class="text-xs text-slate-500 mt-1 leading-relaxed">Header dropdown se <span class="font-bold text-blue-500">Noida</span> ya <span class="font-bold text-emerald-500">Dehradun</span> select karein.</p>
-							</div>
-						</div>
+        <!-- 📜 Scrollable Body -->
+        <div class="flex-1 overflow-y-auto bg-slate-50/50 dark:bg-[#0f172a] p-6 space-y-8 pb-20">
+            
+            <!-- Section 1: Workflow -->
+            <div class="relative">
+                <h4 class="font-black text-sm uppercase tracking-wider text-slate-400 mb-4 flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Operating Procedure
+                </h4>
+                
+                <div class="space-y-4">
+                    <!-- Step 1 -->
+                    <div class="flex gap-4 group">
+                        <div class="flex flex-col items-center">
+                            <div class="w-8 h-8 rounded-full bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center z-10">
+                                <span class="text-xs font-black text-slate-500">1</span>
+                            </div>
+                            <div class="w-0.5 h-full bg-slate-200 dark:bg-slate-700 -my-2"></div>
+                        </div>
+                        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5 flex-1 relative top-[-5px]">
+                            <h5 class="font-bold text-slate-800 dark:text-white text-sm">Select Location 📍</h5>
+                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">Header dropdown se <span class="font-bold text-blue-500">Noida</span> ya <span class="font-bold text-emerald-500">Dehradun</span> select karein.</p>
+                        </div>
+                    </div>
 
-						<!-- Step 2 -->
-						<div class="flex gap-4 group">
-							<div class="flex flex-col items-center">
-								<div class="w-8 h-8 rounded-full bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center z-10">
-									<span class="text-xs font-black text-slate-500">2</span>
-								</div>
-								<div class="w-0.5 h-full bg-slate-200 dark:bg-slate-700 -my-2"></div>
-							</div>
-							<div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5 flex-1 relative top-[-5px]">
-								<h5 class="font-bold text-slate-800 dark:text-white text-sm">Update Asset 💻</h5>
-								<p class="text-xs text-slate-500 mt-1 leading-relaxed">List item pe click karein. Status ko <span class="inline-block px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 text-[10px] font-bold border border-emerald-200">CLEANED</span> mark karein.</p>
-							</div>
-						</div>
+                    <!-- Step 2 -->
+                    <div class="flex gap-4 group">
+                        <div class="flex flex-col items-center">
+                            <div class="w-8 h-8 rounded-full bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center z-10">
+                                <span class="text-xs font-black text-slate-500">2</span>
+                            </div>
+                            <div class="w-0.5 h-full bg-slate-200 dark:bg-slate-700 -my-2"></div>
+                        </div>
+                        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5 flex-1 relative top-[-5px]">
+                            <h5 class="font-bold text-slate-800 dark:text-white text-sm">Update Asset 💻</h5>
+                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">System list check karein aur status ko <span class="font-bold text-emerald-600">CLEANED</span> mark karein.</p>
+                        </div>
+                    </div>
 
-						<!-- Step 3 -->
-						<div class="flex gap-4 group">
-							<div class="flex flex-col items-center">
-								<div class="w-8 h-8 rounded-full bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center z-10">
-									<span class="text-xs font-black text-slate-500">3</span>
-								</div>
-							</div>
-							<div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5 flex-1 relative top-[-5px]">
-								<h5 class="font-bold text-slate-800 dark:text-white text-sm">Save & Sync 💾</h5>
-								<p class="text-xs text-slate-500 mt-1 leading-relaxed">Passkey enter karke save karein. Data auto-sync ho jayega.</p>
-							</div>
-						</div>
-					</div>
-				</div>
+                    <!-- Step 3 -->
+                    <div class="flex gap-4 group">
+                        <div class="flex flex-col items-center">
+                            <div class="w-8 h-8 rounded-full bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center z-10">
+                                <span class="text-xs font-black text-slate-500">3</span>
+                            </div>
+                            <div class="w-0.5 h-full bg-slate-200 dark:bg-slate-700 -my-2"></div>
+                        </div>
+                        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5 flex-1 relative top-[-5px]">
+                            <h5 class="font-bold text-slate-800 dark:text-white text-sm">Save & Sync 💾</h5>
+                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">Passkey enter karke save karein. Data cloud par sync ho jayega.</p>
+                        </div>
+                    </div>
 
-				<!-- Section 2: Color Guide -->
-				<div>
-					<h4 class="font-black text-sm uppercase tracking-wider text-slate-400 mb-4 flex items-center gap-2">
-						<span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span> Status Indicators
-					</h4>
-					<div class="grid grid-cols-2 gap-3">
-						<div class="p-3 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-xl border border-emerald-100 dark:border-emerald-500/20 flex flex-col justify-between h-24">
-							<div class="w-8 h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-sm shadow-emerald-200 shadow-md">
-								<i class="fa-solid fa-check"></i>
-							</div>
-							<div>
-								<p class="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">Done</p>
-								<p class="text-[10px] text-emerald-600/70 leading-tight">Task completed.</p>
-							</div>
-						</div>
-						<div class="p-3 bg-gradient-to-br from-rose-50 to-pink-50 dark:from-rose-900/20 dark:to-pink-900/20 rounded-xl border border-rose-100 dark:border-rose-500/20 flex flex-col justify-between h-24">
-							<div class="w-8 h-8 rounded-lg bg-rose-500 text-white flex items-center justify-center text-sm shadow-rose-200 shadow-md">
-								<i class="fa-regular fa-clock"></i>
-							</div>
-							<div>
-								<p class="text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-wide">Pending</p>
-								<p class="text-[10px] text-rose-600/70 leading-tight">Needs attention.</p>
-							</div>
-						</div>
-						<div class="col-span-2 p-3 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl border border-amber-100 dark:border-amber-500/20 flex items-center gap-4">
-							<div class="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center text-sm shadow-amber-200 shadow-md shrink-0">
-								<i class="fa-solid fa-calendar-day"></i>
-							</div>
-							<div>
-								<p class="text-[10px] font-black text-amber-700 dark:text-amber-400 uppercase tracking-wide">Today's Activity</p>
-								<p class="text-[10px] text-amber-800/60">Systems cleaned within the last 24 hours.</p>
-							</div>
-						</div>
-					</div>
-				</div>
+                    <!-- 🔥 STEP 4: REPORTING (New) -->
+                    <div class="flex gap-4 group">
+                        <div class="flex flex-col items-center">
+                            <!-- Blue Highlight Border -->
+                            <div class="w-8 h-8 rounded-full bg-indigo-50 dark:bg-indigo-900/30 border-2 border-indigo-500 flex items-center justify-center z-10 shadow-lg shadow-indigo-500/20">
+                                <span class="text-xs font-black text-indigo-600 dark:text-indigo-400">4</span>
+                            </div>
+                        </div>
+                        <!-- Highlighted Card -->
+                        <div class="bg-indigo-50 dark:bg-indigo-900/10 p-4 rounded-2xl shadow-sm border border-indigo-100 dark:border-indigo-500/20 flex-1 relative top-[-5px]">
+                            <div class="flex justify-between items-start">
+                                <h5 class="font-bold text-indigo-900 dark:text-indigo-300 text-sm">Send Final Report 🚀</h5>
+                                <i class="fa-solid fa-paper-plane text-indigo-400 text-xs"></i>
+                            </div>
+                            <p class="text-xs text-indigo-800/70 dark:text-indigo-300/70 mt-1 leading-relaxed">
+                                Jab saare updates ho jayein, <span class="font-bold bg-white/50 px-1 rounded">Report</span> button dabayein. Confirm karne par automatic mail <b>Mr. Vikas Rawat (IT Head)</b> ko chala jayega.
+                            </p>
+                        </div>
+                    </div>
 
-				<!-- Section 3: Security -->
-				<div class="relative overflow-hidden rounded-2xl bg-slate-900 text-white p-5 shadow-xl">
-					<div class="absolute top-0 right-0 w-32 h-32 bg-blue-500 rounded-full blur-[60px] opacity-20"></div>
-					<div class="absolute bottom-0 left-0 w-24 h-24 bg-purple-500 rounded-full blur-[50px] opacity-20"></div>
-					
-					<div class="relative z-10 flex gap-4 items-start">
-						<div class="w-10 h-10 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center text-xl backdrop-blur-md shrink-0">
-							🔑
-						</div>
-						<div class="w-full">
-							<h5 class="text-xs font-bold text-blue-200 uppercase tracking-widest mb-1">Authorization</h5>
-							<p class="text-xs text-slate-300 mb-3 leading-relaxed">Modifications save karne ke liye official IT Passkey ki zaroorat padegi.</p>
-							
-							<div class="bg-black/30 rounded-lg p-3 border border-white/10 flex justify-between items-center group cursor-pointer hover:bg-black/50 transition">
-								<code class="font-mono text-sm font-bold text-emerald-400 tracking-wider">PBL2026</code>
-								<i class="fa-regular fa-copy text-slate-500 group-hover:text-white transition text-xs"></i>
-							</div>
-						</div>
-					</div>
-				</div>
-				
-				<div class="text-center pt-4 pb-6">
-					<p class="text-[9px] font-bold text-slate-300 uppercase tracking-widest">
-						Version 2.0 • Designed by Vikas Rawat
-					</p>
-				</div>
+                </div>
+            </div>
 
-			</div>
-		</div>
-	</div>
+            <!-- Section 2: Color Guide -->
+            <div>
+                <h4 class="font-black text-sm uppercase tracking-wider text-slate-400 mb-4 flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span> Status Indicators
+                </h4>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="p-3 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-xl border border-emerald-100 dark:border-emerald-500/20 flex flex-col justify-between h-24">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-sm shadow-emerald-200 shadow-md">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">Done</p>
+                            <p class="text-[10px] text-emerald-600/70 leading-tight">Task completed.</p>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-gradient-to-br from-rose-50 to-pink-50 dark:from-rose-900/20 dark:to-pink-900/20 rounded-xl border border-rose-100 dark:border-rose-500/20 flex flex-col justify-between h-24">
+                        <div class="w-8 h-8 rounded-lg bg-rose-500 text-white flex items-center justify-center text-sm shadow-rose-200 shadow-md">
+                            <i class="fa-regular fa-clock"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-wide">Pending</p>
+                            <p class="text-[10px] text-rose-600/70 leading-tight">Needs attention.</p>
+                        </div>
+                    </div>
+                    <div class="col-span-2 p-3 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl border border-amber-100 dark:border-amber-500/20 flex items-center gap-4">
+                        <div class="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center text-sm shadow-amber-200 shadow-md shrink-0">
+                            <i class="fa-solid fa-calendar-day"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black text-amber-700 dark:text-amber-400 uppercase tracking-wide">Today's Activity</p>
+                            <p class="text-[10px] text-amber-800/60">Systems cleaned within the last 24 hours.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Security -->
+            <div class="relative overflow-hidden rounded-2xl bg-slate-900 text-white p-5 shadow-xl">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500 rounded-full blur-[60px] opacity-20"></div>
+                <div class="absolute bottom-0 left-0 w-24 h-24 bg-purple-500 rounded-full blur-[50px] opacity-20"></div>
+                
+                <div class="relative z-10 flex gap-4 items-start">
+                    <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center text-xl backdrop-blur-md shrink-0">
+                        🔑
+                    </div>
+                    <div class="w-full">
+                        <h5 class="text-xs font-bold text-blue-200 uppercase tracking-widest mb-1">Authorization</h5>
+                        <p class="text-xs text-slate-300 mb-3 leading-relaxed">Modifications save karne ke liye official IT Passkey ki zaroorat padegi.</p>
+                        
+                        <div class="bg-black/30 rounded-lg p-3 border border-white/10 flex justify-between items-center group cursor-pointer hover:bg-black/50 transition">
+                            <code class="font-mono text-sm font-bold text-emerald-400 tracking-wider">PBL2026</code>
+                            <i class="fa-regular fa-copy text-slate-500 group-hover:text-white transition text-xs"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center pt-4 pb-6">
+                <p class="text-[9px] font-bold text-slate-300 uppercase tracking-widest">
+                    Version 2.0 • Designed by Vikas Rawat
+                </p>
+            </div>
+
+        </div>
+    </div>
+</div>
 
     <!-- Confirm Modal -->
     <div x-show="showConfirmModal" x-cloak class="fixed inset-0 z-[110] flex items-center justify-center bg-black/70 backdrop-blur-md p-6">
