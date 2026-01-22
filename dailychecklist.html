@@ -397,7 +397,47 @@
                 <div x-show="currentShift === 'morning'" x-transition class="space-y-4 mb-6">
                     <h3 class="text-xs font-black text-blue-600 uppercase tracking-widest ml-1"><i class="fa-solid fa-sun"></i> Morning Tasks</h3>
                     <div id="card-temp" class="glass-card p-5 rounded-3xl border-l-[6px] border-l-blue-400 scroll-mt-24"><div class="flex justify-between items-end mb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg"><i class="fa-solid fa-temperature-half"></i></div><div><h4 class="text-sm font-black text-slate-700">Server Room Temp</h4><p class="text-[10px] text-slate-400 font-bold">Log Temperature</p></div></div><span class="text-2xl font-black font-mono" :class="checklist.morning.temp ? 'text-slate-800' : 'text-slate-300'" x-text="checklist.morning.temp ? checklist.morning.temp + '°C' : '--'"></span></div><div class="relative py-1"><div x-show="!checklist.morning.temp" @click="checklist.morning.temp = 20" class="absolute inset-0 bg-slate-100/80 backdrop-blur-sm z-30 flex items-center justify-center rounded-xl cursor-pointer border-2 border-dashed border-slate-300"><span class="text-xs font-black text-slate-500 uppercase">Tap to Activate</span></div><input type="range" min="16" max="28" step="0.5" x-model="checklist.morning.temp" @input="saveLocal(); haptic()" class="relative z-20 w-full" :style="`--thumb-color: #3b82f6; --progress: ${((checklist.morning.temp - 16) / 12) * 100}%`"></div></div>
-                    <div id="card-prod" class="glass-card p-5 rounded-3xl border-l-[6px] border-l-yellow-400 scroll-mt-24"><div class="flex justify-between items-center mb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-yellow-100 text-yellow-600 flex items-center justify-center text-lg"><i class="fa-solid fa-power-off"></i></div><div><h4 class="text-sm font-black text-slate-700">System Check</h4><p class="text-[10px] text-slate-400 font-bold">Any PC left ON?</p></div></div><div @click="toggleMorningTask('prodCheck')" class="w-12 h-6 rounded-full relative transition-colors duration-300 cursor-pointer clickable" :class="checklist.morning.prodCheck ? 'bg-rose-500' : 'bg-emerald-500'"><div class="w-4 h-4 bg-white rounded-full absolute top-1 transition-all duration-300 shadow-sm" :class="checklist.morning.prodCheck ? 'left-7' : 'left-1'"></div></div></div><div x-show="checklist.morning.prodCheck" class="mt-3 pt-3 border-t border-yellow-200"><input type="text" x-model="checklist.morning.prodNotes" @input="saveLocal()" placeholder="Which PCs? (e.g. PC-4)" class="w-full bg-yellow-50 border border-yellow-300 text-xs rounded-lg p-3 font-bold"></div></div>
+                    <div id="card-prod" class="glass-card p-5 rounded-3xl border-l-[6px] border-l-yellow-400 scroll-mt-24"><div class="flex justify-between items-center mb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-yellow-100 text-yellow-600 flex items-center justify-center text-lg"><i class="fa-solid fa-power-off"></i></div><div><h4 class="text-sm font-black text-slate-700">System Check</h4><p class="text-[10px] text-slate-400 font-bold">Any PC left ON?</p></div></div><!-- PBL020 (Improved Status Logic) -->
+					<!-- PBL020 (Improved Status Logic) -->
+					<div class="col-span-2 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all group">
+						
+						<div class="flex justify-between items-start">
+							<div class="flex items-center gap-3">
+								<div class="p-2 rounded-lg transition-colors" 
+									 :class="checklist.evening.pbl020Running ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-500'">
+									<i class="fa-solid" :class="checklist.evening.pbl020Running ? 'fa-cloud-arrow-down' : 'fa-power-off'"></i>
+								</div>
+								<div>
+									<h4 class="text-sm font-black text-slate-700">pblnet020</h4>
+									<p class="text-[10px] font-bold text-slate-400">Download Server</p>
+								</div>
+							</div>
+							
+							<!-- Toggle Switch -->
+							<div @click="togglePblRun()" 
+								 class="w-10 h-6 rounded-full relative cursor-pointer transition-colors" 
+								 :class="checklist.evening.pbl020Running ? 'bg-amber-500' : 'bg-slate-200'">
+								<div class="w-4 h-4 bg-white rounded-full absolute top-1 transition-all shadow-sm" 
+									 :class="checklist.evening.pbl020Running ? 'left-5' : 'left-1'"></div>
+							</div>
+						</div>
+
+						<!-- Dynamic Status Area -->
+						<div class="mt-3">
+							<!-- Default State: OFF -->
+							<div x-show="!checklist.evening.pbl020Running" class="flex items-center gap-2 text-slate-500 bg-slate-50 px-3 py-2 rounded-xl border border-slate-100">
+								<div class="w-2 h-2 rounded-full bg-slate-400"></div>
+								<span class="text-[10px] font-black uppercase">System is OFF</span>
+							</div>
+
+							<!-- Active State: Downloading -->
+							<div x-show="checklist.evening.pbl020Running">
+								<input type="text" x-model="checklist.evening.pblReason" @input="saveLocal()" 
+									   placeholder="Enter Running Job Name..." 
+									   class="w-full bg-amber-50 border border-amber-200 text-xs rounded-xl p-2.5 font-bold outline-none focus:ring-2 focus:ring-amber-400 text-amber-800 placeholder-amber-400 transition-all">
+							</div>
+						</div>
+					</div>
                     <div id="card-etoken" @click="toggleMorningTask('authIssue')" class="glass-card p-4 rounded-3xl cursor-pointer border-2 transition-all active:scale-95 flex items-center gap-4 clickable scroll-mt-24" :class="checklist.morning.authIssue ? 'border-blue-400 bg-blue-50' : 'border-transparent'"><div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-md" :class="checklist.morning.authIssue ? 'bg-blue-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-key"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">Issue eTokens</h4><p class="text-[10px] font-bold text-slate-400">Handover 10 Units to Production Dept.</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.morning.authIssue ? 'border-blue-500 bg-blue-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div>
                     <div id="card-ftp" @click="toggleMorningTask('ftpJobCheck')" class="glass-card p-4 rounded-3xl cursor-pointer border-2 transition-all active:scale-95 flex items-center gap-4 clickable scroll-mt-24" :class="checklist.morning.ftpJobCheck ? 'border-indigo-400 bg-indigo-50' : 'border-transparent'"><div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-md" :class="checklist.morning.ftpJobCheck ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-folder-open"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">Client FTP Jobs</h4><p class="text-[10px] font-bold text-slate-400">Check New Jobs</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.morning.ftpJobCheck ? 'border-indigo-500 bg-indigo-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div>
                     <div id="card-pbl020" @click="toggleMorningTask('pbl020Start')" class="glass-card p-4 rounded-3xl cursor-pointer border-2 transition-all active:scale-95 flex items-center gap-4 clickable scroll-mt-24" :class="checklist.morning.pbl020Start ? 'border-emerald-400 bg-emerald-50' : 'border-transparent'"><div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-md" :class="checklist.morning.pbl020Start ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-power-off"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">Start pblnet020</h4><p class="text-[10px] font-bold text-slate-400">Boot Machine</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.morning.pbl020Start ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div>
@@ -416,7 +456,38 @@
                 <div class="space-y-6">
                     <div id="card-isp" class="space-y-3 scroll-mt-24"><h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1"><i class="fa-solid fa-gauge-high"></i> Internet</h3><div class="grid grid-cols-1 gap-4"><template x-for="(isp, index) in checklist.isp" :key="index"><div class="glass-card p-5 rounded-3xl group" :class="isLowSpeed(isp) ? 'border-rose-300 bg-rose-50' : ''"><div class="flex justify-between items-end mb-4 relative z-10"><div class="flex items-center gap-3"><div class="w-11 h-11 rounded-2xl flex items-center justify-center text-white text-lg shadow-lg" :class="getSpeedColor(isp.speed, isp.max)"><i class="fa-solid fa-wifi"></i></div><div><h4 class="text-sm font-black text-slate-700" x-text="isp.name"></h4></div></div><span class="text-3xl font-black font-mono" :class="getSpeedText(isp.speed, isp.max)" x-text="isp.speed || 0"></span></div><div class="relative py-1"><input type="range" min="0" :max="isp.max" step="0.5" x-model="isp.speed" @input="calculateScore(); saveLocal(); haptic()" class="relative z-20 w-full" :style="`--thumb-color: ${getSpeedHex(isp.speed, isp.max)}; --progress: ${(isp.speed / isp.max) * 100}%`"></div><div x-show="isLowSpeed(isp)" class="mt-3 pt-3 border-t border-rose-200"><input type="text" x-model="isp.complaint" @input="saveLocal()" placeholder="Enter Ticket No..." class="w-full bg-white border border-rose-300 text-xs rounded-xl p-3 font-bold"></div></div></template></div></div>
                     <div id="card-security" class="space-y-3 scroll-mt-24"><h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1"><i class="fa-solid fa-shield-halved"></i> Security</h3><div class="grid grid-cols-1 gap-3"><div @click="handleSophosCheck()" class="glass-card p-4 rounded-3xl cursor-pointer border-2 flex items-center gap-4 clickable" :class="checklist.endpoints.sophos ? 'border-cyan-400 bg-cyan-50' : 'border-transparent'"><div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-md" :class="checklist.endpoints.sophos ? 'bg-cyan-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-shield-virus"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">Sophos AV</h4><p class="text-[10px] text-slate-400">Random PC Check</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.endpoints.sophos ? 'border-cyan-500 bg-cyan-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div><div @click="handleUsbCheck()" class="glass-card p-4 rounded-3xl cursor-pointer border-2 flex items-center gap-4 clickable" :class="checklist.endpoints.usb ? 'border-rose-400 bg-rose-50' : 'border-transparent'"><div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-md" :class="checklist.endpoints.usb ? 'bg-rose-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-brands fa-usb"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">USB Blocking</h4><p class="text-[10px] text-slate-400">Physical Check</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.endpoints.usb ? 'border-rose-500 bg-rose-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div></div></div>
-                    <div id="card-services" class="space-y-3 scroll-mt-24"><h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1"><i class="fa-solid fa-network-wired"></i> Services</h3><div class="grid grid-cols-1 gap-3"><template x-for="(svc, index) in checklist.services" :key="index"><div @click="toggleService(index)" class="glass-card p-4 rounded-3xl cursor-pointer border-2 flex items-center gap-4 clickable" :class="svc.status ? 'border-indigo-400 bg-indigo-50' : 'border-transparent'"><div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-md" :class="svc.status ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid" :class="svc.icon"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700" x-text="svc.name"></h4><p class="text-[10px] text-slate-400" x-text="svc.desc"></p></div><span class="px-3 py-1 rounded-full text-[10px] font-black uppercase" :class="svc.status ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400'"><span x-text="svc.status ? 'OK' : 'CHK'"></span></span></div></template></div></div>
+                    <div id="card-services" class="space-y-3 scroll-mt-24"><h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1"><i class="fa-solid fa-network-wired"></i> Services</h3><!-- Services List (Modern & Full Height) -->
+					<div class="flex-1 flex flex-col gap-3 mt-3 min-h-0">
+						<template x-for="(svc, index) in checklist.services" :key="index">
+							<div @click="toggleService(index)" 
+								 class="relative flex-1 flex items-center justify-between px-4 py-3 rounded-2xl border-2 cursor-pointer transition-all duration-300 group" 
+								 :class="svc.status ? 'border-emerald-500 bg-emerald-50/30 shadow-md' : 'border-slate-100 bg-white hover:border-blue-200 hover:shadow-lg hover:-translate-y-0.5'">
+								
+								<!-- Left: Icon & Info -->
+								<div class="flex items-center gap-4">
+									<!-- Icon Box -->
+									<div class="w-12 h-12 rounded-xl flex items-center justify-center text-xl transition-all duration-300"
+										 :class="svc.status ? 'bg-emerald-100 text-emerald-600 rotate-0' : 'bg-slate-50 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-600 group-hover:scale-110'">
+										<i class="fa-solid" :class="svc.icon"></i>
+									</div>
+									
+									<!-- Text -->
+									<div>
+										<h4 class="text-sm font-black text-slate-700 leading-tight" x-text="svc.name"></h4>
+										<p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide mt-0.5 group-hover:text-blue-400 transition-colors" x-text="svc.desc"></p>
+									</div>
+								</div>
+
+								<!-- Right: Status Indicator -->
+								<div class="flex items-center gap-2 px-3 py-1.5 rounded-lg border-2 transition-all duration-300"
+									 :class="svc.status ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-slate-50 border-slate-100 text-slate-300'">
+									<span class="text-[10px] font-black uppercase tracking-wider" x-text="svc.status ? 'ONLINE' : 'CHECK'"></span>
+									<i class="fa-solid text-[10px]" :class="svc.status ? 'fa-check' : 'fa-circle'"></i>
+								</div>
+
+							</div>
+						</template>
+					</div>
                     <div id="card-servers" class="space-y-3 scroll-mt-24"><h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1"><i class="fa-solid fa-server"></i> Servers</h3><div class="grid grid-cols-2 gap-3"><template x-for="(srv, index) in checklist.servers" :key="index"><div @click="toggleServer(index)" class="relative p-4 h-32 rounded-[1.5rem] border-2 cursor-pointer overflow-hidden group clickable transition-colors duration-300 shadow-lg" :class="getServerClass(srv)"><div class="absolute -bottom-6 -right-6 text-9xl text-black opacity-10 transform rotate-12 pointer-events-none z-0 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-0"><i :class="(srv.name.includes('Linux') || srv.name === 'PBL') ? 'fa-brands fa-linux' : 'fa-brands fa-windows'"></i></div><div @click.stop="toggleMaintenance(index)" class="absolute top-2 right-2 z-20 w-8 h-8 flex items-center justify-center rounded-full bg-black/20 text-white clickable hover:bg-black/30 backdrop-blur-md transition-all"><i class="fa-solid fa-wrench text-xs" :class="srv.maintenance ? 'text-amber-400 animate-pulse' : 'text-white/70'"></i></div><div class="relative z-10 h-full flex flex-col justify-between"><div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl bg-white/20 backdrop-blur-md text-white shadow-inner border border-white/10"><i :class="(srv.name.includes('Linux') || srv.name === 'PBL') ? 'fa-brands fa-linux' : 'fa-brands fa-windows'"></i></div><div><h4 class="text-lg font-black leading-tight tracking-tight drop-shadow-md" x-text="srv.name"></h4><p class="text-[10px] font-bold opacity-90 uppercase mt-1 tracking-wider bg-black/10 inline-block px-2 py-0.5 rounded-md backdrop-blur-sm"><span x-text="srv.maintenance ? 'MAINTENANCE' : (srv.status ? 'ONLINE' : 'OFFLINE')"></span></p></div></div></div></template></div></div>
                     <div id="card-servers" class="space-y-3 scroll-mt-24"><h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1"><i class="fa-solid fa-server"></i> Servers</h3><div class="grid grid-cols-2 gap-3"><template x-for="(srv, index) in checklist.servers" :key="index"><div @click="toggleServer(index)" class="relative p-4 h-32 rounded-[1.5rem] border-2 cursor-pointer overflow-hidden group clickable transition-colors duration-300 shadow-lg" :class="getServerClass(srv)"><div class="absolute -bottom-6 -right-6 text-9xl text-black opacity-10 transform rotate-12 pointer-events-none z-0 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-0"><i :class="(srv.name.includes('Linux') || srv.name === 'PBL') ? 'fa-brands fa-linux' : 'fa-brands fa-windows'"></i></div><!-- Button ko Z-Index 50 diya aur White Background diya taaki standout kare -->
 		<div @click.stop="toggleMaintenance(index)" 
@@ -477,7 +548,7 @@
                         <img src="pbl-logo.png" alt="Logo" class="w-8 h-8 object-contain">
                     </div>
                     <div>
-                        <h1 class="text-xl font-black leading-none tracking-tight text-slate-800">Checklist<span class="text-blue-600">Ops</span></h1>
+                        <h1 class="text-xl font-black leading-none tracking-tight text-slate-800">Daily<span class="text-blue-600">Ops</span></h1>
                         <p class="text-[10px] font-bold text-slate-400 tracking-[0.2em] mt-1.5 uppercase">IT Operations</p>
                     </div>
                 </div>
@@ -573,12 +644,13 @@
             <div class="col-span-12 lg:col-span-3 bg-white rounded-3xl p-5 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.1)] border border-slate-100 flex flex-col justify-between relative group overflow-hidden">
                 <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity transform rotate-12"><i class="fa-solid fa-chart-pie text-6xl text-blue-600"></i></div>
                 <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Efficiency Score</p>
-                    <div class="flex items-baseline">
-						<h2 class="text-6xl font-black text-slate-800 tracking-tight leading-none" x-text="score">0</h2>
-						<span class="text-2xl font-bold text-slate-400 ml-1">%</span>
-					</div>
-                </div>
+				<p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Efficiency Score</p>
+				<!-- Fixed Height Container to prevent jumping -->
+				<div class="flex items-baseline h-14 mt-1"> 
+					<h2 class="text-6xl font-black text-slate-800 tracking-tight leading-none" x-text="score">0</h2>
+					<span class="text-2xl font-bold text-slate-400 ml-1 translate-y-[-4px]">%</span>
+				</div>
+			</div>
                 <!-- Progress Bar -->
                 <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden mt-2">
                     <div class="h-full rounded-full transition-all duration-1000 ease-out" 
@@ -615,21 +687,51 @@
                             </div>
                         </div>
 
-                        <!-- Sys Check -->
-                        <div @click="toggleMorningTask('prodCheck')" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 cursor-pointer hover:shadow-md transition-all group relative overflow-hidden" :class="checklist.morning.prodCheck ? 'ring-2 ring-emerald-500 border-transparent' : ''">
-                            <div class="absolute top-0 right-0 w-16 h-16 bg-yellow-50 rounded-full blur-xl -mr-8 -mt-8 transition-colors" :class="checklist.morning.prodCheck ? 'bg-emerald-50' : ''"></div>
-                            <div class="relative z-10 flex flex-col h-full justify-between">
-                                <div class="flex justify-between items-center">
-                                    <div class="p-2 rounded-lg bg-yellow-50 text-yellow-600"><i class="fa-solid fa-power-off"></i></div>
-                                    <i x-show="checklist.morning.prodCheck" class="fa-solid fa-check-circle text-emerald-500 text-lg"></i>
-                                </div>
-                                <div>
-                                    <p class="text-[10px] font-bold text-slate-400 uppercase">System Check</p>
-                                    <input x-show="checklist.morning.prodCheck" @click.stop type="text" x-model="checklist.morning.prodNotes" class="w-full bg-slate-50 text-[10px] p-1.5 rounded border-0 font-bold mt-1" placeholder="Enter PC No...">
-                                    <p x-show="!checklist.morning.prodCheck" class="text-xs font-black text-slate-700">Verify Shutdown</p>
-                                </div>
-                            </div>
-                        </div>
+                        <!-- Sys Check (Optimized Layout) -->
+					<div @click="toggleMorningTask('prodCheck')" 
+						 class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 cursor-pointer hover:shadow-md transition-all group h-full flex flex-col justify-between" 
+						 :class="checklist.morning.prodCheck ? 'ring-2 ring-rose-500 bg-rose-50/20' : 'hover:border-emerald-300'">
+						
+						<!-- Top Section: Header & Toggle Icon -->
+						<div class="flex justify-between items-start w-full">
+							<div class="flex items-center gap-3">
+								<!-- Icon Box -->
+								<div class="w-10 h-10 rounded-xl flex items-center justify-center transition-colors" 
+									 :class="checklist.morning.prodCheck ? 'bg-rose-100 text-rose-600' : 'bg-slate-50 text-slate-500 group-hover:bg-emerald-50 group-hover:text-emerald-600'">
+									<i class="fa-solid fa-desktop text-lg"></i>
+								</div>
+								
+								<!-- Text Labels -->
+								<div>
+									<p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Floor Walk</p>
+									<h4 class="text-xs font-black text-slate-700 mt-0.5">System Check</h4>
+								</div>
+							</div>
+							
+							<!-- Check Circle (Top Right) -->
+							<div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all shrink-0"
+								 :class="checklist.morning.prodCheck ? 'bg-rose-500 border-rose-500 text-white' : 'border-slate-200 text-slate-300 group-hover:border-emerald-400 group-hover:text-emerald-500'">
+								<i class="fa-solid" :class="checklist.morning.prodCheck ? 'fa-exclamation' : 'fa-check text-[10px]'"></i>
+							</div>
+						</div>
+
+						<!-- Bottom Section: Status Badge / Input (Full Width) -->
+						<div class="mt-3 w-full">
+							<!-- Safe State -->
+							<div x-show="!checklist.morning.prodCheck" 
+								 class="w-full py-2.5 px-3 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center gap-2 transition-all">
+								<i class="fa-solid fa-circle-check text-emerald-500 text-xs"></i>
+								<span class="text-[10px] font-black text-emerald-700 uppercase tracking-wide">All Systems OFF</span>
+							</div>
+							
+							<!-- Issue State (Input) -->
+							<div x-show="checklist.morning.prodCheck">
+								<input @click.stop type="text" x-model="checklist.morning.prodNotes" 
+									   class="w-full py-2.5 px-3 bg-white border border-rose-200 text-xs rounded-xl font-bold outline-none focus:ring-2 focus:ring-rose-500 text-rose-700 placeholder-rose-300 transition-all text-center" 
+									   placeholder="Enter PC No (e.g. PC-05)...">
+							</div>
+						</div>
+					</div>
 
                         <!-- Backup Card (Updated) -->
 						<div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col gap-2 hover:shadow-md transition-all group">
@@ -790,140 +892,196 @@
             </div>
         </div>
 
-        <!-- ROW 2: INFRASTRUCTURE (Optimized Grid) -->
-		<div class="grid grid-cols-12 gap-4 h-full min-h-0">
-			
-			<!-- A. SERVERS & SERVICES (Left Column - 5/12 Width) -->
-			<div class="col-span-12 lg:col-span-5 bg-white rounded-3xl p-5 shadow-sm border border-slate-100 flex flex-col">
-				<h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Core Infrastructure</h3>
-				
-				<div class="flex-1 overflow-y-auto no-scrollbar space-y-4">
-					<!-- Servers Grid -->
-					<div class="grid grid-cols-2 gap-3">
-						<template x-for="(srv, index) in checklist.servers" :key="index">
-							<div @click="toggleServer(index)" class="relative p-3 rounded-xl border cursor-pointer transition-all duration-300 hover:scale-[1.02]" 
-								 :class="getServerClass(srv) + ' ' + (srv.status ? 'shadow-md' : 'opacity-80')">
-								<div class="flex justify-between items-start">
-									<i :class="(srv.name.includes('Linux') || srv.name === 'PBL') ? 'fa-brands fa-linux' : 'fa-brands fa-windows'" class="opacity-80"></i>
-									<div @click.stop="toggleMaintenance(index)" class="w-6 h-6 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center backdrop-blur-sm z-20"><i class="fa-solid fa-wrench text-[10px]"></i></div>
-								</div>
-								<p class="text-[10px] font-black mt-2 uppercase tracking-wide" x-text="srv.name"></p>
-								<div class="absolute bottom-0 left-0 w-full h-1 bg-black/10 rounded-b-xl overflow-hidden"><div class="h-full bg-white/50 transition-all duration-500" :class="srv.status ? 'w-full' : 'w-0'"></div></div>
-							</div>
-						</template>
-					</div>
-
-					<!-- Services List -->
-					<div class="space-y-2">
-						<template x-for="(svc, index) in checklist.services" :key="index">
-							<div @click="toggleService(index)" class="flex items-center gap-3 p-2 rounded-lg border cursor-pointer hover:bg-slate-50 transition-colors group" :class="svc.status ? 'bg-white border-emerald-100' : 'bg-slate-50 border-transparent'">
-								<div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-colors" :class="svc.status ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-200 text-slate-400'"><i class="fa-solid" :class="svc.icon"></i></div>
-								<span class="flex-1 text-[10px] font-bold text-slate-600" x-text="svc.name"></span>
-								<div class="w-2 h-2 rounded-full" :class="svc.status ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : 'bg-slate-300'"></div>
-							</div>
-						</template>
-					</div>
-				</div>
-			</div>
-
-			<!-- B. RIGHT SIDE WRAPPER (Network, Facility & Logs - 7/12 Width) -->
-			<div class="col-span-12 lg:col-span-7 flex flex-col gap-4 h-full">
-				
-				<!-- Top Row: Network & Facility Side-by-Side -->
-				<div class="grid grid-cols-7 gap-4 h-fit">
-					
-					<!-- 1. Network & Security (4/7 Width) -->
-					<div class="col-span-4 bg-white rounded-3xl p-5 shadow-sm border border-slate-100 h-full">
-						<h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Network & Security</h3>
-						
-						<div class="space-y-4">
-							<template x-for="(isp, index) in checklist.isp" :key="index">
-								<div>
-									<div class="flex justify-between items-end mb-1">
-										<span class="text-[10px] font-bold text-slate-700" x-text="isp.name"></span>
-										<span class="text-[10px] font-black font-mono" :class="getSpeedText(isp.speed, isp.max)" x-text="isp.speed + ' Mb'"></span>
-									</div>
-									<input type="range" min="0" :max="isp.max" step="0.5" x-model="isp.speed" @input="calculateScore(); saveLocal()" class="w-full h-1.5 bg-slate-100 rounded-full appearance-none cursor-pointer" :style="`--thumb-color: ${getSpeedHex(isp.speed, isp.max)};`">
-								</div>
-							</template>
-
-							<div class="grid grid-cols-2 gap-3 pt-2">
+        <!-- ROW 2: INFRASTRUCTURE (Compact Services & Logs) -->
+<div class="grid grid-cols-12 gap-4 h-full min-h-0 pt-2">
     
-							<!-- 1. Sophos Button -->
-							<div @click="handleSophosCheck()" 
-								 class="p-3 rounded-xl border-2 text-center cursor-pointer transition-all duration-200 active:scale-95 group"
-								 :class="checklist.endpoints.sophos 
-									? 'bg-cyan-500 border-cyan-500 text-white shadow-lg shadow-cyan-200' 
-									: 'bg-white border-slate-100 text-slate-400 hover:border-cyan-200 hover:text-cyan-500 hover:bg-cyan-50'">
-								
-								<i class="fa-solid fa-shield-virus text-xl mb-1 transition-transform group-hover:scale-110"></i>
-								<p class="text-[9px] font-black uppercase tracking-wide">Sophos</p>
+    <!-- A. SERVERS & SERVICES (Left Column - Compact List) -->
+    <div class="col-span-12 lg:col-span-5 bg-white rounded-3xl p-4 shadow-sm border border-slate-100 flex flex-col h-full overflow-hidden">
+        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 shrink-0">Core Infrastructure</h3>
+        
+        <div class="flex-1 overflow-y-auto no-scrollbar space-y-3">
+            <!-- Servers Grid (Standard) -->
+            <div class="grid grid-cols-2 gap-2">
+                <template x-for="(srv, index) in checklist.servers" :key="index">
+                    <div @click="toggleServer(index)" class="relative p-2 rounded-xl border cursor-pointer transition-all duration-200 hover:scale-[1.01]" 
+                         :class="getServerClass(srv) + ' ' + (srv.status ? 'shadow-sm' : 'opacity-80')">
+                        <div class="flex justify-between items-start">
+                            <i :class="(srv.name.includes('Linux') || srv.name === 'PBL') ? 'fa-brands fa-linux' : 'fa-brands fa-windows'" class="opacity-80 text-xs"></i>
+                            <div @click.stop="toggleMaintenance(index)" class="w-5 h-5 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center backdrop-blur-sm z-20"><i class="fa-solid fa-wrench text-[9px]"></i></div>
+                        </div>
+                        <p class="text-[10px] font-black mt-1 uppercase tracking-wide" x-text="srv.name"></p>
+                        <div class="absolute bottom-0 left-0 w-full h-1 bg-black/10 rounded-b-xl overflow-hidden"><div class="h-full bg-white/50 transition-all duration-500" :class="srv.status ? 'w-full' : 'w-0'"></div></div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Services List (Modern & Full Height) -->
+			<div class="flex-1 flex flex-col gap-3 mt-3 min-h-0">
+				<template x-for="(svc, index) in checklist.services" :key="index">
+					<div @click="toggleService(index)" 
+						 class="relative flex-1 flex items-center justify-between px-4 py-3 rounded-2xl border-2 cursor-pointer transition-all duration-300 group" 
+						 :class="svc.status ? 'border-emerald-500 bg-emerald-50/30 shadow-md' : 'border-slate-100 bg-white hover:border-blue-200 hover:shadow-lg hover:-translate-y-0.5'">
+						
+						<!-- Left: Icon & Info -->
+						<div class="flex items-center gap-4">
+							<!-- Icon Box -->
+							<div class="w-12 h-12 rounded-xl flex items-center justify-center text-xl transition-all duration-300"
+								 :class="svc.status ? 'bg-emerald-100 text-emerald-600 rotate-0' : 'bg-slate-50 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-600 group-hover:scale-110'">
+								<i class="fa-solid" :class="svc.icon"></i>
 							</div>
-
-							<!-- 2. USB Button -->
-							<div @click="handleUsbCheck()" 
-								 class="p-3 rounded-xl border-2 text-center cursor-pointer transition-all duration-200 active:scale-95 group"
-								 :class="checklist.endpoints.usb 
-									? 'bg-rose-500 border-rose-500 text-white shadow-lg shadow-rose-200' 
-									: 'bg-white border-slate-100 text-slate-400 hover:border-rose-200 hover:text-rose-500 hover:bg-rose-50'">
-								
-								<i class="fa-brands fa-usb text-xl mb-1 transition-transform group-hover:scale-110"></i>
-								<p class="text-[9px] font-black uppercase tracking-wide">USB Check</p>
-							</div>
-
-						</div>
-						</div>
-					</div>
-
-					<!-- 2. Facility (3/7 Width) -->
-					<div class="col-span-3 bg-white rounded-3xl p-5 shadow-sm border border-slate-100 h-fit">
-						<h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Facility Status</h3>
-						<div class="space-y-3">
-							<template x-for="(ac, index) in checklist.infra.acs" :key="index">
-								<div @click="toggleAC(index)" class="flex items-center justify-between p-2.5 rounded-xl cursor-pointer transition-all border border-transparent hover:bg-slate-50 hover:border-slate-100 group">
-									<div class="flex items-center gap-2">
-										<div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-colors" :class="ac.status ? 'bg-cyan-50 text-cyan-500' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-snowflake" :class="{'animate-spin-slow': ac.status}"></i></div>
-										<span class="text-[10px] font-bold text-slate-700" x-text="ac.name"></span>
-									</div>
-									<div class="w-10 h-6 rounded-full relative transition-all duration-300 ease-in-out" :class="ac.status ? 'bg-cyan-500 shadow-inner' : 'bg-slate-200'"><div class="w-4 h-4 bg-white rounded-full absolute top-1 left-1 shadow-md transition-all duration-300 transform" :class="ac.status ? 'translate-x-4' : 'translate-x-0'"></div></div>
-								</div>
-							</template>
-							<div class="h-px bg-slate-100 my-1"></div>
+							
+							<!-- Text -->
 							<div>
-								<div class="flex items-center justify-between p-2.5">
-									<div class="flex items-center gap-2">
-										<div class="w-8 h-8 rounded-lg bg-rose-50 text-rose-500 flex items-center justify-center text-sm"><i class="fa-solid fa-fire-extinguisher"></i></div>
-										<span class="text-[10px] font-bold text-slate-700">Fire Safety</span>
-									</div>
-									<div @click="toggleInfra('fire')" class="w-10 h-6 rounded-full relative transition-all duration-300 ease-in-out" :class="checklist.infra.fire.status ? 'bg-emerald-500 shadow-inner' : 'bg-slate-200'"><div class="w-4 h-4 bg-white rounded-full absolute top-1 left-1 shadow-md transition-all duration-300 transform" :class="checklist.infra.fire.status ? 'translate-x-4' : 'translate-x-0'"></div></div>
-								</div>
-								<div x-show="checklist.infra.fire.status" x-collapse>
-									<div @click="modals.fireList.show = true" class="mt-1 mx-2 text-[10px] font-bold bg-slate-50 p-2 rounded-lg text-center cursor-pointer border border-slate-200 hover:border-emerald-300 hover:text-emerald-600 transition-colors text-slate-500 flex items-center justify-between px-3">
-										<span x-text="checklist.infra.fire.location || 'Select Location...'"></span>
-										<i class="fa-solid fa-chevron-down text-[9px]"></i>
-									</div>
-								</div>
+								<h4 class="text-sm font-black text-slate-700 leading-tight" x-text="svc.name"></h4>
+								<p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide mt-0.5 group-hover:text-blue-400 transition-colors" x-text="svc.desc"></p>
+							</div>
+						</div>
+
+						<!-- Right: Status Indicator -->
+						<div class="flex items-center gap-2 px-3 py-1.5 rounded-lg border-2 transition-all duration-300"
+							 :class="svc.status ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-slate-50 border-slate-100 text-slate-300'">
+							<span class="text-[10px] font-black uppercase tracking-wider" x-text="svc.status ? 'ONLINE' : 'CHECK'"></span>
+							<i class="fa-solid text-[10px]" :class="svc.status ? 'fa-check' : 'fa-circle'"></i>
+						</div>
+
+					</div>
+				</template>
+			</div>
+        </div>
+    </div>
+
+    <!-- B. NETWORK & LOGS (Middle Column) -->
+    <div class="col-span-12 lg:col-span-4 flex flex-col gap-3 h-full">
+        
+        <!-- Network Card -->
+        <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 h-fit shrink-0">
+            <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Network & Security</h3>
+            
+            <div class="space-y-2">
+                <!-- Sliders -->
+                <template x-for="(isp, index) in checklist.isp" :key="index">
+                    <div class="p-2 rounded-xl border transition-all duration-200" :class="isLowSpeed(isp) ? 'bg-rose-50 border-rose-200' : 'bg-white border-slate-100'">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-[10px] font-bold text-slate-700" x-text="isp.name"></span>
+                            <span class="text-[10px] font-black font-mono" :class="getSpeedText(isp.speed, isp.max)" x-text="isp.speed + ' Mb'"></span>
+                        </div>
+                        <input type="range" min="0" :max="isp.max" step="0.5" x-model="isp.speed" @input="calculateScore(); saveLocal()" class="w-full h-1.5 bg-slate-100 rounded-full appearance-none cursor-pointer" :style="`--thumb-color: ${getSpeedHex(isp.speed, isp.max)};`">
+                    </div>
+                </template>
+
+                <!-- Security Btns -->
+                <div class="grid grid-cols-2 gap-2 mt-1">
+                    <div @click="handleSophosCheck()" class="p-2 rounded-lg border text-center cursor-pointer hover:bg-cyan-50" :class="checklist.endpoints.sophos ? 'bg-cyan-500 border-cyan-500 text-white' : 'bg-white border-slate-100 text-slate-400'">
+                        <i class="fa-solid fa-shield-virus text-sm mb-0.5"></i>
+                        <p class="text-[9px] font-black uppercase">Sophos</p>
+                    </div>
+                    <div @click="handleUsbCheck()" class="p-2 rounded-lg border text-center cursor-pointer hover:bg-rose-50" :class="checklist.endpoints.usb ? 'bg-rose-500 border-rose-500 text-white' : 'bg-white border-slate-100 text-slate-400'">
+                        <i class="fa-brands fa-usb text-sm mb-0.5"></i>
+                        <p class="text-[9px] font-black uppercase">USB</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🔥 LOGS AREA (Fixed Short Height) -->
+        <div class="flex-1 bg-white rounded-3xl p-3 shadow-sm border border-slate-200 flex flex-col h-24 shrink-0">
+            <div class="flex items-center gap-2 mb-1">
+                <i class="fa-solid fa-pen-to-square text-slate-400 text-[10px]"></i>
+                <h3 class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Logs / Handover</h3>
+            </div>
+            <textarea x-model="remarks" @input="saveLocal()" 
+                      class="w-full h-full bg-slate-50 border border-slate-100 rounded-xl p-2 text-xs font-bold text-slate-700 placeholder-slate-400 outline-none focus:ring-1 focus:ring-blue-500 transition-all resize-none leading-relaxed" 
+                      placeholder="Type notes..."></textarea>
+        </div>
+    </div>
+
+    <!-- C. FACILITY (Right Column - Smart Panel) -->
+	<div class="col-span-12 lg:col-span-3 bg-white rounded-3xl p-5 shadow-sm border border-slate-100 flex flex-col h-full overflow-hidden">
+		
+		<!-- Header -->
+		<div class="flex items-center gap-2 mb-4 shrink-0 opacity-60">
+			<i class="fa-solid fa-sliders text-slate-500 text-xs"></i>
+			<h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Environment Control</h3>
+		</div>
+		
+		<!-- Controls Container (Stretches to fill height) -->
+		<div class="flex-1 flex flex-col gap-3 min-h-0">
+			
+			<!-- AC Loop (Expanded Rows) -->
+			<template x-for="(ac, index) in checklist.infra.acs" :key="index">
+				<div @click="toggleAC(index)" 
+					 class="relative flex-1 flex items-center justify-between px-4 rounded-2xl border cursor-pointer transition-all duration-300 group" 
+					 :class="ac.status ? 'bg-cyan-50/50 border-cyan-200' : 'bg-white border-slate-100 hover:border-slate-200'">
+					
+					<!-- Left: Info -->
+					<div class="flex items-center gap-3.5">
+						<!-- Icon Bubble -->
+						<div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg transition-all duration-300 shadow-sm"
+							 :class="ac.status ? 'bg-cyan-500 text-white shadow-cyan-200' : 'bg-slate-100 text-slate-400'">
+							<i class="fa-solid fa-snowflake" :class="{'animate-spin-slow': ac.status}"></i>
+						</div>
+						
+						<!-- Text Stack -->
+						<div class="flex flex-col">
+							<h4 class="text-xs font-black text-slate-700 leading-tight" x-text="ac.name"></h4>
+							<div class="flex items-center gap-1.5 mt-0.5">
+								<div class="w-1.5 h-1.5 rounded-full" :class="ac.status ? 'bg-cyan-500 animate-pulse' : 'bg-slate-300'"></div>
+								<span class="text-[9px] font-bold uppercase tracking-wide" 
+									  :class="ac.status ? 'text-cyan-600' : 'text-slate-400'" 
+									  x-text="ac.status ? 'Cooling Active' : 'Offline'"></span>
 							</div>
 						</div>
 					</div>
-				</div>
 
-				<!-- 3. Logs Area (Full Width of Right Side) -->
-				<div class="flex-1 bg-white rounded-3xl p-4 shadow-sm border border-slate-200 flex flex-col min-h-[140px]">
-					<div class="flex items-center gap-2 mb-2">
-						<i class="fa-solid fa-pen-to-square text-slate-400 text-xs"></i>
-						<h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Shift Logs / Handover</h3>
+					<!-- Right: Toggle -->
+					<div class="w-10 h-6 rounded-full relative transition-all duration-300 ease-in-out border" 
+						 :class="ac.status ? 'bg-cyan-500 border-cyan-500' : 'bg-slate-200 border-slate-200'">
+						<div class="w-4 h-4 bg-white rounded-full absolute top-0.5 shadow-sm transition-all duration-300 transform" 
+							 :class="ac.status ? 'translate-x-4.5' : 'translate-x-0.5'"></div>
 					</div>
-					<textarea x-model="remarks" @input="saveLocal()" 
-							  class="w-full h-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 placeholder-slate-400 outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white focus:border-transparent transition-all resize-none leading-relaxed" 
-							  placeholder="Type any issues, pending tasks, or notes for the next shift..."></textarea>
+				</div>
+			</template>
+
+			<!-- Fire Safety (Expanded Row) -->
+			<div class="flex-1 flex flex-col justify-center rounded-2xl border px-4 transition-all duration-300"
+				 :class="checklist.infra.fire.status ? 'bg-emerald-50/50 border-emerald-200' : 'bg-white border-slate-100'">
+				
+				<!-- Main Row -->
+				<div class="flex items-center justify-between w-full">
+					<div class="flex items-center gap-3.5">
+						<div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg transition-all duration-300 shadow-sm"
+							 :class="checklist.infra.fire.status ? 'bg-emerald-500 text-white shadow-emerald-200' : 'bg-slate-100 text-slate-400'">
+							<i class="fa-solid fa-fire-extinguisher"></i>
+						</div>
+						<div class="flex flex-col">
+							<h4 class="text-xs font-black text-slate-700 leading-tight">Fire Safety</h4>
+							<span class="text-[9px] font-bold uppercase tracking-wide mt-0.5" 
+								  :class="checklist.infra.fire.status ? 'text-emerald-600' : 'text-slate-400'" 
+								  x-text="checklist.infra.fire.status ? 'Verified' : 'Check Required'"></span>
+						</div>
+					</div>
+
+					<!-- Toggle -->
+					<div @click="toggleInfra('fire')" 
+						 class="w-10 h-6 rounded-full relative transition-all duration-300 ease-in-out border cursor-pointer" 
+						 :class="checklist.infra.fire.status ? 'bg-emerald-500 border-emerald-500' : 'bg-slate-200 border-slate-200'">
+						<div class="w-4 h-4 bg-white rounded-full absolute top-0.5 shadow-sm transition-all duration-300 transform" 
+							 :class="checklist.infra.fire.status ? 'translate-x-4.5' : 'translate-x-0.5'"></div>
+					</div>
 				</div>
 
+				<!-- Dropdown (Inside the card) -->
+				<div x-show="checklist.infra.fire.status" x-collapse>
+					<div @click="modals.fireList.show = true" 
+						 class="mt-3 w-full bg-white border border-emerald-100 text-emerald-700 text-[10px] font-bold py-2 px-3 rounded-lg flex justify-between items-center cursor-pointer hover:bg-emerald-50 transition-colors shadow-sm">
+						<span x-text="checklist.infra.fire.location || 'Select Location...'"></span>
+						<i class="fa-solid fa-chevron-down opacity-50"></i>
+					</div>
+				</div>
 			</div>
 
 		</div>
-
-    </div>
+	</div>
 </main>
 </div>
 
