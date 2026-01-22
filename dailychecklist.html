@@ -3,13 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PBL ChecklistITOps | Live</title>
+    <title>PBL ITOps | Pro Dashboard</title>
+    
+    <!-- ✅ Favicon -->
     <link rel="icon" type="image/png" href="pbl-logo.png">
+    
+    <!-- 📦 Dependencies -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;800&family=Outfit:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
 
+    <!-- 🎨 Tailwind Config -->
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -18,7 +22,7 @@
                     colors: { brand: '#0f172a' },
                     fontFamily: { sans: ['Outfit', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
                     animation: {
-                        'spin-slow': 'spin 4s linear infinite',
+                        'spin-slow': 'spin 3s linear infinite',
                         'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                         'float': 'float 3s ease-in-out infinite'
                     },
@@ -29,413 +33,907 @@
             }
         }
     </script>
+
+    <!-- 🧠 LOGIC SECTION (Updated for Validation) -->
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbyvIkwSZ5gdIBc_GHbXXMgadnBHU19twANppiq-nK8D3cGb8B6efZLix1Cxe2FPPsqyJw/exec"; 
+
+        function dailyOpsApp() {
+            return {
+                // 📅 State Variables
+                currentShift: 'morning', pendingShift: '', isLateEntry: false, submitState: 'ask', todayDate: '', timeLeft: '--', startTime: Date.now(),
+                
+                // ⚙️ Configuration
+                shiftConfig: {
+                    'morning': { name: 'Morning Shift', auditor: 'Anil Singh', branch: 'NOIDA', startH: 8, startM: 0, endH: 15, endM: 45, colorClass: 'text-blue-700', timeDisplay: '08 AM - 03:45 PM' },
+                    'general': { name: 'General Shift', auditor: 'Deependra Singh', branch: 'DEHRADUN', startH: 9, startM: 0, endH: 17, endM: 0, colorClass: 'text-teal-700', timeDisplay: '09 AM - 05 PM' },
+                    'evening': { name: 'Evening Shift', auditor: 'Ashok Singh', branch: 'NOIDA', startH: 14, startM: 15, endH: 21, endM: 30, colorClass: 'text-violet-700', timeDisplay: '02:15 PM - 09:30 PM' }
+                },
+                
+                score: 0, remarks: '', isSubmitting: false, showUsbModal: false, missingItems: [],
+                modals: { alert: { show: false }, confirm: { show: false, title: '' }, usb: { show: false }, sophos: { show: false }, lateWarning: { show: false }, scanner: { show: false }, fireList: { show: false } },
+                
+                fireLocations: {
+                    "Basement (BS)": ["BS - Server Room", "BS - Outside Server Room", "BS - Electric Room", "BS - IT Lab", "BS - Cafeteria", "BS - Cafeteria Stair"],
+                    "Ground Floor (GF)": ["GF - Reception", "GF - Conference Room", "GF - Production Hall", "GF - Inside Production", "GF - Staircase", "GF - Water Cooler", "GF - GenSet Area", "GF - Transformer Area", "GF - Inside Guard Room"],
+                    "First Floor (FF)": ["FF - Production Hall", "FF - Production (Right Side)", "FF - Staircase", "FF - Water Cooler"],
+                    "Third Floor (TF)": ["TF - Kitchen"]
+                },
+
+                // 📝 Data Structure
+                checklist: {
+                    morning: { temp: null, prodCheck: false, prodNotes: '', backupDC: false, backupADC: false, backupTime: '', wifi: false, authIssue: false, ftpJobCheck: false, pbl020Start: false },
+                    evening: { temp: null, authCollect: false, ftpReport: false, pbl020Running: true, pblReason: '' },
+                    servers: [ { name: 'WinSvr100', status: false, maintenance: false }, { name: 'WinSvr101', status: false, maintenance: false }, { name: 'WinSvr005', status: false, maintenance: false }, { name: 'PBL', status: false, maintenance: false }, { name: 'Linux 2', status: false, maintenance: false }, { name: 'Linux 3', status: false, maintenance: false } ],
+                    services: [ { name: 'PanBusiness.net', status: false, type: 'web', desc: 'Website Status', icon: 'fa-globe' }, { name: 'Rediff Enterprise', status: false, type: 'mail', desc: 'Mail Flow Check', icon: 'fa-envelope' }, { name: 'Citrix VPN', status: false, type: 'web', desc: 'https://ede.dp-ds.de/vpn', icon: 'fa-cloud' } ],
+                    isp: [ { name: 'STPI 15Mbps', speed: 0, max: 15, complaint: '', vendor: '9876543210' }, { name: 'Airtel 10Mbps', speed: 0, max: 10, complaint: '', vendor: '9876543210' }, { name: 'Airtel 30Mbps BB', speed: 0, max: 30, complaint: '', vendor: '9876543210' } ],
+                    endpoints: { sophos: false, usb: false },
+                    infra: { acs: [{ name: 'Server AC 1', status: false }, { name: 'Server AC 2', status: false }, { name: 'Server AC 3', status: false }], fire: { status: false, location: '' } }
+                },
+
+                // 🏁 Init
+                init() {
+                    this.todayDate = new Date().toLocaleDateString('en-IN', {weekday: 'short', day: '2-digit', month: 'short'});
+                    this.detectCurrentShift();
+                    const todayStr = new Date().toDateString();
+                    const cached = localStorage.getItem('pbl_daily_ops');
+                    if (cached) {
+                        const parsed = JSON.parse(cached);
+                        if (parsed.saveDate === todayStr) {
+                            if(parsed.checklist) {
+                                if(parsed.checklist.morning) this.checklist.morning = parsed.checklist.morning;
+                                if(parsed.checklist.evening) this.checklist.evening = parsed.checklist.evening;
+                                this.checklist.isp.forEach((item, i) => { if(parsed.checklist.isp[i]) { item.speed = parsed.checklist.isp[i].speed; item.complaint = parsed.checklist.isp[i].complaint || ''; } });
+                                this.checklist.servers.forEach((item, i) => { if(parsed.checklist.servers[i]) { item.status = parsed.checklist.servers[i].status; item.maintenance = parsed.checklist.servers[i].maintenance || false; } });
+                                if(parsed.checklist.services) { this.checklist.services.forEach((item, i) => { if(parsed.checklist.services[i]) item.status = parsed.checklist.services[i].status; }); }
+                                this.checklist.infra.forEach((item, i) => { if(parsed.checklist.infra[i]) item.status = parsed.checklist.infra[i].status; });
+                                this.checklist.endpoints = parsed.checklist.endpoints;
+                            }
+                            this.remarks = parsed.remarks || '';
+                        } else { localStorage.removeItem('pbl_daily_ops'); }
+                    }
+                    this.calculateScore();
+                    this.updateTimer();
+                    setInterval(() => this.updateTimer(), 60000);
+                },
+
+                haptic() { if (navigator.vibrate) navigator.vibrate(12); },
+
+                // ⚡ Toggle Functions
+                toggleTask(shift, key) { this.haptic(); this.checklist[shift][key] = !this.checklist[shift][key]; this.update(); },
+                toggleMorningTask(key) { this.toggleTask('morning', key); },
+                toggleEveningTask(key) { this.toggleTask('evening', key); },
+                toggleBackup(key) { this.haptic(); key === 'dc' ? this.checklist.morning.backupDC = !this.checklist.morning.backupDC : this.checklist.morning.backupADC = !this.checklist.morning.backupADC; this.update(); },
+                togglePblRun() { this.haptic(); this.checklist.evening.pbl020Running = !this.checklist.evening.pbl020Running; this.update(); },
+                toggleInfra(key) { this.haptic(); if(key === 'fire') this.checklist.infra.fire.status = !this.checklist.infra.fire.status; else this.checklist.infra.acs[key].status = !this.checklist.infra.acs[key].status; this.update(); },
+                toggleAC(i) { this.haptic(); this.checklist.infra.acs[i].status = !this.checklist.infra.acs[i].status; this.update(); },
+                toggleServer(i) { if(this.checklist.servers[i].maintenance) return; this.haptic(); this.checklist.servers[i].status = !this.checklist.servers[i].status; this.update(); },
+                toggleMaintenance(i) { this.haptic(); this.checklist.servers[i].maintenance = !this.checklist.servers[i].maintenance; if(this.checklist.servers[i].maintenance) this.checklist.servers[i].status = false; this.update(); },
+                getServerClass(srv) { if(srv.maintenance) return 'bg-amber-50 border-amber-300 text-slate-700 opacity-80'; if(!srv.status) return 'bg-white border-slate-200 text-slate-700'; if(srv.name.includes('Linux') || srv.name === 'PBL') return 'bg-orange-600 border-orange-700 text-white shadow-lg shadow-orange-500/30'; return 'bg-blue-600 border-blue-700 text-white shadow-lg shadow-blue-500/30'; },
+                toggleService(i) { this.haptic(); this.checklist.services[i].status = !this.checklist.services[i].status; this.update(); },
+                
+                // 🔒 Security Checks
+                handleUsbCheck() { this.haptic(); if (!this.checklist.endpoints.usb) this.showUsbModal = true; else { this.checklist.endpoints.usb = false; this.update(); } },
+                confirmUsbCheck() { this.haptic(); this.checklist.endpoints.usb = true; this.showUsbModal = false; this.update(); },
+                handleSophosCheck() { this.haptic(); if(!this.checklist.endpoints.sophos) this.modals.sophos.show = true; else { this.checklist.endpoints.sophos = false; this.update(); } },
+                confirmSophos() { this.haptic(); this.checklist.endpoints.sophos = true; this.modals.sophos.show = false; this.update(); },
+                
+                // 📶 ISP Logic
+                getSpeedColor(speed, max) { if(!speed || speed == 0) return 'bg-slate-400 text-white'; return (speed / max) * 100 <= 50 ? 'bg-rose-500 text-white shadow-rose-500/50' : 'bg-emerald-500 text-white shadow-emerald-500/50'; },
+                getSpeedText(speed, max) { if(!speed || speed == 0) return 'text-slate-300'; return (speed / max) * 100 <= 50 ? 'text-rose-500' : 'text-emerald-500'; },
+                getSpeedHex(speed, max) { if(!speed || speed == 0) return '#cbd5e1'; return (speed / max) * 100 <= 50 ? '#f43f5e' : '#10b981'; },
+                isLowSpeed(isp) { return isp.speed > 0 && isp.speed <= (isp.max / 2); },
+                
+                // ⏳ Time & Shift Logic
+                updateTimer() { const now = new Date(); const conf = this.shiftConfig[this.currentShift]; const endTime = new Date(); endTime.setHours(conf.endH, conf.endM, 0); if (now > endTime) { this.timeLeft = "Time Up"; return; } const diff = endTime - now; const hrs = Math.floor((diff / (1000 * 60 * 60))); const mins = Math.floor((diff / (1000 * 60)) % 60); this.timeLeft = `${hrs}h ${mins}m Left`; },
+                detectCurrentShift() { const now = new Date(); const h = now.getHours(); const m = now.getMinutes(); const time = h + m/60; if (time >= 14.25 && time < 21.5) { this.currentShift = 'evening'; } else if (time >= 8 && time < 14.25) { this.currentShift = 'morning'; } else if (time >= 9 && time < 17) { this.currentShift = 'general'; } else { this.currentShift = 'morning'; } this.checkLateStatus(); this.updateTimer(); },
+                isTimeInRange(sH, sM, eH, eM) { const now = new Date(); const h = now.getHours(); const m = now.getMinutes(); const current = h + m/60; const start = sH + sM/60; const end = eH + eM/60; return current >= start && current < end; },
+                checkLateStatus() { const conf = this.shiftConfig[this.currentShift]; this.isLateEntry = !this.isTimeInRange(conf.startH, conf.startM, conf.endH, conf.endM); },
+                requestShiftChange(type) { this.haptic(); const conf = this.shiftConfig[type]; if (this.isTimeInRange(conf.startH, conf.startM, conf.endH, conf.endM)) { this.currentShift = type; this.isLateEntry = false; } else { this.pendingShift = type; this.modals.lateWarning.show = true; } this.updateTimer(); },
+                confirmLateEntry() { this.haptic(); this.currentShift = this.pendingShift; this.isLateEntry = true; this.modals.lateWarning.show = false; if(this.remarks.length < 5) this.remarks = ''; this.updateTimer(); },
+                saveLocal() { localStorage.setItem('pbl_daily_ops', JSON.stringify({ saveDate: new Date().toDateString(), checklist: this.checklist, remarks: this.remarks })); },
+                update() { this.calculateScore(); this.saveLocal(); },
+
+                // 📊 UPDATED SCORE CALCULATION (Excluding Sys Check & PBL)
+				calculateScore() {
+					let total = 0, checked = 0;
+
+					// 1. Shift Specific Items
+					if(this.currentShift === 'morning') {
+						// Total 6 Items (System Check Removed from Score)
+						total += 6; 
+						if(this.checklist.morning.temp) checked++;
+						// if(this.checklist.morning.prodCheck) checked++;  <-- REMOVED
+						if(this.checklist.morning.authIssue) checked++; 
+						if(this.checklist.morning.ftpJobCheck) checked++; 
+						if(this.checklist.morning.backupDC) checked++; 
+						if(this.checklist.morning.backupADC) checked++; 
+						if(this.checklist.morning.wifi) checked++;
+					}
+					if(this.currentShift === 'evening') {
+						// Total 3 Items (PBL Status Removed from Score)
+						total += 3; 
+						if(this.checklist.evening.temp) checked++;
+						if(this.checklist.evening.authCollect) checked++; 
+						if(this.checklist.evening.ftpReport) checked++;
+						// if(this.checklist.evening.pbl020Running) checked++; <-- REMOVED
+					}
+
+					// 2. Common Infrastructure (Same as before)
+					this.checklist.servers.forEach(s => { 
+						if(!s.maintenance) { total++; if(s.status) checked++; } 
+					});
+					this.checklist.services.forEach(s => { total++; if(s.status) checked++; });
+					this.checklist.isp.forEach(i => { total++; if(i.speed && i.speed > 0) checked++; });
+					
+					total += 2; 
+					if(this.checklist.endpoints.sophos) checked++; 
+					if(this.checklist.endpoints.usb) checked++;
+					
+					total += this.checklist.infra.acs.length + 1;
+					this.checklist.infra.acs.forEach(ac => { if(ac.status) checked++; });
+					if(this.checklist.infra.fire.status) checked++;
+
+					// Final Score
+					this.score = total === 0 ? 0 : Math.round((checked / total) * 100);
+				},
+
+                getSubmitButtonClass() {
+                    if (this.isSubmitting) return 'bg-slate-400';
+                    if (this.isLateEntry) return 'bg-gradient-to-r from-rose-600 to-pink-600 shadow-rose-500/30';
+                    if (this.currentShift === 'morning') return 'bg-gradient-to-r from-blue-600 to-indigo-600 shadow-blue-500/30';
+                    if (this.currentShift === 'general') return 'bg-gradient-to-r from-teal-600 to-emerald-600 shadow-teal-500/30';
+                    if (this.currentShift === 'evening') return 'bg-gradient-to-r from-violet-600 to-purple-600 shadow-violet-500/30';
+                    return 'bg-brand';
+                },
+
+                // 🔍 UPDATED VALIDATION (Allow Submit without Sys Check/PBL)
+				scanForIssues() {
+					let issues = [];
+					if (this.currentShift === 'morning') {
+						if (!this.checklist.morning.temp) issues.push({ msg: "Temp not logged", id: "card-temp" });
+						
+						// REMOVED: System Check Validation
+						// if (!this.checklist.morning.prodCheck) issues.push({ msg: "System Check pending", id: "card-prod" }); 
+						
+						if (!this.checklist.morning.authIssue) issues.push({ msg: "eTokens not Issued", id: "card-etoken" });
+						if (!this.checklist.morning.ftpJobCheck) issues.push({ msg: "FTP Check pending", id: "card-ftp" });
+						if (!this.checklist.morning.backupDC) issues.push({ msg: "DC Backup pending", id: "card-backup" });
+						if (!this.checklist.morning.backupADC) issues.push({ msg: "ADC Backup pending", id: "card-backup" });
+						if (!this.checklist.morning.wifi) issues.push({ msg: "WiFi Check pending", id: "card-wifi" });
+					} else if (this.currentShift === 'evening') {
+						if (!this.checklist.evening.temp) issues.push({ msg: "Temp not logged", id: "card-temp-eve" });
+						if (!this.checklist.evening.authCollect) issues.push({ msg: "Tokens not Collected", id: "card-etoken-eve" });
+						if (!this.checklist.evening.ftpReport) issues.push({ msg: "FTP Report not sent", id: "card-ftp-eve" });
+						
+						// REMOVED: PBL Status Validation (Submit allowed regardless of toggle)
+					}
+					
+					// Common Infra Checks (Same as before)
+					this.checklist.servers.forEach(s => { if (!s.maintenance && !s.status) issues.push({ msg: `${s.name} Down`, id: "card-servers" }); });
+					this.checklist.services.forEach(s => { if (!s.status) issues.push({ msg: `${s.name} Down`, id: "card-services" }); });
+					this.checklist.isp.forEach(i => { if (i.speed <= 0) issues.push({ msg: `${i.name} No Speed`, id: "card-isp" }); });
+					this.checklist.infra.acs.forEach(ac => { if (!ac.status) issues.push({ msg: `${ac.name} OFF`, id: "card-infra" }); });
+					if (!this.checklist.infra.fire.status) issues.push({ msg: "Fire Safety pending", id: "card-infra" });
+					if (!this.checklist.endpoints.sophos) issues.push({ msg: "Sophos Check pending", id: "card-security" });
+					if (!this.checklist.endpoints.usb) issues.push({ msg: "USB Check pending", id: "card-security" });
+					
+					return issues;
+				},
+
+                scrollToIssue() {
+                    this.haptic();
+                    this.modals.scanner.show = false;
+                    if (this.missingItems.length > 0) {
+                        // Desktop: No ID scroll needed in single page, but visual shake?
+                        // Mobile: Scroll logic remains
+                        const targetId = this.missingItems[0].id;
+                        const el = document.getElementById(targetId);
+                        if (el) {
+                            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            el.classList.add('ring-4', 'ring-amber-400');
+                            setTimeout(() => el.classList.remove('ring-4', 'ring-amber-400'), 2000);
+                        }
+                    }
+                },
+
+                scrollToRemarks() {
+                    this.haptic();
+                    this.modals.scanner.show = false;
+                    const el = document.getElementById('card-remarks'); // Ensure textarea has this ID or logic finds it
+                    if (el) {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        setTimeout(() => document.querySelector('textarea').focus(), 500);
+                    } else {
+                        // Desktop fallback
+                        document.querySelector('textarea')?.focus();
+                    }
+                    if (this.remarks.trim().length < 3) {
+                        this.showAlert('Remarks Required', 'Please explain why items are pending.', 'warning');
+                    }
+                },
+
+                confirmAction(action) {
+                    this.haptic();
+                    if (action === 'submit') {
+                        if (this.isLateEntry && this.remarks.trim().length < 5) { this.showAlert('Late Entry', 'Please provide a valid reason in remarks.', 'error'); return; }
+                        const pendingIssues = this.scanForIssues();
+                        if (pendingIssues.length > 0) {
+                            this.missingItems = pendingIssues;
+                            this.modals.scanner.show = true; 
+                            return; 
+                        }
+                    }
+                    this.finalizeSubmit(action);
+                },
+                
+                finalizeSubmit(action) {
+                    const shiftData = this.shiftConfig[this.currentShift];
+                    this.submitState = 'ask';
+                    this.modals.confirm = { show: true, title: action === 'reset' ? 'Clear Data?' : `Submit ${shiftData.name}?`, action };
+                },
+                
+                executeConfirmAction() {
+                    this.haptic();
+                    if(this.modals.confirm.action === 'reset') { localStorage.removeItem('pbl_daily_ops'); window.location.reload(); }
+                    else { this.submitState = 'loading'; this.submitAudit(); }
+                },
+                
+                showAlert(title, msg, type) { this.modals.alert = { show: true, title, msg }; this.haptic(); },
+                closeAlert() { this.modals.alert.show = false; },
+
+                async submitAudit() {
+                    this.isSubmitting = true; const dateStr = new Date().toLocaleDateString('en-IN'); const shiftDetails = this.shiftConfig[this.currentShift];
+                    let cycleName = `${shiftDetails.name} (${shiftDetails.branch}) - ${dateStr}`; if (this.isLateEntry) cycleName += " [LATE ENTRY]";
+                    const timeTakenSec = Math.floor((Date.now() - this.startTime) / 1000);
+                    const timeTakenStr = `${Math.floor(timeTakenSec/60)}m ${timeTakenSec%60}s`;
+                    
+                    let finalRemarks = this.remarks + ` [TimeTaken: ${timeTakenStr}]`;
+                    if(this.currentShift === 'morning' && this.checklist.morning.temp) finalRemarks += ` [Temp: ${this.checklist.morning.temp}°C]`;
+                    if(this.currentShift === 'evening' && this.checklist.evening.temp) finalRemarks += ` [Temp: ${this.checklist.evening.temp}°C]`;
+
+                    const payload = { 
+                        action: 'submitSecurityAudit', 
+                        auditor: shiftDetails.auditor, 
+                        cycle: cycleName, 
+                        score: this.score, 
+                        remarks: finalRemarks, 
+                        details: this.checklist 
+                    };
+                    
+                    try {
+                        const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+                        const result = await res.json();
+                        if (result.status === 'success') { 
+                            if(navigator.vibrate) navigator.vibrate([100, 50, 100]); 
+                            localStorage.removeItem('pbl_daily_ops'); 
+                            this.submitState = 'done'; 
+                        } else { alert(result.message); this.modals.confirm.show = false; }
+                    } catch (e) { alert('Network Error'); this.modals.confirm.show = false; } 
+                    finally { this.isSubmitting = false; }
+                }
+            }
+        }
+    </script>
+    
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+
     <style>
         [x-cloak] { display: none !important; }
         body { background-color: #f8fafc; -webkit-tap-highlight-color: transparent; }
+        
+        /* 🌈 Shift Gradients (Standardized) */
         .bg-gradient-morning { background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%); }
         .bg-gradient-general { background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); }
         .bg-gradient-evening { background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%); }
         .bg-gradient-late { background: linear-gradient(135deg, #be123c 0%, #e11d48 100%); }
+        
+        /* 🪟 Glass & Effects */
         .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 10px 30px -10px rgba(0,0,0,0.08); transition: transform 0.1s; }
         .glass-card:active { transform: scale(0.98); }
+        
+        /* 🎚️ Range Sliders */
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; height: 30px; cursor: pointer; }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 10px; border-radius: 99px; background: #e2e8f0; background-image: linear-gradient(to right, var(--thumb-color) 0%, var(--thumb-color) var(--progress), #e2e8f0 var(--progress), #e2e8f0 100%); }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 26px; width: 26px; border-radius: 50%; background: white; border: 4px solid var(--thumb-color); box-shadow: 0 2px 6px rgba(0,0,0,0.15); margin-top: -8px; transition: transform 0.1s; }
         input[type=range]::-webkit-slider-thumb:active { transform: scale(1.2); }
+        
+        /* 🖱️ Utilities */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .bg-icon-visible { opacity: 0.3; mix-blend-mode: overlay; pointer-events: none; z-index: 0; }
         .clickable { cursor: pointer; position: relative; z-index: 50; }
-        /* Safe Area for Mobile Lists */
         .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
+        
+        /* 🖥️ Desktop Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+		
+		/* ✈️ ANIMATED SEND BUTTON */
+		.btn-fly {font-family: inherit; display: flex;align-items: center; border: none; overflow: hidden; transition: all 0.2s; cursor: pointer;}
+		.btn-fly span {display: block; margin-left: 0.3em; transition: all 0.3s ease-in-out;}
+		.btn-fly svg {display: block; transform-origin: center center; transition: transform 0.3s ease-in-out;}
+		.btn-fly:hover .svg-wrapper {animation: fly-1 0.6s ease-in-out infinite alternate;}
+		.btn-fly:hover svg {transform: translateX(1.5em) rotate(45deg) scale(1.1);}
+		.btn-fly:hover span {transform: translateX(7em); /* Text bahar bhej do */opacity: 0;}
+		.btn-fly:active {transform: scale(0.95);}
+		@keyframes fly-1 {from { transform: translateY(0.1em); }to { transform: translateY(-0.1em); }}
+		
     </style>
 </head>
-<body class="text-slate-800 transition-colors duration-300 min-h-screen pb-40 font-sans bg-slate-50" x-data="dailyOpsApp()">
+<body class="text-slate-800 transition-colors duration-300 min-h-screen font-sans bg-slate-50" x-data="dailyOpsApp()">
 
-    <!-- HEADER -->
-    <header class="relative pt-10 pb-28 px-5 overflow-hidden rounded-b-[3rem] shadow-2xl transition-colors duration-500 ease-out"
-            :class="{ 'bg-gradient-late': isLateEntry, 'bg-gradient-morning': !isLateEntry && currentShift === 'morning', 'bg-gradient-general': !isLateEntry && currentShift === 'general', 'bg-gradient-evening': !isLateEntry && currentShift === 'evening' }">
-        <div class="absolute inset-0 z-0 pointer-events-none">
-            <div x-show="['morning', 'evening'].includes(currentShift)" class="absolute bottom-0 left-0 w-full flex items-end justify-center text-white bg-icon-visible"><i class="fa-solid fa-building text-7xl opacity-80"></i><i class="fa-solid fa-city text-9xl mx-2"></i></div>
-            <div x-show="currentShift === 'general'" class="absolute bottom-0 right-0 w-full flex items-end justify-end text-white bg-icon-visible pr-6"><i class="fa-solid fa-mountain text-7xl opacity-80"></i></div>
-        </div>
-        <div class="relative z-10">
-            <div class="flex justify-between items-center mb-6">
-                <div class="flex items-center gap-3"><div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-xl border border-white/50" @click="haptic()">
-				<img src="pbl-logo.png" alt="PBL" class="w-7 h-7 object-contain"></div><div><h1 class="text-2xl font-black text-white leading-none tracking-tight">PBL Daily Ops</h1><div class="flex items-center gap-2 mt-1.5 opacity-90"><span class="text-[10px] bg-white/20 backdrop-blur-md px-2 py-0.5 rounded text-white font-bold border border-white/10" x-text="todayDate"></span><span class="text-[10px] font-bold text-white uppercase tracking-wider" x-text="shiftConfig[currentShift].branch"></span></div></div></div>
-                <div class="flex flex-col items-end"><div class="px-3 py-1.5 rounded-full bg-black/20 backdrop-blur-md border border-white/10 flex items-center gap-2 shadow-inner mb-1"><div class="w-2 h-2 rounded-full shadow-[0_0_10px_currentColor]" :class="isLateEntry ? 'bg-white text-white animate-pulse' : 'bg-emerald-400 text-emerald-400'"></div><span class="text-[10px] font-bold text-white uppercase tracking-wide" x-text="isLateEntry ? 'LATE' : 'ACTIVE'"></span></div><span class="text-[10px] font-mono text-white/90 font-bold tracking-wide" x-show="!isLateEntry"><i class="fa-solid fa-hourglass-half mr-1"></i><span x-text="timeLeft">Syncing...</span></span></div>
+    <!-- =========================================================
+         📱 MOBILE LAYOUT (UNCHANGED)
+    ========================================================== -->
+    <div class="block md:hidden pb-40 relative">
+        <header class="relative pt-10 pb-28 px-5 overflow-hidden rounded-b-[3rem] shadow-2xl transition-colors duration-500 ease-out" :class="{ 'bg-gradient-late': isLateEntry, 'bg-gradient-morning': !isLateEntry && currentShift === 'morning', 'bg-gradient-general': !isLateEntry && currentShift === 'general', 'bg-gradient-evening': !isLateEntry && currentShift === 'evening' }">
+            <div class="absolute inset-0 z-0 pointer-events-none">
+                <div x-show="['morning', 'evening'].includes(currentShift)" class="absolute bottom-0 left-0 w-full flex items-end justify-center text-white bg-icon-visible"><i class="fa-solid fa-building text-7xl opacity-80"></i><i class="fa-solid fa-city text-9xl mx-2"></i></div>
+                <div x-show="currentShift === 'general'" class="absolute bottom-0 right-0 w-full flex items-end justify-end text-white bg-icon-visible pr-6"><i class="fa-solid fa-mountain text-7xl opacity-80"></i></div>
             </div>
-            <div class="bg-black/20 p-1.5 rounded-2xl flex backdrop-blur-md border border-white/10 overflow-x-auto no-scrollbar gap-1 relative z-50">
-                <template x-for="(conf, key) in shiftConfig" :key="key"><button @click="requestShiftChange(key)" class="flex-1 min-w-[100px] py-2.5 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all duration-300 relative group clickable" :class="currentShift === key ? 'bg-white shadow-lg transform -translate-y-0.5' : 'hover:bg-white/10 text-white/70'"><span class="text-xs font-black tracking-tight" :class="currentShift === key ? conf.colorClass : 'text-white'" x-text="conf.auditor.split(' ')[0]"></span><span class="text-[9px] font-bold opacity-80" :class="currentShift === key ? 'text-slate-500' : 'text-white'" x-text="conf.timeDisplay"></span><div x-show="isTimeInRange(conf.startH, conf.startM, conf.endH, conf.endM)" class="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div></button></template>
-            </div>
-        </div>
-    </header>
-
-    <!-- CONTENT -->
-    <main class="px-5 -mt-20 relative z-20 max-w-lg mx-auto space-y-6">
-        <div x-show="currentShift === 'general'" class="flex flex-col items-center justify-center py-20 text-center animate-pulse"><div class="w-24 h-24 bg-teal-100 rounded-full flex items-center justify-center text-4xl text-teal-600 mb-4 shadow-xl"><i class="fa-solid fa-mug-hot"></i></div><h2 class="text-xl font-black text-slate-700">General Shift</h2><p class="text-xs text-slate-400 mt-2 font-medium">Dashboard Standby.</p></div>
-
-        <div x-show="currentShift !== 'general'">
-            <!-- SCORE -->
-            <div class="glass-card p-6 rounded-[2.5rem] flex justify-between items-center shadow-xl mb-6">
-                <div class="flex-1"><p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Shift Readiness</p><div class="flex items-baseline gap-1"><h2 class="text-6xl font-black text-slate-800 tracking-tighter" x-text="score">0</h2><span class="text-2xl font-bold text-slate-400">%</span></div></div>
-                <div class="relative w-20 h-20"><svg class="w-full h-full transform -rotate-90 drop-shadow-lg"><circle cx="40" cy="40" r="36" stroke="#e2e8f0" stroke-width="6" fill="transparent" /><circle cx="40" cy="40" r="36" stroke="currentColor" stroke-width="6" fill="transparent" :class="score == 100 ? 'text-emerald-500' : 'text-orange-500'" :stroke-dasharray="226" :stroke-dashoffset="226 - (226 * score) / 100" class="transition-all duration-1000 ease-out" stroke-linecap="round"/></svg><div class="absolute inset-0 flex items-center justify-center text-2xl text-slate-300"><i class="fa-solid" :class="score == 100 ? 'fa-check text-emerald-500' : 'fa-chart-pie'"></i></div></div>
-            </div>
-
-            <!-- MORNING -->
-            <div x-show="currentShift === 'morning'" x-transition class="space-y-4 mb-6">
-                <h3 class="text-xs font-black text-blue-600 uppercase tracking-widest ml-1"><i class="fa-solid fa-sun"></i> Morning Tasks</h3>
-                <div id="card-temp" class="glass-card p-5 rounded-3xl border-l-[6px] border-l-blue-400 scroll-mt-24">
-                    <div class="flex justify-between items-end mb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg"><i class="fa-solid fa-temperature-half"></i></div><div><h4 class="text-sm font-black text-slate-700">Server Room Temp</h4><p class="text-[10px] text-slate-400 font-bold">Log Temperature</p></div></div><span class="text-2xl font-black font-mono" :class="checklist.morning.temp ? 'text-slate-800' : 'text-slate-300'" x-text="checklist.morning.temp ? checklist.morning.temp + '°C' : '--'"></span></div>
-                    <div class="relative py-1"><div x-show="!checklist.morning.temp" @click="checklist.morning.temp = 20" class="absolute inset-0 bg-slate-100/80 backdrop-blur-sm z-30 flex items-center justify-center rounded-xl cursor-pointer border-2 border-dashed border-slate-300"><span class="text-xs font-black text-slate-500 uppercase">Tap to Activate</span></div><input type="range" min="16" max="28" step="0.5" x-model="checklist.morning.temp" @input="saveLocal(); haptic()" class="relative z-20 w-full" :style="`--thumb-color: #3b82f6; --progress: ${((checklist.morning.temp - 16) / 12) * 100}%`"></div>
+            <div class="relative z-10">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center gap-3"><div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-xl border border-white/50" @click="haptic()">
+                    <img src="pbl-logo.png" alt="PBL" class="w-7 h-7 object-contain"></div><div><h1 class="text-2xl font-black text-white leading-none tracking-tight">PBL Daily Ops</h1><div class="flex items-center gap-2 mt-1.5 opacity-90"><span class="text-[10px] bg-white/20 backdrop-blur-md px-2 py-0.5 rounded text-white font-bold border border-white/10" x-text="todayDate"></span><span class="text-[10px] font-bold text-white uppercase tracking-wider" x-text="shiftConfig[currentShift].branch"></span></div></div></div>
+                    <div class="flex flex-col items-end"><div class="px-3 py-1.5 rounded-full bg-black/20 backdrop-blur-md border border-white/10 flex items-center gap-2 shadow-inner mb-1"><div class="w-2 h-2 rounded-full shadow-[0_0_10px_currentColor]" :class="isLateEntry ? 'bg-white text-white animate-pulse' : 'bg-emerald-400 text-emerald-400'"></div><span class="text-[10px] font-bold text-white uppercase tracking-wide" x-text="isLateEntry ? 'LATE' : 'ACTIVE'"></span></div><span class="text-[10px] font-mono text-white/90 font-bold tracking-wide" x-show="!isLateEntry"><i class="fa-solid fa-hourglass-half mr-1"></i><span x-text="timeLeft">Syncing...</span></span></div>
                 </div>
-                <!-- ... other morning tasks ... -->
-                <div id="card-prod" class="glass-card p-5 rounded-3xl border-l-[6px] border-l-yellow-400 scroll-mt-24">
-                    <div class="flex justify-between items-center mb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-yellow-100 text-yellow-600 flex items-center justify-center text-lg"><i class="fa-solid fa-power-off"></i></div><div><h4 class="text-sm font-black text-slate-700">System Check</h4><p class="text-[10px] text-slate-400 font-bold">Any PC left ON?</p></div></div><div @click="toggleMorningTask('prodCheck')" class="w-12 h-6 rounded-full relative transition-colors duration-300 cursor-pointer clickable" :class="checklist.morning.prodCheck ? 'bg-rose-500' : 'bg-emerald-500'"><div class="w-4 h-4 bg-white rounded-full absolute top-1 transition-all duration-300 shadow-sm" :class="checklist.morning.prodCheck ? 'left-7' : 'left-1'"></div></div></div>
-                    <div x-show="checklist.morning.prodCheck" class="mt-3 pt-3 border-t border-yellow-200"><input type="text" x-model="checklist.morning.prodNotes" @input="saveLocal()" placeholder="Which PCs? (e.g. PC-4)" class="w-full bg-yellow-50 border border-yellow-300 text-xs rounded-lg p-3 font-bold"></div>
+                <div class="bg-black/20 p-1.5 rounded-2xl flex backdrop-blur-md border border-white/10 overflow-x-auto no-scrollbar gap-1 relative z-50">
+                    <template x-for="(conf, key) in shiftConfig" :key="key"><button @click="requestShiftChange(key)" class="flex-1 min-w-[100px] py-2.5 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all duration-300 relative group clickable" :class="currentShift === key ? 'bg-white shadow-lg transform -translate-y-0.5' : 'hover:bg-white/10 text-white/70'"><span class="text-xs font-black tracking-tight" :class="currentShift === key ? conf.colorClass : 'text-white'" x-text="conf.auditor.split(' ')[0]"></span><span class="text-[9px] font-bold opacity-80" :class="currentShift === key ? 'text-slate-500' : 'text-white'" x-text="conf.timeDisplay"></span><div x-show="isTimeInRange(conf.startH, conf.startM, conf.endH, conf.endM)" class="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div></button></template>
                 </div>
-                <div id="card-etoken" @click="toggleMorningTask('authIssue')" class="glass-card p-4 rounded-3xl cursor-pointer border-2 transition-all active:scale-95 flex items-center gap-4 clickable scroll-mt-24" :class="checklist.morning.authIssue ? 'border-blue-400 bg-blue-50' : 'border-transparent'"><div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-md" :class="checklist.morning.authIssue ? 'bg-blue-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-key"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">Issue eTokens</h4><p class="text-[10px] font-bold text-slate-400">Handover 10 Units to Production Dept.</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.morning.authIssue ? 'border-blue-500 bg-blue-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div>
-                <div id="card-ftp" @click="toggleMorningTask('ftpJobCheck')" class="glass-card p-4 rounded-3xl cursor-pointer border-2 transition-all active:scale-95 flex items-center gap-4 clickable scroll-mt-24" :class="checklist.morning.ftpJobCheck ? 'border-indigo-400 bg-indigo-50' : 'border-transparent'"><div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-md" :class="checklist.morning.ftpJobCheck ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-folder-open"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">Client FTP Jobs</h4><p class="text-[10px] font-bold text-slate-400">Check New Jobs</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.morning.ftpJobCheck ? 'border-indigo-500 bg-indigo-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div>
-                <div id="card-pbl020" @click="toggleMorningTask('pbl020Start')" class="glass-card p-4 rounded-3xl cursor-pointer border-2 transition-all active:scale-95 flex items-center gap-4 clickable scroll-mt-24" :class="checklist.morning.pbl020Start ? 'border-emerald-400 bg-emerald-50' : 'border-transparent'"><div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-md" :class="checklist.morning.pbl020Start ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-power-off"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">Start pblnet020</h4><p class="text-[10px] font-bold text-slate-400">Boot Machine</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.morning.pbl020Start ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div>
-                <div id="card-backup" class="glass-card p-5 rounded-3xl border-l-[6px] border-l-blue-500 scroll-mt-24"><div class="flex justify-between items-center mb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg"><i class="fa-solid fa-clock-rotate-left"></i></div><div><h4 class="text-sm font-black text-slate-700">Backup Verify</h4><p class="text-[10px] text-slate-400 font-bold">Check Folders</p></div></div></div><div class="flex gap-2"><div @click="toggleBackup('dc')" class="flex-1 p-2 rounded-xl border-2 text-center cursor-pointer clickable" :class="checklist.morning.backupDC ? 'bg-blue-50 border-blue-500' : 'border-slate-200'"><span class="text-[10px] font-bold">WinSvr100</span></div><div @click="toggleBackup('adc')" class="flex-1 p-2 rounded-xl border-2 text-center cursor-pointer clickable" :class="checklist.morning.backupADC ? 'bg-blue-50 border-blue-500' : 'border-slate-200'"><span class="text-[10px] font-bold">WinSvr101</span></div></div><div x-show="checklist.morning.backupDC || checklist.morning.backupADC" class="mt-3 pt-3 border-t border-slate-100"><input type="text" x-model="checklist.morning.backupTime" @input="saveLocal()" placeholder="Backup Time (e.g. 02:15 AM)" class="w-full mt-1 bg-blue-50 border border-blue-200 text-xs rounded-lg p-2 font-bold"></div></div>
-                <div id="card-wifi" @click="toggleMorningTask('wifi')" class="glass-card p-4 rounded-3xl cursor-pointer border-2 transition-all active:scale-95 flex items-center gap-4 clickable scroll-mt-24" :class="checklist.morning.wifi ? 'border-indigo-400 bg-indigo-50' : 'border-transparent'"><div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl transition-colors shadow-sm" :class="checklist.morning.wifi ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-wifi"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">Admin WiFi</h4><p class="text-[10px] font-bold text-slate-400">Check Admin Wifi Connectivity</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.morning.wifi ? 'border-indigo-500 bg-indigo-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div>
             </div>
+        </header>
 
-            <!-- EVENING -->
-            <div x-show="currentShift === 'evening'" x-transition class="space-y-4 mb-6">
-                <h3 class="text-xs font-black text-violet-600 uppercase tracking-widest ml-1"><i class="fa-solid fa-moon"></i> Evening Tasks</h3>
-                <div id="card-temp-eve" class="glass-card p-5 rounded-3xl border-l-[6px] border-l-violet-400 scroll-mt-24">
-                    <div class="flex justify-between items-end mb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center text-lg"><i class="fa-solid fa-temperature-half"></i></div><div><h4 class="text-sm font-black text-slate-700">Server Room Temp</h4><p class="text-[10px] text-slate-400 font-bold">Log Temperature</p></div></div><span class="text-2xl font-black font-mono" :class="checklist.evening.temp ? 'text-slate-800' : 'text-slate-300'" x-text="checklist.evening.temp ? checklist.evening.temp + '°C' : '--'"></span></div>
-                    <div class="relative py-1"><div x-show="!checklist.evening.temp" @click="checklist.evening.temp = 20" class="absolute inset-0 bg-slate-100/80 backdrop-blur-sm z-30 flex items-center justify-center rounded-xl cursor-pointer border-2 border-dashed border-slate-300"><span class="text-xs font-black text-slate-500 uppercase">Tap to Activate</span></div><input type="range" min="16" max="28" step="0.5" x-model="checklist.evening.temp" @input="saveLocal(); haptic()" class="relative z-20 w-full" :style="`--thumb-color: #7c3aed; --progress: ${((checklist.evening.temp - 16) / 12) * 100}%`"></div>
-                </div>
-                <div id="card-etoken-eve" @click="toggleEveningTask('authCollect')" class="glass-card p-4 rounded-3xl cursor-pointer border-2 transition-all active:scale-95 flex items-center gap-4 clickable scroll-mt-24" :class="checklist.evening.authCollect ? 'border-violet-400 bg-violet-50' : 'border-transparent'"><div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-md" :class="checklist.evening.authCollect ? 'bg-violet-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-vault"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">Collect eTokens</h4><p class="text-[10px] font-bold text-slate-400">Return 10 Units to Server Room Safehouse</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.evening.authCollect ? 'border-violet-500 bg-violet-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div>
-                <div id="card-pbl020-eve" class="glass-card p-5 rounded-3xl border-l-[6px] scroll-mt-24" :class="checklist.evening.pbl020Running ? 'border-l-amber-500' : 'border-l-rose-500'"><div class="flex justify-between items-center mb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg text-white shadow-md" :class="checklist.evening.pbl020Running ? 'bg-amber-500' : 'bg-rose-500'"><i class="fa-solid fa-download"></i></div><div><h4 class="text-sm font-black text-slate-700">pblnet020 Status</h4><p class="text-[10px] text-slate-400 font-bold">Download Running?</p></div></div><div @click="togglePblRun()" class="w-14 h-7 bg-slate-200 rounded-full relative cursor-pointer clickable" :class="checklist.evening.pbl020Running ? 'bg-amber-500' : 'bg-slate-300'"><div class="w-5 h-5 bg-white rounded-full absolute top-1 transition-all shadow-sm" :class="checklist.evening.pbl020Running ? 'left-8' : 'left-1'"></div></div></div><div class="mt-3 pt-3 border-t border-slate-100"><div x-show="checklist.evening.pbl020Running"><label class="text-[9px] font-bold text-amber-600 uppercase">Specify Job Name</label><input type="text" x-model="checklist.evening.pblReason" @input="saveLocal()" placeholder="e.g. BMW Data Download" class="w-full mt-1 bg-amber-50 border border-amber-200 text-xs rounded-lg p-2 font-bold"></div><div x-show="!checklist.evening.pbl020Running"><p class="text-[10px] font-bold text-rose-500 flex items-center gap-1"><i class="fa-solid fa-power-off"></i> Action: Shutdown the machine.</p></div></div></div>
-                <div id="card-ftp-eve" @click="toggleEveningTask('ftpReport')" class="glass-card p-4 rounded-3xl cursor-pointer border-2 transition-all active:scale-95 flex items-center gap-4 clickable scroll-mt-24" :class="checklist.evening.ftpReport ? 'border-violet-400 bg-violet-50' : 'border-transparent'"><div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl transition-colors shadow-sm" :class="checklist.evening.ftpReport ? 'bg-violet-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-file-export"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">FTP Job Report</h4><p class="text-[10px] font-bold text-slate-400">Send Status to Morning Engineer</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.evening.ftpReport ? 'border-violet-500 bg-violet-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div>
-            </div>
+        <main class="px-5 -mt-20 relative z-20 max-w-lg mx-auto space-y-6">
+            <div x-show="currentShift === 'general'" class="flex flex-col items-center justify-center py-20 text-center animate-pulse"><div class="w-24 h-24 bg-teal-100 rounded-full flex items-center justify-center text-4xl text-teal-600 mb-4 shadow-xl"><i class="fa-solid fa-mug-hot"></i></div><h2 class="text-xl font-black text-slate-700">General Shift</h2><p class="text-xs text-slate-400 mt-2 font-medium">Dashboard Standby.</p></div>
 
-            <!-- GLOBAL -->
-            <div class="space-y-6">
-                <!-- ISP -->
-                <div id="card-isp" class="space-y-3 scroll-mt-24"><h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1"><i class="fa-solid fa-gauge-high"></i> Internet</h3><div class="grid grid-cols-1 gap-4"><template x-for="(isp, index) in checklist.isp" :key="index"><div class="glass-card p-5 rounded-3xl group" :class="isLowSpeed(isp) ? 'border-rose-300 bg-rose-50' : ''"><div class="flex justify-between items-end mb-4 relative z-10"><div class="flex items-center gap-3"><div class="w-11 h-11 rounded-2xl flex items-center justify-center text-white text-lg shadow-lg" :class="getSpeedColor(isp.speed, isp.max)"><i class="fa-solid fa-wifi"></i></div><div><h4 class="text-sm font-black text-slate-700" x-text="isp.name"></h4></div></div><span class="text-3xl font-black font-mono" :class="getSpeedText(isp.speed, isp.max)" x-text="isp.speed || 0"></span></div><div class="relative py-1"><input type="range" min="0" :max="isp.max" step="0.5" x-model="isp.speed" @input="calculateScore(); saveLocal(); haptic()" class="relative z-20 w-full" :style="`--thumb-color: ${getSpeedHex(isp.speed, isp.max)}; --progress: ${(isp.speed / isp.max) * 100}%`"></div><div x-show="isLowSpeed(isp)" class="mt-3 pt-3 border-t border-rose-200"><input type="text" x-model="isp.complaint" @input="saveLocal()" placeholder="Enter Ticket No..." class="w-full bg-white border border-rose-300 text-xs rounded-xl p-3 font-bold"></div></div></template></div></div>
-                <!-- SECURITY -->
-                <div id="card-security" class="space-y-3 scroll-mt-24"><h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1"><i class="fa-solid fa-shield-halved"></i> Security</h3><div class="grid grid-cols-1 gap-3"><div @click="handleSophosCheck()" class="glass-card p-4 rounded-3xl cursor-pointer border-2 flex items-center gap-4 clickable" :class="checklist.endpoints.sophos ? 'border-cyan-400 bg-cyan-50' : 'border-transparent'"><div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-md" :class="checklist.endpoints.sophos ? 'bg-cyan-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-shield-virus"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">Sophos AV</h4><p class="text-[10px] text-slate-400">Random PC Check</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.endpoints.sophos ? 'border-cyan-500 bg-cyan-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div><div @click="handleUsbCheck()" class="glass-card p-4 rounded-3xl cursor-pointer border-2 flex items-center gap-4 clickable" :class="checklist.endpoints.usb ? 'border-rose-400 bg-rose-50' : 'border-transparent'"><div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-md" :class="checklist.endpoints.usb ? 'bg-rose-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-brands fa-usb"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">USB Blocking</h4><p class="text-[10px] text-slate-400">Physical Check</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.endpoints.usb ? 'border-rose-500 bg-rose-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div></div></div>
-                <!-- SERVICES -->
-                <div id="card-services" class="space-y-3 scroll-mt-24"><h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1"><i class="fa-solid fa-network-wired"></i> Services</h3><div class="grid grid-cols-1 gap-3"><template x-for="(svc, index) in checklist.services" :key="index"><div @click="toggleService(index)" class="glass-card p-4 rounded-3xl cursor-pointer border-2 flex items-center gap-4 clickable" :class="svc.status ? 'border-indigo-400 bg-indigo-50' : 'border-transparent'"><div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-md" :class="svc.status ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid" :class="svc.icon"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700" x-text="svc.name"></h4><p class="text-[10px] text-slate-400" x-text="svc.desc"></p></div><span class="px-3 py-1 rounded-full text-[10px] font-black uppercase" :class="svc.status ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400'"><span x-text="svc.status ? 'OK' : 'CHK'"></span></span></div></template></div></div>
-                
-                <!-- SERVERS (Watermark) -->
-                <div id="card-servers" class="space-y-3 scroll-mt-24">
-                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1"><i class="fa-solid fa-server"></i> Servers</h3>
-                    <div class="grid grid-cols-2 gap-3">
-                        <template x-for="(srv, index) in checklist.servers" :key="index">
-                            <div @click="toggleServer(index)" class="relative p-4 h-32 rounded-[1.5rem] border-2 cursor-pointer overflow-hidden group clickable transition-colors duration-300 shadow-lg" :class="getServerClass(srv)">
-                                <div class="absolute -bottom-6 -right-6 text-9xl text-black opacity-10 transform rotate-12 pointer-events-none z-0 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-0"><i :class="(srv.name.includes('Linux') || srv.name === 'PBL') ? 'fa-brands fa-linux' : 'fa-brands fa-windows'"></i></div>
-                                <div @click.stop="toggleMaintenance(index)" class="absolute top-2 right-2 z-20 w-8 h-8 flex items-center justify-center rounded-full bg-black/20 text-white clickable hover:bg-black/30 backdrop-blur-md transition-all"><i class="fa-solid fa-wrench text-xs" :class="srv.maintenance ? 'text-amber-400 animate-pulse' : 'text-white/70'"></i></div>
-                                <div class="relative z-10 h-full flex flex-col justify-between">
-                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl bg-white/20 backdrop-blur-md text-white shadow-inner border border-white/10"><i :class="(srv.name.includes('Linux') || srv.name === 'PBL') ? 'fa-brands fa-linux' : 'fa-brands fa-windows'"></i></div>
-                                    <div><h4 class="text-lg font-black leading-tight tracking-tight drop-shadow-md" x-text="srv.name"></h4><p class="text-[10px] font-bold opacity-90 uppercase mt-1 tracking-wider bg-black/10 inline-block px-2 py-0.5 rounded-md backdrop-blur-sm"><span x-text="srv.maintenance ? 'MAINTENANCE' : (srv.status ? 'ONLINE' : 'OFFLINE')"></span></p></div>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
+            <div x-show="currentShift !== 'general'">
+                <div class="glass-card p-6 rounded-[2.5rem] flex justify-between items-center shadow-xl mb-6">
+                    <div class="flex-1"><p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Shift Readiness</p><div class="flex items-baseline gap-1"><h2 class="text-6xl font-black text-slate-800 tracking-tighter" x-text="score">0</h2><span class="text-2xl font-bold text-slate-400">%</span></div></div>
+                    <div class="relative w-20 h-20"><svg class="w-full h-full transform -rotate-90 drop-shadow-lg"><circle cx="40" cy="40" r="36" stroke="#e2e8f0" stroke-width="6" fill="transparent" /><circle cx="40" cy="40" r="36" stroke="currentColor" stroke-width="6" fill="transparent" :class="score == 100 ? 'text-emerald-500' : 'text-orange-500'" :stroke-dasharray="226" :stroke-dashoffset="226 - (226 * score) / 100" class="transition-all duration-1000 ease-out" stroke-linecap="round"/></svg><div class="absolute inset-0 flex items-center justify-center text-2xl text-slate-300"><i class="fa-solid" :class="score == 100 ? 'fa-check text-emerald-500' : 'fa-chart-pie'"></i></div></div>
                 </div>
 
-                <!-- INFRA -->
-                <div id="card-infra" class="space-y-3 scroll-mt-24">
-                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1"><i class="fa-solid fa-fan"></i> Infra</h3>
-                    <div class="grid grid-cols-1 gap-3">
-                        <template x-for="(ac, index) in checklist.infra.acs" :key="index"><div @click="toggleAC(index)" class="glass-card p-4 rounded-3xl cursor-pointer border-2 flex items-center gap-4 clickable" :class="ac.status ? 'border-cyan-400 bg-cyan-50' : 'border-transparent'"><div class="w-12 h-12 rounded-full flex items-center justify-center text-xl shadow-md" :class="ac.status ? 'bg-cyan-500 text-white' : 'bg-slate-100 text-slate-300'"><i class="fa-solid fa-snowflake" :class="ac.status ? 'animate-spin-slow' : ''"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700" x-text="ac.name"></h4><span class="text-[10px] font-bold uppercase text-cyan-600" x-text="ac.status ? 'ON' : 'OFF'"></span></div><div class="w-12 h-6 rounded-full relative transition-colors duration-300" :class="ac.status ? 'bg-cyan-500' : 'bg-slate-200'"><div class="w-4 h-4 bg-white rounded-full absolute top-1 transition-all duration-300 shadow-sm" :class="ac.status ? 'left-7' : 'left-1'"></div></div></div></template>
-                        <div class="glass-card p-5 rounded-3xl border-l-[6px] border-l-rose-500">
-                            <div class="flex justify-between items-center mb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-lg"><i class="fa-solid fa-fire-extinguisher"></i></div><div><h4 class="text-sm font-black text-slate-700">Fire Safety</h4><p class="text-[10px] text-slate-400 font-bold">Check 1 Random Cylinder</p></div></div><div @click="toggleInfra('fire')" class="w-12 h-6 rounded-full relative transition-colors cursor-pointer clickable" :class="checklist.infra.fire.status ? 'bg-emerald-500' : 'bg-slate-200'"><div class="w-4 h-4 bg-white rounded-full absolute top-1 transition-all shadow-sm" :class="checklist.infra.fire.status ? 'left-7' : 'left-1'"></div></div></div>
-                            <!-- TRIGGER ONLY -->
-                            <div x-show="checklist.infra.fire.status" class="mt-3 pt-3 border-t border-rose-100">
-                                <div @click="modals.fireList.show = true; haptic()" class="w-full mt-1 bg-white border border-rose-200 text-slate-700 text-xs font-bold rounded-xl p-3 flex justify-between items-center shadow-sm active:scale-95 transition-transform cursor-pointer">
-                                    <span x-text="checklist.infra.fire.location || 'Select Cylinder Location...'" :class="!checklist.infra.fire.location ? 'text-slate-400' : 'text-slate-800'"></span>
-                                    <i class="fa-solid fa-chevron-down text-rose-400"></i>
+                <div x-show="currentShift === 'morning'" x-transition class="space-y-4 mb-6">
+                    <h3 class="text-xs font-black text-blue-600 uppercase tracking-widest ml-1"><i class="fa-solid fa-sun"></i> Morning Tasks</h3>
+                    <div id="card-temp" class="glass-card p-5 rounded-3xl border-l-[6px] border-l-blue-400 scroll-mt-24"><div class="flex justify-between items-end mb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg"><i class="fa-solid fa-temperature-half"></i></div><div><h4 class="text-sm font-black text-slate-700">Server Room Temp</h4><p class="text-[10px] text-slate-400 font-bold">Log Temperature</p></div></div><span class="text-2xl font-black font-mono" :class="checklist.morning.temp ? 'text-slate-800' : 'text-slate-300'" x-text="checklist.morning.temp ? checklist.morning.temp + '°C' : '--'"></span></div><div class="relative py-1"><div x-show="!checklist.morning.temp" @click="checklist.morning.temp = 20" class="absolute inset-0 bg-slate-100/80 backdrop-blur-sm z-30 flex items-center justify-center rounded-xl cursor-pointer border-2 border-dashed border-slate-300"><span class="text-xs font-black text-slate-500 uppercase">Tap to Activate</span></div><input type="range" min="16" max="28" step="0.5" x-model="checklist.morning.temp" @input="saveLocal(); haptic()" class="relative z-20 w-full" :style="`--thumb-color: #3b82f6; --progress: ${((checklist.morning.temp - 16) / 12) * 100}%`"></div></div>
+                    <div id="card-prod" class="glass-card p-5 rounded-3xl border-l-[6px] border-l-yellow-400 scroll-mt-24"><div class="flex justify-between items-center mb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-yellow-100 text-yellow-600 flex items-center justify-center text-lg"><i class="fa-solid fa-power-off"></i></div><div><h4 class="text-sm font-black text-slate-700">System Check</h4><p class="text-[10px] text-slate-400 font-bold">Any PC left ON?</p></div></div><div @click="toggleMorningTask('prodCheck')" class="w-12 h-6 rounded-full relative transition-colors duration-300 cursor-pointer clickable" :class="checklist.morning.prodCheck ? 'bg-rose-500' : 'bg-emerald-500'"><div class="w-4 h-4 bg-white rounded-full absolute top-1 transition-all duration-300 shadow-sm" :class="checklist.morning.prodCheck ? 'left-7' : 'left-1'"></div></div></div><div x-show="checklist.morning.prodCheck" class="mt-3 pt-3 border-t border-yellow-200"><input type="text" x-model="checklist.morning.prodNotes" @input="saveLocal()" placeholder="Which PCs? (e.g. PC-4)" class="w-full bg-yellow-50 border border-yellow-300 text-xs rounded-lg p-3 font-bold"></div></div>
+                    <div id="card-etoken" @click="toggleMorningTask('authIssue')" class="glass-card p-4 rounded-3xl cursor-pointer border-2 transition-all active:scale-95 flex items-center gap-4 clickable scroll-mt-24" :class="checklist.morning.authIssue ? 'border-blue-400 bg-blue-50' : 'border-transparent'"><div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-md" :class="checklist.morning.authIssue ? 'bg-blue-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-key"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">Issue eTokens</h4><p class="text-[10px] font-bold text-slate-400">Handover 10 Units to Production Dept.</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.morning.authIssue ? 'border-blue-500 bg-blue-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div>
+                    <div id="card-ftp" @click="toggleMorningTask('ftpJobCheck')" class="glass-card p-4 rounded-3xl cursor-pointer border-2 transition-all active:scale-95 flex items-center gap-4 clickable scroll-mt-24" :class="checklist.morning.ftpJobCheck ? 'border-indigo-400 bg-indigo-50' : 'border-transparent'"><div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-md" :class="checklist.morning.ftpJobCheck ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-folder-open"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">Client FTP Jobs</h4><p class="text-[10px] font-bold text-slate-400">Check New Jobs</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.morning.ftpJobCheck ? 'border-indigo-500 bg-indigo-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div>
+                    <div id="card-pbl020" @click="toggleMorningTask('pbl020Start')" class="glass-card p-4 rounded-3xl cursor-pointer border-2 transition-all active:scale-95 flex items-center gap-4 clickable scroll-mt-24" :class="checklist.morning.pbl020Start ? 'border-emerald-400 bg-emerald-50' : 'border-transparent'"><div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-md" :class="checklist.morning.pbl020Start ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-power-off"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">Start pblnet020</h4><p class="text-[10px] font-bold text-slate-400">Boot Machine</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.morning.pbl020Start ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div>
+                    <div id="card-backup" class="glass-card p-5 rounded-3xl border-l-[6px] border-l-blue-500 scroll-mt-24"><div class="flex justify-between items-center mb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg"><i class="fa-solid fa-clock-rotate-left"></i></div><div><h4 class="text-sm font-black text-slate-700">Backup Verify</h4><p class="text-[10px] text-slate-400 font-bold">Check Folders</p></div></div></div><div class="flex gap-2"><div @click="toggleBackup('dc')" class="flex-1 p-2 rounded-xl border-2 text-center cursor-pointer clickable" :class="checklist.morning.backupDC ? 'bg-blue-50 border-blue-500' : 'border-slate-200'"><span class="text-[10px] font-bold">WinSvr100</span></div><div @click="toggleBackup('adc')" class="flex-1 p-2 rounded-xl border-2 text-center cursor-pointer clickable" :class="checklist.morning.backupADC ? 'bg-blue-50 border-blue-500' : 'border-slate-200'"><span class="text-[10px] font-bold">WinSvr101</span></div></div><div x-show="checklist.morning.backupDC || checklist.morning.backupADC" class="mt-3 pt-3 border-t border-slate-100"><input type="text" x-model="checklist.morning.backupTime" @input="saveLocal()" placeholder="Backup Time (e.g. 02:15 AM)" class="w-full mt-1 bg-blue-50 border border-blue-200 text-xs rounded-lg p-2 font-bold"></div></div>
+                    <div id="card-wifi" @click="toggleMorningTask('wifi')" class="glass-card p-4 rounded-3xl cursor-pointer border-2 transition-all active:scale-95 flex items-center gap-4 clickable scroll-mt-24" :class="checklist.morning.wifi ? 'border-indigo-400 bg-indigo-50' : 'border-transparent'"><div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl transition-colors shadow-sm" :class="checklist.morning.wifi ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-wifi"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">Admin WiFi</h4><p class="text-[10px] font-bold text-slate-400">Check Admin Wifi Connectivity</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.morning.wifi ? 'border-indigo-500 bg-indigo-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div>
+                </div>
+
+                <div x-show="currentShift === 'evening'" x-transition class="space-y-4 mb-6">
+                    <h3 class="text-xs font-black text-violet-600 uppercase tracking-widest ml-1"><i class="fa-solid fa-moon"></i> Evening Tasks</h3>
+                    <div id="card-temp-eve" class="glass-card p-5 rounded-3xl border-l-[6px] border-l-violet-400 scroll-mt-24"><div class="flex justify-between items-end mb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center text-lg"><i class="fa-solid fa-temperature-half"></i></div><div><h4 class="text-sm font-black text-slate-700">Server Room Temp</h4><p class="text-[10px] text-slate-400 font-bold">Log Temperature</p></div></div><span class="text-2xl font-black font-mono" :class="checklist.evening.temp ? 'text-slate-800' : 'text-slate-300'" x-text="checklist.evening.temp ? checklist.evening.temp + '°C' : '--'"></span></div><div class="relative py-1"><div x-show="!checklist.evening.temp" @click="checklist.evening.temp = 20" class="absolute inset-0 bg-slate-100/80 backdrop-blur-sm z-30 flex items-center justify-center rounded-xl cursor-pointer border-2 border-dashed border-slate-300"><span class="text-xs font-black text-slate-500 uppercase">Tap to Activate</span></div><input type="range" min="16" max="28" step="0.5" x-model="checklist.evening.temp" @input="saveLocal(); haptic()" class="relative z-20 w-full" :style="`--thumb-color: #7c3aed; --progress: ${((checklist.evening.temp - 16) / 12) * 100}%`"></div></div>
+                    <div id="card-etoken-eve" @click="toggleEveningTask('authCollect')" class="glass-card p-4 rounded-3xl cursor-pointer border-2 transition-all active:scale-95 flex items-center gap-4 clickable scroll-mt-24" :class="checklist.evening.authCollect ? 'border-violet-400 bg-violet-50' : 'border-transparent'"><div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-md" :class="checklist.evening.authCollect ? 'bg-violet-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-vault"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">Collect eTokens</h4><p class="text-[10px] font-bold text-slate-400">Return 10 Units to Server Room Safehouse</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.evening.authCollect ? 'border-violet-500 bg-violet-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div>
+                    <div id="card-pbl020-eve" class="glass-card p-5 rounded-3xl border-l-[6px] scroll-mt-24" :class="checklist.evening.pbl020Running ? 'border-l-amber-500' : 'border-l-rose-500'"><div class="flex justify-between items-center mb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg text-white shadow-md" :class="checklist.evening.pbl020Running ? 'bg-amber-500' : 'bg-rose-500'"><i class="fa-solid fa-download"></i></div><div><h4 class="text-sm font-black text-slate-700">pblnet020 Status</h4><p class="text-[10px] text-slate-400 font-bold">Download Running?</p></div></div><div @click="togglePblRun()" class="w-14 h-7 bg-slate-200 rounded-full relative cursor-pointer clickable" :class="checklist.evening.pbl020Running ? 'bg-amber-500' : 'bg-slate-300'"><div class="w-5 h-5 bg-white rounded-full absolute top-1 transition-all shadow-sm" :class="checklist.evening.pbl020Running ? 'left-8' : 'left-1'"></div></div></div><div class="mt-3 pt-3 border-t border-slate-100"><div x-show="checklist.evening.pbl020Running"><label class="text-[9px] font-bold text-amber-600 uppercase">Specify Job Name</label><input type="text" x-model="checklist.evening.pblReason" @input="saveLocal()" placeholder="e.g. AEMDRE Data Download" class="w-full mt-1 bg-amber-50 border border-amber-200 text-xs rounded-lg p-2 font-bold"></div><div x-show="!checklist.evening.pbl020Running"><p class="text-[10px] font-bold text-rose-500 flex items-center gap-1"><i class="fa-solid fa-power-off"></i> Action: Shutdown the machine.</p></div></div></div>
+                    <div id="card-ftp-eve" @click="toggleEveningTask('ftpReport')" class="glass-card p-4 rounded-3xl cursor-pointer border-2 transition-all active:scale-95 flex items-center gap-4 clickable scroll-mt-24" :class="checklist.evening.ftpReport ? 'border-violet-400 bg-violet-50' : 'border-transparent'"><div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl transition-colors shadow-sm" :class="checklist.evening.ftpReport ? 'bg-violet-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-file-export"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">FTP Job Report</h4><p class="text-[10px] font-bold text-slate-400">Send Status to Morning Engineer</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.evening.ftpReport ? 'border-violet-500 bg-violet-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div>
+                </div>
+
+                <div class="space-y-6">
+                    <div id="card-isp" class="space-y-3 scroll-mt-24"><h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1"><i class="fa-solid fa-gauge-high"></i> Internet</h3><div class="grid grid-cols-1 gap-4"><template x-for="(isp, index) in checklist.isp" :key="index"><div class="glass-card p-5 rounded-3xl group" :class="isLowSpeed(isp) ? 'border-rose-300 bg-rose-50' : ''"><div class="flex justify-between items-end mb-4 relative z-10"><div class="flex items-center gap-3"><div class="w-11 h-11 rounded-2xl flex items-center justify-center text-white text-lg shadow-lg" :class="getSpeedColor(isp.speed, isp.max)"><i class="fa-solid fa-wifi"></i></div><div><h4 class="text-sm font-black text-slate-700" x-text="isp.name"></h4></div></div><span class="text-3xl font-black font-mono" :class="getSpeedText(isp.speed, isp.max)" x-text="isp.speed || 0"></span></div><div class="relative py-1"><input type="range" min="0" :max="isp.max" step="0.5" x-model="isp.speed" @input="calculateScore(); saveLocal(); haptic()" class="relative z-20 w-full" :style="`--thumb-color: ${getSpeedHex(isp.speed, isp.max)}; --progress: ${(isp.speed / isp.max) * 100}%`"></div><div x-show="isLowSpeed(isp)" class="mt-3 pt-3 border-t border-rose-200"><input type="text" x-model="isp.complaint" @input="saveLocal()" placeholder="Enter Ticket No..." class="w-full bg-white border border-rose-300 text-xs rounded-xl p-3 font-bold"></div></div></template></div></div>
+                    <div id="card-security" class="space-y-3 scroll-mt-24"><h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1"><i class="fa-solid fa-shield-halved"></i> Security</h3><div class="grid grid-cols-1 gap-3"><div @click="handleSophosCheck()" class="glass-card p-4 rounded-3xl cursor-pointer border-2 flex items-center gap-4 clickable" :class="checklist.endpoints.sophos ? 'border-cyan-400 bg-cyan-50' : 'border-transparent'"><div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-md" :class="checklist.endpoints.sophos ? 'bg-cyan-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-shield-virus"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">Sophos AV</h4><p class="text-[10px] text-slate-400">Random PC Check</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.endpoints.sophos ? 'border-cyan-500 bg-cyan-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div><div @click="handleUsbCheck()" class="glass-card p-4 rounded-3xl cursor-pointer border-2 flex items-center gap-4 clickable" :class="checklist.endpoints.usb ? 'border-rose-400 bg-rose-50' : 'border-transparent'"><div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-md" :class="checklist.endpoints.usb ? 'bg-rose-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-brands fa-usb"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">USB Blocking</h4><p class="text-[10px] text-slate-400">Physical Check</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.endpoints.usb ? 'border-rose-500 bg-rose-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div></div></div>
+                    <div id="card-services" class="space-y-3 scroll-mt-24"><h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1"><i class="fa-solid fa-network-wired"></i> Services</h3><div class="grid grid-cols-1 gap-3"><template x-for="(svc, index) in checklist.services" :key="index"><div @click="toggleService(index)" class="glass-card p-4 rounded-3xl cursor-pointer border-2 flex items-center gap-4 clickable" :class="svc.status ? 'border-indigo-400 bg-indigo-50' : 'border-transparent'"><div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-md" :class="svc.status ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid" :class="svc.icon"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700" x-text="svc.name"></h4><p class="text-[10px] text-slate-400" x-text="svc.desc"></p></div><span class="px-3 py-1 rounded-full text-[10px] font-black uppercase" :class="svc.status ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400'"><span x-text="svc.status ? 'OK' : 'CHK'"></span></span></div></template></div></div>
+                    <div id="card-servers" class="space-y-3 scroll-mt-24"><h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1"><i class="fa-solid fa-server"></i> Servers</h3><div class="grid grid-cols-2 gap-3"><template x-for="(srv, index) in checklist.servers" :key="index"><div @click="toggleServer(index)" class="relative p-4 h-32 rounded-[1.5rem] border-2 cursor-pointer overflow-hidden group clickable transition-colors duration-300 shadow-lg" :class="getServerClass(srv)"><div class="absolute -bottom-6 -right-6 text-9xl text-black opacity-10 transform rotate-12 pointer-events-none z-0 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-0"><i :class="(srv.name.includes('Linux') || srv.name === 'PBL') ? 'fa-brands fa-linux' : 'fa-brands fa-windows'"></i></div><div @click.stop="toggleMaintenance(index)" class="absolute top-2 right-2 z-20 w-8 h-8 flex items-center justify-center rounded-full bg-black/20 text-white clickable hover:bg-black/30 backdrop-blur-md transition-all"><i class="fa-solid fa-wrench text-xs" :class="srv.maintenance ? 'text-amber-400 animate-pulse' : 'text-white/70'"></i></div><div class="relative z-10 h-full flex flex-col justify-between"><div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl bg-white/20 backdrop-blur-md text-white shadow-inner border border-white/10"><i :class="(srv.name.includes('Linux') || srv.name === 'PBL') ? 'fa-brands fa-linux' : 'fa-brands fa-windows'"></i></div><div><h4 class="text-lg font-black leading-tight tracking-tight drop-shadow-md" x-text="srv.name"></h4><p class="text-[10px] font-bold opacity-90 uppercase mt-1 tracking-wider bg-black/10 inline-block px-2 py-0.5 rounded-md backdrop-blur-sm"><span x-text="srv.maintenance ? 'MAINTENANCE' : (srv.status ? 'ONLINE' : 'OFFLINE')"></span></p></div></div></div></template></div></div>
+                    <div id="card-servers" class="space-y-3 scroll-mt-24"><h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1"><i class="fa-solid fa-server"></i> Servers</h3><div class="grid grid-cols-2 gap-3"><template x-for="(srv, index) in checklist.servers" :key="index"><div @click="toggleServer(index)" class="relative p-4 h-32 rounded-[1.5rem] border-2 cursor-pointer overflow-hidden group clickable transition-colors duration-300 shadow-lg" :class="getServerClass(srv)"><div class="absolute -bottom-6 -right-6 text-9xl text-black opacity-10 transform rotate-12 pointer-events-none z-0 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-0"><i :class="(srv.name.includes('Linux') || srv.name === 'PBL') ? 'fa-brands fa-linux' : 'fa-brands fa-windows'"></i></div><!-- Button ko Z-Index 50 diya aur White Background diya taaki standout kare -->
+		<div @click.stop="toggleMaintenance(index)" 
+			 class="absolute top-2 right-2 z-50 w-8 h-8 flex items-center justify-center rounded-full shadow-lg cursor-pointer transition-all active:scale-90"
+			 :class="srv.maintenance ? 'bg-amber-500 text-white ring-2 ring-white' : 'bg-white/20 hover:bg-white/40 text-white backdrop-blur-md border border-white/20'">
+			
+			<i class="fa-solid fa-wrench text-xs" :class="srv.maintenance ? 'animate-pulse' : ''"></i>
+		</div><div class="relative z-10 h-full flex flex-col justify-between"><div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl bg-white/20 backdrop-blur-md text-white shadow-inner border border-white/10"><i :class="(srv.name.includes('Linux') || srv.name === 'PBL') ? 'fa-brands fa-linux' : 'fa-brands fa-windows'"></i></div><div><h4 class="text-lg font-black leading-tight tracking-tight drop-shadow-md" x-text="srv.name"></h4><p class="text-[10px] font-bold opacity-90 uppercase mt-1 tracking-wider bg-black/10 inline-block px-2 py-0.5 rounded-md backdrop-blur-sm"><span x-text="srv.maintenance ? 'MAINTENANCE' : (srv.status ? 'ONLINE' : 'OFFLINE')"></span></p></div></div></div></template></div></div>
+                    <div id="card-infra" class="space-y-3 scroll-mt-24">
+                        <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1"><i class="fa-solid fa-fan"></i> Infra</h3>
+                        <div class="grid grid-cols-1 gap-3">
+                            <template x-for="(ac, index) in checklist.infra.acs" :key="index"><div @click="toggleAC(index)" class="glass-card p-4 rounded-3xl cursor-pointer border-2 flex items-center gap-4 clickable" :class="ac.status ? 'border-cyan-400 bg-cyan-50' : 'border-transparent'"><div class="w-12 h-12 rounded-full flex items-center justify-center text-xl shadow-md" :class="ac.status ? 'bg-cyan-500 text-white' : 'bg-slate-100 text-slate-300'"><i class="fa-solid fa-snowflake" :class="ac.status ? 'animate-spin-slow' : ''"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700" x-text="ac.name"></h4><span class="text-[10px] font-bold uppercase text-cyan-600" x-text="ac.status ? 'ON' : 'OFF'"></span></div><div class="w-12 h-6 rounded-full relative transition-colors duration-300" :class="ac.status ? 'bg-cyan-500' : 'bg-slate-200'"><div class="w-4 h-4 bg-white rounded-full absolute top-1 transition-all duration-300 shadow-sm" :class="ac.status ? 'left-7' : 'left-1'"></div></div></div></template>
+                            <div class="glass-card p-5 rounded-3xl border-l-[6px] border-l-rose-500">
+                                <div class="flex justify-between items-center mb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-lg"><i class="fa-solid fa-fire-extinguisher"></i></div><div><h4 class="text-sm font-black text-slate-700">Fire Safety</h4><p class="text-[10px] text-slate-400 font-bold">Check 1 Random Cylinder</p></div></div><div @click="toggleInfra('fire')" class="w-12 h-6 rounded-full relative transition-colors cursor-pointer clickable" :class="checklist.infra.fire.status ? 'bg-emerald-500' : 'bg-slate-200'"><div class="w-4 h-4 bg-white rounded-full absolute top-1 transition-all shadow-sm" :class="checklist.infra.fire.status ? 'left-7' : 'left-1'"></div></div></div>
+                                <div x-show="checklist.infra.fire.status" class="mt-3 pt-3 border-t border-rose-100">
+                                    <div @click="modals.fireList.show = true; haptic()" class="w-full mt-1 bg-white border border-rose-200 text-slate-700 text-xs font-bold rounded-xl p-3 flex justify-between items-center shadow-sm active:scale-95 transition-transform cursor-pointer">
+                                        <span x-text="checklist.infra.fire.location || 'Select Cylinder Location...'" :class="!checklist.infra.fire.location ? 'text-slate-400' : 'text-slate-800'"></span>
+                                        <i class="fa-solid fa-chevron-down text-rose-400"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <div id="card-remarks" class="glass-card p-5 rounded-3xl border-l-[6px] mt-6 mb-6 scroll-mt-24" :class="isLateEntry ? 'border-l-rose-500' : 'border-l-blue-500'"><label class="text-xs font-black uppercase tracking-widest mb-3 flex justify-between items-center" :class="isLateEntry ? 'text-rose-600' : 'text-slate-500'"><span><i class="fa-solid fa-pen-nib mr-1"></i> Logs</span><span x-show="isLateEntry" class="text-[9px] bg-rose-500 text-white px-2 py-0.5 rounded animate-pulse">REQUIRED</span></label><textarea x-model="remarks" @input="saveLocal()" class="w-full bg-slate-100 border-0 rounded-xl p-3 text-sm font-medium focus:ring-2 focus:bg-white placeholder-slate-400" rows="3"></textarea></div>
+                </div>
+            </div>
+        </main>
+        
+        <div class="fixed bottom-0 left-0 w-full bg-white/80 backdrop-blur-xl p-5 border-t border-slate-200 z-50">
+		<button @click="confirmAction('submit')" 
+				class="btn-fly w-full py-4 rounded-2xl font-bold text-sm shadow-xl text-white justify-center" 
+				:class="getSubmitButtonClass()" 
+				:disabled="isSubmitting || (isLateEntry && remarks.length < 5)">
+			
+			<div class="svg-wrapper-1">
+				<div class="svg-wrapper">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+						<path fill="none" d="M0 0h24v24H0z"></path>
+						<path fill="currentColor" d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"></path>
+					</svg>
+				</div>
+			</div>
+			<span x-text="isLateEntry ? 'SUBMIT LATE ENTRY' : 'SEND REPORT'"></span>
+		</button>
+	</div>
+    </div>
+
+    <!-- =========================================================
+         🖥️ DESKTOP LAYOUT (UPDATED for PENDING ITEMS & FACILITY FIXES)
+    ========================================================== -->
+    <div class="hidden md:flex h-screen bg-slate-50 text-slate-800 overflow-hidden">
+        
+        <!-- SIDEBAR -->
+        <aside class="w-80 bg-white border-r border-slate-200 flex flex-col shadow-2xl z-20 relative overflow-hidden">
+            <div class="p-6 pb-2">
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center shadow-inner border border-slate-100">
+                        <img src="pbl-logo.png" alt="Logo" class="w-8 h-8 object-contain">
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-black leading-none tracking-tight text-slate-800">Checklist<span class="text-blue-600">Ops</span></h1>
+                        <p class="text-[10px] font-bold text-slate-400 tracking-[0.2em] mt-1.5 uppercase">IT Operations</p>
+                    </div>
                 </div>
 
-                <!-- REMARKS -->
-                <div id="card-remarks" class="glass-card p-5 rounded-3xl border-l-[6px] mt-6 mb-6 scroll-mt-24" :class="isLateEntry ? 'border-l-rose-500' : 'border-l-blue-500'"><label class="text-xs font-black uppercase tracking-widest mb-3 flex justify-between items-center" :class="isLateEntry ? 'text-rose-600' : 'text-slate-500'"><span><i class="fa-solid fa-pen-nib mr-1"></i> Logs</span><span x-show="isLateEntry" class="text-[9px] bg-rose-500 text-white px-2 py-0.5 rounded animate-pulse">REQUIRED</span></label><textarea x-model="remarks" @input="saveLocal()" class="w-full bg-slate-100 border-0 rounded-xl p-3 text-sm font-medium focus:ring-2 focus:bg-white placeholder-slate-400" rows="3"></textarea></div>
+                <div class="space-y-2 mb-8">
+                    <p class="px-2 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Select Shift</p>
+                    <template x-for="(conf, key) in shiftConfig" :key="key">
+                        <button @click="requestShiftChange(key)" 
+                                class="w-full text-left px-4 py-3 rounded-2xl flex items-center justify-between transition-all group border border-transparent"
+                                :class="currentShift === key ? 'bg-slate-800 text-white shadow-lg' : 'hover:bg-slate-50 text-slate-500 border-slate-100'">
+                            <div>
+                                <span class="text-xs font-black block uppercase tracking-wide" x-text="conf.name"></span>
+                                <span class="text-[10px] opacity-70 font-bold" x-text="conf.timeDisplay"></span>
+                            </div>
+                            <div x-show="currentShift === key" class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></div>
+                        </button>
+                    </template>
+                </div>
+            
+                <div class="p-5 rounded-2xl shadow-lg mb-4 relative overflow-hidden group transition-all" 
+                     :class="{'bg-gradient-morning': currentShift === 'morning', 'bg-gradient-general': currentShift === 'general', 'bg-gradient-evening': currentShift === 'evening'}">
+                    <div class="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition"></div>
+                    <div class="relative z-10 flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-white/20 border-2 border-white/30 flex items-center justify-center text-white text-xl shadow-inner backdrop-blur-sm">
+                            <i class="fa-solid fa-user-shield"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-white/70 uppercase tracking-wider">Person On Duty</p>
+                            <p class="text-lg font-black text-white leading-tight" x-text="shiftConfig[currentShift].auditor">...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-auto p-6 border-t border-slate-100 bg-slate-50/50">
+			 <button @click="confirmAction('submit')" 
+					 class="btn-fly w-full py-4 rounded-2xl font-bold text-sm shadow-xl text-white justify-center transform hover:-translate-y-1 transition-all"
+					 :class="getSubmitButtonClass()"
+					 :disabled="isSubmitting || (isLateEntry && remarks.length < 5)">
+				
+				<div class="svg-wrapper-1">
+					<div class="svg-wrapper">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+							<path fill="none" d="M0 0h24v24H0z"></path>
+							<path fill="currentColor" d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"></path>
+						</svg>
+					</div>
+				</div>
+				<span x-text="isLateEntry ? 'SUBMIT LATE' : 'SEND REPORT'"></span>
+			</button>
+		</div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA (Bento Grid Layout) -->
+<main class="flex-1 flex flex-col h-full relative bg-slate-50 overflow-hidden font-sans">
+    
+    <!-- 1. Header (Slim & Glassy) -->
+    <header class="h-16 bg-white/80 backdrop-blur-xl border-b border-slate-200 px-6 flex items-center justify-between shrink-0 z-20">
+        <div class="flex items-center gap-3">
+            <div class="p-2 bg-blue-50 rounded-lg text-blue-600"><i class="fa-solid fa-layer-group"></i></div>
+            <div>
+                <h2 class="text-lg font-black text-slate-800 leading-tight" x-text="shiftConfig[currentShift].branch + ' Dashboard'"></h2>
+                <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider" x-text="todayDate"></span>
+                    <span class="w-1 h-1 rounded-full bg-slate-300"></span>
+                    <span class="text-[10px] font-bold text-blue-500 uppercase tracking-wider" x-text="shiftConfig[currentShift].auditor"></span>
+                </div>
             </div>
         </div>
-    </main>
+        <div class="flex items-center gap-4">
+            <div class="px-3 py-1.5 rounded-lg border flex items-center gap-2 transition-all" 
+                 :class="isLateEntry ? 'bg-rose-50 border-rose-100' : 'bg-emerald-50 border-emerald-100'">
+                <div class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" :class="isLateEntry ? 'bg-rose-500' : 'bg-emerald-500'"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2" :class="isLateEntry ? 'bg-rose-500' : 'bg-emerald-500'"></span>
+                </div>
+                <span class="text-[10px] font-black uppercase tracking-wide" :class="isLateEntry ? 'text-rose-600' : 'text-emerald-600'" x-text="isLateEntry ? 'LATE ENTRY' : 'OPERATIONAL'"></span>
+            </div>
+            <div class="text-right">
+                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Shift Ends In</p>
+                <p class="text-sm font-black font-mono text-slate-700 tabular-nums" x-text="timeLeft">--:--</p>
+            </div>
+        </div>
+    </header>
 
-    <!-- FOOTER -->
-    <div class="fixed bottom-0 left-0 w-full bg-white/80 backdrop-blur-xl p-5 border-t border-slate-200 z-50">
-        <button @click="confirmAction('submit')" class="w-full py-4 rounded-2xl text-white font-bold text-sm shadow-xl flex items-center justify-center gap-2 group ripple-btn clickable" :class="getSubmitButtonClass()" :disabled="isSubmitting || (isLateEntry && remarks.length < 5)"><span x-text="isLateEntry ? 'SUBMIT LATE ENTRY' : 'SEND REPORT'"></span><i class="fa-solid fa-paper-plane"></i></button>
-    </div>
+    <!-- 2. Dashboard Grid (100% Height, No Scroll) -->
+    <div class="flex-1 p-4 grid grid-rows-[auto_1fr] gap-4 overflow-hidden relative z-10">
+        
+        <!-- ROW 1: SHIFT OPERATIONS (Dynamic Height) -->
+        <div class="grid grid-cols-12 gap-4 h-fit">
+            
+            <!-- A. Readiness Score (Square) -->
+            <div class="col-span-12 lg:col-span-3 bg-white rounded-3xl p-5 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.1)] border border-slate-100 flex flex-col justify-between relative group overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity transform rotate-12"><i class="fa-solid fa-chart-pie text-6xl text-blue-600"></i></div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Efficiency Score</p>
+                    <div class="flex items-baseline">
+						<h2 class="text-6xl font-black text-slate-800 tracking-tight leading-none" x-text="score">0</h2>
+						<span class="text-2xl font-bold text-slate-400 ml-1">%</span>
+					</div>
+                </div>
+                <!-- Progress Bar -->
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden mt-2">
+                    <div class="h-full rounded-full transition-all duration-1000 ease-out" 
+                         :class="score == 100 ? 'bg-emerald-500' : 'bg-blue-600'" 
+                         :style="`width: ${score}%`"></div>
+                </div>
+                <!-- Mini Pending List -->
+                <div class="mt-3 space-y-1">
+                    <template x-for="(item, i) in scanForIssues().slice(0, 2)" :key="i">
+                        <div class="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 truncate">
+                            <i class="fa-solid fa-circle-exclamation text-amber-500 text-[8px]"></i>
+                            <span x-text="item.msg" class="truncate"></span>
+                        </div>
+                    </template>
+                    <div x-show="scanForIssues().length > 2" class="text-[9px] font-bold text-blue-500">+ <span x-text="scanForIssues().length - 2"></span> more issues</div>
+                </div>
+            </div>
 
-    <!-- MODALS SECTION -->
-    
-    <!-- 1. JASOOS MODE -->
-    <div x-show="modals.scanner.show" x-cloak class="fixed inset-0 z-[115] flex items-center justify-center bg-black/80 backdrop-blur-sm p-6"><div class="bg-white w-full max-w-sm rounded-[2rem] p-6 shadow-2xl animate-float"><div class="text-center mb-4"><div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-3 text-3xl text-amber-600 shadow-inner"><i class="fa-solid fa-binoculars"></i></div><h3 class="text-xl font-black text-slate-800">Review Score</h3><p class="text-xs font-bold text-slate-400 uppercase tracking-wider mt-1">Score: <span class="text-amber-500 text-lg" x-text="score + '%'"></span></p></div><div class="bg-slate-50 rounded-2xl p-4 mb-6 border border-slate-100 max-h-60 overflow-y-auto"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Pending Items</p><ul class="space-y-2"><template x-for="item in missingItems" :key="item.msg"><li class="flex items-start gap-2 text-xs font-bold text-slate-600 bg-white p-2 rounded-lg border border-slate-100 shadow-sm"><i class="fa-solid fa-circle-exclamation text-amber-500 mt-0.5"></i><span x-text="item.msg"></span></li></template></ul></div><div class="flex flex-col gap-3"><button @click="scrollToIssue()" class="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-500/30 clickable">FIX ISSUES NOW <i class="fa-solid fa-wrench ml-2"></i></button><button @click="scrollToRemarks()" class="w-full py-3 text-slate-400 font-bold text-xs hover:text-slate-600 transition-colors clickable">Skip & Submit with Remarks <i class="fa-solid fa-arrow-right ml-1"></i></button></div></div></div>
+            <!-- B. SHIFT SPECIFIC TASKS (Morning/Evening) -->
+            <div class="col-span-12 lg:col-span-9 bg-slate-50/50 rounded-3xl border border-slate-200/60 p-1 flex flex-col justify-center">
+                
+                <!-- MORNING SHIFT -->
+                <template x-if="currentShift === 'morning'">
+                    <div class="grid grid-cols-4 gap-3 h-full p-2">
+                        <!-- Temp -->
+                        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all group">
+                            <div class="flex justify-between items-start">
+                                <div class="p-2 rounded-lg bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors"><i class="fa-solid fa-temperature-half"></i></div>
+                                <span class="text-xl font-black text-slate-700" x-text="checklist.morning.temp ? checklist.morning.temp + '°' : '--'"></span>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase">Server Temp</p>
+                                <input type="range" min="16" max="28" step="0.5" x-model="checklist.morning.temp" @input="saveLocal()" class="w-full h-1.5 bg-slate-100 rounded-full mt-1 cursor-pointer accent-blue-600">
+                            </div>
+                        </div>
 
-    <!-- 2. CONFIRM -->
-    <div x-show="modals.confirm.show" x-cloak class="fixed inset-0 z-[110] flex items-center justify-center bg-black/70 backdrop-blur-md p-6"><div class="bg-white w-full max-w-xs rounded-[2rem] p-8 text-center shadow-2xl"><div x-show="submitState === 'ask'"><h3 class="text-xl font-black mb-2" x-text="modals.confirm.title"></h3><button @click="executeConfirmAction()" class="w-full py-3 bg-blue-600 text-white rounded-xl font-bold mt-4 clickable">Confirm</button><button @click="modals.confirm.show=false" class="w-full py-3 mt-2 text-slate-500 font-bold clickable">Cancel</button></div><div x-show="submitState === 'loading'"><i class="fa-solid fa-cloud-arrow-up text-blue-500 text-3xl animate-bounce mb-4"></i><h3 class="font-black">Sending...</h3></div><div x-show="submitState === 'done'"><div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 text-emerald-600 text-3xl"><i class="fa-solid fa-check"></i></div><h3 class="text-lg font-black">Success!</h3><button @click="location.reload()" class="w-full py-3 bg-slate-100 text-slate-700 rounded-xl font-bold text-xs hover:bg-slate-200 clickable">Reload</button></div></div></div>
-    
-    <!-- 3. FIRE LOCATION DROPDOWN (MOVED OUTSIDE MAIN) -->
-    <div x-show="modals.fireList.show" x-cloak class="fixed inset-0 z-[200] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-sm sm:rounded-[2rem] rounded-t-[2rem] h-auto max-h-[85vh] flex flex-col shadow-2xl animate-float pb-safe" @click.away="modals.fireList.show = false">
-            <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-rose-50 rounded-t-[2rem] flex-shrink-0"><div><h3 class="text-lg font-black text-rose-700">Select Location</h3><p class="text-[10px] text-rose-400 font-bold uppercase tracking-wider">Fire Extinguisher Check</p></div><button @click="modals.fireList.show = false" class="w-8 h-8 rounded-full bg-white text-rose-500 flex items-center justify-center shadow-sm clickable"><i class="fa-solid fa-xmark"></i></button></div>
-            <div class="overflow-y-auto p-2 space-y-1 flex-1 overscroll-contain">
-                <template x-for="(group, floorName) in fireLocations" :key="floorName">
-                    <div class="mb-2"><div class="sticky top-0 bg-white/95 backdrop-blur z-10 px-4 py-2 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-50" x-text="floorName"></div><div class="grid grid-cols-1 gap-1 p-1"><template x-for="loc in group" :key="loc"><button @click="checklist.infra.fire.location = loc; saveLocal(); modals.fireList.show = false; haptic()" class="w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-colors active:scale-95 clickable" :class="checklist.infra.fire.location === loc ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30' : 'hover:bg-slate-50 text-slate-600'"><i class="fa-solid fa-fire-extinguisher text-sm" :class="checklist.infra.fire.location === loc ? 'text-white' : 'text-rose-300'"></i><span class="text-xs font-bold" x-text="loc"></span><i x-show="checklist.infra.fire.location === loc" class="fa-solid fa-check ml-auto"></i></button></template></div></div>
+                        <!-- Sys Check -->
+                        <div @click="toggleMorningTask('prodCheck')" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 cursor-pointer hover:shadow-md transition-all group relative overflow-hidden" :class="checklist.morning.prodCheck ? 'ring-2 ring-emerald-500 border-transparent' : ''">
+                            <div class="absolute top-0 right-0 w-16 h-16 bg-yellow-50 rounded-full blur-xl -mr-8 -mt-8 transition-colors" :class="checklist.morning.prodCheck ? 'bg-emerald-50' : ''"></div>
+                            <div class="relative z-10 flex flex-col h-full justify-between">
+                                <div class="flex justify-between items-center">
+                                    <div class="p-2 rounded-lg bg-yellow-50 text-yellow-600"><i class="fa-solid fa-power-off"></i></div>
+                                    <i x-show="checklist.morning.prodCheck" class="fa-solid fa-check-circle text-emerald-500 text-lg"></i>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase">System Check</p>
+                                    <input x-show="checklist.morning.prodCheck" @click.stop type="text" x-model="checklist.morning.prodNotes" class="w-full bg-slate-50 text-[10px] p-1.5 rounded border-0 font-bold mt-1" placeholder="Enter PC No...">
+                                    <p x-show="!checklist.morning.prodCheck" class="text-xs font-black text-slate-700">Verify Shutdown</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Backup Card (Updated) -->
+						<div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col gap-2 hover:shadow-md transition-all group">
+							
+							<!-- Header -->
+							<div class="flex items-center gap-2">
+								<div class="p-2 rounded-lg bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+									<i class="fa-solid fa-database"></i>
+								</div>
+								<p class="text-[10px] font-bold text-slate-400 uppercase">Backups</p>
+							</div>
+
+							<!-- Toggle Buttons -->
+							<div class="flex gap-2">
+								<button @click="toggleBackup('dc')" 
+										class="flex-1 py-1.5 rounded-lg text-[10px] font-black border transition-all" 
+										:class="checklist.morning.backupDC ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-200' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'">
+									DC
+								</button>
+								<button @click="toggleBackup('adc')" 
+										class="flex-1 py-1.5 rounded-lg text-[10px] font-black border transition-all" 
+										:class="checklist.morning.backupADC ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-200' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'">
+									ADC
+								</button>
+							</div>
+
+							<!-- Time Input (Visible only when Checked) -->
+							<div x-show="checklist.morning.backupDC || checklist.morning.backupADC" x-transition.opacity.duration.300ms>
+								<div class="relative">
+									<i class="fa-regular fa-clock absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px] text-indigo-400"></i>
+									<input type="text" x-model="checklist.morning.backupTime" @input="saveLocal()" 
+										   placeholder="Time (e.g. 2:00 AM)" 
+										   class="w-full bg-indigo-50/50 border border-indigo-100 rounded-lg py-1.5 pl-7 pr-2 text-[10px] font-bold text-indigo-700 placeholder-indigo-300 outline-none focus:ring-1 focus:ring-indigo-400 transition-all">
+								</div>
+							</div>
+							
+							<!-- Placeholder text when nothing selected (Keeps layout stable) -->
+							<div x-show="!checklist.morning.backupDC && !checklist.morning.backupADC" class="text-[9px] font-bold text-slate-300 text-center py-1.5 bg-slate-50 rounded-lg border border-transparent border-dashed">
+								Verify Status
+							</div>
+
+						</div>
+
+                        <!-- Actions List -->
+                        <div class="flex flex-col gap-2">
+                            <div @click="toggleMorningTask('authIssue')" class="flex-1 bg-white rounded-xl border border-slate-100 px-3 flex items-center justify-between cursor-pointer hover:bg-blue-50 transition-colors group">
+                                <div class="flex items-center gap-2"><div class="w-6 h-6 rounded bg-slate-100 flex items-center justify-center text-slate-500 text-[10px] group-hover:bg-blue-500 group-hover:text-white transition-colors"><i class="fa-solid fa-key"></i></div><span class="text-[10px] font-bold text-slate-600">Issue Tokens</span></div>
+                                <div class="w-4 h-4 rounded-full border-2 flex items-center justify-center" :class="checklist.morning.authIssue ? 'bg-emerald-500 border-emerald-500' : 'border-slate-300'"><i class="fa-solid fa-check text-[8px] text-white"></i></div>
+                            </div>
+                            <div @click="toggleMorningTask('ftpJobCheck')" class="flex-1 bg-white rounded-xl border border-slate-100 px-3 flex items-center justify-between cursor-pointer hover:bg-blue-50 transition-colors group">
+                                <div class="flex items-center gap-2"><div class="w-6 h-6 rounded bg-slate-100 flex items-center justify-center text-slate-500 text-[10px] group-hover:bg-blue-500 group-hover:text-white transition-colors"><i class="fa-solid fa-folder-open"></i></div><span class="text-[10px] font-bold text-slate-600">FTP Check</span></div>
+                                <div class="w-4 h-4 rounded-full border-2 flex items-center justify-center" :class="checklist.morning.ftpJobCheck ? 'bg-emerald-500 border-emerald-500' : 'border-slate-300'"><i class="fa-solid fa-check text-[8px] text-white"></i></div>
+                            </div>
+                            <div @click="toggleMorningTask('wifi')" class="flex-1 bg-white rounded-xl border border-slate-100 px-3 flex items-center justify-between cursor-pointer hover:bg-blue-50 transition-colors group">
+                                <div class="flex items-center gap-2"><div class="w-6 h-6 rounded bg-slate-100 flex items-center justify-center text-slate-500 text-[10px] group-hover:bg-blue-500 group-hover:text-white transition-colors"><i class="fa-solid fa-wifi"></i></div><span class="text-[10px] font-bold text-slate-600">Admin WiFi</span></div>
+                                <div class="w-4 h-4 rounded-full border-2 flex items-center justify-center" :class="checklist.morning.wifi ? 'bg-emerald-500 border-emerald-500' : 'border-slate-300'"><i class="fa-solid fa-check text-[8px] text-white"></i></div>
+                            </div>
+                        </div>
+                    </div>
                 </template>
-                <div class="h-10"></div>
+
+                <!-- EVENING SHIFT -->
+                <template x-if="currentShift === 'evening'">
+				<div class="grid grid-cols-4 gap-3 h-full p-2">
+					
+					<!-- 1. Temperature (Vertical - Stays Same) -->
+					<div class="col-span-1 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all group">
+						<div class="flex justify-between items-start">
+							<div class="p-2 rounded-lg bg-violet-50 text-violet-600 group-hover:bg-violet-600 group-hover:text-white transition-colors"><i class="fa-solid fa-temperature-half"></i></div>
+							<span class="text-xl font-black text-slate-700" x-text="checklist.evening.temp ? checklist.evening.temp + '°' : '--'"></span>
+						</div>
+						<div>
+							<p class="text-[10px] font-bold text-slate-400 uppercase">Server Temp</p>
+							<input type="range" min="16" max="28" step="0.5" x-model="checklist.evening.temp" @input="saveLocal()" class="w-full h-1.5 bg-slate-100 rounded-full mt-1 cursor-pointer accent-violet-600">
+						</div>
+					</div>
+
+					<!-- 2. Collect Tokens (MOVED HERE - Made Compact) -->
+					<div @click="toggleEveningTask('authCollect')" 
+						 class="col-span-1 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between cursor-pointer hover:shadow-md transition-all group" 
+						 :class="checklist.evening.authCollect ? 'ring-2 ring-emerald-500 border-transparent' : ''">
+						
+						<div class="flex justify-between items-start">
+							<div class="p-2 rounded-lg bg-slate-100 text-slate-500 group-hover:bg-violet-600 group-hover:text-white transition-colors">
+								<i class="fa-solid fa-vault"></i>
+							</div>
+							<div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all" 
+								 :class="checklist.evening.authCollect ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-200'">
+								<i class="fa-solid fa-check text-[10px]"></i>
+							</div>
+						</div>
+						<div>
+							<p class="text-[10px] font-bold text-slate-400 uppercase">Tokens</p>
+							<p class="text-xs font-black text-slate-700 leading-tight">Return to Safe</p>
+						</div>
+					</div>
+
+					<!-- 3. PBL020 (MOVED HERE - Made Wide for Input) -->
+					<div class="col-span-2 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all group relative overflow-hidden">
+						<!-- Background Decoration -->
+						<div class="absolute top-0 right-0 w-20 h-20 bg-amber-50 rounded-full blur-2xl -mr-10 -mt-10 transition-colors" :class="checklist.evening.pbl020Running ? 'bg-amber-100' : ''"></div>
+						
+						<div class="relative z-10 flex justify-between items-start">
+							<div class="flex items-center gap-3">
+								<div class="p-2 rounded-lg bg-amber-50 text-amber-600 group-hover:bg-amber-500 group-hover:text-white transition-colors">
+									<i class="fa-solid fa-download"></i>
+								</div>
+								<div>
+									<h4 class="text-sm font-black text-slate-700">pblnet020</h4>
+									<p class="text-[10px] font-bold text-slate-400">Download Status</p>
+								</div>
+							</div>
+							<!-- Toggle Switch -->
+							<div @click="togglePblRun()" class="w-10 h-6 bg-slate-200 rounded-full relative cursor-pointer transition-colors" :class="checklist.evening.pbl020Running ? 'bg-amber-500' : 'bg-slate-200'">
+								<div class="w-4 h-4 bg-white rounded-full absolute top-1 transition-all shadow-sm" :class="checklist.evening.pbl020Running ? 'left-5' : 'left-1'"></div>
+							</div>
+						</div>
+
+						<!-- Input Field Area (Wide) -->
+						<div class="relative z-10 mt-2">
+							<div x-show="checklist.evening.pbl020Running">
+								<input type="text" x-model="checklist.evening.pblReason" @input="saveLocal()" 
+									   placeholder="Enter Job Name (e.g. AEMDRE Download)..." 
+									   class="w-full bg-amber-50/50 border border-amber-200 text-xs rounded-xl p-2.5 font-bold outline-none focus:ring-2 focus:ring-amber-400 text-amber-800 placeholder-amber-400 transition-all">
+							</div>
+							<div x-show="!checklist.evening.pbl020Running" class="flex items-center gap-2 text-rose-500 bg-rose-50 px-3 py-2 rounded-xl border border-rose-100">
+								<i class="fa-solid fa-power-off text-xs"></i>
+								<span class="text-[10px] font-black uppercase">System should be OFF</span>
+							</div>
+						</div>
+					</div>
+
+					<!-- 4. FTP Report (Centered & Compact) -->
+					<div @click="toggleEveningTask('ftpReport')" 
+						 class="col-span-2 col-start-1 bg-white rounded-2xl p-3 shadow-sm border border-slate-100 cursor-pointer hover:shadow-md transition-all flex items-center justify-between group h-fit self-center" 
+						 :class="checklist.evening.ftpReport ? 'ring-1 ring-emerald-500 bg-emerald-50/10' : ''">
+						
+						<div class="flex items-center gap-3">
+							<div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-violet-600 group-hover:text-white transition-colors">
+								<i class="fa-solid fa-paper-plane"></i>
+							</div>
+							<div>
+								<h4 class="text-sm font-black text-slate-700">FTP Report</h4>
+								<p class="text-[10px] font-bold text-slate-400">Email Status</p>
+							</div>
+						</div>
+						
+						<div class="flex items-center gap-2 px-2">
+							<div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all" 
+								 :class="checklist.evening.ftpReport ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-200'">
+								<i class="fa-solid fa-check text-[10px]"></i>
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</template>
             </div>
         </div>
-    </div>
 
+        <!-- ROW 2: INFRASTRUCTURE (Optimized Grid) -->
+		<div class="grid grid-cols-12 gap-4 h-full min-h-0">
+			
+			<!-- A. SERVERS & SERVICES (Left Column - 5/12 Width) -->
+			<div class="col-span-12 lg:col-span-5 bg-white rounded-3xl p-5 shadow-sm border border-slate-100 flex flex-col">
+				<h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Core Infrastructure</h3>
+				
+				<div class="flex-1 overflow-y-auto no-scrollbar space-y-4">
+					<!-- Servers Grid -->
+					<div class="grid grid-cols-2 gap-3">
+						<template x-for="(srv, index) in checklist.servers" :key="index">
+							<div @click="toggleServer(index)" class="relative p-3 rounded-xl border cursor-pointer transition-all duration-300 hover:scale-[1.02]" 
+								 :class="getServerClass(srv) + ' ' + (srv.status ? 'shadow-md' : 'opacity-80')">
+								<div class="flex justify-between items-start">
+									<i :class="(srv.name.includes('Linux') || srv.name === 'PBL') ? 'fa-brands fa-linux' : 'fa-brands fa-windows'" class="opacity-80"></i>
+									<div @click.stop="toggleMaintenance(index)" class="w-6 h-6 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center backdrop-blur-sm z-20"><i class="fa-solid fa-wrench text-[10px]"></i></div>
+								</div>
+								<p class="text-[10px] font-black mt-2 uppercase tracking-wide" x-text="srv.name"></p>
+								<div class="absolute bottom-0 left-0 w-full h-1 bg-black/10 rounded-b-xl overflow-hidden"><div class="h-full bg-white/50 transition-all duration-500" :class="srv.status ? 'w-full' : 'w-0'"></div></div>
+							</div>
+						</template>
+					</div>
+
+					<!-- Services List -->
+					<div class="space-y-2">
+						<template x-for="(svc, index) in checklist.services" :key="index">
+							<div @click="toggleService(index)" class="flex items-center gap-3 p-2 rounded-lg border cursor-pointer hover:bg-slate-50 transition-colors group" :class="svc.status ? 'bg-white border-emerald-100' : 'bg-slate-50 border-transparent'">
+								<div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-colors" :class="svc.status ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-200 text-slate-400'"><i class="fa-solid" :class="svc.icon"></i></div>
+								<span class="flex-1 text-[10px] font-bold text-slate-600" x-text="svc.name"></span>
+								<div class="w-2 h-2 rounded-full" :class="svc.status ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : 'bg-slate-300'"></div>
+							</div>
+						</template>
+					</div>
+				</div>
+			</div>
+
+			<!-- B. RIGHT SIDE WRAPPER (Network, Facility & Logs - 7/12 Width) -->
+			<div class="col-span-12 lg:col-span-7 flex flex-col gap-4 h-full">
+				
+				<!-- Top Row: Network & Facility Side-by-Side -->
+				<div class="grid grid-cols-7 gap-4 h-fit">
+					
+					<!-- 1. Network & Security (4/7 Width) -->
+					<div class="col-span-4 bg-white rounded-3xl p-5 shadow-sm border border-slate-100 h-full">
+						<h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Network & Security</h3>
+						
+						<div class="space-y-4">
+							<template x-for="(isp, index) in checklist.isp" :key="index">
+								<div>
+									<div class="flex justify-between items-end mb-1">
+										<span class="text-[10px] font-bold text-slate-700" x-text="isp.name"></span>
+										<span class="text-[10px] font-black font-mono" :class="getSpeedText(isp.speed, isp.max)" x-text="isp.speed + ' Mb'"></span>
+									</div>
+									<input type="range" min="0" :max="isp.max" step="0.5" x-model="isp.speed" @input="calculateScore(); saveLocal()" class="w-full h-1.5 bg-slate-100 rounded-full appearance-none cursor-pointer" :style="`--thumb-color: ${getSpeedHex(isp.speed, isp.max)};`">
+								</div>
+							</template>
+
+							<div class="grid grid-cols-2 gap-3 pt-2">
+    
+							<!-- 1. Sophos Button -->
+							<div @click="handleSophosCheck()" 
+								 class="p-3 rounded-xl border-2 text-center cursor-pointer transition-all duration-200 active:scale-95 group"
+								 :class="checklist.endpoints.sophos 
+									? 'bg-cyan-500 border-cyan-500 text-white shadow-lg shadow-cyan-200' 
+									: 'bg-white border-slate-100 text-slate-400 hover:border-cyan-200 hover:text-cyan-500 hover:bg-cyan-50'">
+								
+								<i class="fa-solid fa-shield-virus text-xl mb-1 transition-transform group-hover:scale-110"></i>
+								<p class="text-[9px] font-black uppercase tracking-wide">Sophos</p>
+							</div>
+
+							<!-- 2. USB Button -->
+							<div @click="handleUsbCheck()" 
+								 class="p-3 rounded-xl border-2 text-center cursor-pointer transition-all duration-200 active:scale-95 group"
+								 :class="checklist.endpoints.usb 
+									? 'bg-rose-500 border-rose-500 text-white shadow-lg shadow-rose-200' 
+									: 'bg-white border-slate-100 text-slate-400 hover:border-rose-200 hover:text-rose-500 hover:bg-rose-50'">
+								
+								<i class="fa-brands fa-usb text-xl mb-1 transition-transform group-hover:scale-110"></i>
+								<p class="text-[9px] font-black uppercase tracking-wide">USB Check</p>
+							</div>
+
+						</div>
+						</div>
+					</div>
+
+					<!-- 2. Facility (3/7 Width) -->
+					<div class="col-span-3 bg-white rounded-3xl p-5 shadow-sm border border-slate-100 h-fit">
+						<h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Facility Status</h3>
+						<div class="space-y-3">
+							<template x-for="(ac, index) in checklist.infra.acs" :key="index">
+								<div @click="toggleAC(index)" class="flex items-center justify-between p-2.5 rounded-xl cursor-pointer transition-all border border-transparent hover:bg-slate-50 hover:border-slate-100 group">
+									<div class="flex items-center gap-2">
+										<div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-colors" :class="ac.status ? 'bg-cyan-50 text-cyan-500' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-snowflake" :class="{'animate-spin-slow': ac.status}"></i></div>
+										<span class="text-[10px] font-bold text-slate-700" x-text="ac.name"></span>
+									</div>
+									<div class="w-10 h-6 rounded-full relative transition-all duration-300 ease-in-out" :class="ac.status ? 'bg-cyan-500 shadow-inner' : 'bg-slate-200'"><div class="w-4 h-4 bg-white rounded-full absolute top-1 left-1 shadow-md transition-all duration-300 transform" :class="ac.status ? 'translate-x-4' : 'translate-x-0'"></div></div>
+								</div>
+							</template>
+							<div class="h-px bg-slate-100 my-1"></div>
+							<div>
+								<div class="flex items-center justify-between p-2.5">
+									<div class="flex items-center gap-2">
+										<div class="w-8 h-8 rounded-lg bg-rose-50 text-rose-500 flex items-center justify-center text-sm"><i class="fa-solid fa-fire-extinguisher"></i></div>
+										<span class="text-[10px] font-bold text-slate-700">Fire Safety</span>
+									</div>
+									<div @click="toggleInfra('fire')" class="w-10 h-6 rounded-full relative transition-all duration-300 ease-in-out" :class="checklist.infra.fire.status ? 'bg-emerald-500 shadow-inner' : 'bg-slate-200'"><div class="w-4 h-4 bg-white rounded-full absolute top-1 left-1 shadow-md transition-all duration-300 transform" :class="checklist.infra.fire.status ? 'translate-x-4' : 'translate-x-0'"></div></div>
+								</div>
+								<div x-show="checklist.infra.fire.status" x-collapse>
+									<div @click="modals.fireList.show = true" class="mt-1 mx-2 text-[10px] font-bold bg-slate-50 p-2 rounded-lg text-center cursor-pointer border border-slate-200 hover:border-emerald-300 hover:text-emerald-600 transition-colors text-slate-500 flex items-center justify-between px-3">
+										<span x-text="checklist.infra.fire.location || 'Select Location...'"></span>
+										<i class="fa-solid fa-chevron-down text-[9px]"></i>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- 3. Logs Area (Full Width of Right Side) -->
+				<div class="flex-1 bg-white rounded-3xl p-4 shadow-sm border border-slate-200 flex flex-col min-h-[140px]">
+					<div class="flex items-center gap-2 mb-2">
+						<i class="fa-solid fa-pen-to-square text-slate-400 text-xs"></i>
+						<h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Shift Logs / Handover</h3>
+					</div>
+					<textarea x-model="remarks" @input="saveLocal()" 
+							  class="w-full h-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 placeholder-slate-400 outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white focus:border-transparent transition-all resize-none leading-relaxed" 
+							  placeholder="Type any issues, pending tasks, or notes for the next shift..."></textarea>
+				</div>
+
+			</div>
+
+		</div>
+
+    </div>
+</main>
+</div>
+
+    <!-- MODALS (Scanner, Confirm, Fire List, etc.) SAME AS BEFORE -->
+    <div x-show="modals.scanner.show" x-cloak class="fixed inset-0 z-[115] flex items-center justify-center bg-black/80 backdrop-blur-sm p-6"><div class="bg-white w-full max-w-sm rounded-[2rem] p-6 shadow-2xl animate-float"><div class="text-center mb-4"><div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-3 text-3xl text-amber-600 shadow-inner"><i class="fa-solid fa-binoculars"></i></div><h3 class="text-xl font-black text-slate-800">Review Score</h3><p class="text-xs font-bold text-slate-400 uppercase tracking-wider mt-1">Score: <span class="text-amber-500 text-lg" x-text="score + '%'"></span></p></div><div class="bg-slate-50 rounded-2xl p-4 mb-6 border border-slate-100 max-h-60 overflow-y-auto"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Pending Items</p><ul class="space-y-2"><template x-for="item in missingItems" :key="item.msg"><li class="flex items-start gap-2 text-xs font-bold text-slate-600 bg-white p-2 rounded-lg border border-slate-100 shadow-sm"><i class="fa-solid fa-circle-exclamation text-amber-500 mt-0.5"></i><span x-text="item.msg"></span></li></template></ul></div><div class="flex flex-col gap-3"><button @click="scrollToIssue()" class="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-500/30 clickable">FIX ISSUES NOW <i class="fa-solid fa-wrench ml-2"></i></button><button @click="scrollToRemarks()" class="w-full py-3 text-slate-400 font-bold text-xs hover:text-slate-600 transition-colors clickable">Skip & Submit with Remarks <i class="fa-solid fa-arrow-right ml-1"></i></button></div></div></div>
+    <div x-show="modals.confirm.show" x-cloak class="fixed inset-0 z-[110] flex items-center justify-center bg-black/70 backdrop-blur-md p-6"><div class="bg-white w-full max-w-xs rounded-[2rem] p-8 text-center shadow-2xl"><div x-show="submitState === 'ask'"><h3 class="text-xl font-black mb-2" x-text="modals.confirm.title"></h3><button @click="executeConfirmAction()" class="w-full py-3 bg-blue-600 text-white rounded-xl font-bold mt-4 clickable">Confirm</button><button @click="modals.confirm.show=false" class="w-full py-3 mt-2 text-slate-500 font-bold clickable">Cancel</button></div><div x-show="submitState === 'loading'"><i class="fa-solid fa-cloud-arrow-up text-blue-500 text-3xl animate-bounce mb-4"></i><h3 class="font-black">Sending...</h3></div><div x-show="submitState === 'done'"><div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 text-emerald-600 text-3xl"><i class="fa-solid fa-check"></i></div><h3 class="text-lg font-black">Success!</h3><button @click="location.reload()" class="w-full py-3 bg-slate-100 text-slate-700 rounded-xl font-bold text-xs hover:bg-slate-200 clickable">Reload</button></div></div></div>
+    <div x-show="modals.fireList.show" x-cloak class="fixed inset-0 z-[200] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4"><div class="bg-white w-full max-w-sm rounded-t-[2rem] sm:rounded-[2rem] h-auto max-h-[85vh] flex flex-col shadow-2xl animate-float pb-safe" @click.away="modals.fireList.show = false"><div class="p-5 border-b border-slate-100 flex justify-between items-center bg-rose-50 sm:rounded-t-[2rem] rounded-t-[2rem] flex-shrink-0"><div><h3 class="text-lg font-black text-rose-700">Select Location</h3><p class="text-[10px] text-rose-400 font-bold uppercase tracking-wider">Fire Extinguisher Check</p></div><button @click="modals.fireList.show = false" class="w-8 h-8 rounded-full bg-white text-rose-500 flex items-center justify-center shadow-sm clickable"><i class="fa-solid fa-xmark"></i></button></div><div class="overflow-y-auto p-2 space-y-1 flex-1 overscroll-contain"><template x-for="(group, floorName) in fireLocations" :key="floorName"><div class="mb-2"><div class="sticky top-0 bg-white/95 backdrop-blur z-10 px-4 py-2 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-50" x-text="floorName"></div><div class="grid grid-cols-1 gap-1 p-1"><template x-for="loc in group" :key="loc"><button @click="checklist.infra.fire.location = loc; saveLocal(); modals.fireList.show = false; haptic()" class="w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-colors active:scale-95 clickable" :class="checklist.infra.fire.location === loc ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30' : 'hover:bg-slate-50 text-slate-600'"><i class="fa-solid fa-fire-extinguisher text-sm" :class="checklist.infra.fire.location === loc ? 'text-white' : 'text-rose-300'"></i><span class="text-xs font-bold" x-text="loc"></span><i x-show="checklist.infra.fire.location === loc" class="fa-solid fa-check ml-auto"></i></button></template></div></div></template><div class="h-10"></div></div></div></div>
     <div x-show="modals.alert.show" x-cloak class="fixed inset-0 z-[120] flex items-center justify-center bg-black/80 backdrop-blur-md p-6"><div class="bg-white w-full max-w-xs rounded-3xl p-6 text-center shadow-2xl"><h3 class="text-lg font-black" x-text="modals.alert.title"></h3><p class="text-xs text-slate-500 mb-4" x-text="modals.alert.msg"></p><button @click="closeAlert()" class="w-full py-3 bg-slate-100 rounded-xl font-bold clickable">Okay</button></div></div>
     <div x-show="modals.lateWarning.show" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-6"><div class="bg-white w-full max-w-xs rounded-[2rem] p-6 text-center shadow-2xl relative overflow-hidden"><div class="absolute top-0 left-0 w-full h-1.5 bg-rose-500"></div><div class="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl text-rose-500"><i class="fa-solid fa-clock-rotate-left"></i></div><h3 class="text-xl font-black text-slate-800 mb-2">Shift Timeout!</h3><p class="text-xs text-slate-500 mb-6 font-medium">Flagged as <strong class="text-rose-500">LATE ENTRY</strong>.</p><div class="flex gap-3"><button @click="modals.lateWarning.show = false" class="flex-1 py-3 rounded-xl bg-slate-100 text-slate-600 font-bold text-xs clickable">BACK</button><button @click="confirmLateEntry()" class="flex-1 py-3 rounded-xl bg-rose-600 text-white font-bold text-xs shadow-lg clickable">PROCEED</button></div></div></div>
     <div x-show="showUsbModal" x-cloak class="fixed inset-0 z-[105] flex items-center justify-center bg-black/80 backdrop-blur-sm p-6"><div class="bg-white w-full max-w-sm rounded-3xl p-6 text-center animate-float"><i class="fa-solid fa-hand text-4xl text-amber-500 mb-4 block"></i><h3 class="text-lg font-black text-slate-800">Physical Check</h3><p class="text-xs text-slate-500 mb-6">Insert Pen Drive to verify blockage on 1 Random PC.</p><div class="flex gap-3"><button @click="showUsbModal=false" class="flex-1 py-3 rounded-xl bg-slate-100 text-xs font-bold clickable">Cancel</button><button @click="confirmUsbCheck()" class="flex-1 py-3 rounded-xl bg-amber-500 text-white text-xs font-bold shadow-lg clickable">Verified</button></div></div></div>
     <div x-show="modals.sophos.show" x-cloak class="fixed inset-0 z-[105] flex items-center justify-center bg-black/80 backdrop-blur-sm p-6"><div class="bg-white w-full max-w-sm rounded-3xl p-6 text-center animate-float"><i class="fa-solid fa-shield-virus text-4xl text-cyan-500 mb-4 block"></i><h3 class="text-lg font-black text-slate-800">Antivirus Check</h3><p class="text-xs text-slate-500 mb-6">Verify Sophos is green on 1 Random PC.</p><div class="flex gap-3"><button @click="modals.sophos.show=false" class="flex-1 py-3 rounded-xl bg-slate-100 text-xs font-bold clickable">Cancel</button><button @click="confirmSophos()" class="flex-1 py-3 rounded-xl bg-cyan-600 text-white text-xs font-bold shadow-lg clickable">Verified</button></div></div></div>
-
-    <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbyvIkwSZ5gdIBc_GHbXXMgadnBHU19twANppiq-nK8D3cGb8B6efZLix1Cxe2FPPsqyJw/exec"; 
-
-    document.addEventListener('alpine:init', () => {
-        Alpine.data('dailyOpsApp', () => ({
-            currentShift: 'morning', pendingShift: '', isLateEntry: false, submitState: 'ask', todayDate: '', timeLeft: '--', startTime: Date.now(),
-            shiftConfig: {
-                'morning': { name: 'Morning Shift', auditor: 'Anil Singh', branch: 'NOIDA', startH: 8, startM: 0, endH: 15, endM: 45, colorClass: 'text-blue-700', timeDisplay: '08 AM - 03:45 PM' },
-                'general': { name: 'General Shift', auditor: 'Deependra Singh', branch: 'DEHRADUN', startH: 9, startM: 0, endH: 17, endM: 0, colorClass: 'text-teal-700', timeDisplay: '09 AM - 05 PM' },
-                'evening': { name: 'Evening Shift', auditor: 'Ashok Singh', branch: 'NOIDA', startH: 14, startM: 15, endH: 21, endM: 30, colorClass: 'text-violet-700', timeDisplay: '02:15 PM - 09:30 PM' }
-            },
-            score: 0, remarks: '', isSubmitting: false, showUsbModal: false, missingItems: [],
-            modals: { alert: { show: false }, confirm: { show: false, title: '' }, usb: { show: false }, sophos: { show: false }, lateWarning: { show: false }, scanner: { show: false }, fireList: { show: false } },
-            
-            fireLocations: {
-                "Basement (BS)": ["BS - Server Room", "BS - Outside Server Room", "BS - Electric Room", "BS - IT Lab", "BS - Cafeteria", "BS - Cafeteria Stair"],
-                "Ground Floor (GF)": ["GF - Reception", "GF - Conference Room", "GF - Production Hall", "GF - Inside Production", "GF - Staircase", "GF - Water Cooler", "GF - GenSet Area", "GF - Transformer Area", "GF - Inside Guard Room"],
-                "First Floor (FF)": ["FF - Production Hall", "FF - Production (Right Side)", "FF - Staircase", "FF - Water Cooler"],
-                "Third Floor (TF)": ["TF - Kitchen"]
-            },
-
-            checklist: {
-                morning: { temp: null, prodCheck: false, prodNotes: '', backupDC: false, backupADC: false, backupTime: '', wifi: false, authIssue: false, ftpJobCheck: false, pbl020Start: false },
-                evening: { temp: null, authCollect: false, ftpReport: false, pbl020Running: true, pblReason: '' },
-                servers: [ { name: 'WinSvr100', status: false, maintenance: false }, { name: 'WinSvr101', status: false, maintenance: false }, { name: 'WinSvr005', status: false, maintenance: false }, { name: 'PBL', status: false, maintenance: false }, { name: 'Linux 2', status: false, maintenance: false }, { name: 'Linux 3', status: false, maintenance: false } ],
-                services: [ { name: 'PanBusiness.net', status: false, type: 'web', desc: 'Website Status', icon: 'fa-globe' }, { name: 'Rediff Enterprise', status: false, type: 'mail', desc: 'Mail Flow Check', icon: 'fa-envelope' }, { name: 'Citrix VPN', status: false, type: 'web', desc: 'https://ede.dp-ds.de/vpn', icon: 'fa-cloud' } ],
-                isp: [ { name: 'STPI 15Mbps', speed: 0, max: 15, complaint: '', vendor: '9876543210' }, { name: 'Airtel 10Mbps', speed: 0, max: 10, complaint: '', vendor: '9876543210' }, { name: 'Airtel 30Mbps BB', speed: 0, max: 30, complaint: '', vendor: '9876543210' } ],
-                endpoints: { sophos: false, usb: false },
-                infra: { acs: [{ name: 'Server AC 1', status: false }, { name: 'Server AC 2', status: false }, { name: 'Server AC 3', status: false }], fire: { status: false, location: '' } }
-            },
-
-            init() {
-                this.todayDate = new Date().toLocaleDateString('en-IN', {weekday: 'short', day: '2-digit', month: 'short'});
-                this.detectCurrentShift();
-                const todayStr = new Date().toDateString();
-                const cached = localStorage.getItem('pbl_daily_ops');
-                if (cached) {
-                    const parsed = JSON.parse(cached);
-                    if (parsed.saveDate === todayStr) {
-                        if(parsed.checklist) {
-                            if(parsed.checklist.morning) this.checklist.morning = parsed.checklist.morning;
-                            if(parsed.checklist.evening) this.checklist.evening = parsed.checklist.evening;
-                            this.checklist.isp.forEach((item, i) => { if(parsed.checklist.isp[i]) { item.speed = parsed.checklist.isp[i].speed; item.complaint = parsed.checklist.isp[i].complaint || ''; } });
-                            this.checklist.servers.forEach((item, i) => { if(parsed.checklist.servers[i]) { item.status = parsed.checklist.servers[i].status; item.maintenance = parsed.checklist.servers[i].maintenance || false; } });
-                            if(parsed.checklist.services) { this.checklist.services.forEach((item, i) => { if(parsed.checklist.services[i]) item.status = parsed.checklist.services[i].status; }); }
-                            this.checklist.infra.forEach((item, i) => { if(parsed.checklist.infra[i]) item.status = parsed.checklist.infra[i].status; });
-                            this.checklist.endpoints = parsed.checklist.endpoints;
-                        }
-                        this.remarks = parsed.remarks || '';
-                    } else { localStorage.removeItem('pbl_daily_ops'); }
-                }
-                this.calculateScore();
-                this.updateTimer();
-                setInterval(() => this.updateTimer(), 60000);
-            },
-
-            haptic() { if (navigator.vibrate) navigator.vibrate(12); },
-
-            toggleTask(shift, key) { this.haptic(); this.checklist[shift][key] = !this.checklist[shift][key]; this.update(); },
-            toggleMorningTask(key) { this.toggleTask('morning', key); },
-            toggleEveningTask(key) { this.toggleTask('evening', key); },
-            toggleBackup(key) { this.haptic(); key === 'dc' ? this.checklist.morning.backupDC = !this.checklist.morning.backupDC : this.checklist.morning.backupADC = !this.checklist.morning.backupADC; this.update(); },
-            togglePblRun() { this.haptic(); this.checklist.evening.pbl020Running = !this.checklist.evening.pbl020Running; this.update(); },
-            toggleInfra(key) { this.haptic(); if(key === 'fire') this.checklist.infra.fire.status = !this.checklist.infra.fire.status; else this.checklist.infra.acs[key].status = !this.checklist.infra.acs[key].status; this.update(); },
-            toggleAC(i) { this.haptic(); this.checklist.infra.acs[i].status = !this.checklist.infra.acs[i].status; this.update(); },
-            toggleServer(i) { if(this.checklist.servers[i].maintenance) return; this.haptic(); this.checklist.servers[i].status = !this.checklist.servers[i].status; this.update(); },
-            toggleMaintenance(i) { this.haptic(); this.checklist.servers[i].maintenance = !this.checklist.servers[i].maintenance; if(this.checklist.servers[i].maintenance) this.checklist.servers[i].status = false; this.update(); },
-            getServerClass(srv) { if(srv.maintenance) return 'bg-amber-50 border-amber-300 text-slate-700 opacity-80'; if(!srv.status) return 'bg-white border-slate-200 text-slate-700'; if(srv.name.includes('Linux') || srv.name === 'PBL') return 'bg-orange-600 border-orange-700 text-white shadow-lg shadow-orange-500/30'; return 'bg-blue-600 border-blue-700 text-white shadow-lg shadow-blue-500/30'; },
-            toggleService(i) { this.haptic(); this.checklist.services[i].status = !this.checklist.services[i].status; this.update(); },
-            handleUsbCheck() { this.haptic(); if (!this.checklist.endpoints.usb) this.showUsbModal = true; else { this.checklist.endpoints.usb = false; this.update(); } },
-            confirmUsbCheck() { this.haptic(); this.checklist.endpoints.usb = true; this.showUsbModal = false; this.update(); },
-            handleSophosCheck() { this.haptic(); if(!this.checklist.endpoints.sophos) this.modals.sophos.show = true; else { this.checklist.endpoints.sophos = false; this.update(); } },
-            confirmSophos() { this.haptic(); this.checklist.endpoints.sophos = true; this.modals.sophos.show = false; this.update(); },
-            getSpeedColor(speed, max) { if(!speed || speed == 0) return 'bg-slate-400 text-white'; return (speed / max) * 100 <= 50 ? 'bg-rose-500 text-white shadow-rose-500/50' : 'bg-emerald-500 text-white shadow-emerald-500/50'; },
-            getSpeedText(speed, max) { if(!speed || speed == 0) return 'text-slate-300'; return (speed / max) * 100 <= 50 ? 'text-rose-500' : 'text-emerald-500'; },
-            getSpeedHex(speed, max) { if(!speed || speed == 0) return '#cbd5e1'; return (speed / max) * 100 <= 50 ? '#f43f5e' : '#10b981'; },
-            isLowSpeed(isp) { return isp.speed > 0 && isp.speed <= (isp.max / 2); },
-            updateTimer() { const now = new Date(); const conf = this.shiftConfig[this.currentShift]; const endTime = new Date(); endTime.setHours(conf.endH, conf.endM, 0); if (now > endTime) { this.timeLeft = "Time Up"; return; } const diff = endTime - now; const hrs = Math.floor((diff / (1000 * 60 * 60))); const mins = Math.floor((diff / (1000 * 60)) % 60); this.timeLeft = `${hrs}h ${mins}m Left`; },
-            detectCurrentShift() { const now = new Date(); const h = now.getHours(); const m = now.getMinutes(); const time = h + m/60; if (time >= 14.25 && time < 21.5) { this.currentShift = 'evening'; } else if (time >= 8 && time < 14.25) { this.currentShift = 'morning'; } else if (time >= 9 && time < 17) { this.currentShift = 'general'; } else { this.currentShift = 'morning'; } this.checkLateStatus(); this.updateTimer(); },
-            isTimeInRange(sH, sM, eH, eM) { const now = new Date(); const h = now.getHours(); const m = now.getMinutes(); const current = h + m/60; const start = sH + sM/60; const end = eH + eM/60; return current >= start && current < end; },
-            checkLateStatus() { const conf = this.shiftConfig[this.currentShift]; this.isLateEntry = !this.isTimeInRange(conf.startH, conf.startM, conf.endH, conf.endM); },
-            requestShiftChange(type) { this.haptic(); const conf = this.shiftConfig[type]; if (this.isTimeInRange(conf.startH, conf.startM, conf.endH, conf.endM)) { this.currentShift = type; this.isLateEntry = false; } else { this.pendingShift = type; this.modals.lateWarning.show = true; } this.updateTimer(); },
-            confirmLateEntry() { this.haptic(); this.currentShift = this.pendingShift; this.isLateEntry = true; this.modals.lateWarning.show = false; if(this.remarks.length < 5) this.remarks = ''; this.updateTimer(); },
-            saveLocal() { localStorage.setItem('pbl_daily_ops', JSON.stringify({ saveDate: new Date().toDateString(), checklist: this.checklist, remarks: this.remarks })); },
-            update() { this.calculateScore(); this.saveLocal(); },
-
-            calculateScore() {
-                let total = 0, checked = 0;
-                if(this.currentShift === 'morning') {
-                    total += 8; 
-                    if(this.checklist.morning.temp) checked++;
-                    checked++; // Prod check default
-                    if(this.checklist.morning.authIssue) checked++; 
-                    if(this.checklist.morning.ftpJobCheck) checked++; 
-                    if(this.checklist.morning.pbl020Start) checked++; 
-                    if(this.checklist.morning.backupDC) checked++; 
-                    if(this.checklist.morning.backupADC) checked++; 
-                    if(this.checklist.morning.wifi) checked++;
-                }
-                if(this.currentShift === 'evening') {
-                    total += 4; 
-                    if(this.checklist.evening.temp) checked++;
-                    if(this.checklist.evening.authCollect) checked++; if(this.checklist.evening.ftpReport) checked++;
-                    if(this.checklist.evening.pbl020Running || (!this.checklist.evening.pbl020Running && this.checklist.evening.pblReason)) checked++; 
-                }
-                this.checklist.servers.forEach(s => { if(!s.maintenance) { total++; if(s.status) checked++; } });
-                this.checklist.services.forEach(s => { total++; if(s.status) checked++; });
-                this.checklist.isp.forEach(i => { total++; if(i.speed && i.speed > 0) checked++; });
-                total+=2; if(this.checklist.endpoints.sophos) checked++; if(this.checklist.endpoints.usb) checked++;
-                total += this.checklist.infra.acs.length + 1;
-                this.checklist.infra.acs.forEach(ac => { if(ac.status) checked++; });
-                if(this.checklist.infra.fire.status) checked++;
-                this.score = total === 0 ? 0 : Math.round((checked / total) * 100);
-            },
-
-            getSubmitButtonClass() {
-                if (this.isSubmitting) return 'bg-slate-400';
-                if (this.isLateEntry) return 'bg-gradient-to-r from-rose-600 to-pink-600 shadow-rose-500/30';
-                if (this.currentShift === 'morning') return 'bg-gradient-to-r from-blue-600 to-indigo-600 shadow-blue-500/30';
-                if (this.currentShift === 'general') return 'bg-gradient-to-r from-teal-600 to-emerald-600 shadow-teal-500/30';
-                if (this.currentShift === 'evening') return 'bg-gradient-to-r from-violet-600 to-purple-600 shadow-violet-500/30';
-                return 'bg-brand';
-            },
-
-            scanForIssues() {
-                let issues = [];
-                if (this.currentShift === 'morning') {
-                    if (!this.checklist.morning.temp) issues.push({ msg: "Server Room Temp not logged", id: "card-temp" });
-                    if (!this.checklist.morning.authIssue) issues.push({ msg: "eTokens not Issued", id: "card-etoken" });
-                    if (!this.checklist.morning.ftpJobCheck) issues.push({ msg: "FTP Jobs not checked", id: "card-ftp" });
-                    if (!this.checklist.morning.pbl020Start) issues.push({ msg: "pblnet020 not started", id: "card-pbl020" });
-                    if (!this.checklist.morning.backupDC) issues.push({ msg: "DC Backup not verified", id: "card-backup" });
-                    if (!this.checklist.morning.backupADC) issues.push({ msg: "ADC Backup not verified", id: "card-backup" });
-                    if (!this.checklist.morning.wifi) issues.push({ msg: "Admin WiFi not checked", id: "card-wifi" });
-                } else if (this.currentShift === 'evening') {
-					// Sirf Mandatory cheezein check hongi
-					if (!this.checklist.evening.temp) issues.push({ msg: "Server Room Temp not logged", id: "card-temp-eve" });
-					if (!this.checklist.evening.authCollect) issues.push({ msg: "eTokens not Collected", id: "card-etoken-eve" });
-					if (!this.checklist.evening.ftpReport) issues.push({ msg: "FTP Report not sent", id: "card-ftp-eve" });
-					
-					// ✅ pblnet020 logic removed. 
-					// Ab chahe wo ON ho ya OFF, scanner error nahi dega.
-				}
-                this.checklist.servers.forEach(s => { if (!s.maintenance && !s.status) issues.push({ msg: `Server: ${s.name} Offline/Unchecked`, id: "card-servers" }); });
-                this.checklist.services.forEach(s => { if (!s.status) issues.push({ msg: `Service: ${s.name} Down/Unchecked`, id: "card-services" }); });
-                this.checklist.isp.forEach(i => { if (i.speed <= 0) issues.push({ msg: `ISP: ${i.name} speed not logged`, id: "card-isp" }); });
-                this.checklist.infra.acs.forEach(ac => { if (!ac.status) issues.push({ msg: `AC: ${ac.name} is OFF`, id: "card-infra" }); });
-                if (!this.checklist.infra.fire.status) issues.push({ msg: "Fire Safety check pending", id: "card-infra" });
-                if (!this.checklist.endpoints.sophos) issues.push({ msg: "Sophos Check pending", id: "card-security" });
-                if (!this.checklist.endpoints.usb) issues.push({ msg: "USB Check pending", id: "card-security" });
-                return issues;
-            },
-
-            scrollToIssue() {
-                this.haptic();
-                this.modals.scanner.show = false;
-                if (this.missingItems.length > 0) {
-                    const targetId = this.missingItems[0].id;
-                    const el = document.getElementById(targetId);
-                    if (el) {
-                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        el.classList.add('ring-4', 'ring-amber-400');
-                        setTimeout(() => el.classList.remove('ring-4', 'ring-amber-400'), 2000);
-                    }
-                }
-            },
-
-            scrollToRemarks() {
-                this.haptic();
-                this.modals.scanner.show = false;
-                const el = document.getElementById('card-remarks');
-                if (el) {
-                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    setTimeout(() => document.querySelector('textarea').focus(), 500);
-                }
-                if (this.remarks.trim().length < 3) {
-                    this.showAlert('Remarks Required', 'Please explain why items are pending.', 'warning');
-                }
-            },
-
-            confirmAction(action) {
-                this.haptic();
-                if (action === 'submit') {
-                    if (this.isLateEntry && this.remarks.trim().length < 5) { this.showAlert('Late Entry', 'Please provide a valid reason in remarks.', 'error'); return; }
-                    const pendingIssues = this.scanForIssues();
-                    if (this.score < 100 && pendingIssues.length > 0) {
-                        this.missingItems = pendingIssues;
-                        this.modals.scanner.show = true; 
-                        return; 
-                    }
-                }
-                this.finalizeSubmit(action);
-            },
-            
-            proceedWithLowScore() { this.scrollToRemarks(); },
-
-            finalizeSubmit(action) {
-                const shiftData = this.shiftConfig[this.currentShift];
-                this.submitState = 'ask';
-                this.modals.confirm = { show: true, title: action === 'reset' ? 'Clear Data?' : `Submit ${shiftData.name}?`, action };
-            },
-            
-            executeConfirmAction() {
-                this.haptic();
-                if(this.modals.confirm.action === 'reset') { localStorage.removeItem('pbl_daily_ops'); window.location.reload(); }
-                else { this.submitState = 'loading'; this.submitAudit(); }
-            },
-            
-            showAlert(title, msg, type) { this.modals.alert = { show: true, title, msg }; this.haptic(); },
-            closeAlert() { this.modals.alert.show = false; },
-
-            async submitAudit() {
-                this.isSubmitting = true; const dateStr = new Date().toLocaleDateString('en-IN'); const shiftDetails = this.shiftConfig[this.currentShift];
-                let cycleName = `${shiftDetails.name} (${shiftDetails.branch}) - ${dateStr}`; if (this.isLateEntry) cycleName += " [LATE ENTRY]";
-                const timeTakenSec = Math.floor((Date.now() - this.startTime) / 1000);
-                const timeTakenStr = `${Math.floor(timeTakenSec/60)}m ${timeTakenSec%60}s`;
-                
-                let finalRemarks = this.remarks + ` [TimeTaken: ${timeTakenStr}]`;
-                if(this.currentShift === 'morning' && this.checklist.morning.temp) finalRemarks += ` [Temp: ${this.checklist.morning.temp}°C]`;
-                if(this.currentShift === 'evening' && this.checklist.evening.temp) finalRemarks += ` [Temp: ${this.checklist.evening.temp}°C]`;
-
-                const payload = { 
-                    action: 'submitSecurityAudit', 
-                    auditor: shiftDetails.auditor, 
-                    cycle: cycleName, 
-                    score: this.score, 
-                    remarks: finalRemarks, 
-                    details: this.checklist 
-                };
-                
-                try {
-                    const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
-                    const result = await res.json();
-                    if (result.status === 'success') { 
-                        if(navigator.vibrate) navigator.vibrate([100, 50, 100]); 
-                        localStorage.removeItem('pbl_daily_ops'); 
-                        this.submitState = 'done'; 
-                    } else { alert(result.message); this.modals.confirm.show = false; }
-                } catch (e) { alert('Network Error'); this.modals.confirm.show = false; } 
-                finally { this.isSubmitting = false; }
-            }
-        }))
-    })
-    </script>
 </body>
 </html>
