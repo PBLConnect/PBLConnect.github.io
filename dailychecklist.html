@@ -72,7 +72,7 @@
 
                 // 📝 Checklist Data Structure (Saare tasks yahan hain)
                 checklist: {
-                    morning: { temp: null, prodCheck: false, prodNotes: '', backupDC: false, backupADC: false, backupTime: '', wifi: false, authIssue: false, ftpJobCheck: false, pbl020Start: false },
+                    morning: { temp: null, prodCheck: true, prodNotes: '', backupDC: false, backupADC: false, backupTime: '', wifi: false, authIssue: false, ftpJobCheck: false, pbl020Start: false },
                     evening: { temp: null, authCollect: false, ftpReport: false, pbl020Running: true, pblReason: '' },
                     servers: [ { name: 'WinSvr100', status: false, maintenance: false }, { name: 'WinSvr101', status: false, maintenance: false }, { name: 'WinSvr005', status: false, maintenance: false }, { name: 'PBL', status: false, maintenance: false }, { name: 'Linux 2', status: false, maintenance: false }, { name: 'Linux 3', status: false, maintenance: false } ],
                     services: [ { name: 'PanBusiness.net', status: false, type: 'web', desc: 'Website Status', icon: 'fa-globe' }, { name: 'Rediff Enterprise', status: false, type: 'mail', desc: 'Mail Flow Check', icon: 'fa-envelope' }, { name: 'Citrix VPN', status: false, type: 'web', desc: 'https://ede.dp-ds.de/vpn', icon: 'fa-cloud' } ],
@@ -452,8 +452,38 @@
                     <!-- Security (Sophos & USB) -->
                     <div id="card-security" class="space-y-3 scroll-mt-24"><h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1"><i class="fa-solid fa-shield-halved"></i> Security</h3><div class="grid grid-cols-1 gap-3"><div @click="handleSophosCheck()" class="glass-card p-4 rounded-3xl cursor-pointer border-2 flex items-center gap-4 clickable" :class="checklist.endpoints.sophos ? 'border-cyan-400 bg-cyan-50' : 'border-transparent'"><div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-md" :class="checklist.endpoints.sophos ? 'bg-cyan-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-shield-virus"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">Sophos AV</h4><p class="text-[10px] text-slate-400">Random PC Check</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.endpoints.sophos ? 'border-cyan-500 bg-cyan-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div><div @click="handleUsbCheck()" class="glass-card p-4 rounded-3xl cursor-pointer border-2 flex items-center gap-4 clickable" :class="checklist.endpoints.usb ? 'border-rose-400 bg-rose-50' : 'border-transparent'"><div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-md" :class="checklist.endpoints.usb ? 'bg-rose-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-brands fa-usb"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">USB Blocking</h4><p class="text-[10px] text-slate-400">Physical Check</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.endpoints.usb ? 'border-rose-500 bg-rose-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div></div></div>
                     
-                    <!-- Services (Websites etc) -->
-                    <div id="card-services" class="space-y-3 scroll-mt-24"><h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1"><i class="fa-solid fa-network-wired"></i> Services</h3><div class="grid grid-cols-1 gap-3"><template x-for="(svc, index) in checklist.services" :key="index"><div @click="toggleService(index)" class="glass-card p-4 rounded-3xl cursor-pointer border-2 flex items-center gap-4 clickable" :class="svc.status ? 'border-indigo-400 bg-indigo-50' : 'border-transparent'"><div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-md" :class="svc.status ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid" :class="svc.icon"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700" x-text="svc.name"></h4><p class="text-[10px] text-slate-400" x-text="svc.desc"></p></div><span class="px-3 py-1 rounded-full text-[10px] font-black uppercase" :class="svc.status ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400'"><span x-text="svc.status ? 'OK' : 'CHK'"></span></span></div></template></div></div>
+                    <!-- Services (Websites etc) - FIXED FOR MOBILE -->
+					<div id="card-services" class="space-y-3 scroll-mt-24">
+						<h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">
+							<i class="fa-solid fa-network-wired"></i> Services
+						</h3>
+						<div class="grid grid-cols-1 gap-3">
+							<template x-for="(svc, index) in checklist.services" :key="index">
+								<div @click="toggleService(index)" 
+									 class="glass-card p-4 rounded-3xl cursor-pointer border-2 flex items-center gap-4 clickable transition-all active:scale-95" 
+									 :class="svc.status ? 'border-emerald-400 bg-emerald-50' : 'border-transparent'">
+									
+									<!-- Icon -->
+									<div class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-md transition-colors" 
+										 :class="svc.status ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400'">
+										<i class="fa-solid" :class="svc.icon"></i>
+									</div>
+
+									<!-- Text Info -->
+									<div class="flex-1">
+										<h4 class="text-sm font-black text-slate-700" x-text="svc.name"></h4>
+										<p class="text-[10px] font-bold text-slate-400" x-text="svc.desc"></p>
+									</div>
+
+									<!-- Toggle Check -->
+									<div class="w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors" 
+										 :class="svc.status ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-slate-200 text-slate-200'">
+										<i class="fa-solid fa-check"></i>
+									</div>
+								</div>
+							</template>
+						</div>
+					</div>
                     
                     <!-- Servers (DUPLICATE REMOVED - Ab ek hi baar dikhega) -->
                     <div id="card-servers" class="space-y-3 scroll-mt-24"><h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1"><i class="fa-solid fa-server"></i> Servers</h3><div class="grid grid-cols-2 gap-3"><template x-for="(srv, index) in checklist.servers" :key="index"><div @click="toggleServer(index)" class="relative p-4 h-32 rounded-[1.5rem] border-2 cursor-pointer overflow-hidden group clickable transition-colors duration-300 shadow-lg" :class="getServerClass(srv)"><div class="absolute -bottom-6 -right-6 text-9xl text-black opacity-10 transform rotate-12 pointer-events-none z-0 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-0"><i :class="(srv.name.includes('Linux') || srv.name === 'PBL') ? 'fa-brands fa-linux' : 'fa-brands fa-windows'"></i></div>
@@ -642,33 +672,86 @@
                 <!-- MORNING SHIFT DESKTOP -->
                 <template x-if="currentShift === 'morning'">
                     <div class="grid grid-cols-4 gap-3 h-full p-2">
-                        <!-- Temp -->
-                        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all group">
-                            <div class="flex justify-between items-start">
-                                <div class="p-2 rounded-lg bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors"><i class="fa-solid fa-temperature-half"></i></div>
-                                <span class="text-xl font-black text-slate-700" x-text="checklist.morning.temp ? checklist.morning.temp + '°' : '--'"></span>
-                            </div>
-                            <div>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase">Server Temp</p>
-                                <input type="range" min="16" max="28" step="0.5" x-model="checklist.morning.temp" @input="saveLocal()" class="w-full h-1.5 bg-slate-100 rounded-full mt-1 cursor-pointer accent-blue-600">
-                            </div>
-                        </div>
+                        <!-- 1. Modern Temp Card (Thermostat Style 🌡️) -->
+						<div class="relative overflow-hidden bg-white rounded-[1.5rem] p-4 border border-slate-100 shadow-sm group hover:shadow-md transition-all">
+							<!-- Subtle Background Glow -->
+							<div class="absolute -right-6 -top-6 w-24 h-24 rounded-full blur-2xl opacity-20 transition-colors duration-500"
+								 :class="checklist.morning.temp > 24 ? 'bg-rose-500' : 'bg-blue-500'"></div>
 
-                        <!-- Sys Check -->
-                        <div @click="toggleMorningTask('prodCheck')" class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 cursor-pointer hover:shadow-md transition-all group relative overflow-hidden" :class="checklist.morning.prodCheck ? 'ring-2 ring-emerald-500 border-transparent' : ''">
-                            <div class="absolute top-0 right-0 w-16 h-16 bg-yellow-50 rounded-full blur-xl -mr-8 -mt-8 transition-colors" :class="checklist.morning.prodCheck ? 'bg-emerald-50' : ''"></div>
-                            <div class="relative z-10 flex flex-col h-full justify-between">
-                                <div class="flex justify-between items-center">
-                                    <div class="p-2 rounded-lg bg-yellow-50 text-yellow-600"><i class="fa-solid fa-power-off"></i></div>
-                                    <i x-show="checklist.morning.prodCheck" class="fa-solid fa-check-circle text-emerald-500 text-lg"></i>
-                                </div>
-                                <div>
-                                    <p class="text-[10px] font-bold text-slate-400 uppercase">System Check</p>
-                                    <input x-show="checklist.morning.prodCheck" @click.stop type="text" x-model="checklist.morning.prodNotes" class="w-full bg-slate-50 text-[10px] p-1.5 rounded border-0 font-bold mt-1" placeholder="Enter PC No...">
-                                    <p x-show="!checklist.morning.prodCheck" class="text-xs font-black text-slate-700">Verify Shutdown</p>
-                                </div>
-                            </div>
-                        </div>
+							<div class="relative z-10 flex flex-col h-full justify-between">
+								<div class="flex justify-between items-start">
+									<!-- Icon Box -->
+									<div class="w-10 h-10 rounded-2xl flex items-center justify-center text-lg shadow-sm transition-colors duration-300"
+										 :class="checklist.morning.temp > 24 ? 'bg-rose-50 text-rose-500' : 'bg-blue-50 text-blue-500'">
+										<i class="fa-solid fa-temperature-half"></i>
+									</div>
+									<!-- Big Digital Reading -->
+									<div class="text-right">
+										<span class="text-3xl font-black tracking-tighter text-slate-800" 
+											  x-text="checklist.morning.temp ? checklist.morning.temp : '--'"></span>
+										<span class="text-lg text-slate-400 font-bold align-top">°C</span>
+									</div>
+								</div>
+
+								<div>
+									<div class="flex justify-between items-end mb-1">
+										<p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Server Room</p>
+										<p class="text-[9px] font-bold" :class="checklist.morning.temp > 24 ? 'text-rose-500' : 'text-blue-500'" 
+										   x-text="checklist.morning.temp > 24 ? 'HOT' : 'OPTIMAL'"></p>
+									</div>
+									<!-- Sleek Slider -->
+									<input type="range" min="16" max="28" step="0.5" 
+										   x-model="checklist.morning.temp" 
+										   @input="saveLocal()" 
+										   class="w-full h-1.5 bg-slate-100 rounded-full appearance-none cursor-pointer accent-current"
+										   :class="checklist.morning.temp > 24 ? 'accent-rose-500' : 'accent-blue-500'">
+								</div>
+							</div>
+						</div>
+
+						<!-- 2. Modern System Check (Smart Toggle ⚡) -->
+						<div @click="toggleMorningTask('prodCheck')" 
+							 class="relative overflow-hidden rounded-[1.5rem] p-4 border-2 cursor-pointer transition-all duration-300 group shadow-sm hover:shadow-md"
+							 :class="checklist.morning.prodCheck ? 'bg-emerald-500 border-emerald-500' : 'bg-white border-slate-100 hover:border-amber-200'">
+							
+							<!-- Background Icon Decoration -->
+							<i class="fa-solid fa-power-off absolute -bottom-4 -right-4 text-6xl opacity-10 transition-transform duration-500 group-hover:rotate-12"
+							   :class="checklist.morning.prodCheck ? 'text-white' : 'text-slate-800'"></i>
+
+							<div class="relative z-10 flex flex-col h-full justify-between">
+								<div class="flex justify-between items-start">
+									<!-- Icon -->
+									<div class="w-10 h-10 rounded-2xl flex items-center justify-center text-lg shadow-sm transition-colors"
+										 :class="checklist.morning.prodCheck ? 'bg-white/20 text-white backdrop-blur-sm' : 'bg-amber-50 text-amber-500'">
+										<i class="fa-solid" :class="checklist.morning.prodCheck ? 'fa-check' : 'fa-plug'"></i>
+									</div>
+									
+									<!-- Status Pill -->
+									<div class="px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest border transition-colors"
+										 :class="checklist.morning.prodCheck ? 'bg-white/20 text-white border-white/20' : 'bg-slate-50 text-slate-400 border-slate-200'">
+										<span x-text="checklist.morning.prodCheck ? 'VERIFIED' : 'PENDING'"></span>
+									</div>
+								</div>
+
+								<div>
+									<!-- Main Text -->
+									<h4 class="text-sm font-black leading-tight mb-1"
+										:class="checklist.morning.prodCheck ? 'text-white' : 'text-slate-700'">
+										<span x-text="checklist.morning.prodCheck ? 'All Systems OFF' : 'System Check'"></span>
+									</h4>
+									
+									<!-- Smart Input Area -->
+									<div @click.stop class="relative" x-show="!checklist.morning.prodCheck">
+										<input type="text" x-model="checklist.morning.prodNotes" 
+											   class="w-full bg-slate-50 border border-slate-200 rounded-lg py-1 px-2 text-[10px] font-bold text-slate-700 placeholder-slate-400 focus:ring-2 focus:ring-amber-400 outline-none transition-all"
+											   placeholder="Any PC ON? Type ID...">
+									</div>
+									<p x-show="checklist.morning.prodCheck" class="text-[10px] font-medium text-emerald-100 truncate">
+										Ready for production.
+									</p>
+								</div>
+							</div>
+						</div>
 
                         <!-- Backup Card -->
 						<div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col gap-2 hover:shadow-md transition-all group">
@@ -708,22 +791,76 @@
 
 						</div>
 
-                        <!-- Actions List -->
-                        <div class="flex flex-col gap-2">
-                            <div @click="toggleMorningTask('authIssue')" class="flex-1 bg-white rounded-xl border border-slate-100 px-3 flex items-center justify-between cursor-pointer hover:bg-blue-50 transition-colors group">
-                                <div class="flex items-center gap-2"><div class="w-6 h-6 rounded bg-slate-100 flex items-center justify-center text-slate-500 text-[10px] group-hover:bg-blue-500 group-hover:text-white transition-colors"><i class="fa-solid fa-key"></i></div><span class="text-[10px] font-bold text-slate-600">Issue Tokens</span></div>
-                                <div class="w-4 h-4 rounded-full border-2 flex items-center justify-center" :class="checklist.morning.authIssue ? 'bg-emerald-500 border-emerald-500' : 'border-slate-300'"><i class="fa-solid fa-check text-[8px] text-white"></i></div>
-                            </div>
-                            <div @click="toggleMorningTask('ftpJobCheck')" class="flex-1 bg-white rounded-xl border border-slate-100 px-3 flex items-center justify-between cursor-pointer hover:bg-blue-50 transition-colors group">
-                                <div class="flex items-center gap-2"><div class="w-6 h-6 rounded bg-slate-100 flex items-center justify-center text-slate-500 text-[10px] group-hover:bg-blue-500 group-hover:text-white transition-colors"><i class="fa-solid fa-folder-open"></i></div><span class="text-[10px] font-bold text-slate-600">FTP Check</span></div>
-                                <div class="w-4 h-4 rounded-full border-2 flex items-center justify-center" :class="checklist.morning.ftpJobCheck ? 'bg-emerald-500 border-emerald-500' : 'border-slate-300'"><i class="fa-solid fa-check text-[8px] text-white"></i></div>
-                            </div>
-                            <div @click="toggleMorningTask('wifi')" class="flex-1 bg-white rounded-xl border border-slate-100 px-3 flex items-center justify-between cursor-pointer hover:bg-blue-50 transition-colors group">
-                                <div class="flex items-center gap-2"><div class="w-6 h-6 rounded bg-slate-100 flex items-center justify-center text-slate-500 text-[10px] group-hover:bg-blue-500 group-hover:text-white transition-colors"><i class="fa-solid fa-wifi"></i></div><span class="text-[10px] font-bold text-slate-600">Admin WiFi</span></div>
-                                <div class="w-4 h-4 rounded-full border-2 flex items-center justify-center" :class="checklist.morning.wifi ? 'bg-emerald-500 border-emerald-500' : 'border-slate-300'"><i class="fa-solid fa-check text-[8px] text-white"></i></div>
-                            </div>
-                        </div>
-                    </div>
+                        <!-- Compact Actions List (Fit & Modern ✨) -->
+<div class="flex flex-col gap-2 h-full justify-between"> <!-- Gap reduced to 2 -->
+    
+    <!-- 1. Issue Tokens -->
+    <div @click="toggleMorningTask('authIssue')" 
+         class="flex items-center p-2 rounded-xl border cursor-pointer transition-all duration-300 group shadow-sm active:scale-95 h-[48px]"
+         :class="checklist.morning.authIssue ? 'bg-blue-50 border-blue-500' : 'bg-white border-slate-100 hover:border-blue-200'">
+        
+        <!-- Small Icon Box -->
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-colors duration-300"
+             :class="checklist.morning.authIssue ? 'bg-blue-500 text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500'">
+            <i class="fa-solid fa-key"></i>
+        </div>
+
+        <!-- Text -->
+        <div class="ml-3 flex-1 min-w-0">
+            <h4 class="text-[10px] font-black text-slate-700 uppercase tracking-wide truncate">Issue Tokens</h4>
+            <p class="text-[8px] font-bold text-slate-400 truncate">10 Units Handover</p>
+        </div>
+
+        <!-- Mini Check -->
+        <div class="w-5 h-5 rounded-full border flex items-center justify-center transition-all duration-300 mr-1"
+             :class="checklist.morning.authIssue ? 'bg-blue-500 border-blue-500' : 'border-slate-200'">
+            <i class="fa-solid fa-check text-[8px] text-white" x-show="checklist.morning.authIssue"></i>
+        </div>
+    </div>
+
+    <!-- 2. FTP Check -->
+    <div @click="toggleMorningTask('ftpJobCheck')" 
+         class="flex items-center p-2 rounded-xl border cursor-pointer transition-all duration-300 group shadow-sm active:scale-95 h-[48px]"
+         :class="checklist.morning.ftpJobCheck ? 'bg-violet-50 border-violet-500' : 'bg-white border-slate-100 hover:border-violet-200'">
+        
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-colors duration-300"
+             :class="checklist.morning.ftpJobCheck ? 'bg-violet-500 text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-violet-50 group-hover:text-violet-500'">
+            <i class="fa-solid fa-folder-open"></i>
+        </div>
+
+        <div class="ml-3 flex-1 min-w-0">
+            <h4 class="text-[10px] font-black text-slate-700 uppercase tracking-wide truncate">FTP Check</h4>
+            <p class="text-[8px] font-bold text-slate-400 truncate">Check Client Jobs</p>
+        </div>
+
+        <div class="w-5 h-5 rounded-full border flex items-center justify-center transition-all duration-300 mr-1"
+             :class="checklist.morning.ftpJobCheck ? 'bg-violet-500 border-violet-500' : 'border-slate-200'">
+            <i class="fa-solid fa-check text-[8px] text-white" x-show="checklist.morning.ftpJobCheck"></i>
+        </div>
+    </div>
+
+    <!-- 3. WiFi Check -->
+    <div @click="toggleMorningTask('wifi')" 
+         class="flex items-center p-2 rounded-xl border cursor-pointer transition-all duration-300 group shadow-sm active:scale-95 h-[48px]"
+         :class="checklist.morning.wifi ? 'bg-cyan-50 border-cyan-500' : 'bg-white border-slate-100 hover:border-cyan-200'">
+        
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-colors duration-300"
+             :class="checklist.morning.wifi ? 'bg-cyan-500 text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-cyan-50 group-hover:text-cyan-500'">
+            <i class="fa-solid fa-wifi"></i>
+        </div>
+
+        <div class="ml-3 flex-1 min-w-0">
+            <h4 class="text-[10px] font-black text-slate-700 uppercase tracking-wide truncate">Admin WiFi</h4>
+            <p class="text-[8px] font-bold text-slate-400 truncate">Connectivity Test</p>
+        </div>
+
+        <div class="w-5 h-5 rounded-full border flex items-center justify-center transition-all duration-300 mr-1"
+             :class="checklist.morning.wifi ? 'bg-cyan-500 border-cyan-500' : 'border-slate-200'">
+            <i class="fa-solid fa-check text-[8px] text-white" x-show="checklist.morning.wifi"></i>
+        </div>
+    </div>
+
+</div>
                 </template>
 
                 <!-- EVENING SHIFT DESKTOP -->
@@ -758,7 +895,7 @@
 						</div>
 						<div>
 							<p class="text-[10px] font-bold text-slate-400 uppercase">Tokens</p>
-							<p class="text-xs font-black text-slate-700 leading-tight">Return to Safe</p>
+							<p class="text-xs font-black text-slate-700 leading-tight">Return to Server Room Safehouse</p>
 						</div>
 					</div>
 
@@ -828,33 +965,92 @@
         <!-- ROW 2: INFRASTRUCTURE -->
 		<div class="grid grid-cols-12 gap-4 h-full min-h-0">
 			
-			<!-- A. SERVERS & SERVICES -->
-			<div class="col-span-12 lg:col-span-5 bg-white rounded-3xl p-5 shadow-sm border border-slate-100 flex flex-col">
-				<h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Core Infrastructure</h3>
+			<!-- A. SERVERS & SERVICES (Left Column - 5/12 Width) -->
+			<div class="col-span-12 lg:col-span-5 bg-white rounded-3xl p-5 shadow-sm border border-slate-100 flex flex-col h-full">
+				<h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 shrink-0">Core Infrastructure</h3>
 				
-				<div class="flex-1 overflow-y-auto no-scrollbar space-y-4">
-					<!-- Servers Grid -->
-					<div class="grid grid-cols-2 gap-3">
+				<!-- Wrapper: Flex Column + Gap, No Scrollbar so items stretch -->
+				<div class="flex-1 flex flex-col gap-4 min-h-0">
+					
+					<!-- 1. Servers Grid (Upgraded Design 🚀) -->
+					<div class="grid grid-cols-2 gap-3 shrink-0">
 						<template x-for="(srv, index) in checklist.servers" :key="index">
-							<div @click="toggleServer(index)" class="relative p-3 rounded-xl border cursor-pointer transition-all duration-300 hover:scale-[1.02]" 
-								 :class="getServerClass(srv) + ' ' + (srv.status ? 'shadow-md' : 'opacity-80')">
-								<div class="flex justify-between items-start">
-									<i :class="(srv.name.includes('Linux') || srv.name === 'PBL') ? 'fa-brands fa-linux' : 'fa-brands fa-windows'" class="opacity-80"></i>
-									<div @click.stop="toggleMaintenance(index)" class="w-6 h-6 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center backdrop-blur-sm z-20"><i class="fa-solid fa-wrench text-[10px]"></i></div>
+							<div @click="toggleServer(index)" 
+								 class="relative p-3 h-20 rounded-2xl border-2 cursor-pointer overflow-hidden group clickable transition-all duration-300 shadow-sm hover:shadow-md hover:scale-[1.02]" 
+								 :class="getServerClass(srv)">
+								
+								<!-- 🎨 Background Watermark (Rotation Effect) -->
+								<div class="absolute -bottom-4 -right-4 text-6xl text-black opacity-10 transform rotate-12 pointer-events-none transition-transform duration-500 group-hover:rotate-0">
+									<i :class="(srv.name.includes('Linux') || srv.name === 'PBL') ? 'fa-brands fa-linux' : 'fa-brands fa-windows'"></i>
 								</div>
-								<p class="text-[10px] font-black mt-2 uppercase tracking-wide" x-text="srv.name"></p>
-								<div class="absolute bottom-0 left-0 w-full h-1 bg-black/10 rounded-b-xl overflow-hidden"><div class="h-full bg-white/50 transition-all duration-500" :class="srv.status ? 'w-full' : 'w-0'"></div></div>
+
+								<!-- 🔧 Maintenance Button (Top Right) -->
+								<div @click.stop="toggleMaintenance(index)" 
+									 class="absolute top-1.5 right-1.5 z-20 w-6 h-6 flex items-center justify-center rounded-full shadow-sm cursor-pointer transition-all hover:scale-110 active:scale-90" 
+									 :class="srv.maintenance ? 'bg-amber-500 text-white ring-2 ring-white' : 'bg-white/20 hover:bg-white/40 text-white backdrop-blur-md border border-white/20'">
+									<i class="fa-solid fa-wrench text-[9px]" :class="srv.maintenance ? 'animate-pulse' : ''"></i>
+								</div>
+
+								<!-- 📦 Content Layout (Full Width Clean Design ✨) -->
+								<div class="relative z-10 h-full flex flex-col justify-center px-2">
+									
+									<!-- Top Row: Icon + Name -->
+									<div class="flex items-center gap-2 mb-1">
+										<!-- Small Inline Icon -->
+										<i :class="(srv.name.includes('Linux') || srv.name === 'PBL') ? 'fa-brands fa-linux' : 'fa-brands fa-windows'" 
+										   class="text-lg opacity-90 drop-shadow-sm"></i>
+										
+										<!-- Server Name (Bada aur Bold) -->
+										<h4 class="text-base font-black leading-none tracking-tight drop-shadow-sm truncate" x-text="srv.name"></h4>
+									</div>
+
+									<!-- Bottom Row: Status Badge -->
+									<div>
+										<span class="text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-md backdrop-blur-md border border-white/20 shadow-sm transition-colors"
+											  :class="srv.status ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500 border-slate-200'"
+											  x-text="srv.maintenance ? 'MAINTENANCE' : (srv.status ? 'ONLINE' : 'OFFLINE')">
+										</span>
+									</div>
+
+								</div>
 							</div>
 						</template>
 					</div>
 
-					<!-- Services List -->
-					<div class="space-y-2">
+					<!-- 2. Services List (EXPAND to fill empty space) -->
+					<div class="flex-1 flex flex-col gap-3">
 						<template x-for="(svc, index) in checklist.services" :key="index">
-							<div @click="toggleService(index)" class="flex items-center gap-3 p-2 rounded-lg border cursor-pointer hover:bg-slate-50 transition-colors group" :class="svc.status ? 'bg-white border-emerald-100' : 'bg-slate-50 border-transparent'">
-								<div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-colors" :class="svc.status ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-200 text-slate-400'"><i class="fa-solid" :class="svc.icon"></i></div>
-								<span class="flex-1 text-[10px] font-bold text-slate-600" x-text="svc.name"></span>
-								<div class="w-2 h-2 rounded-full" :class="svc.status ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : 'bg-slate-300'"></div>
+							<div @click="toggleService(index)" 
+								 class="flex-1 relative rounded-2xl border-2 cursor-pointer transition-all duration-300 group overflow-hidden flex items-center px-4 py-2"
+								 :class="svc.status 
+									? 'bg-white border-emerald-500 shadow-lg shadow-emerald-100' 
+									: 'bg-slate-50 border-transparent hover:border-slate-200 hover:bg-white'">
+								
+								<!-- Background Status Strip -->
+								<div class="absolute left-0 top-0 bottom-0 w-1.5 transition-all duration-300" 
+									 :class="svc.status ? 'bg-emerald-500' : 'bg-transparent'"></div>
+
+								<!-- Icon Box -->
+								<div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg transition-all duration-300 z-10 shrink-0" 
+									 :class="svc.status ? 'bg-emerald-50 text-emerald-600' : 'bg-white text-slate-300 shadow-sm border border-slate-100'">
+									<i class="fa-solid" :class="svc.icon"></i>
+								</div>
+
+								<!-- Text Info (Expanded) -->
+								<div class="ml-4 flex-1 z-10 flex flex-col justify-center">
+									<h4 class="text-sm font-black text-slate-700 leading-tight transition-colors" 
+										:class="svc.status ? 'text-slate-800' : 'text-slate-500'" 
+										x-text="svc.name"></h4>
+									<p class="text-[10px] font-bold mt-0.5" 
+									   :class="svc.status ? 'text-emerald-600' : 'text-slate-300'" 
+									   x-text="svc.status ? 'System Operational' : svc.desc"></p>
+								</div>
+
+								<!-- Status Indicator (Arrow/Check) -->
+								<div class="w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300 z-10 shrink-0 ml-2"
+									 :class="svc.status ? 'border-emerald-500 bg-emerald-500 text-white scale-110' : 'border-slate-200 text-slate-200'">
+									<i class="fa-solid text-[10px]" :class="svc.status ? 'fa-check' : 'fa-chevron-right'"></i>
+								</div>
 							</div>
 						</template>
 					</div>
