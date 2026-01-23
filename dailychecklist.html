@@ -550,59 +550,117 @@
 						
 						<!-- 🌞 NOIDA MORNING (Restored Perfect Design) -->
 						<template x-if="currentShift === 'morning'">
-							<div class="grid grid-cols-4 gap-3 h-full p-2">
-								<!-- 1. Modern Temp Card -->
-								<div class="relative overflow-hidden bg-white rounded-[1.5rem] p-4 border border-slate-100 shadow-sm group hover:shadow-md transition-all">
-									<div class="absolute -right-6 -top-6 w-24 h-24 rounded-full blur-2xl opacity-20 transition-colors duration-500" :class="checklist.morning.temp > 24 ? 'bg-rose-500' : 'bg-blue-500'"></div>
-									<div class="relative z-10 flex flex-col h-full justify-between">
-										<div class="flex justify-between items-start">
-											<div class="w-10 h-10 rounded-2xl flex items-center justify-center text-lg shadow-sm transition-colors duration-300" :class="checklist.morning.temp > 24 ? 'bg-rose-50 text-rose-500' : 'bg-blue-50 text-blue-500'"><i class="fa-solid fa-temperature-half"></i></div>
-											<div class="text-right"><span class="text-3xl font-black tracking-tighter text-slate-800" x-text="checklist.morning.temp ? checklist.morning.temp : '--'"></span><span class="text-lg text-slate-400 font-bold align-top">°C</span></div>
-										</div>
-										<div>
-											<div class="flex justify-between items-end mb-1"><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Server Room</p><p class="text-[9px] font-bold" :class="checklist.morning.temp > 24 ? 'text-rose-500' : 'text-blue-500'" x-text="checklist.morning.temp > 24 ? 'HOT' : 'OPTIMAL'"></p></div>
-											<input type="range" min="16" max="28" step="0.5" x-model="checklist.morning.temp" @input="saveLocal()" class="w-full h-1.5 bg-slate-100 rounded-full appearance-none cursor-pointer accent-current" :class="checklist.morning.temp > 24 ? 'accent-rose-500' : 'accent-blue-500'">
-										</div>
+						<div class="grid grid-cols-4 gap-4 h-full p-2">
+							
+							<!-- 1. Temp Card (Span 1) -->
+							<div class="col-span-1 relative overflow-hidden bg-white rounded-[1.5rem] p-4 border border-slate-100 shadow-sm group hover:shadow-md transition-all flex flex-col justify-between">
+								<div class="absolute -right-6 -top-6 w-24 h-24 rounded-full blur-2xl opacity-20 transition-colors duration-500" :class="checklist.morning.temp > 24 ? 'bg-rose-500' : 'bg-blue-500'"></div>
+								<div class="relative z-10 flex flex-col h-full justify-between">
+									<div class="flex justify-between items-start">
+										<div class="w-10 h-10 rounded-2xl flex items-center justify-center text-lg shadow-sm transition-colors duration-300" :class="checklist.morning.temp > 24 ? 'bg-rose-50 text-rose-500' : 'bg-blue-50 text-blue-500'"><i class="fa-solid fa-temperature-half"></i></div>
+										<div class="text-right"><span class="text-3xl font-black tracking-tighter text-slate-800" x-text="checklist.morning.temp ? checklist.morning.temp : '--'"></span><span class="text-lg text-slate-400 font-bold align-top">°C</span></div>
 									</div>
-								</div>
-
-								<!-- 2. System Check -->
-								<div @click="toggleMorningTask('prodCheck')" class="relative overflow-hidden rounded-[1.5rem] p-4 border-2 cursor-pointer transition-all duration-300 group shadow-sm hover:shadow-md" :class="checklist.morning.prodCheck ? 'bg-emerald-500 border-emerald-500' : 'bg-white border-slate-100 hover:border-amber-200'">
-									<i class="fa-solid fa-power-off absolute -bottom-4 -right-4 text-6xl opacity-10 transition-transform duration-500 group-hover:rotate-12" :class="checklist.morning.prodCheck ? 'text-white' : 'text-slate-800'"></i>
-									<div class="relative z-10 flex flex-col h-full justify-between">
-										<div class="flex justify-between items-start">
-											<div class="w-10 h-10 rounded-2xl flex items-center justify-center text-lg shadow-sm transition-colors" :class="checklist.morning.prodCheck ? 'bg-white/20 text-white backdrop-blur-sm' : 'bg-amber-50 text-amber-500'"><i class="fa-solid" :class="checklist.morning.prodCheck ? 'fa-check' : 'fa-plug'"></i></div>
-											<div class="px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest border transition-colors" :class="checklist.morning.prodCheck ? 'bg-white/20 text-white border-white/20' : 'bg-slate-50 text-slate-400 border-slate-200'"><span x-text="checklist.morning.prodCheck ? 'VERIFIED' : 'PENDING'"></span></div>
-										</div>
-										<div>
-											<h4 class="text-sm font-black leading-tight mb-1" :class="checklist.morning.prodCheck ? 'text-white' : 'text-slate-700'"><span x-text="checklist.morning.prodCheck ? 'All Systems OFF' : 'System Check'"></span></h4>
-											<div @click.stop class="relative" x-show="!checklist.morning.prodCheck"><input type="text" x-model="checklist.morning.prodNotes" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-1 px-2 text-[10px] font-bold text-slate-700 placeholder-slate-400 focus:ring-2 focus:ring-amber-400 outline-none transition-all" placeholder="Any PC ON? Type ID..."></div>
-											<p x-show="checklist.morning.prodCheck" class="text-[10px] font-medium text-emerald-100 truncate">Ready for production.</p>
-										</div>
+									<div>
+										<div class="flex justify-between items-end mb-1"><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Server Room</p><p class="text-[9px] font-bold" :class="checklist.morning.temp > 24 ? 'text-rose-500' : 'text-blue-500'" x-text="checklist.morning.temp > 24 ? 'HOT' : 'OPTIMAL'"></p></div>
+										<input type="range" min="16" max="28" step="0.5" x-model="checklist.morning.temp" @input="saveLocal()" class="w-full h-1.5 bg-slate-100 rounded-full appearance-none cursor-pointer accent-current" :class="checklist.morning.temp > 24 ? 'accent-rose-500' : 'accent-blue-500'">
 									</div>
-								</div>
-
-								<!-- 3. Backup Card -->
-								<div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col gap-2 hover:shadow-md transition-all group">
-									<div class="flex items-center gap-2"><div class="p-2 rounded-lg bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors"><i class="fa-solid fa-database"></i></div><p class="text-[10px] font-bold text-slate-400 uppercase">Backups</p></div>
-									<div class="flex gap-2"><button @click="toggleBackup('dc')" class="flex-1 py-1.5 rounded-lg text-[10px] font-black border transition-all" :class="checklist.morning.backupDC ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-200' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'">DC</button><button @click="toggleBackup('adc')" class="flex-1 py-1.5 rounded-lg text-[10px] font-black border transition-all" :class="checklist.morning.backupADC ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-200' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'">ADC</button></div>
-									<div x-show="checklist.morning.backupDC || checklist.morning.backupADC" x-transition.opacity.duration.300ms><div class="relative"><i class="fa-regular fa-clock absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px] text-indigo-400"></i><input type="text" x-model="checklist.morning.backupTime" @input="saveLocal()" placeholder="Time (e.g. 2:00 AM)" class="w-full bg-indigo-50/50 border border-indigo-100 rounded-lg py-1.5 pl-7 pr-2 text-[10px] font-bold text-indigo-700 placeholder-indigo-300 outline-none focus:ring-1 focus:ring-indigo-400 transition-all"></div></div>
-									<div x-show="!checklist.morning.backupDC && !checklist.morning.backupADC" class="text-[9px] font-bold text-slate-300 text-center py-1.5 bg-slate-50 rounded-lg border border-transparent border-dashed">Verify Status</div>
-								</div>
-
-								<!-- 4. Action Tiles -->
-								<div class="flex flex-col gap-2 h-full justify-between">
-									<div @click="toggleMorningTask('authIssue')" class="flex items-center p-2 rounded-xl border cursor-pointer transition-all duration-300 group shadow-sm active:scale-95 h-[48px]" :class="checklist.morning.authIssue ? 'bg-blue-50 border-blue-500' : 'bg-white border-slate-100 hover:border-blue-200'"><div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-colors duration-300" :class="checklist.morning.authIssue ? 'bg-blue-500 text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500'"><i class="fa-solid fa-key"></i></div><div class="ml-3 flex-1 min-w-0"><h4 class="text-[10px] font-black text-slate-700 uppercase tracking-wide truncate">Issue Tokens</h4><p class="text-[8px] font-bold text-slate-400 truncate">10 Units Handover</p></div><div class="w-5 h-5 rounded-full border flex items-center justify-center transition-all duration-300 mr-1" :class="checklist.morning.authIssue ? 'bg-blue-500 border-blue-500' : 'border-slate-200'"><i class="fa-solid fa-check text-[8px] text-white" x-show="checklist.morning.authIssue"></i></div></div>
-									<div @click="toggleMorningTask('ftpJobCheck')" class="flex items-center p-2 rounded-xl border cursor-pointer transition-all duration-300 group shadow-sm active:scale-95 h-[48px]" :class="checklist.morning.ftpJobCheck ? 'bg-violet-50 border-violet-500' : 'bg-white border-slate-100 hover:border-violet-200'"><div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-colors duration-300" :class="checklist.morning.ftpJobCheck ? 'bg-violet-500 text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-violet-50 group-hover:text-violet-500'"><i class="fa-solid fa-folder-open"></i></div><div class="ml-3 flex-1 min-w-0"><h4 class="text-[10px] font-black text-slate-700 uppercase tracking-wide truncate">FTP Check</h4><p class="text-[8px] font-bold text-slate-400 truncate">Check Client Jobs</p></div><div class="w-5 h-5 rounded-full border flex items-center justify-center transition-all duration-300 mr-1" :class="checklist.morning.ftpJobCheck ? 'bg-violet-500 border-violet-500' : 'border-slate-200'"><i class="fa-solid fa-check text-[8px] text-white" x-show="checklist.morning.ftpJobCheck"></i></div></div>
-									<div @click="toggleMorningTask('wifi')" class="flex items-center p-2 rounded-xl border cursor-pointer transition-all duration-300 group shadow-sm active:scale-95 h-[48px]" :class="checklist.morning.wifi ? 'bg-cyan-50 border-cyan-500' : 'bg-white border-slate-100 hover:border-cyan-200'"><div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-colors duration-300" :class="checklist.morning.wifi ? 'bg-cyan-500 text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-cyan-50 group-hover:text-cyan-500'"><i class="fa-solid fa-wifi"></i></div><div class="ml-3 flex-1 min-w-0"><h4 class="text-[10px] font-black text-slate-700 uppercase tracking-wide truncate">Admin WiFi</h4><p class="text-[8px] font-bold text-slate-400 truncate">Connectivity Test</p></div><div class="w-5 h-5 rounded-full border flex items-center justify-center transition-all duration-300 mr-1" :class="checklist.morning.wifi ? 'bg-cyan-500 border-cyan-500' : 'border-slate-200'"><i class="fa-solid fa-check text-[8px] text-white" x-show="checklist.morning.wifi"></i></div></div>
 								</div>
 							</div>
-						</template>
+
+							<!-- 2. System Check (Span 1) -->
+							<div @click="toggleMorningTask('prodCheck')" 
+								 class="col-span-1 relative overflow-hidden rounded-[1.5rem] p-4 border-2 cursor-pointer transition-all duration-300 group shadow-sm hover:shadow-md flex flex-col justify-between"
+								 :class="checklist.morning.prodCheck ? 'bg-emerald-500 border-emerald-500' : 'bg-white border-slate-100 hover:border-amber-200'">
+								
+								<i class="fa-solid fa-power-off absolute -bottom-4 -right-4 text-7xl opacity-10 transition-transform duration-500 group-hover:rotate-12" :class="checklist.morning.prodCheck ? 'text-white' : 'text-slate-800'"></i>
+								
+								<div class="relative z-10 flex justify-between items-start">
+									<div class="w-10 h-10 rounded-2xl flex items-center justify-center text-lg shadow-sm transition-colors" :class="checklist.morning.prodCheck ? 'bg-white/20 text-white backdrop-blur-sm' : 'bg-amber-50 text-amber-500'"><i class="fa-solid" :class="checklist.morning.prodCheck ? 'fa-check' : 'fa-plug'"></i></div>
+									<div class="px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest border transition-colors" :class="checklist.morning.prodCheck ? 'bg-white/20 text-white border-white/20' : 'bg-slate-50 text-slate-400 border-slate-200'"><span x-text="checklist.morning.prodCheck ? 'VERIFIED' : 'PENDING'"></span></div>
+								</div>
+								
+								<div class="relative z-10 mt-2">
+									<h4 class="text-sm font-black leading-tight mb-1" :class="checklist.morning.prodCheck ? 'text-white' : 'text-slate-700'"><span x-text="checklist.morning.prodCheck ? 'All Systems OFF' : 'System Check'"></span></h4>
+									<!-- Input only shows if NOT checked -->
+									<div @click.stop class="relative" x-show="!checklist.morning.prodCheck">
+										<input type="text" x-model="checklist.morning.prodNotes" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-1.5 px-2 text-[10px] font-bold text-slate-700 placeholder-slate-400 focus:ring-2 focus:ring-amber-400 outline-none transition-all" placeholder="PC ON? Type ID...">
+									</div>
+									<p x-show="checklist.morning.prodCheck" class="text-[10px] font-medium text-emerald-100 truncate">Floor Ready.</p>
+								</div>
+							</div>
+
+							<!-- 3. Backups (Span 1) -->
+							<div class="col-span-1 bg-white rounded-[1.5rem] p-4 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all group relative overflow-hidden">
+								 <div class="absolute -right-6 -bottom-6 w-20 h-20 rounded-full bg-indigo-50 blur-xl opacity-50 group-hover:bg-indigo-100 transition-colors"></div>
+								 
+								 <div class="relative z-10">
+									<div class="flex items-center gap-2 mb-3">
+										<div class="p-2 rounded-lg bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors"><i class="fa-solid fa-database"></i></div>
+										<p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Backups</p>
+									</div>
+									
+									<div class="flex gap-2 mb-3">
+										<button @click="toggleBackup('dc')" class="flex-1 py-2 rounded-xl text-[10px] font-black border transition-all active:scale-95" :class="checklist.morning.backupDC ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-200' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'">DC</button>
+										<button @click="toggleBackup('adc')" class="flex-1 py-2 rounded-xl text-[10px] font-black border transition-all active:scale-95" :class="checklist.morning.backupADC ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-200' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'">ADC</button>
+									</div>
+								 </div>
+
+								 <div class="relative z-10 mt-auto">
+									<div x-show="checklist.morning.backupDC || checklist.morning.backupADC" x-transition.opacity.duration.300ms>
+										<div class="relative">
+											<i class="fa-regular fa-clock absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-indigo-400"></i>
+											<input type="text" x-model="checklist.morning.backupTime" @input="saveLocal()" placeholder="End Time..." class="w-full bg-indigo-50/50 border border-indigo-100 rounded-lg py-1.5 pl-8 pr-2 text-[10px] font-bold text-indigo-700 placeholder-indigo-300 outline-none focus:ring-1 focus:ring-indigo-400 transition-all">
+										</div>
+									</div>
+									<div x-show="!checklist.morning.backupDC && !checklist.morning.backupADC" class="text-[9px] font-bold text-slate-300 text-center py-1.5 bg-slate-50 rounded-lg border border-transparent border-dashed">Verify Status</div>
+								 </div>
+							</div>
+
+							<!-- 4. Quick Actions Stack (Span 1 - Tokens, FTP, WiFi) -->
+							<div class="col-span-1 flex flex-col gap-2 h-full justify-between">
+								
+								<!-- Issue Tokens -->
+								<div @click="toggleMorningTask('authIssue')" class="flex-1 flex items-center p-2 rounded-[1rem] border cursor-pointer transition-all duration-300 group shadow-sm hover:shadow-md active:scale-95" :class="checklist.morning.authIssue ? 'bg-blue-50 border-blue-500' : 'bg-white border-slate-100 hover:border-blue-200'">
+									<div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-colors duration-300 shrink-0" :class="checklist.morning.authIssue ? 'bg-blue-500 text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500'"><i class="fa-solid fa-key"></i></div>
+									<div class="ml-2 flex-1 min-w-0"><h4 class="text-[9px] font-black text-slate-700 uppercase tracking-wide truncate">Issue Tokens</h4><p class="text-[8px] font-bold text-slate-400 truncate">10 Units Out</p></div>
+									<div class="w-4 h-4 rounded-full border flex items-center justify-center transition-all duration-300 shrink-0" :class="checklist.morning.authIssue ? 'bg-blue-500 border-blue-500' : 'border-slate-200'"><i class="fa-solid fa-check text-[7px] text-white" x-show="checklist.morning.authIssue"></i></div>
+								</div>
+
+								<!-- FTP Check -->
+								<div @click="toggleMorningTask('ftpJobCheck')" class="flex-1 flex items-center p-2 rounded-[1rem] border cursor-pointer transition-all duration-300 group shadow-sm hover:shadow-md active:scale-95" :class="checklist.morning.ftpJobCheck ? 'bg-violet-50 border-violet-500' : 'bg-white border-slate-100 hover:border-violet-200'">
+									<div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-colors duration-300 shrink-0" :class="checklist.morning.ftpJobCheck ? 'bg-violet-500 text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-violet-50 group-hover:text-violet-500'"><i class="fa-solid fa-folder-tree"></i></div>
+									<div class="ml-2 flex-1 min-w-0"><h4 class="text-[9px] font-black text-slate-700 uppercase tracking-wide truncate">FTP Check</h4><p class="text-[8px] font-bold text-slate-400 truncate">Client Jobs</p></div>
+									<div class="w-4 h-4 rounded-full border flex items-center justify-center transition-all duration-300 shrink-0" :class="checklist.morning.ftpJobCheck ? 'bg-violet-500 border-violet-500' : 'border-slate-200'"><i class="fa-solid fa-check text-[7px] text-white" x-show="checklist.morning.ftpJobCheck"></i></div>
+								</div>
+
+								<!-- Admin WiFi -->
+								<div @click="toggleMorningTask('wifi')" class="flex-1 flex items-center p-2 rounded-[1rem] border cursor-pointer transition-all duration-300 group shadow-sm hover:shadow-md active:scale-95" :class="checklist.morning.wifi ? 'bg-cyan-50 border-cyan-500' : 'bg-white border-slate-100 hover:border-cyan-200'">
+									<div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-colors duration-300 shrink-0" :class="checklist.morning.wifi ? 'bg-cyan-500 text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-cyan-50 group-hover:text-cyan-500'"><i class="fa-solid fa-wifi"></i></div>
+									<div class="ml-2 flex-1 min-w-0"><h4 class="text-[9px] font-black text-slate-700 uppercase tracking-wide truncate">Admin WiFi</h4><p class="text-[8px] font-bold text-slate-400 truncate">Access Test</p></div>
+									<div class="w-4 h-4 rounded-full border flex items-center justify-center transition-all duration-300 shrink-0" :class="checklist.morning.wifi ? 'bg-cyan-500 border-cyan-500' : 'border-slate-200'"><i class="fa-solid fa-check text-[7px] text-white" x-show="checklist.morning.wifi"></i></div>
+								</div>
+
+							</div>
+						</div>
+					</template>
 
 						<!-- 🌲 DEHRADUN GENERAL (Deependra's Panel - Keep As Is) -->
 						<template x-if="currentShift === 'general'">
 							<div class="grid grid-cols-4 gap-3 h-full p-2">
-								<div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex flex-col justify-between"><div class="flex justify-between items-start"><div class="p-2 rounded-lg bg-teal-50 text-teal-600"><i class="fa-solid fa-temperature-half"></i></div><span class="text-xl font-black text-slate-700" x-text="checklist.general.temp ? checklist.general.temp + '°' : '--'"></span></div><div><div class="flex justify-between mb-1"><p class="text-[9px] font-bold text-slate-400 uppercase">Server Room</p><p class="text-[9px] font-bold text-teal-500" x-show="checklist.general.temp > 28">AC ON REQ</p></div><input type="range" min="16" max="32" step="0.5" x-model="checklist.general.temp" @input="saveLocal()" class="w-full h-1.5 bg-slate-100 rounded-full accent-teal-600 cursor-pointer"></div></div>
+								<!-- 1. Modern Temp Card (DDN Style) -->
+								<div class="relative overflow-hidden bg-white rounded-[1.5rem] p-4 border border-slate-100 shadow-sm group hover:shadow-md transition-all">
+									<div class="absolute -right-6 -top-6 w-24 h-24 rounded-full blur-2xl opacity-20 transition-colors duration-500" :class="checklist.general.temp > 28 ? 'bg-rose-500' : 'bg-teal-500'"></div>
+									<div class="relative z-10 flex flex-col h-full justify-between">
+										<div class="flex justify-between items-start">
+											<div class="w-10 h-10 rounded-2xl flex items-center justify-center text-lg shadow-sm transition-colors duration-300" :class="checklist.general.temp > 28 ? 'bg-rose-50 text-rose-500' : 'bg-teal-50 text-teal-600'"><i class="fa-solid fa-temperature-half"></i></div>
+											<div class="text-right"><span class="text-3xl font-black tracking-tighter text-slate-800" x-text="checklist.general.temp ? checklist.general.temp : '--'"></span><span class="text-lg text-slate-400 font-bold align-top">°C</span></div>
+										</div>
+										<div>
+											<div class="flex justify-between items-end mb-1"><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Server Room</p><p class="text-[9px] font-bold" :class="checklist.general.temp > 28 ? 'text-rose-500' : 'text-teal-600'" x-text="checklist.general.temp > 28 ? 'HOT (AC REQ)' : 'OPTIMAL'"></p></div>
+											<input type="range" min="16" max="32" step="0.5" x-model="checklist.general.temp" @input="saveLocal()" class="w-full h-1.5 bg-slate-100 rounded-full appearance-none cursor-pointer accent-current" :class="checklist.general.temp > 28 ? 'accent-rose-500' : 'accent-teal-600'">
+										</div>
+									</div>
+								</div>
 								<!-- Guard Audit (Modern Full Card) -->
 								<div @click="toggleGeneralTask('guardAudit')" 
 									 class="relative overflow-hidden rounded-2xl border-2 cursor-pointer transition-all duration-300 group shadow-sm hover:shadow-md flex flex-col justify-between p-4 h-full"
@@ -727,39 +785,87 @@
 
 						<!-- 🌙 NOIDA EVENING (Restored Perfect Design) -->
 						<template x-if="currentShift === 'evening'">
-							<div class="grid grid-cols-4 gap-3 h-full p-2">
-								<!-- 1. Temp -->
-								<div class="col-span-1 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all group">
-									<div class="flex justify-between items-start"><div class="p-2 rounded-lg bg-violet-50 text-violet-600 group-hover:bg-violet-600 group-hover:text-white transition-colors"><i class="fa-solid fa-temperature-half"></i></div><span class="text-xl font-black text-slate-700" x-text="checklist.evening.temp ? checklist.evening.temp + '°' : '--'"></span></div>
-									<div><p class="text-[10px] font-bold text-slate-400 uppercase">Server Temp</p><input type="range" min="16" max="28" step="0.5" x-model="checklist.evening.temp" @input="saveLocal()" class="w-full h-1.5 bg-slate-100 rounded-full mt-1 cursor-pointer accent-violet-600"></div>
-								</div>
+    <div class="grid grid-cols-4 gap-3 h-full p-2">
+        
+        <!-- 1. Temp (Top Left - Span 1) -->
+        <div class="col-span-1 relative overflow-hidden bg-white rounded-[1.5rem] p-3 border border-slate-100 shadow-sm group hover:shadow-md transition-all flex flex-col justify-between">
+            <div class="absolute -right-6 -top-6 w-20 h-20 rounded-full blur-2xl opacity-20 transition-colors duration-500" :class="checklist.evening.temp > 24 ? 'bg-rose-500' : 'bg-violet-500'"></div>
+            <div class="flex justify-between items-start z-10">
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center text-sm shadow-sm transition-colors duration-300" :class="checklist.evening.temp > 24 ? 'bg-rose-50 text-rose-500' : 'bg-violet-50 text-violet-600'"><i class="fa-solid fa-temperature-half"></i></div>
+                <div class="text-right"><span class="text-xl font-black text-slate-800" x-text="checklist.evening.temp ? checklist.evening.temp : '--'"></span><span class="text-xs text-slate-400 font-bold">°C</span></div>
+            </div>
+            <div class="z-10 mt-1">
+                <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Server Room</p>
+                <input type="range" min="16" max="28" step="0.5" x-model="checklist.evening.temp" @input="saveLocal()" class="w-full h-1 bg-slate-100 rounded-full appearance-none cursor-pointer accent-current" :class="checklist.evening.temp > 24 ? 'accent-rose-500' : 'accent-violet-600'">
+            </div>
+        </div>
 
-								<!-- 2. Tokens -->
-								<div @click="toggleEveningTask('authCollect')" class="col-span-1 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between cursor-pointer hover:shadow-md transition-all group" :class="checklist.evening.authCollect ? 'ring-2 ring-emerald-500 border-transparent' : ''">
-									<div class="flex justify-between items-start"><div class="p-2 rounded-lg bg-slate-100 text-slate-500 group-hover:bg-violet-600 group-hover:text-white transition-colors"><i class="fa-solid fa-vault"></i></div><div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all" :class="checklist.evening.authCollect ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-200'"><i class="fa-solid fa-check text-[10px]"></i></div></div>
-									<div><p class="text-[10px] font-bold text-slate-400 uppercase">Tokens</p><p class="text-xs font-black text-slate-700 leading-tight">Return to Safe</p></div>
-								</div>
+        <!-- 2. Tokens (Top Middle - Span 1) -->
+        <div @click="toggleEveningTask('authCollect')" 
+             class="col-span-1 relative overflow-hidden rounded-[1.5rem] p-3 border-2 cursor-pointer transition-all duration-300 group shadow-sm hover:shadow-md flex flex-col justify-between"
+             :class="checklist.evening.authCollect ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-white border-slate-100 hover:border-violet-200'">
+            <div class="absolute -bottom-2 -right-2 text-5xl opacity-10 transform rotate-12 transition-transform duration-500 group-hover:scale-110" :class="checklist.evening.authCollect ? 'text-white' : 'text-violet-600'"><i class="fa-solid fa-vault"></i></div>
+            <div class="relative z-10 flex justify-between items-start">
+                <div class="w-8 h-8 rounded-xl flex items-center justify-center text-sm shadow-sm transition-colors duration-300" :class="checklist.evening.authCollect ? 'bg-white/20 text-white backdrop-blur-sm' : 'bg-violet-50 text-violet-600'"><i class="fa-solid fa-key"></i></div>
+                <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center" :class="checklist.evening.authCollect ? 'border-white bg-white text-emerald-500' : 'border-slate-200 text-transparent'"><i class="fa-solid fa-check text-[8px]" x-show="checklist.evening.authCollect"></i></div>
+            </div>
+            <div class="relative z-10 mt-1">
+                <h4 class="text-xs font-black leading-tight" :class="checklist.evening.authCollect ? 'text-white' : 'text-slate-700'">eTokens</h4>
+                <p class="text-[8px] font-bold mt-0.5 truncate" :class="checklist.evening.authCollect ? 'text-emerald-50' : 'text-violet-600'"><span x-text="checklist.evening.authCollect ? 'Secured in Safe' : 'Return to Safe'"></span></p>
+            </div>
+        </div>
 
-								<!-- 3. PBL020 -->
-								<div class="col-span-2 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all group relative overflow-hidden">
-									<div class="absolute top-0 right-0 w-20 h-20 bg-amber-50 rounded-full blur-2xl -mr-10 -mt-10 transition-colors" :class="checklist.evening.pbl020Running ? 'bg-amber-100' : ''"></div>
-									<div class="relative z-10 flex justify-between items-start">
-										<div class="flex items-center gap-3"><div class="p-2 rounded-lg bg-amber-50 text-amber-600 group-hover:bg-amber-500 group-hover:text-white transition-colors"><i class="fa-solid fa-download"></i></div><div><h4 class="text-sm font-black text-slate-700">pblnet020</h4><p class="text-[10px] font-bold text-slate-400">Download Status</p></div></div>
-										<div @click="togglePblRun()" class="w-10 h-6 bg-slate-200 rounded-full relative cursor-pointer transition-colors" :class="checklist.evening.pbl020Running ? 'bg-amber-500' : 'bg-slate-200'"><div class="w-4 h-4 bg-white rounded-full absolute top-1 transition-all shadow-sm" :class="checklist.evening.pbl020Running ? 'left-5' : 'left-1'"></div></div>
-									</div>
-									<div class="relative z-10 mt-2">
-										<div x-show="checklist.evening.pbl020Running"><input type="text" x-model="checklist.evening.pblReason" @input="saveLocal()" placeholder="Enter Job Name..." class="w-full bg-amber-50/50 border border-amber-200 text-xs rounded-xl p-2.5 font-bold outline-none focus:ring-2 focus:ring-amber-400 text-amber-800 placeholder-amber-400 transition-all"></div>
-										<div x-show="!checklist.evening.pbl020Running" class="flex items-center gap-2 text-rose-500 bg-rose-50 px-3 py-2 rounded-xl border border-rose-100"><i class="fa-solid fa-power-off text-xs"></i><span class="text-[10px] font-black uppercase">System should be OFF</span></div>
-									</div>
-								</div>
+        <!-- 3. FTP Report (Top Right - Span 2) -->
+        <div @click="toggleEveningTask('ftpReport')" 
+             class="col-span-2 relative overflow-hidden rounded-[1.5rem] p-3 border-2 cursor-pointer transition-all duration-300 group shadow-sm hover:shadow-md flex items-center justify-between px-5"
+             :class="checklist.evening.ftpReport ? 'bg-blue-500 border-blue-500 text-white' : 'bg-white border-slate-100 hover:border-blue-200'">
+             
+             <!-- Watermark -->
+             <div class="absolute right-10 top-1/2 -translate-y-1/2 text-6xl opacity-10 pointer-events-none" :class="checklist.evening.ftpReport ? 'text-white' : 'text-blue-500'"><i class="fa-solid fa-paper-plane"></i></div>
+             
+             <div class="flex items-center gap-4 z-10">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg shadow-sm transition-colors duration-300" :class="checklist.evening.ftpReport ? 'bg-white/20 text-white backdrop-blur-sm' : 'bg-blue-50 text-blue-600'"><i class="fa-solid fa-envelope-open-text"></i></div>
+                <div>
+                    <h4 class="text-sm font-black leading-tight" :class="checklist.evening.ftpReport ? 'text-white' : 'text-slate-700'">FTP Report</h4>
+                    <p class="text-[10px] font-bold mt-0.5" :class="checklist.evening.ftpReport ? 'text-blue-100' : 'text-slate-400'"><span x-text="checklist.evening.ftpReport ? 'Email Confirmed' : 'Check Mail Status'"></span></p>
+                </div>
+             </div>
+             <div class="w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all z-10" :class="checklist.evening.ftpReport ? 'border-white bg-white text-blue-500' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check" x-show="checklist.evening.ftpReport"></i></div>
+        </div>
 
-								<!-- 4. FTP Report -->
-								<div @click="toggleEveningTask('ftpReport')" class="col-span-2 col-start-1 bg-white rounded-2xl p-3 shadow-sm border border-slate-100 cursor-pointer hover:shadow-md transition-all flex items-center justify-between group h-fit self-center" :class="checklist.evening.ftpReport ? 'ring-1 ring-emerald-500 bg-emerald-50/10' : ''">
-									<div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-violet-600 group-hover:text-white transition-colors"><i class="fa-solid fa-paper-plane"></i></div><div><h4 class="text-sm font-black text-slate-700">FTP Report</h4><p class="text-[10px] font-bold text-slate-400">Email Status</p></div></div>
-									<div class="flex items-center gap-2 px-2"><div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all" :class="checklist.evening.ftpReport ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-200'"><i class="fa-solid fa-check text-[10px]"></i></div></div>
-								</div>
-							</div>
-						</template>
+        <!-- 4. PBLnet020 (Bottom Full Width - Span 4) -->
+        <div class="col-span-4 relative overflow-hidden bg-white rounded-[1.5rem] p-4 border border-slate-100 shadow-sm transition-all group hover:shadow-md" :class="checklist.evening.pbl020Running ? 'ring-2 ring-amber-400 border-transparent' : ''">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg transition-colors" :class="checklist.evening.pbl020Running ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/30' : 'bg-amber-50 text-amber-600'"><i class="fa-solid fa-server"></i></div>
+                    <div>
+                        <h4 class="text-sm font-black text-slate-800">pblnet020</h4>
+                        <p class="text-[10px] font-bold text-slate-400">Data Download Status</p>
+                    </div>
+                </div>
+                <!-- Toggle Switch -->
+                <div @click="togglePblRun()" class="relative flex items-center gap-2 cursor-pointer bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200 transition-colors">
+                    <span class="text-[10px] font-black uppercase tracking-wider" :class="checklist.evening.pbl020Running ? 'text-amber-600' : 'text-slate-400'" x-text="checklist.evening.pbl020Running ? 'RUNNING' : 'OFFLINE'"></span>
+                    <div class="w-8 h-4 rounded-full relative transition-colors" :class="checklist.evening.pbl020Running ? 'bg-amber-500' : 'bg-slate-300'"><div class="w-3 h-3 bg-white rounded-full absolute top-0.5 transition-all shadow-sm" :class="checklist.evening.pbl020Running ? 'left-4.5' : 'left-0.5'"></div></div>
+                </div>
+            </div>
+
+            <!-- Expandable Input Area -->
+            <div class="grid transition-[grid-template-rows] duration-300 ease-out" :class="checklist.evening.pbl020Running ? 'grid-rows-[1fr] mt-3 pt-3 border-t border-slate-100' : 'grid-rows-[0fr]'">
+                <div class="overflow-hidden min-h-0">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-keyboard text-amber-300 text-sm pl-2"></i>
+                        <input type="text" x-model="checklist.evening.pblReason" @input="saveLocal()" placeholder="Enter Job Name / Reason..." class="w-full bg-amber-50/50 border-0 rounded-lg py-2 px-3 text-xs font-bold text-slate-700 placeholder-amber-400/70 focus:ring-2 focus:ring-amber-400 outline-none transition-all">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Off State Warning -->
+            <div x-show="!checklist.evening.pbl020Running" class="mt-2 text-[9px] font-bold text-rose-400 flex items-center gap-1.5 pl-1 opacity-70"><i class="fa-solid fa-power-off"></i> Ensure system is powered down.</div>
+        </div>
+
+    </div>
+</template>
 
 					</div>
                 </div>
