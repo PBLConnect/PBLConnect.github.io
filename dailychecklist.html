@@ -2,20 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- Mobile responsiveness ke liye meta tag -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PBL ITOps | Pro Dashboard</title>
-    
-    <!-- ✅ Favicon (Browser tab ka icon) -->
     <link rel="icon" type="image/png" href="pbl-logo.png">
     
-    <!-- 📦 Dependencies (Ye external libraries hain - Tailwind CSS design ke liye aur FontAwesome icons ke liye) -->
+    <!-- Dependencies -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Google Fonts import kar rahe hain badhiya look ke liye -->
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;800&family=Outfit:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 
-    <!-- 🎨 Tailwind Config (Custom colors aur animations yahan set kiye hain) -->
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -24,9 +19,8 @@
                     colors: { brand: '#0f172a' },
                     fontFamily: { sans: ['Outfit', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
                     animation: {
-                        'spin-slow': 'spin 3s linear infinite', // AC fan dheere ghumne ke liye
-                        'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'float': 'float 3s ease-in-out infinite' // Modals ko hawa me tairne jaisa effect
+                        'spin-slow': 'spin 3s linear infinite',
+                        'float': 'float 3s ease-in-out infinite'
                     },
                     keyframes: {
                         float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-5px)' } }
@@ -36,13 +30,11 @@
         }
     </script>
 
-    <!-- 🧠 LOGIC SECTION (Yahan saara dimaag hai - AlpineJS Logic) -->
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbyvIkwSZ5gdIBc_GHbXXMgadnBHU19twANppiq-nK8D3cGb8B6efZLix1Cxe2FPPsqyJw/exec"; 
 
         function dailyOpsApp() {
             return {
-                // 📅 State Variables (Data jo change hota rahega)
                 currentShift: 'morning', 
                 pendingShift: '', 
                 isLateEntry: false, 
@@ -51,150 +43,232 @@
                 timeLeft: '--', 
                 startTime: Date.now(),
                 
-                // ⚙️ Configuration (Shift ka time, naam aur banda kaun hai)
+                // ⚙️ Shift Configuration
                 shiftConfig: {
                     'morning': { name: 'Morning Shift', auditor: 'Anil Singh', branch: 'NOIDA', startH: 8, startM: 0, endH: 15, endM: 45, colorClass: 'text-blue-700', timeDisplay: '08 AM - 03:45 PM' },
-                    'general': { name: 'General Shift', auditor: 'Deependra Singh', branch: 'DEHRADUN', startH: 9, startM: 0, endH: 17, endM: 0, colorClass: 'text-teal-700', timeDisplay: '09 AM - 05 PM' },
+                    'general': { name: 'General Shift', auditor: 'Deependra Singh', branch: 'DEHRADUN', startH: 9, startM: 30, endH: 17, endM: 30, colorClass: 'text-teal-700', timeDisplay: '09:30 AM - 05:30 PM' },
                     'evening': { name: 'Evening Shift', auditor: 'Ashok Singh', branch: 'NOIDA', startH: 14, startM: 15, endH: 21, endM: 30, colorClass: 'text-violet-700', timeDisplay: '02:15 PM - 09:30 PM' }
                 },
                 
-                // Form ka data store karne ke liye variables
                 score: 0, remarks: '', isSubmitting: false, showUsbModal: false, missingItems: [],
                 modals: { alert: { show: false }, confirm: { show: false, title: '' }, usb: { show: false }, sophos: { show: false }, lateWarning: { show: false }, scanner: { show: false }, fireList: { show: false } },
                 
-                // Fire Extinguisher ki locations
                 fireLocations: {
-                    "Basement (BS)": ["BS - Server Room", "BS - Outside Server Room", "BS - Electric Room", "BS - IT Lab", "BS - Cafeteria", "BS - Cafeteria Stair"],
-                    "Ground Floor (GF)": ["GF - Reception", "GF - Conference Room", "GF - Production Hall", "GF - Inside Production", "GF - Staircase", "GF - Water Cooler", "GF - GenSet Area", "GF - Transformer Area", "GF - Inside Guard Room"],
-                    "First Floor (FF)": ["FF - Production Hall", "FF - Production (Right Side)", "FF - Staircase", "FF - Water Cooler"],
-                    "Third Floor (TF)": ["TF - Kitchen"]
+                    "Basement (BS)": ["BS - Server Room", "BS - Outside Server Room", "BS - Electric Room"],
+                    "Ground Floor (GF)": ["GF - Reception", "GF - Production Hall", "GF - GenSet Area"],
+                    "First Floor (FF)": ["FF - Production Hall", "FF - Staircase"]
                 },
 
-                // 📝 Checklist Data Structure (Saare tasks yahan hain)
+                // 📝 Checklist Data
                 checklist: {
+                    // Noida Morning
                     morning: { temp: null, prodCheck: true, prodNotes: '', backupDC: false, backupADC: false, backupTime: '', wifi: false, authIssue: false, ftpJobCheck: false, pbl020Start: false },
+                    // Noida Evening
                     evening: { temp: null, authCollect: false, ftpReport: false, pbl020Running: true, pblReason: '' },
-                    servers: [ { name: 'WinSvr100', status: false, maintenance: false }, { name: 'WinSvr101', status: false, maintenance: false }, { name: 'WinSvr005', status: false, maintenance: false }, { name: 'PBL', status: false, maintenance: false }, { name: 'Linux 2', status: false, maintenance: false }, { name: 'Linux 3', status: false, maintenance: false } ],
-                    services: [ { name: 'PanBusiness.net', status: false, type: 'web', desc: 'Website Status', icon: 'fa-globe' }, { name: 'Rediff Enterprise', status: false, type: 'mail', desc: 'Mail Flow Check', icon: 'fa-envelope' }, { name: 'Citrix VPN', status: false, type: 'web', desc: 'https://ede.dp-ds.de/vpn', icon: 'fa-cloud' } ],
-                    isp: [ { name: 'STPI 15Mbps', speed: 0, max: 15, complaint: '', vendor: '9876543210' }, { name: 'Airtel 10Mbps', speed: 0, max: 10, complaint: '', vendor: '9876543210' }, { name: 'Airtel 30Mbps BB', speed: 0, max: 30, complaint: '', vendor: '9876543210' } ],
+                    // 🌲 Dehradun General
+                    general: { temp: null, guardAudit: false, ftpStart: false, ftpJobReport: false, manualBackup: false, sysCheckEve: false, ftpStop: false },
+
+                    // Dynamic Arrays (Will be loaded via JS based on branch)
+                    servers: [],
+                    isp: [],
+                    services: [],
                     endpoints: { sophos: false, usb: false },
-                    infra: { acs: [{ name: 'Server AC 1', status: false }, { name: 'Server AC 2', status: false }, { name: 'Server AC 3', status: false }], fire: { status: false, location: '' } }
+                    infra: { acs: [], fire: { status: false, location: '' } }
                 },
 
-                // 🏁 Init Function (Page load hote hi ye chalega)
                 init() {
                     this.todayDate = new Date().toLocaleDateString('en-IN', {weekday: 'short', day: '2-digit', month: 'short'});
                     this.detectCurrentShift();
                     
-                    // LocalStorage se purana data uthana (Refresh hone par data na ude)
+                    // ⚡ Load correct data on init
+                    this.switchBranchData(this.currentShift);
+
+                    // Recovery
                     const todayStr = new Date().toDateString();
                     const cached = localStorage.getItem('pbl_daily_ops');
                     if (cached) {
                         const parsed = JSON.parse(cached);
                         if (parsed.saveDate === todayStr) {
                             if(parsed.checklist) {
-                                if(parsed.checklist.morning) this.checklist.morning = parsed.checklist.morning;
-                                if(parsed.checklist.evening) this.checklist.evening = parsed.checklist.evening;
-                                this.checklist.isp.forEach((item, i) => { if(parsed.checklist.isp[i]) { item.speed = parsed.checklist.isp[i].speed; item.complaint = parsed.checklist.isp[i].complaint || ''; } });
-                                this.checklist.servers.forEach((item, i) => { if(parsed.checklist.servers[i]) { item.status = parsed.checklist.servers[i].status; item.maintenance = parsed.checklist.servers[i].maintenance || false; } });
-                                if(parsed.checklist.services) { this.checklist.services.forEach((item, i) => { if(parsed.checklist.services[i]) item.status = parsed.checklist.services[i].status; }); }
-                                this.checklist.infra.forEach((item, i) => { if(parsed.checklist.infra[i]) item.status = parsed.checklist.infra[i].status; });
+                                this.checklist.morning = parsed.checklist.morning || this.checklist.morning;
+                                this.checklist.evening = parsed.checklist.evening || this.checklist.evening;
+                                this.checklist.general = parsed.checklist.general || this.checklist.general;
+                                // Arrays ko carefully restore karo
+                                if(parsed.checklist.servers) {
+                                    this.checklist.servers.forEach((s, i) => { if(parsed.checklist.servers[i] && parsed.checklist.servers[i].name === s.name) s.status = parsed.checklist.servers[i].status; });
+                                }
                                 this.checklist.endpoints = parsed.checklist.endpoints;
+                                // Restore ISP/Services logic similarly if needed
                             }
                             this.remarks = parsed.remarks || '';
                         } else { localStorage.removeItem('pbl_daily_ops'); }
                     }
                     this.calculateScore();
                     this.updateTimer();
-                    setInterval(() => this.updateTimer(), 60000); // Har minute timer update karega
+                    setInterval(() => this.updateTimer(), 60000);
                 },
 
-                // Mobile vibration effect (Feedback ke liye)
                 haptic() { if (navigator.vibrate) navigator.vibrate(12); },
 
-                // ⚡ Toggle Functions (Button dabane par kya hoga)
+                // 🧠 BRAIN: Switch Data based on Branch (Noida vs Dehradun)
+                switchBranchData(shift) {
+                    if (shift === 'general') {
+                        // 🌲 DEHRADUN DATA
+                        this.checklist.servers = [
+                            { name: 'S08DD001 (DC)', status: false, maintenance: false, type: 'win' }, 
+                            { name: 'S008DD002 (ADC)', status: false, maintenance: false, type: 'win' }, 
+                            { name: 'PBL (DB)', status: false, maintenance: false, type: 'linux' },
+                            { name: 'PBL1 (DB)', status: false, maintenance: false, type: 'linux' },
+                            { name: 'LINUX1', status: false, maintenance: false, type: 'linux' },
+                            { name: 'LINUX2', status: false, maintenance: false, type: 'linux' },
+                            { name: 'LINUX3', status: false, maintenance: false, type: 'linux' },
+                            { name: 'LINUX4', status: false, maintenance: false, type: 'linux' }
+                        ];
+                        this.checklist.isp = [
+                            { name: 'STPI 4Mbps', speed: 0, max: 4, complaint: '' },
+                            { name: 'GS Tech 10Mbps', speed: 0, max: 10, complaint: '' },
+                            { name: 'BSNL 15Mbps', speed: 0, max: 15, complaint: '' }
+                        ];
+                        this.checklist.infra.acs = [
+                            { name: 'Server AC 1', status: false }, { name: 'Server AC 2', status: false }
+                        ];
+                        this.checklist.services = [
+                            { name: 'PanBusiness.net', status: false, icon: 'fa-globe', desc: 'Website' },
+                            { name: 'Rediff Mail', status: false, icon: 'fa-envelope', desc: 'Mail Flow' }
+                        ];
+                    } else {
+                        // 🏙️ NOIDA DATA
+                        this.checklist.servers = [
+                            { name: 'WinSvr100', status: false, maintenance: false, type: 'win' },
+                            { name: 'WinSvr101', status: false, maintenance: false, type: 'win' },
+                            { name: 'WinSvr005', status: false, maintenance: false, type: 'win' },
+                            { name: 'PBL', status: false, maintenance: false, type: 'linux' },
+                            { name: 'Linux 2', status: false, maintenance: false, type: 'linux' },
+                            { name: 'Linux 3', status: false, maintenance: false, type: 'linux' }
+                        ];
+                        this.checklist.isp = [
+                            { name: 'STPI 15Mbps', speed: 0, max: 15, complaint: '' },
+                            { name: 'Airtel 10Mbps', speed: 0, max: 10, complaint: '' },
+                            { name: 'Airtel 30Mbps BB', speed: 0, max: 30, complaint: '' }
+                        ];
+                        this.checklist.infra.acs = [
+                            { name: 'Server AC 1', status: false }, { name: 'Server AC 2', status: false }, { name: 'Server AC 3', status: false }
+                        ];
+                        this.checklist.services = [ 
+                            { name: 'PanBusiness.net', status: false, type: 'web', desc: 'Website Status', icon: 'fa-globe' }, 
+                            { name: 'Rediff Enterprise', status: false, type: 'mail', desc: 'Mail Flow Check', icon: 'fa-envelope' }, 
+                            { name: 'Citrix VPN', status: false, type: 'web', desc: 'VPN Access', icon: 'fa-cloud' } 
+                        ];
+                    }
+                },
+
+                // Toggles
                 toggleTask(shift, key) { this.haptic(); this.checklist[shift][key] = !this.checklist[shift][key]; this.update(); },
                 toggleMorningTask(key) { this.toggleTask('morning', key); },
                 toggleEveningTask(key) { this.toggleTask('evening', key); },
+                toggleGeneralTask(key) { this.toggleTask('general', key); }, // DDN specific
+                
                 toggleBackup(key) { this.haptic(); key === 'dc' ? this.checklist.morning.backupDC = !this.checklist.morning.backupDC : this.checklist.morning.backupADC = !this.checklist.morning.backupADC; this.update(); },
                 togglePblRun() { this.haptic(); this.checklist.evening.pbl020Running = !this.checklist.evening.pbl020Running; this.update(); },
                 toggleInfra(key) { this.haptic(); if(key === 'fire') this.checklist.infra.fire.status = !this.checklist.infra.fire.status; else this.checklist.infra.acs[key].status = !this.checklist.infra.acs[key].status; this.update(); },
                 toggleAC(i) { this.haptic(); this.checklist.infra.acs[i].status = !this.checklist.infra.acs[i].status; this.update(); },
-                
-                // Server Maintenance Logic
                 toggleServer(i) { if(this.checklist.servers[i].maintenance) return; this.haptic(); this.checklist.servers[i].status = !this.checklist.servers[i].status; this.update(); },
                 toggleMaintenance(i) { this.haptic(); this.checklist.servers[i].maintenance = !this.checklist.servers[i].maintenance; if(this.checklist.servers[i].maintenance) this.checklist.servers[i].status = false; this.update(); },
-                
-                // Server Card Colors
-                getServerClass(srv) { if(srv.maintenance) return 'bg-amber-50 border-amber-300 text-slate-700 opacity-80'; if(!srv.status) return 'bg-white border-slate-200 text-slate-700'; if(srv.name.includes('Linux') || srv.name === 'PBL') return 'bg-orange-600 border-orange-700 text-white shadow-lg shadow-orange-500/30'; return 'bg-blue-600 border-blue-700 text-white shadow-lg shadow-blue-500/30'; },
-                
                 toggleService(i) { this.haptic(); this.checklist.services[i].status = !this.checklist.services[i].status; this.update(); },
-                
-                // 🔒 Security Checks (Popups handle karna)
-                handleUsbCheck() { this.haptic(); if (!this.checklist.endpoints.usb) this.showUsbModal = true; else { this.checklist.endpoints.usb = false; this.update(); } },
-                confirmUsbCheck() { this.haptic(); this.checklist.endpoints.usb = true; this.showUsbModal = false; this.update(); },
-                handleSophosCheck() { this.haptic(); if(!this.checklist.endpoints.sophos) this.modals.sophos.show = true; else { this.checklist.endpoints.sophos = false; this.update(); } },
-                confirmSophos() { this.haptic(); this.checklist.endpoints.sophos = true; this.modals.sophos.show = false; this.update(); },
-                
-                // 📶 ISP Logic (Speed ke hisaab se color change)
+
+                // Helpers
+                getServerClass(srv) { if(srv.maintenance) return 'bg-amber-50 border-amber-300 text-slate-700 opacity-80'; if(!srv.status) return 'bg-white border-slate-200 text-slate-700'; if(srv.type === 'linux') return 'bg-orange-600 border-orange-700 text-white shadow-lg shadow-orange-500/30'; return 'bg-blue-600 border-blue-700 text-white shadow-lg shadow-blue-500/30'; },
                 getSpeedColor(speed, max) { if(!speed || speed == 0) return 'bg-slate-400 text-white'; return (speed / max) * 100 <= 50 ? 'bg-rose-500 text-white shadow-rose-500/50' : 'bg-emerald-500 text-white shadow-emerald-500/50'; },
                 getSpeedText(speed, max) { if(!speed || speed == 0) return 'text-slate-300'; return (speed / max) * 100 <= 50 ? 'text-rose-500' : 'text-emerald-500'; },
                 getSpeedHex(speed, max) { if(!speed || speed == 0) return '#cbd5e1'; return (speed / max) * 100 <= 50 ? '#f43f5e' : '#10b981'; },
                 isLowSpeed(isp) { return isp.speed > 0 && isp.speed <= (isp.max / 2); },
                 
-                // ⏳ Time & Shift Logic (Current shift pata lagana)
+                // Security Checks
+                handleUsbCheck() { this.haptic(); if (!this.checklist.endpoints.usb) this.showUsbModal = true; else { this.checklist.endpoints.usb = false; this.update(); } },
+                confirmUsbCheck() { this.haptic(); this.checklist.endpoints.usb = true; this.showUsbModal = false; this.update(); },
+                handleSophosCheck() { this.haptic(); if(!this.checklist.endpoints.sophos) this.modals.sophos.show = true; else { this.checklist.endpoints.sophos = false; this.update(); } },
+                confirmSophos() { this.haptic(); this.checklist.endpoints.sophos = true; this.modals.sophos.show = false; this.update(); },
+
                 updateTimer() { const now = new Date(); const conf = this.shiftConfig[this.currentShift]; const endTime = new Date(); endTime.setHours(conf.endH, conf.endM, 0); if (now > endTime) { this.timeLeft = "Time Up"; return; } const diff = endTime - now; const hrs = Math.floor((diff / (1000 * 60 * 60))); const mins = Math.floor((diff / (1000 * 60)) % 60); this.timeLeft = `${hrs}h ${mins}m Left`; },
-                detectCurrentShift() { const now = new Date(); const h = now.getHours(); const m = now.getMinutes(); const time = h + m/60; if (time >= 14.25 && time < 21.5) { this.currentShift = 'evening'; } else if (time >= 8 && time < 14.25) { this.currentShift = 'morning'; } else if (time >= 9 && time < 17) { this.currentShift = 'general'; } else { this.currentShift = 'morning'; } this.checkLateStatus(); this.updateTimer(); },
+                
+                detectCurrentShift() { 
+                    const now = new Date(); const h = now.getHours(); const m = now.getMinutes(); const time = h + m/60; 
+                    if (time >= 14.25 && time < 21.5) { this.currentShift = 'evening'; } 
+                    else if (time >= 8 && time < 14.25) { this.currentShift = 'morning'; } 
+                    else { this.currentShift = 'morning'; } // Default
+                    this.checkLateStatus(); this.updateTimer(); 
+                },
+                
                 isTimeInRange(sH, sM, eH, eM) { const now = new Date(); const h = now.getHours(); const m = now.getMinutes(); const current = h + m/60; const start = sH + sM/60; const end = eH + eM/60; return current >= start && current < end; },
                 checkLateStatus() { const conf = this.shiftConfig[this.currentShift]; this.isLateEntry = !this.isTimeInRange(conf.startH, conf.startM, conf.endH, conf.endM); },
-                requestShiftChange(type) { this.haptic(); const conf = this.shiftConfig[type]; if (this.isTimeInRange(conf.startH, conf.startM, conf.endH, conf.endM)) { this.currentShift = type; this.isLateEntry = false; } else { this.pendingShift = type; this.modals.lateWarning.show = true; } this.updateTimer(); },
-                confirmLateEntry() { this.haptic(); this.currentShift = this.pendingShift; this.isLateEntry = true; this.modals.lateWarning.show = false; if(this.remarks.length < 5) this.remarks = ''; this.updateTimer(); },
+                
+                requestShiftChange(type) { 
+                    this.haptic(); 
+                    const conf = this.shiftConfig[type]; 
+                    if (this.isTimeInRange(conf.startH, conf.startM, conf.endH, conf.endM)) { 
+                        this.currentShift = type; 
+                        this.isLateEntry = false; 
+                        this.switchBranchData(type); // 🟢 Important: Load new branch data
+                    } else { 
+                        this.pendingShift = type; 
+                        this.modals.lateWarning.show = true; 
+                    } 
+                    this.updateTimer(); 
+                },
+                
+                confirmLateEntry() { 
+                    this.haptic(); 
+                    this.currentShift = this.pendingShift; 
+                    this.isLateEntry = true; 
+                    this.switchBranchData(this.pendingShift); // 🟢 Important
+                    this.modals.lateWarning.show = false; 
+                    this.updateTimer(); 
+                },
                 
                 saveLocal() { localStorage.setItem('pbl_daily_ops', JSON.stringify({ saveDate: new Date().toDateString(), checklist: this.checklist, remarks: this.remarks })); },
                 update() { this.calculateScore(); this.saveLocal(); },
 
-                // 📊 SCORE CALCULATION (Score kaise banta hai)
-				calculateScore() {
-					let total = 0, checked = 0;
+                calculateScore() {
+                    let total = 0, checked = 0;
+                    if(this.currentShift === 'morning') {
+                        total += 6; 
+                        if(this.checklist.morning.temp) checked++;
+                        if(this.checklist.morning.authIssue) checked++; 
+                        if(this.checklist.morning.ftpJobCheck) checked++; 
+                        if(this.checklist.morning.backupDC) checked++; 
+                        if(this.checklist.morning.backupADC) checked++; 
+                        if(this.checklist.morning.wifi) checked++;
+                    } else if(this.currentShift === 'evening') {
+                        total += 3; 
+                        if(this.checklist.evening.temp) checked++;
+                        if(this.checklist.evening.authCollect) checked++; 
+                        if(this.checklist.evening.ftpReport) checked++;
+                    } else if(this.currentShift === 'general') {
+                        // 🌲 DDN Score Logic
+                        total += 6;
+                        if(this.checklist.general.temp) checked++;
+                        if(this.checklist.general.guardAudit) checked++;
+                        if(this.checklist.general.ftpStart) checked++;
+                        if(this.checklist.general.ftpJobReport) checked++;
+                        if(this.checklist.general.manualBackup) checked++;
+                        if(this.checklist.general.sysCheckEve) checked++;
+                    }
 
-					// 1. Shift Specific Items
-					if(this.currentShift === 'morning') {
-						total += 6; 
-						if(this.checklist.morning.temp) checked++;
-						// if(this.checklist.morning.prodCheck) checked++;  <-- REMOVED from score
-						if(this.checklist.morning.authIssue) checked++; 
-						if(this.checklist.morning.ftpJobCheck) checked++; 
-						if(this.checklist.morning.backupDC) checked++; 
-						if(this.checklist.morning.backupADC) checked++; 
-						if(this.checklist.morning.wifi) checked++;
-					}
-					if(this.currentShift === 'evening') {
-						total += 3; 
-						if(this.checklist.evening.temp) checked++;
-						if(this.checklist.evening.authCollect) checked++; 
-						if(this.checklist.evening.ftpReport) checked++;
-					}
+                    this.checklist.servers.forEach(s => { if(!s.maintenance) { total++; if(s.status) checked++; } });
+                    this.checklist.services.forEach(s => { total++; if(s.status) checked++; });
+                    this.checklist.isp.forEach(i => { total++; if(i.speed && i.speed > 0) checked++; });
+                    
+                    total += 2; 
+                    if(this.checklist.endpoints.sophos) checked++; 
+                    if(this.checklist.endpoints.usb) checked++;
+                    
+                    total += this.checklist.infra.acs.length + 1;
+                    this.checklist.infra.acs.forEach(ac => { if(ac.status) checked++; });
+                    if(this.checklist.infra.fire.status) checked++;
 
-					// 2. Common Infrastructure
-					this.checklist.servers.forEach(s => { 
-						if(!s.maintenance) { total++; if(s.status) checked++; } 
-					});
-					this.checklist.services.forEach(s => { total++; if(s.status) checked++; });
-					this.checklist.isp.forEach(i => { total++; if(i.speed && i.speed > 0) checked++; });
-					
-					total += 2; 
-					if(this.checklist.endpoints.sophos) checked++; 
-					if(this.checklist.endpoints.usb) checked++;
-					
-					total += this.checklist.infra.acs.length + 1;
-					this.checklist.infra.acs.forEach(ac => { if(ac.status) checked++; });
-					if(this.checklist.infra.fire.status) checked++;
+                    this.score = total === 0 ? 0 : Math.round((checked / total) * 100);
+                },
 
-					// Final Score
-					this.score = total === 0 ? 0 : Math.round((checked / total) * 100);
-				},
-
-                // Submit Button ka color
                 getSubmitButtonClass() {
                     if (this.isSubmitting) return 'bg-slate-400';
                     if (this.isLateEntry) return 'bg-gradient-to-r from-rose-600 to-pink-600 shadow-rose-500/30';
@@ -204,47 +278,32 @@
                     return 'bg-brand';
                 },
 
-                // 🔍 VALIDATION (Submit se pehle kya check karna hai)
-				scanForIssues() {
-					let issues = [];
-					if (this.currentShift === 'morning') {
-						if (!this.checklist.morning.temp) issues.push({ msg: "Temp not logged", id: "card-temp" });
-						// if (!this.checklist.morning.prodCheck) issues.push({ msg: "System Check pending", id: "card-prod" }); 
-						if (!this.checklist.morning.authIssue) issues.push({ msg: "eTokens not Issued", id: "card-etoken" });
-						if (!this.checklist.morning.ftpJobCheck) issues.push({ msg: "FTP Check pending", id: "card-ftp" });
-						if (!this.checklist.morning.backupDC) issues.push({ msg: "DC Backup pending", id: "card-backup" });
-						if (!this.checklist.morning.backupADC) issues.push({ msg: "ADC Backup pending", id: "card-backup" });
-						if (!this.checklist.morning.wifi) issues.push({ msg: "WiFi Check pending", id: "card-wifi" });
-					} else if (this.currentShift === 'evening') {
-						if (!this.checklist.evening.temp) issues.push({ msg: "Temp not logged", id: "card-temp-eve" });
-						if (!this.checklist.evening.authCollect) issues.push({ msg: "Tokens not Collected", id: "card-etoken-eve" });
-						if (!this.checklist.evening.ftpReport) issues.push({ msg: "FTP Report not sent", id: "card-ftp-eve" });
-					}
-					
-					// Common Checks
-					this.checklist.servers.forEach(s => { if (!s.maintenance && !s.status) issues.push({ msg: `${s.name} Down`, id: "card-servers" }); });
-					this.checklist.services.forEach(s => { if (!s.status) issues.push({ msg: `${s.name} Down`, id: "card-services" }); });
-					this.checklist.isp.forEach(i => { if (i.speed <= 0) issues.push({ msg: `${i.name} No Speed`, id: "card-isp" }); });
-					this.checklist.infra.acs.forEach(ac => { if (!ac.status) issues.push({ msg: `${ac.name} OFF`, id: "card-infra" }); });
-					if (!this.checklist.infra.fire.status) issues.push({ msg: "Fire Safety pending", id: "card-infra" });
-					if (!this.checklist.endpoints.sophos) issues.push({ msg: "Sophos Check pending", id: "card-security" });
-					if (!this.checklist.endpoints.usb) issues.push({ msg: "USB Check pending", id: "card-security" });
-					
-					return issues;
-				},
+                scanForIssues() {
+                    let issues = [];
+                    if (this.currentShift === 'morning') {
+                        if (!this.checklist.morning.temp) issues.push({ msg: "Temp not logged", id: "card-temp" });
+                        if (!this.checklist.morning.authIssue) issues.push({ msg: "eTokens Pending", id: "card-etoken" });
+                        if (!this.checklist.morning.backupDC) issues.push({ msg: "DC Backup Pending", id: "card-backup" });
+                    } else if (this.currentShift === 'general') {
+                        // 🌲 DDN Validation
+                        if (!this.checklist.general.temp) issues.push({ msg: "Temp missing", id: "card-temp-gen" });
+                        if (!this.checklist.general.guardAudit) issues.push({ msg: "Guard Audit Pending", id: "card-guard" });
+                        if (!this.checklist.general.ftpStart) issues.push({ msg: "FTP Start Pending", id: "card-ftp-gen" });
+                        if (!this.checklist.general.manualBackup) issues.push({ msg: "Backup Pending", id: "card-backup-gen" });
+                    }
+                    
+                    this.checklist.servers.forEach(s => { if (!s.maintenance && !s.status) issues.push({ msg: `${s.name} Down`, id: "card-servers" }); });
+                    if (!this.checklist.endpoints.sophos) issues.push({ msg: "AV Check pending", id: "card-security" });
+                    return issues;
+                },
 
-                // Issue par scroll karne ka logic
                 scrollToIssue() {
                     this.haptic();
                     this.modals.scanner.show = false;
                     if (this.missingItems.length > 0) {
                         const targetId = this.missingItems[0].id;
                         const el = document.getElementById(targetId);
-                        if (el) {
-                            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            el.classList.add('ring-4', 'ring-amber-400');
-                            setTimeout(() => el.classList.remove('ring-4', 'ring-amber-400'), 2000);
-                        }
+                        if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => el.classList.remove('ring-4', 'ring-amber-400'), 2000); }
                     }
                 },
 
@@ -252,28 +311,15 @@
                     this.haptic();
                     this.modals.scanner.show = false;
                     const el = document.getElementById('card-remarks');
-                    if (el) {
-                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        setTimeout(() => document.querySelector('textarea').focus(), 500);
-                    } else {
-                        document.querySelector('textarea')?.focus();
-                    }
-                    if (this.remarks.trim().length < 3) {
-                        this.showAlert('Remarks Required', 'Please explain why items are pending.', 'warning');
-                    }
+                    if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => document.querySelector('textarea').focus(), 500); }
                 },
 
-                // Final Submission Logic
                 confirmAction(action) {
                     this.haptic();
                     if (action === 'submit') {
                         if (this.isLateEntry && this.remarks.trim().length < 5) { this.showAlert('Late Entry', 'Please provide a valid reason in remarks.', 'error'); return; }
                         const pendingIssues = this.scanForIssues();
-                        if (pendingIssues.length > 0) {
-                            this.missingItems = pendingIssues;
-                            this.modals.scanner.show = true; 
-                            return; 
-                        }
+                        if (pendingIssues.length > 0) { this.missingItems = pendingIssues; this.modals.scanner.show = true; return; }
                     }
                     this.finalizeSubmit(action);
                 },
@@ -293,7 +339,6 @@
                 showAlert(title, msg, type) { this.modals.alert = { show: true, title, msg }; this.haptic(); },
                 closeAlert() { this.modals.alert.show = false; },
 
-                // 🚀 API CALL (Google Sheet pe data bhejna)
                 async submitAudit() {
                     this.isSubmitting = true; const dateStr = new Date().toLocaleDateString('en-IN'); const shiftDetails = this.shiftConfig[this.currentShift];
                     let cycleName = `${shiftDetails.name} (${shiftDetails.branch}) - ${dateStr}`; if (this.isLateEntry) cycleName += " [LATE ENTRY]";
@@ -302,6 +347,7 @@
                     
                     let finalRemarks = this.remarks + ` [TimeTaken: ${timeTakenStr}]`;
                     if(this.currentShift === 'morning' && this.checklist.morning.temp) finalRemarks += ` [Temp: ${this.checklist.morning.temp}°C]`;
+                    if(this.currentShift === 'general' && this.checklist.general.temp) finalRemarks += ` [Temp: ${this.checklist.general.temp}°C]`;
                     if(this.currentShift === 'evening' && this.checklist.evening.temp) finalRemarks += ` [Temp: ${this.checklist.evening.temp}°C]`;
 
                     const payload = { 
@@ -328,66 +374,58 @@
         }
     </script>
     
-    <!-- AlpineJS (Framework load kar rahe hain) -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
 
-    <!-- 🎨 STYLES (Custom CSS Design) -->
     <style>
         [x-cloak] { display: none !important; }
         body { background-color: #f8fafc; -webkit-tap-highlight-color: transparent; }
         
-        /* 🌈 Shift Gradients (Background Colors) */
         .bg-gradient-morning { background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%); }
-        .bg-gradient-general { background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); }
+        .bg-gradient-general { background: linear-gradient(135deg, #0d9488 0%, #115e59 100%); } /* Teal for DDN */
         .bg-gradient-evening { background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%); }
         .bg-gradient-late { background: linear-gradient(135deg, #be123c 0%, #e11d48 100%); }
         
-        /* 🪟 Glass & Effects (Kaanch jaisa effect) */
         .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 10px 30px -10px rgba(0,0,0,0.08); transition: transform 0.1s; }
         .glass-card:active { transform: scale(0.98); }
         
-        /* 🎚️ Range Sliders (Slider ka design) */
         input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; height: 30px; cursor: pointer; }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 10px; border-radius: 99px; background: #e2e8f0; background-image: linear-gradient(to right, var(--thumb-color) 0%, var(--thumb-color) var(--progress), #e2e8f0 var(--progress), #e2e8f0 100%); }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 26px; width: 26px; border-radius: 50%; background: white; border: 4px solid var(--thumb-color); box-shadow: 0 2px 6px rgba(0,0,0,0.15); margin-top: -8px; transition: transform 0.1s; }
         input[type=range]::-webkit-slider-thumb:active { transform: scale(1.2); }
         
-        /* 🖱️ Utilities */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .bg-icon-visible { opacity: 0.3; mix-blend-mode: overlay; pointer-events: none; z-index: 0; }
         .clickable { cursor: pointer; position: relative; z-index: 50; }
         .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
         
-        /* 🖥️ Desktop Scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-		
-		/* ✈️ ANIMATED SEND BUTTON (Button ka animation) */
-		.btn-fly {font-family: inherit; display: flex;align-items: center; border: none; overflow: hidden; transition: all 0.2s; cursor: pointer;}
-		.btn-fly span {display: block; margin-left: 0.3em; transition: all 0.3s ease-in-out;}
-		.btn-fly svg {display: block; transform-origin: center center; transition: transform 0.3s ease-in-out;}
-		.btn-fly:hover .svg-wrapper {animation: fly-1 0.6s ease-in-out infinite alternate;}
-		.btn-fly:hover svg {transform: translateX(1.5em) rotate(45deg) scale(1.1);}
-		.btn-fly:hover span {transform: translateX(7em); opacity: 0;}
-		.btn-fly:active {transform: scale(0.95);}
-		@keyframes fly-1 {from { transform: translateY(0.1em); }to { transform: translateY(-0.1em); }}
-		
+        
+        .btn-fly {font-family: inherit; display: flex;align-items: center; border: none; overflow: hidden; transition: all 0.2s; cursor: pointer;}
+        .btn-fly span {display: block; margin-left: 0.3em; transition: all 0.3s ease-in-out;}
+        .btn-fly svg {display: block; transform-origin: center center; transition: transform 0.3s ease-in-out;}
+        .btn-fly:hover .svg-wrapper {animation: fly-1 0.6s ease-in-out infinite alternate;}
+        .btn-fly:hover svg {transform: translateX(1.5em) rotate(45deg) scale(1.1);}
+        .btn-fly:hover span {transform: translateX(7em); opacity: 0;}
+        .btn-fly:active {transform: scale(0.95);}
+        @keyframes fly-1 {from { transform: translateY(0.1em); }to { transform: translateY(-0.1em); }}
     </style>
 </head>
 <body class="text-slate-800 transition-colors duration-300 min-h-screen font-sans bg-slate-50" x-data="dailyOpsApp()">
 
     <!-- =========================================================
-         📱 MOBILE LAYOUT (UPDATED: Duplicates Removed)
+         📱 MOBILE LAYOUT
     ========================================================== -->
     <div class="block md:hidden pb-40 relative">
         
-        <!-- HEADER (Naam, Shift Buttons, Status) -->
+        <!-- HEADER -->
         <header class="relative pt-10 pb-28 px-5 overflow-hidden rounded-b-[3rem] shadow-2xl transition-colors duration-500 ease-out" :class="{ 'bg-gradient-late': isLateEntry, 'bg-gradient-morning': !isLateEntry && currentShift === 'morning', 'bg-gradient-general': !isLateEntry && currentShift === 'general', 'bg-gradient-evening': !isLateEntry && currentShift === 'evening' }">
             <div class="absolute inset-0 z-0 pointer-events-none">
                 <div x-show="['morning', 'evening'].includes(currentShift)" class="absolute bottom-0 left-0 w-full flex items-end justify-center text-white bg-icon-visible"><i class="fa-solid fa-building text-7xl opacity-80"></i><i class="fa-solid fa-city text-9xl mx-2"></i></div>
-                <div x-show="currentShift === 'general'" class="absolute bottom-0 right-0 w-full flex items-end justify-end text-white bg-icon-visible pr-6"><i class="fa-solid fa-mountain text-7xl opacity-80"></i></div>
+                <!-- 🌲 Dehradun Icon -->
+                <div x-show="currentShift === 'general'" class="absolute bottom-0 right-0 w-full flex items-end justify-end text-white bg-icon-visible pr-6"><i class="fa-solid fa-mountain-sun text-8xl opacity-80"></i></div>
             </div>
             <div class="relative z-10">
                 <div class="flex justify-between items-center mb-6">
@@ -395,7 +433,6 @@
                     <img src="pbl-logo.png" alt="PBL" class="w-7 h-7 object-contain"></div><div><h1 class="text-2xl font-black text-white leading-none tracking-tight">PBL Daily Ops</h1><div class="flex items-center gap-2 mt-1.5 opacity-90"><span class="text-[10px] bg-white/20 backdrop-blur-md px-2 py-0.5 rounded text-white font-bold border border-white/10" x-text="todayDate"></span><span class="text-[10px] font-bold text-white uppercase tracking-wider" x-text="shiftConfig[currentShift].branch"></span></div></div></div>
                     <div class="flex flex-col items-end"><div class="px-3 py-1.5 rounded-full bg-black/20 backdrop-blur-md border border-white/10 flex items-center gap-2 shadow-inner mb-1"><div class="w-2 h-2 rounded-full shadow-[0_0_10px_currentColor]" :class="isLateEntry ? 'bg-white text-white animate-pulse' : 'bg-emerald-400 text-emerald-400'"></div><span class="text-[10px] font-bold text-white uppercase tracking-wide" x-text="isLateEntry ? 'LATE' : 'ACTIVE'"></span></div><span class="text-[10px] font-mono text-white/90 font-bold tracking-wide" x-show="!isLateEntry"><i class="fa-solid fa-hourglass-half mr-1"></i><span x-text="timeLeft">Syncing...</span></span></div>
                 </div>
-                <!-- Shift Selection Buttons -->
                 <div class="bg-black/20 p-1.5 rounded-2xl flex backdrop-blur-md border border-white/10 overflow-x-auto no-scrollbar gap-1 relative z-50">
                     <template x-for="(conf, key) in shiftConfig" :key="key"><button @click="requestShiftChange(key)" class="flex-1 min-w-[100px] py-2.5 rounded-xl flex flex-col items-center justify-center gap-0.5 transition-all duration-300 relative group clickable" :class="currentShift === key ? 'bg-white shadow-lg transform -translate-y-0.5' : 'hover:bg-white/10 text-white/70'"><span class="text-xs font-black tracking-tight" :class="currentShift === key ? conf.colorClass : 'text-white'" x-text="conf.auditor.split(' ')[0]"></span><span class="text-[9px] font-bold opacity-80" :class="currentShift === key ? 'text-slate-500' : 'text-white'" x-text="conf.timeDisplay"></span><div x-show="isTimeInRange(conf.startH, conf.startM, conf.endH, conf.endM)" class="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div></button></template>
                 </div>
@@ -403,782 +440,523 @@
         </header>
 
         <main class="px-5 -mt-20 relative z-20 max-w-lg mx-auto space-y-6">
-            <div x-show="currentShift === 'general'" class="flex flex-col items-center justify-center py-20 text-center animate-pulse"><div class="w-24 h-24 bg-teal-100 rounded-full flex items-center justify-center text-4xl text-teal-600 mb-4 shadow-xl"><i class="fa-solid fa-mug-hot"></i></div><h2 class="text-xl font-black text-slate-700">General Shift</h2><p class="text-xs text-slate-400 mt-2 font-medium">Dashboard Standby.</p></div>
+            
+            <!-- Score Card -->
+            <div class="glass-card p-6 rounded-[2.5rem] flex justify-between items-center shadow-xl mb-6">
+                <div class="flex-1"><p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Shift Readiness</p><div class="flex items-baseline gap-1"><h2 class="text-6xl font-black text-slate-800 tracking-tighter" x-text="score">0</h2><span class="text-2xl font-bold text-slate-400">%</span></div></div>
+                <div class="relative w-20 h-20"><svg class="w-full h-full transform -rotate-90 drop-shadow-lg"><circle cx="40" cy="40" r="36" stroke="#e2e8f0" stroke-width="6" fill="transparent" /><circle cx="40" cy="40" r="36" stroke="currentColor" stroke-width="6" fill="transparent" :class="score == 100 ? 'text-emerald-500' : 'text-orange-500'" :stroke-dasharray="226" :stroke-dashoffset="226 - (226 * score) / 100" class="transition-all duration-1000 ease-out" stroke-linecap="round"/></svg><div class="absolute inset-0 flex items-center justify-center text-2xl text-slate-300"><i class="fa-solid" :class="score == 100 ? 'fa-check text-emerald-500' : 'fa-chart-pie'"></i></div></div>
+            </div>
 
-            <div x-show="currentShift !== 'general'">
-                <!-- Score Card (Percentage dikhane wala box) -->
-                <div class="glass-card p-6 rounded-[2.5rem] flex justify-between items-center shadow-xl mb-6">
-                    <div class="flex-1"><p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Shift Readiness</p><div class="flex items-baseline gap-1"><h2 class="text-6xl font-black text-slate-800 tracking-tighter" x-text="score">0</h2><span class="text-2xl font-bold text-slate-400">%</span></div></div>
-                    <div class="relative w-20 h-20"><svg class="w-full h-full transform -rotate-90 drop-shadow-lg"><circle cx="40" cy="40" r="36" stroke="#e2e8f0" stroke-width="6" fill="transparent" /><circle cx="40" cy="40" r="36" stroke="currentColor" stroke-width="6" fill="transparent" :class="score == 100 ? 'text-emerald-500' : 'text-orange-500'" :stroke-dasharray="226" :stroke-dashoffset="226 - (226 * score) / 100" class="transition-all duration-1000 ease-out" stroke-linecap="round"/></svg><div class="absolute inset-0 flex items-center justify-center text-2xl text-slate-300"><i class="fa-solid" :class="score == 100 ? 'fa-check text-emerald-500' : 'fa-chart-pie'"></i></div></div>
-                </div>
+            <!-- 🌞 MORNING SHIFT -->
+            <div x-show="currentShift === 'morning'" x-transition class="space-y-4 mb-6">
+                <h3 class="text-xs font-black text-blue-600 uppercase tracking-widest ml-1"><i class="fa-solid fa-sun"></i> Morning Tasks</h3>
+                <div id="card-temp" class="glass-card p-5 rounded-3xl border-l-[6px] border-l-blue-400 scroll-mt-24"><div class="flex justify-between items-end mb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg"><i class="fa-solid fa-temperature-half"></i></div><div><h4 class="text-sm font-black text-slate-700">Server Room Temp</h4><p class="text-[10px] text-slate-400 font-bold">Log Temperature</p></div></div><span class="text-2xl font-black font-mono" :class="checklist.morning.temp ? 'text-slate-800' : 'text-slate-300'" x-text="checklist.morning.temp ? checklist.morning.temp + '°C' : '--'"></span></div><div class="relative py-1"><div x-show="!checklist.morning.temp" @click="checklist.morning.temp = 20" class="absolute inset-0 bg-slate-100/80 backdrop-blur-sm z-30 flex items-center justify-center rounded-xl cursor-pointer border-2 border-dashed border-slate-300"><span class="text-xs font-black text-slate-500 uppercase">Tap to Activate</span></div><input type="range" min="16" max="28" step="0.5" x-model="checklist.morning.temp" @input="saveLocal(); haptic()" class="relative z-20 w-full" :style="`--thumb-color: #3b82f6; --progress: ${((checklist.morning.temp - 16) / 12) * 100}%`"></div></div>
+                <div id="card-etoken" @click="toggleMorningTask('authIssue')" class="glass-card p-4 rounded-3xl cursor-pointer border-2 transition-all active:scale-95 flex items-center gap-4 clickable scroll-mt-24" :class="checklist.morning.authIssue ? 'border-blue-400 bg-blue-50' : 'border-transparent'"><div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-md" :class="checklist.morning.authIssue ? 'bg-blue-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-key"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">Issue eTokens</h4><p class="text-[10px] font-bold text-slate-400">Handover 10 Units to Production Dept.</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.morning.authIssue ? 'border-blue-500 bg-blue-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div>
+                <div id="card-backup" class="glass-card p-5 rounded-3xl border-l-[6px] border-l-blue-500 scroll-mt-24"><div class="flex justify-between items-center mb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg"><i class="fa-solid fa-clock-rotate-left"></i></div><div><h4 class="text-sm font-black text-slate-700">Backup Verify</h4><p class="text-[10px] text-slate-400 font-bold">Check Folders</p></div></div></div><div class="flex gap-2"><div @click="toggleBackup('dc')" class="flex-1 p-2 rounded-xl border-2 text-center cursor-pointer clickable" :class="checklist.morning.backupDC ? 'bg-blue-50 border-blue-500' : 'border-slate-200'"><span class="text-[10px] font-bold">WinSvr100</span></div><div @click="toggleBackup('adc')" class="flex-1 p-2 rounded-xl border-2 text-center cursor-pointer clickable" :class="checklist.morning.backupADC ? 'bg-blue-50 border-blue-500' : 'border-slate-200'"><span class="text-[10px] font-bold">WinSvr101</span></div></div><div x-show="checklist.morning.backupDC || checklist.morning.backupADC" class="mt-3 pt-3 border-t border-slate-100"><input type="text" x-model="checklist.morning.backupTime" @input="saveLocal()" placeholder="Backup Time (e.g. 02:15 AM)" class="w-full mt-1 bg-blue-50 border border-blue-200 text-xs rounded-lg p-2 font-bold"></div></div>
+            </div>
 
-                <!-- 🌞 MORNING SPECIFIC TASKS (Sirf Subah dikhenge) -->
-                <div x-show="currentShift === 'morning'" x-transition class="space-y-4 mb-6">
-                    <h3 class="text-xs font-black text-blue-600 uppercase tracking-widest ml-1"><i class="fa-solid fa-sun"></i> Morning Tasks</h3>
-                    <!-- Temp Card -->
-                    <div id="card-temp" class="glass-card p-5 rounded-3xl border-l-[6px] border-l-blue-400 scroll-mt-24"><div class="flex justify-between items-end mb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg"><i class="fa-solid fa-temperature-half"></i></div><div><h4 class="text-sm font-black text-slate-700">Server Room Temp</h4><p class="text-[10px] text-slate-400 font-bold">Log Temperature</p></div></div><span class="text-2xl font-black font-mono" :class="checklist.morning.temp ? 'text-slate-800' : 'text-slate-300'" x-text="checklist.morning.temp ? checklist.morning.temp + '°C' : '--'"></span></div><div class="relative py-1"><div x-show="!checklist.morning.temp" @click="checklist.morning.temp = 20" class="absolute inset-0 bg-slate-100/80 backdrop-blur-sm z-30 flex items-center justify-center rounded-xl cursor-pointer border-2 border-dashed border-slate-300"><span class="text-xs font-black text-slate-500 uppercase">Tap to Activate</span></div><input type="range" min="16" max="28" step="0.5" x-model="checklist.morning.temp" @input="saveLocal(); haptic()" class="relative z-20 w-full" :style="`--thumb-color: #3b82f6; --progress: ${((checklist.morning.temp - 16) / 12) * 100}%`"></div></div>
-                    <!-- System Check -->
-                    <div id="card-prod" class="glass-card p-5 rounded-3xl border-l-[6px] border-l-yellow-400 scroll-mt-24"><div class="flex justify-between items-center mb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-yellow-100 text-yellow-600 flex items-center justify-center text-lg"><i class="fa-solid fa-power-off"></i></div><div><h4 class="text-sm font-black text-slate-700">System Check</h4><p class="text-[10px] text-slate-400 font-bold">Any PC left ON?</p></div></div><div @click="toggleMorningTask('prodCheck')" class="w-12 h-6 rounded-full relative transition-colors duration-300 cursor-pointer clickable" :class="checklist.morning.prodCheck ? 'bg-rose-500' : 'bg-emerald-500'"><div class="w-4 h-4 bg-white rounded-full absolute top-1 transition-all duration-300 shadow-sm" :class="checklist.morning.prodCheck ? 'left-7' : 'left-1'"></div></div></div><div x-show="checklist.morning.prodCheck" class="mt-3 pt-3 border-t border-yellow-200"><input type="text" x-model="checklist.morning.prodNotes" @input="saveLocal()" placeholder="Which PCs? (e.g. PC-4)" class="w-full bg-yellow-50 border border-yellow-300 text-xs rounded-lg p-3 font-bold"></div></div>
-                    <!-- eTokens -->
-                    <div id="card-etoken" @click="toggleMorningTask('authIssue')" class="glass-card p-4 rounded-3xl cursor-pointer border-2 transition-all active:scale-95 flex items-center gap-4 clickable scroll-mt-24" :class="checklist.morning.authIssue ? 'border-blue-400 bg-blue-50' : 'border-transparent'"><div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-md" :class="checklist.morning.authIssue ? 'bg-blue-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-key"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">Issue eTokens</h4><p class="text-[10px] font-bold text-slate-400">Handover 10 Units to Production Dept.</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.morning.authIssue ? 'border-blue-500 bg-blue-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div>
-                    <!-- FTP -->
-                    <div id="card-ftp" @click="toggleMorningTask('ftpJobCheck')" class="glass-card p-4 rounded-3xl cursor-pointer border-2 transition-all active:scale-95 flex items-center gap-4 clickable scroll-mt-24" :class="checklist.morning.ftpJobCheck ? 'border-indigo-400 bg-indigo-50' : 'border-transparent'"><div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-md" :class="checklist.morning.ftpJobCheck ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-folder-open"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">Client FTP Jobs</h4><p class="text-[10px] font-bold text-slate-400">Check New Jobs</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.morning.ftpJobCheck ? 'border-indigo-500 bg-indigo-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div>
-                    <!-- PBL020 Start -->
-                    <div id="card-pbl020" @click="toggleMorningTask('pbl020Start')" class="glass-card p-4 rounded-3xl cursor-pointer border-2 transition-all active:scale-95 flex items-center gap-4 clickable scroll-mt-24" :class="checklist.morning.pbl020Start ? 'border-emerald-400 bg-emerald-50' : 'border-transparent'"><div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-md" :class="checklist.morning.pbl020Start ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-power-off"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">Start pblnet020</h4><p class="text-[10px] font-bold text-slate-400">Boot Machine</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.morning.pbl020Start ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div>
-                    <!-- Backup -->
-                    <div id="card-backup" class="glass-card p-5 rounded-3xl border-l-[6px] border-l-blue-500 scroll-mt-24"><div class="flex justify-between items-center mb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg"><i class="fa-solid fa-clock-rotate-left"></i></div><div><h4 class="text-sm font-black text-slate-700">Backup Verify</h4><p class="text-[10px] text-slate-400 font-bold">Check Folders</p></div></div></div><div class="flex gap-2"><div @click="toggleBackup('dc')" class="flex-1 p-2 rounded-xl border-2 text-center cursor-pointer clickable" :class="checklist.morning.backupDC ? 'bg-blue-50 border-blue-500' : 'border-slate-200'"><span class="text-[10px] font-bold">WinSvr100</span></div><div @click="toggleBackup('adc')" class="flex-1 p-2 rounded-xl border-2 text-center cursor-pointer clickable" :class="checklist.morning.backupADC ? 'bg-blue-50 border-blue-500' : 'border-slate-200'"><span class="text-[10px] font-bold">WinSvr101</span></div></div><div x-show="checklist.morning.backupDC || checklist.morning.backupADC" class="mt-3 pt-3 border-t border-slate-100"><input type="text" x-model="checklist.morning.backupTime" @input="saveLocal()" placeholder="Backup Time (e.g. 02:15 AM)" class="w-full mt-1 bg-blue-50 border border-blue-200 text-xs rounded-lg p-2 font-bold"></div></div>
-                    <!-- WiFi -->
-                    <div id="card-wifi" @click="toggleMorningTask('wifi')" class="glass-card p-4 rounded-3xl cursor-pointer border-2 transition-all active:scale-95 flex items-center gap-4 clickable scroll-mt-24" :class="checklist.morning.wifi ? 'border-indigo-400 bg-indigo-50' : 'border-transparent'"><div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl transition-colors shadow-sm" :class="checklist.morning.wifi ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-wifi"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">Admin WiFi</h4><p class="text-[10px] font-bold text-slate-400">Check Admin Wifi Connectivity</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.morning.wifi ? 'border-indigo-500 bg-indigo-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div>
-                </div>
+            <!-- 🌲 DEHRADUN GENERAL SHIFT MOBILE (ADDED) -->
+            <div x-show="currentShift === 'general'" x-transition class="space-y-4 mb-6">
+                <h3 class="text-xs font-black text-teal-600 uppercase tracking-widest ml-1"><i class="fa-solid fa-mountain-sun"></i> General Tasks</h3>
+                
+                <!-- DDN Temp -->
+                <div id="card-temp-gen" class="glass-card p-5 rounded-3xl border-l-[6px] border-l-teal-400 scroll-mt-24"><div class="flex justify-between items-end mb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-teal-100 text-teal-600 flex items-center justify-center text-lg"><i class="fa-solid fa-temperature-half"></i></div><div><h4 class="text-sm font-black text-slate-700">Server Temp</h4><p class="text-[10px] text-slate-400 font-bold">Log Temperature</p></div></div><span class="text-2xl font-black font-mono" :class="checklist.general.temp ? 'text-slate-800' : 'text-slate-300'" x-text="checklist.general.temp ? checklist.general.temp + '°C' : '--'"></span></div><div class="relative py-1"><div x-show="!checklist.general.temp" @click="checklist.general.temp = 20" class="absolute inset-0 bg-slate-100/80 backdrop-blur-sm z-30 flex items-center justify-center rounded-xl cursor-pointer border-2 border-dashed border-slate-300"><span class="text-xs font-black text-slate-500 uppercase">Tap to Activate</span></div><input type="range" min="16" max="32" step="0.5" x-model="checklist.general.temp" @input="saveLocal(); haptic()" class="relative z-20 w-full" :style="`--thumb-color: #0d9488; --progress: ${((checklist.general.temp - 16) / 16) * 100}%`"></div></div>
 
-                <!-- 🌙 EVENING SPECIFIC TASKS (Sirf Shaam ko dikhenge) -->
-                <div x-show="currentShift === 'evening'" x-transition class="space-y-4 mb-6">
-                    <h3 class="text-xs font-black text-violet-600 uppercase tracking-widest ml-1"><i class="fa-solid fa-moon"></i> Evening Tasks</h3>
-                    <!-- Evening Temp (Duplicate Removed) -->
-                    <div id="card-temp-eve" class="glass-card p-5 rounded-3xl border-l-[6px] border-l-violet-400 scroll-mt-24"><div class="flex justify-between items-end mb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center text-lg"><i class="fa-solid fa-temperature-half"></i></div><div><h4 class="text-sm font-black text-slate-700">Server Room Temp</h4><p class="text-[10px] text-slate-400 font-bold">Log Temperature</p></div></div><span class="text-2xl font-black font-mono" :class="checklist.evening.temp ? 'text-slate-800' : 'text-slate-300'" x-text="checklist.evening.temp ? checklist.evening.temp + '°C' : '--'"></span></div><div class="relative py-1"><div x-show="!checklist.evening.temp" @click="checklist.evening.temp = 20" class="absolute inset-0 bg-slate-100/80 backdrop-blur-sm z-30 flex items-center justify-center rounded-xl cursor-pointer border-2 border-dashed border-slate-300"><span class="text-xs font-black text-slate-500 uppercase">Tap to Activate</span></div><input type="range" min="16" max="28" step="0.5" x-model="checklist.evening.temp" @input="saveLocal(); haptic()" class="relative z-20 w-full" :style="`--thumb-color: #7c3aed; --progress: ${((checklist.evening.temp - 16) / 12) * 100}%`"></div></div>
-                    <!-- Tokens Return -->
-                    <div id="card-etoken-eve" @click="toggleEveningTask('authCollect')" class="glass-card p-4 rounded-3xl cursor-pointer border-2 transition-all active:scale-95 flex items-center gap-4 clickable scroll-mt-24" :class="checklist.evening.authCollect ? 'border-violet-400 bg-violet-50' : 'border-transparent'"><div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-md" :class="checklist.evening.authCollect ? 'bg-violet-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-vault"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">Collect eTokens</h4><p class="text-[10px] font-bold text-slate-400">Return 10 Units to Server Room Safehouse</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.evening.authCollect ? 'border-violet-500 bg-violet-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div>
-                    <!-- PBL020 Stop -->
-                    <div id="card-pbl020-eve" class="glass-card p-5 rounded-3xl border-l-[6px] scroll-mt-24" :class="checklist.evening.pbl020Running ? 'border-l-amber-500' : 'border-l-rose-500'"><div class="flex justify-between items-center mb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg text-white shadow-md" :class="checklist.evening.pbl020Running ? 'bg-amber-500' : 'bg-rose-500'"><i class="fa-solid fa-download"></i></div><div><h4 class="text-sm font-black text-slate-700">pblnet020 Status</h4><p class="text-[10px] text-slate-400 font-bold">Download Running?</p></div></div><div @click="togglePblRun()" class="w-14 h-7 bg-slate-200 rounded-full relative cursor-pointer clickable" :class="checklist.evening.pbl020Running ? 'bg-amber-500' : 'bg-slate-300'"><div class="w-5 h-5 bg-white rounded-full absolute top-1 transition-all shadow-sm" :class="checklist.evening.pbl020Running ? 'left-8' : 'left-1'"></div></div></div><div class="mt-3 pt-3 border-t border-slate-100"><div x-show="checklist.evening.pbl020Running"><label class="text-[9px] font-bold text-amber-600 uppercase">Specify Job Name</label><input type="text" x-model="checklist.evening.pblReason" @input="saveLocal()" placeholder="e.g. AEMDRE Data Download" class="w-full mt-1 bg-amber-50 border border-amber-200 text-xs rounded-lg p-2 font-bold"></div><div x-show="!checklist.evening.pbl020Running"><p class="text-[10px] font-bold text-rose-500 flex items-center gap-1"><i class="fa-solid fa-power-off"></i> Action: Shutdown the machine.</p></div></div></div>
-                    <!-- FTP Report -->
-                    <div id="card-ftp-eve" @click="toggleEveningTask('ftpReport')" class="glass-card p-4 rounded-3xl cursor-pointer border-2 transition-all active:scale-95 flex items-center gap-4 clickable scroll-mt-24" :class="checklist.evening.ftpReport ? 'border-violet-400 bg-violet-50' : 'border-transparent'"><div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl transition-colors shadow-sm" :class="checklist.evening.ftpReport ? 'bg-violet-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-file-export"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">FTP Job Report</h4><p class="text-[10px] font-bold text-slate-400">Send Status to Morning Engineer</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.evening.ftpReport ? 'border-violet-500 bg-violet-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div>
-                </div>
+                <!-- Guard Audit -->
+                <div id="card-guard" @click="toggleGeneralTask('guardAudit')" class="glass-card p-4 rounded-3xl cursor-pointer border-2 transition-all active:scale-95 flex items-center gap-4 clickable scroll-mt-24" :class="checklist.general.guardAudit ? 'border-teal-400 bg-teal-50' : 'border-transparent'"><div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-md" :class="checklist.general.guardAudit ? 'bg-teal-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-user-secret"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">Guard Audit</h4><p class="text-[10px] font-bold text-slate-400">Register vs CCTV (2Hr)</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.general.guardAudit ? 'border-teal-500 bg-teal-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div>
 
-                <!-- 🌐 COMMON TASKS (Jo Har Shift me same hain) -->
-                <div class="space-y-6">
-                    <!-- ISP -->
-                    <div id="card-isp" class="space-y-3 scroll-mt-24"><h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1"><i class="fa-solid fa-gauge-high"></i> Internet</h3><div class="grid grid-cols-1 gap-4"><template x-for="(isp, index) in checklist.isp" :key="index"><div class="glass-card p-5 rounded-3xl group" :class="isLowSpeed(isp) ? 'border-rose-300 bg-rose-50' : ''"><div class="flex justify-between items-end mb-4 relative z-10"><div class="flex items-center gap-3"><div class="w-11 h-11 rounded-2xl flex items-center justify-center text-white text-lg shadow-lg" :class="getSpeedColor(isp.speed, isp.max)"><i class="fa-solid fa-wifi"></i></div><div><h4 class="text-sm font-black text-slate-700" x-text="isp.name"></h4></div></div><span class="text-3xl font-black font-mono" :class="getSpeedText(isp.speed, isp.max)" x-text="isp.speed || 0"></span></div><div class="relative py-1"><input type="range" min="0" :max="isp.max" step="0.5" x-model="isp.speed" @input="calculateScore(); saveLocal(); haptic()" class="relative z-20 w-full" :style="`--thumb-color: ${getSpeedHex(isp.speed, isp.max)}; --progress: ${(isp.speed / isp.max) * 100}%`"></div><div x-show="isLowSpeed(isp)" class="mt-3 pt-3 border-t border-rose-200"><input type="text" x-model="isp.complaint" @input="saveLocal()" placeholder="Enter Ticket No..." class="w-full bg-white border border-rose-300 text-xs rounded-xl p-3 font-bold"></div></div></template></div></div>
-                    
-                    <!-- Security (Sophos & USB) -->
-                    <div id="card-security" class="space-y-3 scroll-mt-24"><h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1"><i class="fa-solid fa-shield-halved"></i> Security</h3><div class="grid grid-cols-1 gap-3"><div @click="handleSophosCheck()" class="glass-card p-4 rounded-3xl cursor-pointer border-2 flex items-center gap-4 clickable" :class="checklist.endpoints.sophos ? 'border-cyan-400 bg-cyan-50' : 'border-transparent'"><div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-md" :class="checklist.endpoints.sophos ? 'bg-cyan-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-shield-virus"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">Sophos AV</h4><p class="text-[10px] text-slate-400">Random PC Check</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.endpoints.sophos ? 'border-cyan-500 bg-cyan-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div><div @click="handleUsbCheck()" class="glass-card p-4 rounded-3xl cursor-pointer border-2 flex items-center gap-4 clickable" :class="checklist.endpoints.usb ? 'border-rose-400 bg-rose-50' : 'border-transparent'"><div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-md" :class="checklist.endpoints.usb ? 'bg-rose-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-brands fa-usb"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">USB Blocking</h4><p class="text-[10px] text-slate-400">Physical Check</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.endpoints.usb ? 'border-rose-500 bg-rose-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div></div></div>
-                    
-                    <!-- Services (Websites etc) - FIXED FOR MOBILE -->
-					<div id="card-services" class="space-y-3 scroll-mt-24">
-						<h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">
-							<i class="fa-solid fa-network-wired"></i> Services
-						</h3>
-						<div class="grid grid-cols-1 gap-3">
-							<template x-for="(svc, index) in checklist.services" :key="index">
-								<div @click="toggleService(index)" 
-									 class="glass-card p-4 rounded-3xl cursor-pointer border-2 flex items-center gap-4 clickable transition-all active:scale-95" 
-									 :class="svc.status ? 'border-emerald-400 bg-emerald-50' : 'border-transparent'">
-									
-									<!-- Icon -->
-									<div class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-md transition-colors" 
-										 :class="svc.status ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400'">
-										<i class="fa-solid" :class="svc.icon"></i>
-									</div>
+                <!-- FTP Server Start -->
+                <div id="card-ftp-gen" @click="toggleGeneralTask('ftpStart')" class="glass-card p-4 rounded-3xl cursor-pointer border-2 transition-all active:scale-95 flex items-center gap-4 clickable scroll-mt-24" :class="checklist.general.ftpStart ? 'border-teal-400 bg-teal-50' : 'border-transparent'"><div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-md" :class="checklist.general.ftpStart ? 'bg-teal-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-server"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">Start FTP Server</h4><p class="text-[10px] font-bold text-slate-400">PBLDD027 Power ON</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.general.ftpStart ? 'border-teal-500 bg-teal-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div>
+                
+                <!-- Manual Backup -->
+                <div id="card-backup-gen" @click="toggleGeneralTask('manualBackup')" class="glass-card p-4 rounded-3xl cursor-pointer border-2 transition-all active:scale-95 flex items-center gap-4 clickable scroll-mt-24" :class="checklist.general.manualBackup ? 'border-teal-400 bg-teal-50' : 'border-transparent'"><div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-md" :class="checklist.general.manualBackup ? 'bg-teal-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-floppy-disk"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">Manual Backup</h4><p class="text-[10px] font-bold text-slate-400">DC/ADC + 3 Days Check</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.general.manualBackup ? 'border-teal-500 bg-teal-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div>
+            </div>
 
-									<!-- Text Info -->
-									<div class="flex-1">
-										<h4 class="text-sm font-black text-slate-700" x-text="svc.name"></h4>
-										<p class="text-[10px] font-bold text-slate-400" x-text="svc.desc"></p>
-									</div>
+            <!-- 🌙 EVENING SHIFT -->
+            <div x-show="currentShift === 'evening'" x-transition class="space-y-4 mb-6">
+                <h3 class="text-xs font-black text-violet-600 uppercase tracking-widest ml-1"><i class="fa-solid fa-moon"></i> Evening Tasks</h3>
+                <div id="card-temp-eve" class="glass-card p-5 rounded-3xl border-l-[6px] border-l-violet-400 scroll-mt-24"><div class="flex justify-between items-end mb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center text-lg"><i class="fa-solid fa-temperature-half"></i></div><div><h4 class="text-sm font-black text-slate-700">Server Room Temp</h4><p class="text-[10px] text-slate-400 font-bold">Log Temperature</p></div></div><span class="text-2xl font-black font-mono" :class="checklist.evening.temp ? 'text-slate-800' : 'text-slate-300'" x-text="checklist.evening.temp ? checklist.evening.temp + '°C' : '--'"></span></div><div class="relative py-1"><div x-show="!checklist.evening.temp" @click="checklist.evening.temp = 20" class="absolute inset-0 bg-slate-100/80 backdrop-blur-sm z-30 flex items-center justify-center rounded-xl cursor-pointer border-2 border-dashed border-slate-300"><span class="text-xs font-black text-slate-500 uppercase">Tap to Activate</span></div><input type="range" min="16" max="28" step="0.5" x-model="checklist.evening.temp" @input="saveLocal(); haptic()" class="relative z-20 w-full" :style="`--thumb-color: #7c3aed; --progress: ${((checklist.evening.temp - 16) / 12) * 100}%`"></div></div>
+                <div id="card-etoken-eve" @click="toggleEveningTask('authCollect')" class="glass-card p-4 rounded-3xl cursor-pointer border-2 transition-all active:scale-95 flex items-center gap-4 clickable scroll-mt-24" :class="checklist.evening.authCollect ? 'border-violet-400 bg-violet-50' : 'border-transparent'"><div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-md" :class="checklist.evening.authCollect ? 'bg-violet-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-vault"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">Collect eTokens</h4><p class="text-[10px] font-bold text-slate-400">Return 10 Units to Safehouse</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.evening.authCollect ? 'border-violet-500 bg-violet-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div>
+                <div id="card-pbl020-eve" class="glass-card p-5 rounded-3xl border-l-[6px] scroll-mt-24" :class="checklist.evening.pbl020Running ? 'border-l-amber-500' : 'border-l-rose-500'"><div class="flex justify-between items-center mb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg text-white shadow-md" :class="checklist.evening.pbl020Running ? 'bg-amber-500' : 'bg-rose-500'"><i class="fa-solid fa-download"></i></div><div><h4 class="text-sm font-black text-slate-700">pblnet020 Status</h4><p class="text-[10px] text-slate-400 font-bold">Download Running?</p></div></div><div @click="togglePblRun()" class="w-14 h-7 bg-slate-200 rounded-full relative cursor-pointer clickable" :class="checklist.evening.pbl020Running ? 'bg-amber-500' : 'bg-slate-300'"><div class="w-5 h-5 bg-white rounded-full absolute top-1 transition-all shadow-sm" :class="checklist.evening.pbl020Running ? 'left-8' : 'left-1'"></div></div></div><div class="mt-3 pt-3 border-t border-slate-100"><div x-show="checklist.evening.pbl020Running"><label class="text-[9px] font-bold text-amber-600 uppercase">Specify Job Name</label><input type="text" x-model="checklist.evening.pblReason" @input="saveLocal()" placeholder="e.g. AEMDRE Data Download" class="w-full mt-1 bg-amber-50 border border-amber-200 text-xs rounded-lg p-2 font-bold"></div><div x-show="!checklist.evening.pbl020Running"><p class="text-[10px] font-bold text-rose-500 flex items-center gap-1"><i class="fa-solid fa-power-off"></i> Action: Shutdown the machine.</p></div></div></div>
+            </div>
 
-									<!-- Toggle Check -->
-									<div class="w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors" 
-										 :class="svc.status ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-slate-200 text-slate-200'">
-										<i class="fa-solid fa-check"></i>
-									</div>
-								</div>
-							</template>
-						</div>
-					</div>
-                    
-                    <!-- Servers (DUPLICATE REMOVED - Ab ek hi baar dikhega) -->
-                    <div id="card-servers" class="space-y-3 scroll-mt-24"><h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1"><i class="fa-solid fa-server"></i> Servers</h3><div class="grid grid-cols-2 gap-3"><template x-for="(srv, index) in checklist.servers" :key="index"><div @click="toggleServer(index)" class="relative p-4 h-32 rounded-[1.5rem] border-2 cursor-pointer overflow-hidden group clickable transition-colors duration-300 shadow-lg" :class="getServerClass(srv)"><div class="absolute -bottom-6 -right-6 text-9xl text-black opacity-10 transform rotate-12 pointer-events-none z-0 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-0"><i :class="(srv.name.includes('Linux') || srv.name === 'PBL') ? 'fa-brands fa-linux' : 'fa-brands fa-windows'"></i></div>
-                        <!-- Maintenance Button -->
-		                <div @click.stop="toggleMaintenance(index)" class="absolute top-2 right-2 z-50 w-8 h-8 flex items-center justify-center rounded-full shadow-lg cursor-pointer transition-all active:scale-90" :class="srv.maintenance ? 'bg-amber-500 text-white ring-2 ring-white' : 'bg-white/20 hover:bg-white/40 text-white backdrop-blur-md border border-white/20'"><i class="fa-solid fa-wrench text-xs" :class="srv.maintenance ? 'animate-pulse' : ''"></i></div><div class="relative z-10 h-full flex flex-col justify-between"><div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl bg-white/20 backdrop-blur-md text-white shadow-inner border border-white/10"><i :class="(srv.name.includes('Linux') || srv.name === 'PBL') ? 'fa-brands fa-linux' : 'fa-brands fa-windows'"></i></div><div><h4 class="text-lg font-black leading-tight tracking-tight drop-shadow-md" x-text="srv.name"></h4><p class="text-[10px] font-bold opacity-90 uppercase mt-1 tracking-wider bg-black/10 inline-block px-2 py-0.5 rounded-md backdrop-blur-sm"><span x-text="srv.maintenance ? 'MAINTENANCE' : (srv.status ? 'ONLINE' : 'OFFLINE')"></span></p></div></div></div></template></div></div>
-                    
-                    <!-- Infra (AC & Fire) -->
-                    <div id="card-infra" class="space-y-3 scroll-mt-24">
-                        <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1"><i class="fa-solid fa-fan"></i> Infra</h3>
-                        <div class="grid grid-cols-1 gap-3">
-                            <template x-for="(ac, index) in checklist.infra.acs" :key="index"><div @click="toggleAC(index)" class="glass-card p-4 rounded-3xl cursor-pointer border-2 flex items-center gap-4 clickable" :class="ac.status ? 'border-cyan-400 bg-cyan-50' : 'border-transparent'"><div class="w-12 h-12 rounded-full flex items-center justify-center text-xl shadow-md" :class="ac.status ? 'bg-cyan-500 text-white' : 'bg-slate-100 text-slate-300'"><i class="fa-solid fa-snowflake" :class="ac.status ? 'animate-spin-slow' : ''"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700" x-text="ac.name"></h4><span class="text-[10px] font-bold uppercase text-cyan-600" x-text="ac.status ? 'ON' : 'OFF'"></span></div><div class="w-12 h-6 rounded-full relative transition-colors duration-300" :class="ac.status ? 'bg-cyan-500' : 'bg-slate-200'"><div class="w-4 h-4 bg-white rounded-full absolute top-1 transition-all duration-300 shadow-sm" :class="ac.status ? 'left-7' : 'left-1'"></div></div></div></template>
-                            <div class="glass-card p-5 rounded-3xl border-l-[6px] border-l-rose-500">
-                                <div class="flex justify-between items-center mb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-lg"><i class="fa-solid fa-fire-extinguisher"></i></div><div><h4 class="text-sm font-black text-slate-700">Fire Safety</h4><p class="text-[10px] text-slate-400 font-bold">Check 1 Random Cylinder</p></div></div><div @click="toggleInfra('fire')" class="w-12 h-6 rounded-full relative transition-colors cursor-pointer clickable" :class="checklist.infra.fire.status ? 'bg-emerald-500' : 'bg-slate-200'"><div class="w-4 h-4 bg-white rounded-full absolute top-1 transition-all shadow-sm" :class="checklist.infra.fire.status ? 'left-7' : 'left-1'"></div></div></div>
-                                <div x-show="checklist.infra.fire.status" class="mt-3 pt-3 border-t border-rose-100">
-                                    <div @click="modals.fireList.show = true; haptic()" class="w-full mt-1 bg-white border border-rose-200 text-slate-700 text-xs font-bold rounded-xl p-3 flex justify-between items-center shadow-sm active:scale-95 transition-transform cursor-pointer">
-                                        <span x-text="checklist.infra.fire.location || 'Select Cylinder Location...'" :class="!checklist.infra.fire.location ? 'text-slate-400' : 'text-slate-800'"></span>
-                                        <i class="fa-solid fa-chevron-down text-rose-400"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <!-- 🌐 COMMON TASKS (Dynamically Updated via JS for DDN/Noida) -->
+            <div class="space-y-6">
+                <!-- ISP -->
+                <div id="card-isp" class="space-y-3 scroll-mt-24"><h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1"><i class="fa-solid fa-gauge-high"></i> Internet</h3><div class="grid grid-cols-1 gap-4"><template x-for="(isp, index) in checklist.isp" :key="index"><div class="glass-card p-5 rounded-3xl group" :class="isLowSpeed(isp) ? 'border-rose-300 bg-rose-50' : ''"><div class="flex justify-between items-end mb-4 relative z-10"><div class="flex items-center gap-3"><div class="w-11 h-11 rounded-2xl flex items-center justify-center text-white text-lg shadow-lg" :class="getSpeedColor(isp.speed, isp.max)"><i class="fa-solid fa-wifi"></i></div><div><h4 class="text-sm font-black text-slate-700" x-text="isp.name"></h4></div></div><span class="text-3xl font-black font-mono" :class="getSpeedText(isp.speed, isp.max)" x-text="isp.speed || 0"></span></div><div class="relative py-1"><input type="range" min="0" :max="isp.max" step="0.5" x-model="isp.speed" @input="calculateScore(); saveLocal(); haptic()" class="relative z-20 w-full" :style="`--thumb-color: ${getSpeedHex(isp.speed, isp.max)}; --progress: ${(isp.speed / isp.max) * 100}%`"></div><div x-show="isLowSpeed(isp)" class="mt-3 pt-3 border-t border-rose-200"><input type="text" x-model="isp.complaint" @input="saveLocal()" placeholder="Enter Ticket No..." class="w-full bg-white border border-rose-300 text-xs rounded-xl p-3 font-bold"></div></div></template></div></div>
+                
+                <!-- Security (Dynamic Text for DDN) -->
+                <div id="card-security" class="space-y-3 scroll-mt-24"><h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1"><i class="fa-solid fa-shield-halved"></i> Security</h3><div class="grid grid-cols-1 gap-3"><div @click="handleSophosCheck()" class="glass-card p-4 rounded-3xl cursor-pointer border-2 flex items-center gap-4 clickable" :class="checklist.endpoints.sophos ? 'border-cyan-400 bg-cyan-50' : 'border-transparent'"><div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-md" :class="checklist.endpoints.sophos ? 'bg-cyan-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-shield-virus"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700" x-text="currentShift === 'general' ? 'Seqrite AV' : 'Sophos AV'"></h4><p class="text-[10px] text-slate-400">Random PC Check</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.endpoints.sophos ? 'border-cyan-500 bg-cyan-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div><div @click="handleUsbCheck()" class="glass-card p-4 rounded-3xl cursor-pointer border-2 flex items-center gap-4 clickable" :class="checklist.endpoints.usb ? 'border-rose-400 bg-rose-50' : 'border-transparent'"><div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-md" :class="checklist.endpoints.usb ? 'bg-rose-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-brands fa-usb"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700">USB Blocking</h4><p class="text-[10px] text-slate-400">Physical Check</p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2" :class="checklist.endpoints.usb ? 'border-rose-500 bg-rose-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div></div></div>
+                
+                <!-- Services -->
+                <div id="card-services" class="space-y-3 scroll-mt-24"><h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1"><i class="fa-solid fa-network-wired"></i> Services</h3><div class="grid grid-cols-1 gap-3"><template x-for="(svc, index) in checklist.services" :key="index"><div @click="toggleService(index)" class="glass-card p-4 rounded-3xl cursor-pointer border-2 flex items-center gap-4 clickable transition-all active:scale-95" :class="svc.status ? 'border-emerald-400 bg-emerald-50' : 'border-transparent'"><div class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-md transition-colors" :class="svc.status ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400'"><i class="fa-solid" :class="svc.icon"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700" x-text="svc.name"></h4><p class="text-[10px] font-bold text-slate-400" x-text="svc.desc"></p></div><div class="w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors" :class="svc.status ? 'border-emerald-500 bg-emerald-500 text-white' : 'border-slate-200 text-slate-200'"><i class="fa-solid fa-check"></i></div></div></template></div></div>
+                
+                <!-- Servers -->
+                <div id="card-servers" class="space-y-3 scroll-mt-24"><h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1"><i class="fa-solid fa-server"></i> Servers</h3><div class="grid grid-cols-2 gap-3"><template x-for="(srv, index) in checklist.servers" :key="index"><div @click="toggleServer(index)" class="relative p-4 h-32 rounded-[1.5rem] border-2 cursor-pointer overflow-hidden group clickable transition-colors duration-300 shadow-lg" :class="getServerClass(srv)"><div class="absolute -bottom-6 -right-6 text-9xl text-black opacity-10 transform rotate-12 pointer-events-none z-0 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-0"><i :class="(srv.name.includes('Linux') || srv.name.includes('PBL') || srv.type === 'linux') ? 'fa-brands fa-linux' : 'fa-brands fa-windows'"></i></div><div @click.stop="toggleMaintenance(index)" class="absolute top-2 right-2 z-50 w-8 h-8 flex items-center justify-center rounded-full shadow-lg cursor-pointer transition-all active:scale-90" :class="srv.maintenance ? 'bg-amber-500 text-white ring-2 ring-white' : 'bg-white/20 hover:bg-white/40 text-white backdrop-blur-md border border-white/20'"><i class="fa-solid fa-wrench text-xs" :class="srv.maintenance ? 'animate-pulse' : ''"></i></div><div class="relative z-10 h-full flex flex-col justify-between"><div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl bg-white/20 backdrop-blur-md text-white shadow-inner border border-white/10"><i :class="(srv.name.includes('Linux') || srv.name.includes('PBL') || srv.type === 'linux') ? 'fa-brands fa-linux' : 'fa-brands fa-windows'"></i></div><div><h4 class="text-lg font-black leading-tight tracking-tight drop-shadow-md" x-text="srv.name"></h4><p class="text-[10px] font-bold opacity-90 uppercase mt-1 tracking-wider bg-black/10 inline-block px-2 py-0.5 rounded-md backdrop-blur-sm"><span x-text="srv.maintenance ? 'MAINTENANCE' : (srv.status ? 'ONLINE' : 'OFFLINE')"></span></p></div></div></div></template></div></div>
+                
+                <!-- Infra -->
+                <div id="card-infra" class="space-y-3 scroll-mt-24"><h3 class="text-xs font-black text-slate-400 uppercase tracking-widest ml-1"><i class="fa-solid fa-fan"></i> Infra</h3><div class="grid grid-cols-1 gap-3"><template x-for="(ac, index) in checklist.infra.acs" :key="index"><div @click="toggleAC(index)" class="glass-card p-4 rounded-3xl cursor-pointer border-2 flex items-center gap-4 clickable" :class="ac.status ? 'border-cyan-400 bg-cyan-50' : 'border-transparent'"><div class="w-12 h-12 rounded-full flex items-center justify-center text-xl shadow-md" :class="ac.status ? 'bg-cyan-500 text-white' : 'bg-slate-100 text-slate-300'"><i class="fa-solid fa-snowflake" :class="ac.status ? 'animate-spin-slow' : ''"></i></div><div class="flex-1"><h4 class="text-sm font-black text-slate-700" x-text="ac.name"></h4><span class="text-[10px] font-bold uppercase text-cyan-600" x-text="ac.status ? 'ON' : 'OFF'"></span></div><div class="w-12 h-6 rounded-full relative transition-colors duration-300" :class="ac.status ? 'bg-cyan-500' : 'bg-slate-200'"><div class="w-4 h-4 bg-white rounded-full absolute top-1 transition-all duration-300 shadow-sm" :class="ac.status ? 'left-7' : 'left-1'"></div></div></div></template><div class="glass-card p-5 rounded-3xl border-l-[6px] border-l-rose-500"><div class="flex justify-between items-center mb-3"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-lg"><i class="fa-solid fa-fire-extinguisher"></i></div><div><h4 class="text-sm font-black text-slate-700">Fire Safety</h4><p class="text-[10px] text-slate-400 font-bold">Check 1 Random Cylinder</p></div></div><div @click="toggleInfra('fire')" class="w-12 h-6 rounded-full relative transition-colors cursor-pointer clickable" :class="checklist.infra.fire.status ? 'bg-emerald-500' : 'bg-slate-200'"><div class="w-4 h-4 bg-white rounded-full absolute top-1 transition-all shadow-sm" :class="checklist.infra.fire.status ? 'left-7' : 'left-1'"></div></div></div><div x-show="checklist.infra.fire.status" class="mt-3 pt-3 border-t border-rose-100"><div @click="modals.fireList.show = true; haptic()" class="w-full mt-1 bg-white border border-rose-200 text-slate-700 text-xs font-bold rounded-xl p-3 flex justify-between items-center shadow-sm active:scale-95 transition-transform cursor-pointer"><span x-text="checklist.infra.fire.location || 'Select Cylinder Location...'" :class="!checklist.infra.fire.location ? 'text-slate-400' : 'text-slate-800'"></span><i class="fa-solid fa-chevron-down text-rose-400"></i></div></div></div></div></div>
 
-                    <!-- Remarks Log -->
-                    <div id="card-remarks" class="glass-card p-5 rounded-3xl border-l-[6px] mt-6 mb-6 scroll-mt-24" :class="isLateEntry ? 'border-l-rose-500' : 'border-l-blue-500'"><label class="text-xs font-black uppercase tracking-widest mb-3 flex justify-between items-center" :class="isLateEntry ? 'text-rose-600' : 'text-slate-500'"><span><i class="fa-solid fa-pen-nib mr-1"></i> Logs</span><span x-show="isLateEntry" class="text-[9px] bg-rose-500 text-white px-2 py-0.5 rounded animate-pulse">REQUIRED</span></label><textarea x-model="remarks" @input="saveLocal()" class="w-full bg-slate-100 border-0 rounded-xl p-3 text-sm font-medium focus:ring-2 focus:bg-white placeholder-slate-400" rows="3"></textarea></div>
-                </div>
+                <!-- Logs -->
+                <div id="card-remarks" class="glass-card p-5 rounded-3xl border-l-[6px] mt-6 mb-6 scroll-mt-24" :class="isLateEntry ? 'border-l-rose-500' : 'border-l-blue-500'"><label class="text-xs font-black uppercase tracking-widest mb-3 flex justify-between items-center" :class="isLateEntry ? 'text-rose-600' : 'text-slate-500'"><span><i class="fa-solid fa-pen-nib mr-1"></i> Logs</span><span x-show="isLateEntry" class="text-[9px] bg-rose-500 text-white px-2 py-0.5 rounded animate-pulse">REQUIRED</span></label><textarea x-model="remarks" @input="saveLocal()" class="w-full bg-slate-100 border-0 rounded-xl p-3 text-sm font-medium focus:ring-2 focus:bg-white placeholder-slate-400" rows="3"></textarea></div>
             </div>
         </main>
         
-        <!-- Bottom Floating Submit Button (Mobile Only) -->
         <div class="fixed bottom-0 left-0 w-full bg-white/80 backdrop-blur-xl p-5 border-t border-slate-200 z-50">
-		<button @click="confirmAction('submit')" 
-				class="btn-fly w-full py-4 rounded-2xl font-bold text-sm shadow-xl text-white justify-center" 
-				:class="getSubmitButtonClass()" 
-				:disabled="isSubmitting || (isLateEntry && remarks.length < 5)">
-			
-			<div class="svg-wrapper-1">
-				<div class="svg-wrapper">
-					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-						<path fill="none" d="M0 0h24v24H0z"></path>
-						<path fill="currentColor" d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"></path>
-					</svg>
-				</div>
-			</div>
-			<span x-text="isLateEntry ? 'SUBMIT LATE ENTRY' : 'SEND REPORT'"></span>
-		</button>
-	</div>
+            <button @click="confirmAction('submit')" class="btn-fly w-full py-4 rounded-2xl font-bold text-sm shadow-xl text-white justify-center" :class="getSubmitButtonClass()" :disabled="isSubmitting || (isLateEntry && remarks.length < 5)"><div class="svg-wrapper-1"><div class="svg-wrapper"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"></path><path fill="currentColor" d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"></path></svg></div></div><span x-text="isLateEntry ? 'SUBMIT LATE ENTRY' : 'SEND REPORT'"></span></button>
+        </div>
     </div>
 
     <!-- =========================================================
-         🖥️ DESKTOP LAYOUT (Preserved as per request)
+         🖥️ DESKTOP LAYOUT (Auto-Adapts via Template Logic)
     ========================================================== -->
     <div class="hidden md:flex h-screen bg-slate-50 text-slate-800 overflow-hidden">
-        
         <!-- SIDEBAR -->
         <aside class="w-80 bg-white border-r border-slate-200 flex flex-col shadow-2xl z-20 relative overflow-hidden">
             <div class="p-6 pb-2">
                 <div class="flex items-center gap-4 mb-8">
-                    <div class="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center shadow-inner border border-slate-100">
-                        <img src="pbl-logo.png" alt="Logo" class="w-8 h-8 object-contain">
-                    </div>
-                    <div>
-                        <h1 class="text-xl font-black leading-none tracking-tight text-slate-800">Checklist<span class="text-blue-600">Ops</span></h1>
-                        <p class="text-[10px] font-bold text-slate-400 tracking-[0.2em] mt-1.5 uppercase">IT Operations</p>
-                    </div>
+                    <div class="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center shadow-inner border border-slate-100"><img src="pbl-logo.png" alt="Logo" class="w-8 h-8 object-contain"></div>
+                    <div><h1 class="text-xl font-black leading-none tracking-tight text-slate-800">Checklist<span class="text-blue-600">Ops</span></h1><p class="text-[10px] font-bold text-slate-400 tracking-[0.2em] mt-1.5 uppercase">IT Operations</p></div>
                 </div>
-
                 <div class="space-y-2 mb-8">
                     <p class="px-2 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Select Shift</p>
-                    <template x-for="(conf, key) in shiftConfig" :key="key">
-                        <button @click="requestShiftChange(key)" 
-                                class="w-full text-left px-4 py-3 rounded-2xl flex items-center justify-between transition-all group border border-transparent"
-                                :class="currentShift === key ? 'bg-slate-800 text-white shadow-lg' : 'hover:bg-slate-50 text-slate-500 border-slate-100'">
-                            <div>
-                                <span class="text-xs font-black block uppercase tracking-wide" x-text="conf.name"></span>
-                                <span class="text-[10px] opacity-70 font-bold" x-text="conf.timeDisplay"></span>
+                    <template x-for="(conf, key) in shiftConfig" :key="key"><button @click="requestShiftChange(key)" class="w-full text-left px-4 py-3 rounded-2xl flex items-center justify-between transition-all group border border-transparent" :class="currentShift === key ? 'bg-slate-800 text-white shadow-lg' : 'hover:bg-slate-50 text-slate-500 border-slate-100'"><div><span class="text-xs font-black block uppercase tracking-wide" x-text="conf.name"></span><span class="text-[10px] opacity-70 font-bold" x-text="conf.timeDisplay"></span></div><div x-show="currentShift === key" class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></div></button></template>
+                </div>
+                <div class="p-5 rounded-2xl shadow-lg mb-4 relative overflow-hidden group transition-all" :class="{'bg-gradient-morning': currentShift === 'morning', 'bg-gradient-general': currentShift === 'general', 'bg-gradient-evening': currentShift === 'evening'}"><div class="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition"></div><div class="relative z-10 flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-white/20 border-2 border-white/30 flex items-center justify-center text-white text-xl shadow-inner backdrop-blur-sm"><i class="fa-solid fa-user-shield"></i></div><div><p class="text-[10px] font-bold text-white/70 uppercase tracking-wider">Person On Duty</p><p class="text-lg font-black text-white leading-tight" x-text="shiftConfig[currentShift].auditor">...</p></div></div></div>
+            </div>
+            <div class="mt-auto p-6 border-t border-slate-100 bg-slate-50/50">
+                <button @click="confirmAction('submit')" class="btn-fly w-full py-4 rounded-2xl font-bold text-sm shadow-xl text-white justify-center transform hover:-translate-y-1 transition-all" :class="getSubmitButtonClass()" :disabled="isSubmitting || (isLateEntry && remarks.length < 5)"><div class="svg-wrapper-1"><div class="svg-wrapper"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="none" d="M0 0h24v24H0z"></path><path fill="currentColor" d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"></path></svg></div></div><span x-text="isLateEntry ? 'SUBMIT LATE' : 'SEND REPORT'"></span></button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 flex flex-col h-full relative bg-slate-50 overflow-hidden font-sans">
+            <header class="h-16 bg-white/80 backdrop-blur-xl border-b border-slate-200 px-6 flex items-center justify-between shrink-0 z-20">
+                <div class="flex items-center gap-3"><div class="p-2 bg-blue-50 rounded-lg text-blue-600"><i class="fa-solid fa-layer-group"></i></div><div><h2 class="text-lg font-black text-slate-800 leading-tight" x-text="shiftConfig[currentShift].branch + ' Dashboard'"></h2><div class="flex items-center gap-2"><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider" x-text="todayDate"></span><span class="w-1 h-1 rounded-full bg-slate-300"></span><span class="text-[10px] font-bold text-blue-500 uppercase tracking-wider" x-text="shiftConfig[currentShift].auditor"></span></div></div></div>
+                <div class="flex items-center gap-4"><div class="px-3 py-1.5 rounded-lg border flex items-center gap-2 transition-all" :class="isLateEntry ? 'bg-rose-50 border-rose-100' : 'bg-emerald-50 border-emerald-100'"><div class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" :class="isLateEntry ? 'bg-rose-500' : 'bg-emerald-500'"></span><span class="relative inline-flex rounded-full h-2 w-2" :class="isLateEntry ? 'bg-rose-500' : 'bg-emerald-500'"></span></div><span class="text-[10px] font-black uppercase tracking-wide" :class="isLateEntry ? 'text-rose-600' : 'text-emerald-600'" x-text="isLateEntry ? 'LATE ENTRY' : 'OPERATIONAL'"></span></div><div class="text-right"><p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Shift Ends In</p><p class="text-sm font-black font-mono text-slate-700 tabular-nums" x-text="timeLeft">--:--</p></div></div>
+            </header>
+
+            <div class="flex-1 p-4 grid grid-rows-[auto_1fr] gap-4 overflow-hidden relative z-10">
+                <div class="grid grid-cols-12 gap-4 h-fit">
+                    <div class="col-span-12 lg:col-span-3 bg-white rounded-3xl p-5 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.1)] border border-slate-100 flex flex-col justify-between relative group overflow-hidden">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity transform rotate-12"><i class="fa-solid fa-chart-pie text-6xl text-blue-600"></i></div>
+                        <div><p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Efficiency Score</p><div class="flex items-baseline"><h2 class="text-6xl font-black text-slate-800 tracking-tight leading-none" x-text="score">0</h2><span class="text-2xl font-bold text-slate-400 ml-1">%</span></div></div>
+                        <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden mt-2"><div class="h-full rounded-full transition-all duration-1000 ease-out" :class="score == 100 ? 'bg-emerald-500' : 'bg-blue-600'" :style="`width: ${score}%`"></div></div>
+                        <div class="mt-3 space-y-1"><template x-for="(item, i) in scanForIssues().slice(0, 2)" :key="i"><div class="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 truncate"><i class="fa-solid fa-circle-exclamation text-amber-500 text-[8px]"></i><span x-text="item.msg" class="truncate"></span></div></template><div x-show="scanForIssues().length > 2" class="text-[9px] font-bold text-blue-500">+ <span x-text="scanForIssues().length - 2"></span> more issues</div></div>
+                    </div>
+
+                    <!-- Shift Specific Tasks Area -->
+					<div class="col-span-12 lg:col-span-9 bg-slate-50/50 rounded-3xl border border-slate-200/60 p-1 flex flex-col justify-center">
+						
+						<!-- 🌞 NOIDA MORNING (Restored Perfect Design) -->
+						<template x-if="currentShift === 'morning'">
+							<div class="grid grid-cols-4 gap-3 h-full p-2">
+								<!-- 1. Modern Temp Card -->
+								<div class="relative overflow-hidden bg-white rounded-[1.5rem] p-4 border border-slate-100 shadow-sm group hover:shadow-md transition-all">
+									<div class="absolute -right-6 -top-6 w-24 h-24 rounded-full blur-2xl opacity-20 transition-colors duration-500" :class="checklist.morning.temp > 24 ? 'bg-rose-500' : 'bg-blue-500'"></div>
+									<div class="relative z-10 flex flex-col h-full justify-between">
+										<div class="flex justify-between items-start">
+											<div class="w-10 h-10 rounded-2xl flex items-center justify-center text-lg shadow-sm transition-colors duration-300" :class="checklist.morning.temp > 24 ? 'bg-rose-50 text-rose-500' : 'bg-blue-50 text-blue-500'"><i class="fa-solid fa-temperature-half"></i></div>
+											<div class="text-right"><span class="text-3xl font-black tracking-tighter text-slate-800" x-text="checklist.morning.temp ? checklist.morning.temp : '--'"></span><span class="text-lg text-slate-400 font-bold align-top">°C</span></div>
+										</div>
+										<div>
+											<div class="flex justify-between items-end mb-1"><p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Server Room</p><p class="text-[9px] font-bold" :class="checklist.morning.temp > 24 ? 'text-rose-500' : 'text-blue-500'" x-text="checklist.morning.temp > 24 ? 'HOT' : 'OPTIMAL'"></p></div>
+											<input type="range" min="16" max="28" step="0.5" x-model="checklist.morning.temp" @input="saveLocal()" class="w-full h-1.5 bg-slate-100 rounded-full appearance-none cursor-pointer accent-current" :class="checklist.morning.temp > 24 ? 'accent-rose-500' : 'accent-blue-500'">
+										</div>
+									</div>
+								</div>
+
+								<!-- 2. System Check -->
+								<div @click="toggleMorningTask('prodCheck')" class="relative overflow-hidden rounded-[1.5rem] p-4 border-2 cursor-pointer transition-all duration-300 group shadow-sm hover:shadow-md" :class="checklist.morning.prodCheck ? 'bg-emerald-500 border-emerald-500' : 'bg-white border-slate-100 hover:border-amber-200'">
+									<i class="fa-solid fa-power-off absolute -bottom-4 -right-4 text-6xl opacity-10 transition-transform duration-500 group-hover:rotate-12" :class="checklist.morning.prodCheck ? 'text-white' : 'text-slate-800'"></i>
+									<div class="relative z-10 flex flex-col h-full justify-between">
+										<div class="flex justify-between items-start">
+											<div class="w-10 h-10 rounded-2xl flex items-center justify-center text-lg shadow-sm transition-colors" :class="checklist.morning.prodCheck ? 'bg-white/20 text-white backdrop-blur-sm' : 'bg-amber-50 text-amber-500'"><i class="fa-solid" :class="checklist.morning.prodCheck ? 'fa-check' : 'fa-plug'"></i></div>
+											<div class="px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest border transition-colors" :class="checklist.morning.prodCheck ? 'bg-white/20 text-white border-white/20' : 'bg-slate-50 text-slate-400 border-slate-200'"><span x-text="checklist.morning.prodCheck ? 'VERIFIED' : 'PENDING'"></span></div>
+										</div>
+										<div>
+											<h4 class="text-sm font-black leading-tight mb-1" :class="checklist.morning.prodCheck ? 'text-white' : 'text-slate-700'"><span x-text="checklist.morning.prodCheck ? 'All Systems OFF' : 'System Check'"></span></h4>
+											<div @click.stop class="relative" x-show="!checklist.morning.prodCheck"><input type="text" x-model="checklist.morning.prodNotes" class="w-full bg-slate-50 border border-slate-200 rounded-lg py-1 px-2 text-[10px] font-bold text-slate-700 placeholder-slate-400 focus:ring-2 focus:ring-amber-400 outline-none transition-all" placeholder="Any PC ON? Type ID..."></div>
+											<p x-show="checklist.morning.prodCheck" class="text-[10px] font-medium text-emerald-100 truncate">Ready for production.</p>
+										</div>
+									</div>
+								</div>
+
+								<!-- 3. Backup Card -->
+								<div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col gap-2 hover:shadow-md transition-all group">
+									<div class="flex items-center gap-2"><div class="p-2 rounded-lg bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors"><i class="fa-solid fa-database"></i></div><p class="text-[10px] font-bold text-slate-400 uppercase">Backups</p></div>
+									<div class="flex gap-2"><button @click="toggleBackup('dc')" class="flex-1 py-1.5 rounded-lg text-[10px] font-black border transition-all" :class="checklist.morning.backupDC ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-200' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'">DC</button><button @click="toggleBackup('adc')" class="flex-1 py-1.5 rounded-lg text-[10px] font-black border transition-all" :class="checklist.morning.backupADC ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-200' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'">ADC</button></div>
+									<div x-show="checklist.morning.backupDC || checklist.morning.backupADC" x-transition.opacity.duration.300ms><div class="relative"><i class="fa-regular fa-clock absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px] text-indigo-400"></i><input type="text" x-model="checklist.morning.backupTime" @input="saveLocal()" placeholder="Time (e.g. 2:00 AM)" class="w-full bg-indigo-50/50 border border-indigo-100 rounded-lg py-1.5 pl-7 pr-2 text-[10px] font-bold text-indigo-700 placeholder-indigo-300 outline-none focus:ring-1 focus:ring-indigo-400 transition-all"></div></div>
+									<div x-show="!checklist.morning.backupDC && !checklist.morning.backupADC" class="text-[9px] font-bold text-slate-300 text-center py-1.5 bg-slate-50 rounded-lg border border-transparent border-dashed">Verify Status</div>
+								</div>
+
+								<!-- 4. Action Tiles -->
+								<div class="flex flex-col gap-2 h-full justify-between">
+									<div @click="toggleMorningTask('authIssue')" class="flex items-center p-2 rounded-xl border cursor-pointer transition-all duration-300 group shadow-sm active:scale-95 h-[48px]" :class="checklist.morning.authIssue ? 'bg-blue-50 border-blue-500' : 'bg-white border-slate-100 hover:border-blue-200'"><div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-colors duration-300" :class="checklist.morning.authIssue ? 'bg-blue-500 text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500'"><i class="fa-solid fa-key"></i></div><div class="ml-3 flex-1 min-w-0"><h4 class="text-[10px] font-black text-slate-700 uppercase tracking-wide truncate">Issue Tokens</h4><p class="text-[8px] font-bold text-slate-400 truncate">10 Units Handover</p></div><div class="w-5 h-5 rounded-full border flex items-center justify-center transition-all duration-300 mr-1" :class="checklist.morning.authIssue ? 'bg-blue-500 border-blue-500' : 'border-slate-200'"><i class="fa-solid fa-check text-[8px] text-white" x-show="checklist.morning.authIssue"></i></div></div>
+									<div @click="toggleMorningTask('ftpJobCheck')" class="flex items-center p-2 rounded-xl border cursor-pointer transition-all duration-300 group shadow-sm active:scale-95 h-[48px]" :class="checklist.morning.ftpJobCheck ? 'bg-violet-50 border-violet-500' : 'bg-white border-slate-100 hover:border-violet-200'"><div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-colors duration-300" :class="checklist.morning.ftpJobCheck ? 'bg-violet-500 text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-violet-50 group-hover:text-violet-500'"><i class="fa-solid fa-folder-open"></i></div><div class="ml-3 flex-1 min-w-0"><h4 class="text-[10px] font-black text-slate-700 uppercase tracking-wide truncate">FTP Check</h4><p class="text-[8px] font-bold text-slate-400 truncate">Check Client Jobs</p></div><div class="w-5 h-5 rounded-full border flex items-center justify-center transition-all duration-300 mr-1" :class="checklist.morning.ftpJobCheck ? 'bg-violet-500 border-violet-500' : 'border-slate-200'"><i class="fa-solid fa-check text-[8px] text-white" x-show="checklist.morning.ftpJobCheck"></i></div></div>
+									<div @click="toggleMorningTask('wifi')" class="flex items-center p-2 rounded-xl border cursor-pointer transition-all duration-300 group shadow-sm active:scale-95 h-[48px]" :class="checklist.morning.wifi ? 'bg-cyan-50 border-cyan-500' : 'bg-white border-slate-100 hover:border-cyan-200'"><div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-colors duration-300" :class="checklist.morning.wifi ? 'bg-cyan-500 text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-cyan-50 group-hover:text-cyan-500'"><i class="fa-solid fa-wifi"></i></div><div class="ml-3 flex-1 min-w-0"><h4 class="text-[10px] font-black text-slate-700 uppercase tracking-wide truncate">Admin WiFi</h4><p class="text-[8px] font-bold text-slate-400 truncate">Connectivity Test</p></div><div class="w-5 h-5 rounded-full border flex items-center justify-center transition-all duration-300 mr-1" :class="checklist.morning.wifi ? 'bg-cyan-500 border-cyan-500' : 'border-slate-200'"><i class="fa-solid fa-check text-[8px] text-white" x-show="checklist.morning.wifi"></i></div></div>
+								</div>
+							</div>
+						</template>
+
+						<!-- 🌲 DEHRADUN GENERAL (Deependra's Panel - Keep As Is) -->
+						<template x-if="currentShift === 'general'">
+							<div class="grid grid-cols-4 gap-3 h-full p-2">
+								<div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex flex-col justify-between"><div class="flex justify-between items-start"><div class="p-2 rounded-lg bg-teal-50 text-teal-600"><i class="fa-solid fa-temperature-half"></i></div><span class="text-xl font-black text-slate-700" x-text="checklist.general.temp ? checklist.general.temp + '°' : '--'"></span></div><div><div class="flex justify-between mb-1"><p class="text-[9px] font-bold text-slate-400 uppercase">Server Room</p><p class="text-[9px] font-bold text-teal-500" x-show="checklist.general.temp > 28">AC ON REQ</p></div><input type="range" min="16" max="32" step="0.5" x-model="checklist.general.temp" @input="saveLocal()" class="w-full h-1.5 bg-slate-100 rounded-full accent-teal-600 cursor-pointer"></div></div>
+								<!-- Guard Audit (Modern Full Card) -->
+								<div @click="toggleGeneralTask('guardAudit')" 
+									 class="relative overflow-hidden rounded-2xl border-2 cursor-pointer transition-all duration-300 group shadow-sm hover:shadow-md flex flex-col justify-between p-4 h-full"
+									 :class="checklist.general.guardAudit ? 'bg-teal-500 border-teal-500 text-white' : 'bg-white border-slate-100 hover:border-teal-200'">
+									
+									<!-- Background Watermark (Fills Empty Space) -->
+									<div class="absolute -bottom-4 -right-4 text-7xl opacity-10 transform rotate-12 transition-transform duration-500 group-hover:scale-110"
+										 :class="checklist.general.guardAudit ? 'text-white' : 'text-teal-600'">
+										<i class="fa-solid fa-user-secret"></i>
+									</div>
+
+									<!-- Top Row: Icon & Status -->
+									<div class="relative z-10 flex justify-between items-start">
+										<div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg shadow-sm transition-colors"
+											 :class="checklist.general.guardAudit ? 'bg-white/20 text-white backdrop-blur-sm' : 'bg-teal-50 text-teal-600'">
+											<i class="fa-solid fa-user-secret"></i>
+										</div>
+										<div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all"
+											 :class="checklist.general.guardAudit ? 'border-white bg-white text-teal-500' : 'border-slate-200 text-transparent'">
+											<i class="fa-solid fa-check text-[10px]" x-show="checklist.general.guardAudit"></i>
+										</div>
+									</div>
+
+									<!-- Bottom Row: Text Info -->
+									<div class="relative z-10 mt-2">
+										<p class="text-[9px] font-bold uppercase tracking-wider mb-0.5 opacity-80" 
+										   :class="checklist.general.guardAudit ? 'text-teal-100' : 'text-slate-400'">
+											Security Check
+										</p>
+										<h4 class="text-sm font-black leading-tight" 
+											:class="checklist.general.guardAudit ? 'text-white' : 'text-slate-700'">
+											Guard Register Audit
+										</h4>
+										<p class="text-[9px] font-bold mt-1 truncate" 
+										   :class="checklist.general.guardAudit ? 'text-teal-50' : 'text-teal-600'">
+											Verify CCTV vs Entry
+										</p>
+									</div>
+								</div>
+
+								<!-- Manual Backup (Modern Full Card) -->
+								<div @click="toggleGeneralTask('manualBackup')" 
+									 class="relative overflow-hidden rounded-2xl border-2 cursor-pointer transition-all duration-300 group shadow-sm hover:shadow-md flex flex-col justify-between p-4 h-full"
+									 :class="checklist.general.manualBackup ? 'bg-teal-500 border-teal-500 text-white' : 'bg-white border-slate-100 hover:border-teal-200'">
+									
+									<!-- Background Watermark -->
+									<div class="absolute -bottom-4 -right-4 text-7xl opacity-10 transform rotate-12 transition-transform duration-500 group-hover:scale-110"
+										 :class="checklist.general.manualBackup ? 'text-white' : 'text-teal-600'">
+										<i class="fa-solid fa-floppy-disk"></i>
+									</div>
+
+									<!-- Top Row -->
+									<div class="relative z-10 flex justify-between items-start">
+										<div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg shadow-sm transition-colors"
+											 :class="checklist.general.manualBackup ? 'bg-white/20 text-white backdrop-blur-sm' : 'bg-teal-50 text-teal-600'">
+											<i class="fa-solid fa-database"></i>
+										</div>
+										<div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all"
+											 :class="checklist.general.manualBackup ? 'border-white bg-white text-teal-500' : 'border-slate-200 text-transparent'">
+											<i class="fa-solid fa-check text-[10px]" x-show="checklist.general.manualBackup"></i>
+										</div>
+									</div>
+
+									<!-- Bottom Row -->
+									<div class="relative z-10 mt-2">
+										<p class="text-[9px] font-bold uppercase tracking-wider mb-0.5 opacity-80" 
+										   :class="checklist.general.manualBackup ? 'text-teal-100' : 'text-slate-400'">
+											Critical Task
+										</p>
+										<h4 class="text-sm font-black leading-tight" 
+											:class="checklist.general.manualBackup ? 'text-white' : 'text-slate-700'">
+											Manual Backup
+										</h4>
+										<p class="text-[9px] font-bold mt-1 truncate" 
+										   :class="checklist.general.manualBackup ? 'text-teal-50' : 'text-teal-600'">
+											Check DC/ADC + 3 Days
+										</p>
+									</div>
+								</div>
+								<!-- FTP Server Start (Modern Full Card) -->
+								<div @click="toggleGeneralTask('ftpStart')" 
+									 class="relative overflow-hidden rounded-2xl border-2 cursor-pointer transition-all duration-300 group shadow-sm hover:shadow-md flex flex-col justify-between p-4 h-full"
+									 :class="checklist.general.ftpStart ? 'bg-teal-500 border-teal-500 text-white' : 'bg-white border-slate-100 hover:border-teal-200'">
+									
+									<!-- Background Watermark (Visual Depth) -->
+									<div class="absolute -bottom-4 -right-4 text-7xl opacity-10 transform rotate-12 transition-transform duration-500 group-hover:scale-110"
+										 :class="checklist.general.ftpStart ? 'text-white' : 'text-teal-600'">
+										<i class="fa-solid fa-network-wired"></i>
+									</div>
+
+									<!-- Top Row: Icon & Status -->
+									<div class="relative z-10 flex justify-between items-start">
+										<div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg shadow-sm transition-colors"
+											 :class="checklist.general.ftpStart ? 'bg-white/20 text-white backdrop-blur-sm' : 'bg-teal-50 text-teal-600'">
+											<i class="fa-solid fa-server"></i>
+										</div>
+										<!-- Status Indicator Ring -->
+										<div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all"
+											 :class="checklist.general.ftpStart ? 'border-white bg-white text-teal-500' : 'border-slate-200 text-transparent'">
+											<i class="fa-solid fa-power-off text-[10px]" x-show="checklist.general.ftpStart"></i>
+										</div>
+									</div>
+
+									<!-- Bottom Row: Dynamic Text Info -->
+									<div class="relative z-10 mt-2">
+										<p class="text-[9px] font-bold uppercase tracking-wider mb-0.5 opacity-80" 
+										   :class="checklist.general.ftpStart ? 'text-teal-100' : 'text-slate-400'">
+											<span x-text="checklist.general.ftpStart ? 'Server Online' : 'Server Offline'"></span>
+										</p>
+										<h4 class="text-sm font-black leading-tight" 
+											:class="checklist.general.ftpStart ? 'text-white' : 'text-slate-700'">
+											Start FTP Svr
+										</h4>
+										<p class="text-[9px] font-bold mt-1 truncate" 
+										   :class="checklist.general.ftpStart ? 'text-teal-50' : 'text-teal-600'">
+											<span x-text="checklist.general.ftpStart ? 'PBLDD027 Running' : 'Power ON PBLDD027'"></span>
+										</p>
+									</div>
+								</div>
+							</div>
+						</template>
+
+						<!-- 🌙 NOIDA EVENING (Restored Perfect Design) -->
+						<template x-if="currentShift === 'evening'">
+							<div class="grid grid-cols-4 gap-3 h-full p-2">
+								<!-- 1. Temp -->
+								<div class="col-span-1 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all group">
+									<div class="flex justify-between items-start"><div class="p-2 rounded-lg bg-violet-50 text-violet-600 group-hover:bg-violet-600 group-hover:text-white transition-colors"><i class="fa-solid fa-temperature-half"></i></div><span class="text-xl font-black text-slate-700" x-text="checklist.evening.temp ? checklist.evening.temp + '°' : '--'"></span></div>
+									<div><p class="text-[10px] font-bold text-slate-400 uppercase">Server Temp</p><input type="range" min="16" max="28" step="0.5" x-model="checklist.evening.temp" @input="saveLocal()" class="w-full h-1.5 bg-slate-100 rounded-full mt-1 cursor-pointer accent-violet-600"></div>
+								</div>
+
+								<!-- 2. Tokens -->
+								<div @click="toggleEveningTask('authCollect')" class="col-span-1 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between cursor-pointer hover:shadow-md transition-all group" :class="checklist.evening.authCollect ? 'ring-2 ring-emerald-500 border-transparent' : ''">
+									<div class="flex justify-between items-start"><div class="p-2 rounded-lg bg-slate-100 text-slate-500 group-hover:bg-violet-600 group-hover:text-white transition-colors"><i class="fa-solid fa-vault"></i></div><div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all" :class="checklist.evening.authCollect ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-200'"><i class="fa-solid fa-check text-[10px]"></i></div></div>
+									<div><p class="text-[10px] font-bold text-slate-400 uppercase">Tokens</p><p class="text-xs font-black text-slate-700 leading-tight">Return to Safe</p></div>
+								</div>
+
+								<!-- 3. PBL020 -->
+								<div class="col-span-2 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all group relative overflow-hidden">
+									<div class="absolute top-0 right-0 w-20 h-20 bg-amber-50 rounded-full blur-2xl -mr-10 -mt-10 transition-colors" :class="checklist.evening.pbl020Running ? 'bg-amber-100' : ''"></div>
+									<div class="relative z-10 flex justify-between items-start">
+										<div class="flex items-center gap-3"><div class="p-2 rounded-lg bg-amber-50 text-amber-600 group-hover:bg-amber-500 group-hover:text-white transition-colors"><i class="fa-solid fa-download"></i></div><div><h4 class="text-sm font-black text-slate-700">pblnet020</h4><p class="text-[10px] font-bold text-slate-400">Download Status</p></div></div>
+										<div @click="togglePblRun()" class="w-10 h-6 bg-slate-200 rounded-full relative cursor-pointer transition-colors" :class="checklist.evening.pbl020Running ? 'bg-amber-500' : 'bg-slate-200'"><div class="w-4 h-4 bg-white rounded-full absolute top-1 transition-all shadow-sm" :class="checklist.evening.pbl020Running ? 'left-5' : 'left-1'"></div></div>
+									</div>
+									<div class="relative z-10 mt-2">
+										<div x-show="checklist.evening.pbl020Running"><input type="text" x-model="checklist.evening.pblReason" @input="saveLocal()" placeholder="Enter Job Name..." class="w-full bg-amber-50/50 border border-amber-200 text-xs rounded-xl p-2.5 font-bold outline-none focus:ring-2 focus:ring-amber-400 text-amber-800 placeholder-amber-400 transition-all"></div>
+										<div x-show="!checklist.evening.pbl020Running" class="flex items-center gap-2 text-rose-500 bg-rose-50 px-3 py-2 rounded-xl border border-rose-100"><i class="fa-solid fa-power-off text-xs"></i><span class="text-[10px] font-black uppercase">System should be OFF</span></div>
+									</div>
+								</div>
+
+								<!-- 4. FTP Report -->
+								<div @click="toggleEveningTask('ftpReport')" class="col-span-2 col-start-1 bg-white rounded-2xl p-3 shadow-sm border border-slate-100 cursor-pointer hover:shadow-md transition-all flex items-center justify-between group h-fit self-center" :class="checklist.evening.ftpReport ? 'ring-1 ring-emerald-500 bg-emerald-50/10' : ''">
+									<div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-violet-600 group-hover:text-white transition-colors"><i class="fa-solid fa-paper-plane"></i></div><div><h4 class="text-sm font-black text-slate-700">FTP Report</h4><p class="text-[10px] font-bold text-slate-400">Email Status</p></div></div>
+									<div class="flex items-center gap-2 px-2"><div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all" :class="checklist.evening.ftpReport ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-200'"><i class="fa-solid fa-check text-[10px]"></i></div></div>
+								</div>
+							</div>
+						</template>
+
+					</div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-4 h-full min-h-0">
+                    <div class="col-span-12 lg:col-span-5 bg-white rounded-3xl p-5 shadow-sm border border-slate-100 flex flex-col h-full">
+					<h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-3 shrink-0">Core Infrastructure</h3>
+					<div class="flex-1 flex flex-col gap-3 min-h-0">
+						
+						<!-- Dynamic Servers Grid (No Scroll, Compact) -->
+						<div class="grid grid-cols-2 gap-2 shrink-0">
+							<template x-for="(srv, index) in checklist.servers" :key="index">
+								<div @click="toggleServer(index)" class="relative p-2 h-16 rounded-xl border-2 cursor-pointer overflow-hidden group clickable transition-all duration-300 shadow-sm hover:shadow-md hover:scale-[1.02]" :class="getServerClass(srv)">
+									<div class="absolute -bottom-4 -right-4 text-5xl text-black opacity-10 transform rotate-12 pointer-events-none transition-transform duration-500 group-hover:rotate-0"><i :class="srv.type === 'linux' ? 'fa-brands fa-linux' : 'fa-brands fa-windows'"></i></div>
+									<div @click.stop="toggleMaintenance(index)" class="absolute top-1 right-1 z-20 w-5 h-5 flex items-center justify-center rounded-full shadow-sm cursor-pointer transition-all hover:scale-110 active:scale-90" :class="srv.maintenance ? 'bg-amber-500 text-white ring-2 ring-white' : 'bg-white/20 hover:bg-white/40 text-white backdrop-blur-md border border-white/20'"><i class="fa-solid fa-wrench text-[8px]" :class="srv.maintenance ? 'animate-pulse' : ''"></i></div>
+									<div class="relative z-10 h-full flex flex-col justify-center px-1">
+										<div class="flex items-center gap-1.5 mb-0.5"><i :class="srv.type === 'linux' ? 'fa-brands fa-linux' : 'fa-brands fa-windows'" class="text-base opacity-90 drop-shadow-sm"></i><h4 class="text-sm font-black leading-none tracking-tight drop-shadow-sm truncate" x-text="srv.name"></h4></div>
+										<div><span class="text-[8px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-md backdrop-blur-md border border-white/20 shadow-sm transition-colors" :class="srv.status ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500 border-slate-200'" x-text="srv.maintenance ? 'MAINTENANCE' : (srv.status ? 'ONLINE' : 'OFFLINE')"></span></div>
+									</div>
+								</div>
+							</template>
+						</div>
+
+						<!-- Services List (Dynamic Shift Colors) -->
+						<div class="flex-1 flex flex-col gap-3 overflow-y-auto no-scrollbar py-1">
+							<template x-for="(svc, index) in checklist.services" :key="index">
+								<div @click="toggleService(index)" 
+									 class="flex-1 relative rounded-2xl border-2 cursor-pointer transition-all duration-300 ease-out group overflow-hidden flex items-center px-4"
+									 :class="svc.status ? 
+										(currentShift === 'morning' ? 'bg-white border-blue-500 shadow-lg shadow-blue-500/20 scale-[1.02]' : 
+										(currentShift === 'evening' ? 'bg-white border-violet-500 shadow-lg shadow-violet-500/20 scale-[1.02]' : 
+										'bg-white border-teal-500 shadow-lg shadow-teal-500/20 scale-[1.02]')) 
+										: 
+										'bg-slate-50/50 border-transparent hover:bg-white ' + 
+										(currentShift === 'morning' ? 'hover:border-blue-200 hover:shadow-md hover:shadow-blue-100' : 
+										(currentShift === 'evening' ? 'hover:border-violet-200 hover:shadow-md hover:shadow-violet-100' : 
+										'hover:border-teal-200 hover:shadow-md hover:shadow-teal-100'))">
+									
+									<!-- Active Indicator Strip -->
+									<div class="absolute left-0 top-0 bottom-0 w-1.5 transition-all duration-500" 
+										 :class="svc.status ? 
+											(currentShift === 'morning' ? 'bg-gradient-to-b from-blue-400 to-blue-600' : 
+											(currentShift === 'evening' ? 'bg-gradient-to-b from-violet-400 to-violet-600' : 
+											'bg-gradient-to-b from-teal-400 to-teal-600')) 
+											: 'bg-transparent'"></div>
+
+									<!-- Icon with Shift Glow Effect -->
+									<div class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl transition-all duration-500 z-10 shrink-0" 
+										 :class="svc.status ? 
+											(currentShift === 'morning' ? 'bg-blue-50 text-blue-600 shadow-inner' : 
+											(currentShift === 'evening' ? 'bg-violet-50 text-violet-600 shadow-inner' : 
+											'bg-teal-50 text-teal-600 shadow-inner')) 
+											: 
+											'bg-white text-slate-300 shadow-sm border border-slate-100 group-hover:scale-110 ' + 
+											(currentShift === 'morning' ? 'group-hover:text-blue-500' : 
+											(currentShift === 'evening' ? 'group-hover:text-violet-500' : 
+											'group-hover:text-teal-500'))">
+										<i class="fa-solid" :class="svc.icon"></i>
+									</div>
+
+									<!-- Text Content -->
+									<div class="ml-5 flex-1 z-10 flex flex-col justify-center">
+										<h4 class="text-base font-black text-slate-700 leading-tight transition-colors group-hover:text-slate-900" 
+											x-text="svc.name"></h4>
+										<p class="text-[10px] font-bold mt-1 tracking-wide transition-colors" 
+										   :class="svc.status ? 
+												(currentShift === 'morning' ? 'text-blue-600' : 
+												(currentShift === 'evening' ? 'text-violet-600' : 
+												'text-teal-600')) 
+												: 'text-slate-400'" 
+										   x-text="svc.status ? 'System Operational' : svc.desc"></p>
+									</div>
+
+									<!-- Status Action Icon -->
+									<div class="w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300 z-10 shrink-0 ml-2" 
+										 :class="svc.status ? 
+											(currentShift === 'morning' ? 'border-blue-500 bg-blue-500 text-white rotate-0' : 
+											(currentShift === 'evening' ? 'border-violet-500 bg-violet-500 text-white rotate-0' : 
+											'border-teal-500 bg-teal-500 text-white rotate-0')) 
+											: 'border-slate-200 text-slate-300 -rotate-90 group-hover:rotate-0 group-hover:text-slate-400'">
+										<i class="fa-solid" :class="svc.status ? 'fa-check' : 'fa-arrow-right'"></i>
+									</div>
+								</div>
+							</template>
+						</div>
+					</div>
+				</div>
+
+                    <!-- Right Side Wrapper (Fixed Layout) -->
+<div class="col-span-12 lg:col-span-7 flex flex-col gap-4 h-full overflow-hidden">
+    
+    <!-- Top Row: Network & Facility -->
+    <div class="grid grid-cols-12 gap-4 h-[350px] shrink-0 min-h-0">
+        
+        <!-- Network & Security -->
+        <div class="col-span-7 bg-white rounded-3xl p-4 shadow-sm border border-slate-100 flex flex-col h-full overflow-hidden">
+            <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-3 shrink-0">Network & Security</h3>
+            
+            <!-- ISP List -->
+            <div class="flex-1 overflow-y-auto no-scrollbar pr-2 space-y-3 min-h-0">
+                <template x-for="(isp, index) in checklist.isp" :key="index">
+                    <div class="group">
+                        <div class="flex justify-between items-end mb-1.5">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full ring-1 ring-slate-200 shadow-sm transition-colors duration-300" :class="isLowSpeed(isp) ? 'bg-rose-500' : 'bg-emerald-500'"></div>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-600" x-text="isp.name"></span>
                             </div>
-                            <div x-show="currentShift === key" class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></div>
-                        </button>
+                            <div class="flex items-baseline gap-0.5">
+                                <span class="text-sm font-black font-mono leading-none transition-colors duration-300" :class="getSpeedText(isp.speed, isp.max)" x-text="isp.speed || 0"></span>
+                                <span class="text-[8px] font-bold text-slate-300">Mb</span>
+                            </div>
+                        </div>
+                        <div class="relative h-5 flex items-center select-none">
+                            <div class="absolute inset-x-0 h-1.5 bg-slate-100 rounded-full overflow-hidden border border-slate-50"></div>
+                            <div class="absolute left-0 h-1.5 rounded-full transition-all duration-300 ease-out" :class="isLowSpeed(isp) ? 'bg-rose-500' : 'bg-emerald-500'" :style="`width: ${(isp.speed / isp.max) * 100}%`"></div>
+                            <input type="range" min="0" :max="isp.max" step="0.5" x-model="isp.speed" @input="calculateScore(); saveLocal();" class="relative z-10 w-full h-5 bg-transparent appearance-none cursor-pointer focus:outline-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-[0_1px_3px_rgba(0,0,0,0.3)] [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-slate-200 [&::-webkit-slider-thumb]:-mt-0.5">
+                        </div>
+                        <div x-show="isLowSpeed(isp)" class="mt-1 origin-top transition-all duration-300" x-transition>
+                            <div class="flex items-center gap-2 bg-rose-50 rounded-lg p-1.5 border border-rose-100 shadow-inner">
+                                <div class="w-5 h-5 rounded-md bg-white flex items-center justify-center shrink-0 shadow-sm border border-rose-100 text-rose-500"><i class="fa-solid fa-ticket text-[9px]"></i></div>
+                                <input type="text" x-model="isp.complaint" placeholder="Ticket No..." class="w-full bg-transparent text-[9px] font-bold text-slate-700 placeholder-rose-300 border-none outline-none focus:ring-0 p-0 h-full">
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Security Buttons -->
+            <div class="grid grid-cols-2 gap-2 pt-2 mt-auto shrink-0 border-t border-slate-50">
+                <div @click="handleSophosCheck()" class="relative overflow-hidden p-2 rounded-xl border-2 cursor-pointer transition-all active:scale-95 group flex flex-col items-center justify-center gap-0.5" :class="checklist.endpoints.sophos ? 'bg-cyan-500 border-cyan-500 text-white shadow-md' : 'bg-slate-50 border-transparent hover:bg-white hover:border-cyan-200 hover:text-cyan-600 text-slate-400'">
+                    <i class="fa-solid fa-shield-virus text-base transition-transform group-hover:scale-110"></i><span class="text-[8px] font-black uppercase tracking-wide" x-text="currentShift === 'general' ? 'Seqrite' : 'Sophos'"></span><div class="absolute right-1.5 top-1.5 w-1.5 h-1.5 rounded-full bg-white opacity-50" x-show="checklist.endpoints.sophos"></div>
+                </div>
+                <div @click="handleUsbCheck()" class="relative overflow-hidden p-2 rounded-xl border-2 cursor-pointer transition-all active:scale-95 group flex flex-col items-center justify-center gap-0.5" :class="checklist.endpoints.usb ? 'bg-rose-500 border-rose-500 text-white shadow-md' : 'bg-slate-50 border-transparent hover:bg-white hover:border-rose-200 hover:text-rose-600 text-slate-400'">
+                    <i class="fa-brands fa-usb text-base transition-transform group-hover:scale-110"></i><span class="text-[8px] font-black uppercase tracking-wide">USB Check</span><div class="absolute right-1.5 top-1.5 w-1.5 h-1.5 rounded-full bg-white opacity-50" x-show="checklist.endpoints.usb"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Facility Status (Fixed & Compact) -->
+        <div class="col-span-5 bg-white rounded-3xl p-4 shadow-sm border border-slate-100 h-full flex flex-col overflow-hidden">
+            <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-3 shrink-0">Facility Status</h3>
+            
+            <div class="flex-1 flex flex-col justify-between min-h-0">
+                <!-- AC List -->
+                <div class="flex flex-col gap-2">
+                    <template x-for="(ac, index) in checklist.infra.acs" :key="index">
+                        <div @click="toggleAC(index)" class="flex items-center justify-between p-2 rounded-xl cursor-pointer border-2 transition-all group" :class="ac.status ? 'bg-cyan-50 border-cyan-200' : 'bg-slate-50 border-slate-100 hover:border-slate-200 hover:bg-slate-100'">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-colors shadow-sm" :class="ac.status ? 'bg-cyan-500 text-white' : 'bg-white text-slate-400 border border-slate-200'"><i class="fa-solid fa-snowflake" :class="{'animate-spin-slow': ac.status}"></i></div>
+                                <div><span class="text-[10px] font-black text-slate-700 block leading-tight" x-text="ac.name"></span><span class="text-[8px] font-bold uppercase tracking-wide transition-colors" :class="ac.status ? 'text-cyan-600' : 'text-slate-400'" x-text="ac.status ? 'RUNNING' : 'OFF'"></span></div>
+                            </div>
+                            <div class="w-8 h-5 rounded-full relative transition-colors duration-300 shadow-inner" :class="ac.status ? 'bg-cyan-500' : 'bg-slate-300'"><div class="w-3.5 h-3.5 bg-white rounded-full absolute top-0.5 shadow-md transition-all duration-300" :class="ac.status ? 'left-4' : 'left-0.5'"></div></div>
+                        </div>
                     </template>
                 </div>
-            
-                <div class="p-5 rounded-2xl shadow-lg mb-4 relative overflow-hidden group transition-all" 
-                     :class="{'bg-gradient-morning': currentShift === 'morning', 'bg-gradient-general': currentShift === 'general', 'bg-gradient-evening': currentShift === 'evening'}">
-                    <div class="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition"></div>
-                    <div class="relative z-10 flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-full bg-white/20 border-2 border-white/30 flex items-center justify-center text-white text-xl shadow-inner backdrop-blur-sm">
-                            <i class="fa-solid fa-user-shield"></i>
+
+                <!-- Fire Safety -->
+                <div class="p-2 rounded-xl border-2 transition-all mt-auto" :class="checklist.infra.fire.status ? 'bg-rose-50 border-rose-200' : 'bg-slate-50 border-slate-100 hover:border-slate-200'">
+                    <div class="flex items-center justify-between" @click="toggleInfra('fire')">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm shadow-sm transition-colors" :class="checklist.infra.fire.status ? 'bg-rose-500 text-white' : 'bg-white text-slate-400 border border-slate-200'"><i class="fa-solid fa-fire-extinguisher"></i></div>
+                            <div><span class="text-[10px] font-black text-slate-700 block leading-tight">Fire Safety</span><span class="text-[8px] font-bold text-slate-400">Random Check</span></div>
                         </div>
-                        <div>
-                            <p class="text-[10px] font-bold text-white/70 uppercase tracking-wider">Person On Duty</p>
-                            <p class="text-lg font-black text-white leading-tight" x-text="shiftConfig[currentShift].auditor">...</p>
-                        </div>
+                        <div class="w-8 h-5 rounded-full relative transition-colors duration-300 shadow-inner cursor-pointer" :class="checklist.infra.fire.status ? 'bg-rose-500' : 'bg-slate-300'"><div class="w-3.5 h-3.5 bg-white rounded-full absolute top-0.5 shadow-md transition-all duration-300" :class="checklist.infra.fire.status ? 'left-4' : 'left-0.5'"></div></div>
+                    </div>
+                    <!-- Conditional Input -->
+                    <div x-show="checklist.infra.fire.status" class="mt-2 pt-2 border-t border-rose-200/60" x-transition>
+                        <template x-if="currentShift === 'general'">
+                            <div class="flex items-center gap-2 bg-white border border-rose-200 rounded-lg px-2 py-1.5 shadow-sm"><i class="fa-solid fa-pen text-[10px] text-rose-400"></i><input type="text" x-model="checklist.infra.fire.location" placeholder="Type Location..." class="w-full bg-transparent text-[10px] font-bold text-slate-700 placeholder-rose-300 border-none outline-none focus:ring-0 p-0"></div>
+                        </template>
+                        <template x-if="currentShift !== 'general'">
+                            <button @click="modals.fireList.show = true; haptic()" class="w-full flex items-center justify-between bg-white border border-rose-200 rounded-lg px-2 py-1.5 text-[10px] font-bold text-rose-700 hover:bg-rose-50 transition-colors shadow-sm active:scale-95"><span class="truncate" x-text="checklist.infra.fire.location || 'Select Location'"></span><i class="fa-solid fa-chevron-right text-[9px] opacity-60"></i></button>
+                        </template>
                     </div>
                 </div>
             </div>
-
-            <div class="mt-auto p-6 border-t border-slate-100 bg-slate-50/50">
-			 <button @click="confirmAction('submit')" 
-					 class="btn-fly w-full py-4 rounded-2xl font-bold text-sm shadow-xl text-white justify-center transform hover:-translate-y-1 transition-all"
-					 :class="getSubmitButtonClass()"
-					 :disabled="isSubmitting || (isLateEntry && remarks.length < 5)">
-				
-				<div class="svg-wrapper-1">
-					<div class="svg-wrapper">
-						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-							<path fill="none" d="M0 0h24v24H0z"></path>
-							<path fill="currentColor" d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"></path>
-						</svg>
-					</div>
-				</div>
-				<span x-text="isLateEntry ? 'SUBMIT LATE' : 'SEND REPORT'"></span>
-			</button>
-		</div>
-        </aside>
-
-        <!-- MAIN CONTENT AREA -->
-<main class="flex-1 flex flex-col h-full relative bg-slate-50 overflow-hidden font-sans">
-    
-    <!-- 1. Header (Slim & Glassy) -->
-    <header class="h-16 bg-white/80 backdrop-blur-xl border-b border-slate-200 px-6 flex items-center justify-between shrink-0 z-20">
-        <div class="flex items-center gap-3">
-            <div class="p-2 bg-blue-50 rounded-lg text-blue-600"><i class="fa-solid fa-layer-group"></i></div>
-            <div>
-                <h2 class="text-lg font-black text-slate-800 leading-tight" x-text="shiftConfig[currentShift].branch + ' Dashboard'"></h2>
-                <div class="flex items-center gap-2">
-                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider" x-text="todayDate"></span>
-                    <span class="w-1 h-1 rounded-full bg-slate-300"></span>
-                    <span class="text-[10px] font-bold text-blue-500 uppercase tracking-wider" x-text="shiftConfig[currentShift].auditor"></span>
-                </div>
-            </div>
-        </div>
-        <div class="flex items-center gap-4">
-            <div class="px-3 py-1.5 rounded-lg border flex items-center gap-2 transition-all" 
-                 :class="isLateEntry ? 'bg-rose-50 border-rose-100' : 'bg-emerald-50 border-emerald-100'">
-                <div class="relative flex h-2 w-2">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" :class="isLateEntry ? 'bg-rose-500' : 'bg-emerald-500'"></span>
-                  <span class="relative inline-flex rounded-full h-2 w-2" :class="isLateEntry ? 'bg-rose-500' : 'bg-emerald-500'"></span>
-                </div>
-                <span class="text-[10px] font-black uppercase tracking-wide" :class="isLateEntry ? 'text-rose-600' : 'text-emerald-600'" x-text="isLateEntry ? 'LATE ENTRY' : 'OPERATIONAL'"></span>
-            </div>
-            <div class="text-right">
-                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Shift Ends In</p>
-                <p class="text-sm font-black font-mono text-slate-700 tabular-nums" x-text="timeLeft">--:--</p>
-            </div>
-        </div>
-    </header>
-
-    <!-- 2. Dashboard Grid -->
-    <div class="flex-1 p-4 grid grid-rows-[auto_1fr] gap-4 overflow-hidden relative z-10">
-        
-        <!-- ROW 1: SHIFT OPERATIONS -->
-        <div class="grid grid-cols-12 gap-4 h-fit">
-            
-            <!-- A. Readiness Score -->
-            <div class="col-span-12 lg:col-span-3 bg-white rounded-3xl p-5 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.1)] border border-slate-100 flex flex-col justify-between relative group overflow-hidden">
-                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity transform rotate-12"><i class="fa-solid fa-chart-pie text-6xl text-blue-600"></i></div>
-                <div>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Efficiency Score</p>
-                    <div class="flex items-baseline">
-						<h2 class="text-6xl font-black text-slate-800 tracking-tight leading-none" x-text="score">0</h2>
-						<span class="text-2xl font-bold text-slate-400 ml-1">%</span>
-					</div>
-                </div>
-                <!-- Progress Bar -->
-                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden mt-2">
-                    <div class="h-full rounded-full transition-all duration-1000 ease-out" 
-                         :class="score == 100 ? 'bg-emerald-500' : 'bg-blue-600'" 
-                         :style="`width: ${score}%`"></div>
-                </div>
-                <!-- Mini Pending List -->
-                <div class="mt-3 space-y-1">
-                    <template x-for="(item, i) in scanForIssues().slice(0, 2)" :key="i">
-                        <div class="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 truncate">
-                            <i class="fa-solid fa-circle-exclamation text-amber-500 text-[8px]"></i>
-                            <span x-text="item.msg" class="truncate"></span>
-                        </div>
-                    </template>
-                    <div x-show="scanForIssues().length > 2" class="text-[9px] font-bold text-blue-500">+ <span x-text="scanForIssues().length - 2"></span> more issues</div>
-                </div>
-            </div>
-
-            <!-- B. SHIFT SPECIFIC TASKS -->
-            <div class="col-span-12 lg:col-span-9 bg-slate-50/50 rounded-3xl border border-slate-200/60 p-1 flex flex-col justify-center">
-                
-                <!-- MORNING SHIFT DESKTOP -->
-                <template x-if="currentShift === 'morning'">
-                    <div class="grid grid-cols-4 gap-3 h-full p-2">
-                        <!-- 1. Modern Temp Card (Thermostat Style 🌡️) -->
-						<div class="relative overflow-hidden bg-white rounded-[1.5rem] p-4 border border-slate-100 shadow-sm group hover:shadow-md transition-all">
-							<!-- Subtle Background Glow -->
-							<div class="absolute -right-6 -top-6 w-24 h-24 rounded-full blur-2xl opacity-20 transition-colors duration-500"
-								 :class="checklist.morning.temp > 24 ? 'bg-rose-500' : 'bg-blue-500'"></div>
-
-							<div class="relative z-10 flex flex-col h-full justify-between">
-								<div class="flex justify-between items-start">
-									<!-- Icon Box -->
-									<div class="w-10 h-10 rounded-2xl flex items-center justify-center text-lg shadow-sm transition-colors duration-300"
-										 :class="checklist.morning.temp > 24 ? 'bg-rose-50 text-rose-500' : 'bg-blue-50 text-blue-500'">
-										<i class="fa-solid fa-temperature-half"></i>
-									</div>
-									<!-- Big Digital Reading -->
-									<div class="text-right">
-										<span class="text-3xl font-black tracking-tighter text-slate-800" 
-											  x-text="checklist.morning.temp ? checklist.morning.temp : '--'"></span>
-										<span class="text-lg text-slate-400 font-bold align-top">°C</span>
-									</div>
-								</div>
-
-								<div>
-									<div class="flex justify-between items-end mb-1">
-										<p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Server Room</p>
-										<p class="text-[9px] font-bold" :class="checklist.morning.temp > 24 ? 'text-rose-500' : 'text-blue-500'" 
-										   x-text="checklist.morning.temp > 24 ? 'HOT' : 'OPTIMAL'"></p>
-									</div>
-									<!-- Sleek Slider -->
-									<input type="range" min="16" max="28" step="0.5" 
-										   x-model="checklist.morning.temp" 
-										   @input="saveLocal()" 
-										   class="w-full h-1.5 bg-slate-100 rounded-full appearance-none cursor-pointer accent-current"
-										   :class="checklist.morning.temp > 24 ? 'accent-rose-500' : 'accent-blue-500'">
-								</div>
-							</div>
-						</div>
-
-						<!-- 2. Modern System Check (Smart Toggle ⚡) -->
-						<div @click="toggleMorningTask('prodCheck')" 
-							 class="relative overflow-hidden rounded-[1.5rem] p-4 border-2 cursor-pointer transition-all duration-300 group shadow-sm hover:shadow-md"
-							 :class="checklist.morning.prodCheck ? 'bg-emerald-500 border-emerald-500' : 'bg-white border-slate-100 hover:border-amber-200'">
-							
-							<!-- Background Icon Decoration -->
-							<i class="fa-solid fa-power-off absolute -bottom-4 -right-4 text-6xl opacity-10 transition-transform duration-500 group-hover:rotate-12"
-							   :class="checklist.morning.prodCheck ? 'text-white' : 'text-slate-800'"></i>
-
-							<div class="relative z-10 flex flex-col h-full justify-between">
-								<div class="flex justify-between items-start">
-									<!-- Icon -->
-									<div class="w-10 h-10 rounded-2xl flex items-center justify-center text-lg shadow-sm transition-colors"
-										 :class="checklist.morning.prodCheck ? 'bg-white/20 text-white backdrop-blur-sm' : 'bg-amber-50 text-amber-500'">
-										<i class="fa-solid" :class="checklist.morning.prodCheck ? 'fa-check' : 'fa-plug'"></i>
-									</div>
-									
-									<!-- Status Pill -->
-									<div class="px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest border transition-colors"
-										 :class="checklist.morning.prodCheck ? 'bg-white/20 text-white border-white/20' : 'bg-slate-50 text-slate-400 border-slate-200'">
-										<span x-text="checklist.morning.prodCheck ? 'VERIFIED' : 'PENDING'"></span>
-									</div>
-								</div>
-
-								<div>
-									<!-- Main Text -->
-									<h4 class="text-sm font-black leading-tight mb-1"
-										:class="checklist.morning.prodCheck ? 'text-white' : 'text-slate-700'">
-										<span x-text="checklist.morning.prodCheck ? 'All Systems OFF' : 'System Check'"></span>
-									</h4>
-									
-									<!-- Smart Input Area -->
-									<div @click.stop class="relative" x-show="!checklist.morning.prodCheck">
-										<input type="text" x-model="checklist.morning.prodNotes" 
-											   class="w-full bg-slate-50 border border-slate-200 rounded-lg py-1 px-2 text-[10px] font-bold text-slate-700 placeholder-slate-400 focus:ring-2 focus:ring-amber-400 outline-none transition-all"
-											   placeholder="Any PC ON? Type ID...">
-									</div>
-									<p x-show="checklist.morning.prodCheck" class="text-[10px] font-medium text-emerald-100 truncate">
-										Ready for production.
-									</p>
-								</div>
-							</div>
-						</div>
-
-                        <!-- Backup Card -->
-						<div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col gap-2 hover:shadow-md transition-all group">
-							
-							<div class="flex items-center gap-2">
-								<div class="p-2 rounded-lg bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-									<i class="fa-solid fa-database"></i>
-								</div>
-								<p class="text-[10px] font-bold text-slate-400 uppercase">Backups</p>
-							</div>
-
-							<div class="flex gap-2">
-								<button @click="toggleBackup('dc')" 
-										class="flex-1 py-1.5 rounded-lg text-[10px] font-black border transition-all" 
-										:class="checklist.morning.backupDC ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-200' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'">
-									DC
-								</button>
-								<button @click="toggleBackup('adc')" 
-										class="flex-1 py-1.5 rounded-lg text-[10px] font-black border transition-all" 
-										:class="checklist.morning.backupADC ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-200' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50'">
-									ADC
-								</button>
-							</div>
-
-							<div x-show="checklist.morning.backupDC || checklist.morning.backupADC" x-transition.opacity.duration.300ms>
-								<div class="relative">
-									<i class="fa-regular fa-clock absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px] text-indigo-400"></i>
-									<input type="text" x-model="checklist.morning.backupTime" @input="saveLocal()" 
-										   placeholder="Time (e.g. 2:00 AM)" 
-										   class="w-full bg-indigo-50/50 border border-indigo-100 rounded-lg py-1.5 pl-7 pr-2 text-[10px] font-bold text-indigo-700 placeholder-indigo-300 outline-none focus:ring-1 focus:ring-indigo-400 transition-all">
-								</div>
-							</div>
-							
-							<div x-show="!checklist.morning.backupDC && !checklist.morning.backupADC" class="text-[9px] font-bold text-slate-300 text-center py-1.5 bg-slate-50 rounded-lg border border-transparent border-dashed">
-								Verify Status
-							</div>
-
-						</div>
-
-                        <!-- Compact Actions List (Fit & Modern ✨) -->
-<div class="flex flex-col gap-2 h-full justify-between"> <!-- Gap reduced to 2 -->
-    
-    <!-- 1. Issue Tokens -->
-    <div @click="toggleMorningTask('authIssue')" 
-         class="flex items-center p-2 rounded-xl border cursor-pointer transition-all duration-300 group shadow-sm active:scale-95 h-[48px]"
-         :class="checklist.morning.authIssue ? 'bg-blue-50 border-blue-500' : 'bg-white border-slate-100 hover:border-blue-200'">
-        
-        <!-- Small Icon Box -->
-        <div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-colors duration-300"
-             :class="checklist.morning.authIssue ? 'bg-blue-500 text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500'">
-            <i class="fa-solid fa-key"></i>
-        </div>
-
-        <!-- Text -->
-        <div class="ml-3 flex-1 min-w-0">
-            <h4 class="text-[10px] font-black text-slate-700 uppercase tracking-wide truncate">Issue Tokens</h4>
-            <p class="text-[8px] font-bold text-slate-400 truncate">10 Units Handover</p>
-        </div>
-
-        <!-- Mini Check -->
-        <div class="w-5 h-5 rounded-full border flex items-center justify-center transition-all duration-300 mr-1"
-             :class="checklist.morning.authIssue ? 'bg-blue-500 border-blue-500' : 'border-slate-200'">
-            <i class="fa-solid fa-check text-[8px] text-white" x-show="checklist.morning.authIssue"></i>
         </div>
     </div>
 
-    <!-- 2. FTP Check -->
-    <div @click="toggleMorningTask('ftpJobCheck')" 
-         class="flex items-center p-2 rounded-xl border cursor-pointer transition-all duration-300 group shadow-sm active:scale-95 h-[48px]"
-         :class="checklist.morning.ftpJobCheck ? 'bg-violet-50 border-violet-500' : 'bg-white border-slate-100 hover:border-violet-200'">
-        
-        <div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-colors duration-300"
-             :class="checklist.morning.ftpJobCheck ? 'bg-violet-500 text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-violet-50 group-hover:text-violet-500'">
-            <i class="fa-solid fa-folder-open"></i>
-        </div>
-
-        <div class="ml-3 flex-1 min-w-0">
-            <h4 class="text-[10px] font-black text-slate-700 uppercase tracking-wide truncate">FTP Check</h4>
-            <p class="text-[8px] font-bold text-slate-400 truncate">Check Client Jobs</p>
-        </div>
-
-        <div class="w-5 h-5 rounded-full border flex items-center justify-center transition-all duration-300 mr-1"
-             :class="checklist.morning.ftpJobCheck ? 'bg-violet-500 border-violet-500' : 'border-slate-200'">
-            <i class="fa-solid fa-check text-[8px] text-white" x-show="checklist.morning.ftpJobCheck"></i>
-        </div>
+    <!-- Logs -->
+    <div class="flex-1 bg-white rounded-3xl p-4 shadow-sm border border-slate-200 flex flex-col min-h-[120px]">
+        <div class="flex items-center gap-2 mb-2"><i class="fa-solid fa-pen-to-square text-slate-400 text-xs"></i><h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Shift Logs / Handover</h3></div>
+        <textarea x-model="remarks" @input="saveLocal()" class="w-full h-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 placeholder-slate-400 outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white resize-none" placeholder="Type notes for the next shift..."></textarea>
     </div>
-
-    <!-- 3. WiFi Check -->
-    <div @click="toggleMorningTask('wifi')" 
-         class="flex items-center p-2 rounded-xl border cursor-pointer transition-all duration-300 group shadow-sm active:scale-95 h-[48px]"
-         :class="checklist.morning.wifi ? 'bg-cyan-50 border-cyan-500' : 'bg-white border-slate-100 hover:border-cyan-200'">
-        
-        <div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-colors duration-300"
-             :class="checklist.morning.wifi ? 'bg-cyan-500 text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-cyan-50 group-hover:text-cyan-500'">
-            <i class="fa-solid fa-wifi"></i>
-        </div>
-
-        <div class="ml-3 flex-1 min-w-0">
-            <h4 class="text-[10px] font-black text-slate-700 uppercase tracking-wide truncate">Admin WiFi</h4>
-            <p class="text-[8px] font-bold text-slate-400 truncate">Connectivity Test</p>
-        </div>
-
-        <div class="w-5 h-5 rounded-full border flex items-center justify-center transition-all duration-300 mr-1"
-             :class="checklist.morning.wifi ? 'bg-cyan-500 border-cyan-500' : 'border-slate-200'">
-            <i class="fa-solid fa-check text-[8px] text-white" x-show="checklist.morning.wifi"></i>
-        </div>
-    </div>
-
 </div>
-                </template>
-
-                <!-- EVENING SHIFT DESKTOP -->
-                <template x-if="currentShift === 'evening'">
-				<div class="grid grid-cols-4 gap-3 h-full p-2">
-					
-					<!-- 1. Temperature -->
-					<div class="col-span-1 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all group">
-						<div class="flex justify-between items-start">
-							<div class="p-2 rounded-lg bg-violet-50 text-violet-600 group-hover:bg-violet-600 group-hover:text-white transition-colors"><i class="fa-solid fa-temperature-half"></i></div>
-							<span class="text-xl font-black text-slate-700" x-text="checklist.evening.temp ? checklist.evening.temp + '°' : '--'"></span>
-						</div>
-						<div>
-							<p class="text-[10px] font-bold text-slate-400 uppercase">Server Temp</p>
-							<input type="range" min="16" max="28" step="0.5" x-model="checklist.evening.temp" @input="saveLocal()" class="w-full h-1.5 bg-slate-100 rounded-full mt-1 cursor-pointer accent-violet-600">
-						</div>
-					</div>
-
-					<!-- 2. Collect Tokens -->
-					<div @click="toggleEveningTask('authCollect')" 
-						 class="col-span-1 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between cursor-pointer hover:shadow-md transition-all group" 
-						 :class="checklist.evening.authCollect ? 'ring-2 ring-emerald-500 border-transparent' : ''">
-						
-						<div class="flex justify-between items-start">
-							<div class="p-2 rounded-lg bg-slate-100 text-slate-500 group-hover:bg-violet-600 group-hover:text-white transition-colors">
-								<i class="fa-solid fa-vault"></i>
-							</div>
-							<div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all" 
-								 :class="checklist.evening.authCollect ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-200'">
-								<i class="fa-solid fa-check text-[10px]"></i>
-							</div>
-						</div>
-						<div>
-							<p class="text-[10px] font-bold text-slate-400 uppercase">Tokens</p>
-							<p class="text-xs font-black text-slate-700 leading-tight">Return to Server Room Safehouse</p>
-						</div>
-					</div>
-
-					<!-- 3. PBL020 -->
-					<div class="col-span-2 bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col justify-between hover:shadow-md transition-all group relative overflow-hidden">
-						<!-- Background Decoration -->
-						<div class="absolute top-0 right-0 w-20 h-20 bg-amber-50 rounded-full blur-2xl -mr-10 -mt-10 transition-colors" :class="checklist.evening.pbl020Running ? 'bg-amber-100' : ''"></div>
-						
-						<div class="relative z-10 flex justify-between items-start">
-							<div class="flex items-center gap-3">
-								<div class="p-2 rounded-lg bg-amber-50 text-amber-600 group-hover:bg-amber-500 group-hover:text-white transition-colors">
-									<i class="fa-solid fa-download"></i>
-								</div>
-								<div>
-									<h4 class="text-sm font-black text-slate-700">pblnet020</h4>
-									<p class="text-[10px] font-bold text-slate-400">Download Status</p>
-								</div>
-							</div>
-							<!-- Toggle Switch -->
-							<div @click="togglePblRun()" class="w-10 h-6 bg-slate-200 rounded-full relative cursor-pointer transition-colors" :class="checklist.evening.pbl020Running ? 'bg-amber-500' : 'bg-slate-200'">
-								<div class="w-4 h-4 bg-white rounded-full absolute top-1 transition-all shadow-sm" :class="checklist.evening.pbl020Running ? 'left-5' : 'left-1'"></div>
-							</div>
-						</div>
-
-						<!-- Input Field Area -->
-						<div class="relative z-10 mt-2">
-							<div x-show="checklist.evening.pbl020Running">
-								<input type="text" x-model="checklist.evening.pblReason" @input="saveLocal()" 
-									   placeholder="Enter Job Name (e.g. AEMDRE Download)..." 
-									   class="w-full bg-amber-50/50 border border-amber-200 text-xs rounded-xl p-2.5 font-bold outline-none focus:ring-2 focus:ring-amber-400 text-amber-800 placeholder-amber-400 transition-all">
-							</div>
-							<div x-show="!checklist.evening.pbl020Running" class="flex items-center gap-2 text-rose-500 bg-rose-50 px-3 py-2 rounded-xl border border-rose-100">
-								<i class="fa-solid fa-power-off text-xs"></i>
-								<span class="text-[10px] font-black uppercase">System should be OFF</span>
-							</div>
-						</div>
-					</div>
-
-					<!-- 4. FTP Report -->
-					<div @click="toggleEveningTask('ftpReport')" 
-						 class="col-span-2 col-start-1 bg-white rounded-2xl p-3 shadow-sm border border-slate-100 cursor-pointer hover:shadow-md transition-all flex items-center justify-between group h-fit self-center" 
-						 :class="checklist.evening.ftpReport ? 'ring-1 ring-emerald-500 bg-emerald-50/10' : ''">
-						
-						<div class="flex items-center gap-3">
-							<div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-violet-600 group-hover:text-white transition-colors">
-								<i class="fa-solid fa-paper-plane"></i>
-							</div>
-							<div>
-								<h4 class="text-sm font-black text-slate-700">FTP Report</h4>
-								<p class="text-[10px] font-bold text-slate-400">Email Status</p>
-							</div>
-						</div>
-						
-						<div class="flex items-center gap-2 px-2">
-							<div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all" 
-								 :class="checklist.evening.ftpReport ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-200'">
-								<i class="fa-solid fa-check text-[10px]"></i>
-							</div>
-						</div>
-					</div>
-
-				</div>
-			</template>
+                </div>
             </div>
-        </div>
-
-        <!-- ROW 2: INFRASTRUCTURE -->
-		<div class="grid grid-cols-12 gap-4 h-full min-h-0">
-			
-			<!-- A. SERVERS & SERVICES (Left Column - 5/12 Width) -->
-			<div class="col-span-12 lg:col-span-5 bg-white rounded-3xl p-5 shadow-sm border border-slate-100 flex flex-col h-full">
-				<h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 shrink-0">Core Infrastructure</h3>
-				
-				<!-- Wrapper: Flex Column + Gap, No Scrollbar so items stretch -->
-				<div class="flex-1 flex flex-col gap-4 min-h-0">
-					
-					<!-- 1. Servers Grid (Upgraded Design 🚀) -->
-					<div class="grid grid-cols-2 gap-3 shrink-0">
-						<template x-for="(srv, index) in checklist.servers" :key="index">
-							<div @click="toggleServer(index)" 
-								 class="relative p-3 h-20 rounded-2xl border-2 cursor-pointer overflow-hidden group clickable transition-all duration-300 shadow-sm hover:shadow-md hover:scale-[1.02]" 
-								 :class="getServerClass(srv)">
-								
-								<!-- 🎨 Background Watermark (Rotation Effect) -->
-								<div class="absolute -bottom-4 -right-4 text-6xl text-black opacity-10 transform rotate-12 pointer-events-none transition-transform duration-500 group-hover:rotate-0">
-									<i :class="(srv.name.includes('Linux') || srv.name === 'PBL') ? 'fa-brands fa-linux' : 'fa-brands fa-windows'"></i>
-								</div>
-
-								<!-- 🔧 Maintenance Button (Top Right) -->
-								<div @click.stop="toggleMaintenance(index)" 
-									 class="absolute top-1.5 right-1.5 z-20 w-6 h-6 flex items-center justify-center rounded-full shadow-sm cursor-pointer transition-all hover:scale-110 active:scale-90" 
-									 :class="srv.maintenance ? 'bg-amber-500 text-white ring-2 ring-white' : 'bg-white/20 hover:bg-white/40 text-white backdrop-blur-md border border-white/20'">
-									<i class="fa-solid fa-wrench text-[9px]" :class="srv.maintenance ? 'animate-pulse' : ''"></i>
-								</div>
-
-								<!-- 📦 Content Layout (Full Width Clean Design ✨) -->
-								<div class="relative z-10 h-full flex flex-col justify-center px-2">
-									
-									<!-- Top Row: Icon + Name -->
-									<div class="flex items-center gap-2 mb-1">
-										<!-- Small Inline Icon -->
-										<i :class="(srv.name.includes('Linux') || srv.name === 'PBL') ? 'fa-brands fa-linux' : 'fa-brands fa-windows'" 
-										   class="text-lg opacity-90 drop-shadow-sm"></i>
-										
-										<!-- Server Name (Bada aur Bold) -->
-										<h4 class="text-base font-black leading-none tracking-tight drop-shadow-sm truncate" x-text="srv.name"></h4>
-									</div>
-
-									<!-- Bottom Row: Status Badge -->
-									<div>
-										<span class="text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-md backdrop-blur-md border border-white/20 shadow-sm transition-colors"
-											  :class="srv.status ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500 border-slate-200'"
-											  x-text="srv.maintenance ? 'MAINTENANCE' : (srv.status ? 'ONLINE' : 'OFFLINE')">
-										</span>
-									</div>
-
-								</div>
-							</div>
-						</template>
-					</div>
-
-					<!-- 2. Services List (EXPAND to fill empty space) -->
-					<div class="flex-1 flex flex-col gap-3">
-						<template x-for="(svc, index) in checklist.services" :key="index">
-							<div @click="toggleService(index)" 
-								 class="flex-1 relative rounded-2xl border-2 cursor-pointer transition-all duration-300 group overflow-hidden flex items-center px-4 py-2"
-								 :class="svc.status 
-									? 'bg-white border-emerald-500 shadow-lg shadow-emerald-100' 
-									: 'bg-slate-50 border-transparent hover:border-slate-200 hover:bg-white'">
-								
-								<!-- Background Status Strip -->
-								<div class="absolute left-0 top-0 bottom-0 w-1.5 transition-all duration-300" 
-									 :class="svc.status ? 'bg-emerald-500' : 'bg-transparent'"></div>
-
-								<!-- Icon Box -->
-								<div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg transition-all duration-300 z-10 shrink-0" 
-									 :class="svc.status ? 'bg-emerald-50 text-emerald-600' : 'bg-white text-slate-300 shadow-sm border border-slate-100'">
-									<i class="fa-solid" :class="svc.icon"></i>
-								</div>
-
-								<!-- Text Info (Expanded) -->
-								<div class="ml-4 flex-1 z-10 flex flex-col justify-center">
-									<h4 class="text-sm font-black text-slate-700 leading-tight transition-colors" 
-										:class="svc.status ? 'text-slate-800' : 'text-slate-500'" 
-										x-text="svc.name"></h4>
-									<p class="text-[10px] font-bold mt-0.5" 
-									   :class="svc.status ? 'text-emerald-600' : 'text-slate-300'" 
-									   x-text="svc.status ? 'System Operational' : svc.desc"></p>
-								</div>
-
-								<!-- Status Indicator (Arrow/Check) -->
-								<div class="w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300 z-10 shrink-0 ml-2"
-									 :class="svc.status ? 'border-emerald-500 bg-emerald-500 text-white scale-110' : 'border-slate-200 text-slate-200'">
-									<i class="fa-solid text-[10px]" :class="svc.status ? 'fa-check' : 'fa-chevron-right'"></i>
-								</div>
-							</div>
-						</template>
-					</div>
-				</div>
-			</div>
-
-			<!-- B. RIGHT SIDE WRAPPER -->
-			<div class="col-span-12 lg:col-span-7 flex flex-col gap-4 h-full">
-				
-				<!-- Top Row: Network & Facility Side-by-Side -->
-				<div class="grid grid-cols-7 gap-4 h-fit">
-					
-					<!-- 1. Network & Security -->
-					<div class="col-span-4 bg-white rounded-3xl p-5 shadow-sm border border-slate-100 h-full">
-						<h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Network & Security</h3>
-						
-						<div class="space-y-4">
-							<template x-for="(isp, index) in checklist.isp" :key="index">
-								<div>
-									<div class="flex justify-between items-end mb-1">
-										<span class="text-[10px] font-bold text-slate-700" x-text="isp.name"></span>
-										<span class="text-[10px] font-black font-mono" :class="getSpeedText(isp.speed, isp.max)" x-text="isp.speed + ' Mb'"></span>
-									</div>
-									<input type="range" min="0" :max="isp.max" step="0.5" x-model="isp.speed" @input="calculateScore(); saveLocal()" class="w-full h-1.5 bg-slate-100 rounded-full appearance-none cursor-pointer" :style="`--thumb-color: ${getSpeedHex(isp.speed, isp.max)};`">
-								</div>
-							</template>
-
-							<div class="grid grid-cols-2 gap-3 pt-2">
-    
-							<!-- 1. Sophos Button -->
-							<div @click="handleSophosCheck()" 
-								 class="p-3 rounded-xl border-2 text-center cursor-pointer transition-all duration-200 active:scale-95 group"
-								 :class="checklist.endpoints.sophos 
-									? 'bg-cyan-500 border-cyan-500 text-white shadow-lg shadow-cyan-200' 
-									: 'bg-white border-slate-100 text-slate-400 hover:border-cyan-200 hover:text-cyan-500 hover:bg-cyan-50'">
-								
-								<i class="fa-solid fa-shield-virus text-xl mb-1 transition-transform group-hover:scale-110"></i>
-								<p class="text-[9px] font-black uppercase tracking-wide">Sophos</p>
-							</div>
-
-							<!-- 2. USB Button -->
-							<div @click="handleUsbCheck()" 
-								 class="p-3 rounded-xl border-2 text-center cursor-pointer transition-all duration-200 active:scale-95 group"
-								 :class="checklist.endpoints.usb 
-									? 'bg-rose-500 border-rose-500 text-white shadow-lg shadow-rose-200' 
-									: 'bg-white border-slate-100 text-slate-400 hover:border-rose-200 hover:text-rose-500 hover:bg-rose-50'">
-								
-								<i class="fa-brands fa-usb text-xl mb-1 transition-transform group-hover:scale-110"></i>
-								<p class="text-[9px] font-black uppercase tracking-wide">USB Check</p>
-							</div>
-
-						</div>
-						</div>
-					</div>
-
-					<!-- 2. Facility -->
-					<div class="col-span-3 bg-white rounded-3xl p-5 shadow-sm border border-slate-100 h-fit">
-						<h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Facility Status</h3>
-						<div class="space-y-3">
-							<template x-for="(ac, index) in checklist.infra.acs" :key="index">
-								<div @click="toggleAC(index)" class="flex items-center justify-between p-2.5 rounded-xl cursor-pointer transition-all border border-transparent hover:bg-slate-50 hover:border-slate-100 group">
-									<div class="flex items-center gap-2">
-										<div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-colors" :class="ac.status ? 'bg-cyan-50 text-cyan-500' : 'bg-slate-100 text-slate-400'"><i class="fa-solid fa-snowflake" :class="{'animate-spin-slow': ac.status}"></i></div>
-										<span class="text-[10px] font-bold text-slate-700" x-text="ac.name"></span>
-									</div>
-									<div class="w-10 h-6 rounded-full relative transition-all duration-300 ease-in-out" :class="ac.status ? 'bg-cyan-500 shadow-inner' : 'bg-slate-200'"><div class="w-4 h-4 bg-white rounded-full absolute top-1 left-1 shadow-md transition-all duration-300 transform" :class="ac.status ? 'translate-x-4' : 'translate-x-0'"></div></div>
-								</div>
-							</template>
-							<div class="h-px bg-slate-100 my-1"></div>
-							<div>
-								<div class="flex items-center justify-between p-2.5">
-									<div class="flex items-center gap-2">
-										<div class="w-8 h-8 rounded-lg bg-rose-50 text-rose-500 flex items-center justify-center text-sm"><i class="fa-solid fa-fire-extinguisher"></i></div>
-										<span class="text-[10px] font-bold text-slate-700">Fire Safety</span>
-									</div>
-									<div @click="toggleInfra('fire')" class="w-10 h-6 rounded-full relative transition-all duration-300 ease-in-out" :class="checklist.infra.fire.status ? 'bg-emerald-500 shadow-inner' : 'bg-slate-200'"><div class="w-4 h-4 bg-white rounded-full absolute top-1 left-1 shadow-md transition-all duration-300 transform" :class="checklist.infra.fire.status ? 'translate-x-4' : 'translate-x-0'"></div></div>
-								</div>
-								<div x-show="checklist.infra.fire.status" x-collapse>
-									<div @click="modals.fireList.show = true" class="mt-1 mx-2 text-[10px] font-bold bg-slate-50 p-2 rounded-lg text-center cursor-pointer border border-slate-200 hover:border-emerald-300 hover:text-emerald-600 transition-colors text-slate-500 flex items-center justify-between px-3">
-										<span x-text="checklist.infra.fire.location || 'Select Location...'"></span>
-										<i class="fa-solid fa-chevron-down text-[9px]"></i>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<!-- 3. Logs Area -->
-				<div class="flex-1 bg-white rounded-3xl p-4 shadow-sm border border-slate-200 flex flex-col min-h-[140px]">
-					<div class="flex items-center gap-2 mb-2">
-						<i class="fa-solid fa-pen-to-square text-slate-400 text-xs"></i>
-						<h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Shift Logs / Handover</h3>
-					</div>
-					<textarea x-model="remarks" @input="saveLocal()" 
-							  class="w-full h-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 placeholder-slate-400 outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white focus:border-transparent transition-all resize-none leading-relaxed" 
-							  placeholder="Type any issues, pending tasks, or notes for the next shift..."></textarea>
-				</div>
-
-			</div>
-
-		</div>
-
+        </main>
     </div>
-</main>
-</div>
 
-    <!-- MODALS (Popups for Alerts, Confirmations, etc.) -->
-    
-    <!-- 1. Scanner/Pending Items Modal -->
+    <!-- MODALS -->
     <div x-show="modals.scanner.show" x-cloak class="fixed inset-0 z-[115] flex items-center justify-center bg-black/80 backdrop-blur-sm p-6"><div class="bg-white w-full max-w-sm rounded-[2rem] p-6 shadow-2xl animate-float"><div class="text-center mb-4"><div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-3 text-3xl text-amber-600 shadow-inner"><i class="fa-solid fa-binoculars"></i></div><h3 class="text-xl font-black text-slate-800">Review Score</h3><p class="text-xs font-bold text-slate-400 uppercase tracking-wider mt-1">Score: <span class="text-amber-500 text-lg" x-text="score + '%'"></span></p></div><div class="bg-slate-50 rounded-2xl p-4 mb-6 border border-slate-100 max-h-60 overflow-y-auto"><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Pending Items</p><ul class="space-y-2"><template x-for="item in missingItems" :key="item.msg"><li class="flex items-start gap-2 text-xs font-bold text-slate-600 bg-white p-2 rounded-lg border border-slate-100 shadow-sm"><i class="fa-solid fa-circle-exclamation text-amber-500 mt-0.5"></i><span x-text="item.msg"></span></li></template></ul></div><div class="flex flex-col gap-3"><button @click="scrollToIssue()" class="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-500/30 clickable">FIX ISSUES NOW <i class="fa-solid fa-wrench ml-2"></i></button><button @click="scrollToRemarks()" class="w-full py-3 text-slate-400 font-bold text-xs hover:text-slate-600 transition-colors clickable">Skip & Submit with Remarks <i class="fa-solid fa-arrow-right ml-1"></i></button></div></div></div>
-    
-    <!-- 2. Confirmation Modal -->
     <div x-show="modals.confirm.show" x-cloak class="fixed inset-0 z-[110] flex items-center justify-center bg-black/70 backdrop-blur-md p-6"><div class="bg-white w-full max-w-xs rounded-[2rem] p-8 text-center shadow-2xl"><div x-show="submitState === 'ask'"><h3 class="text-xl font-black mb-2" x-text="modals.confirm.title"></h3><button @click="executeConfirmAction()" class="w-full py-3 bg-blue-600 text-white rounded-xl font-bold mt-4 clickable">Confirm</button><button @click="modals.confirm.show=false" class="w-full py-3 mt-2 text-slate-500 font-bold clickable">Cancel</button></div><div x-show="submitState === 'loading'"><i class="fa-solid fa-cloud-arrow-up text-blue-500 text-3xl animate-bounce mb-4"></i><h3 class="font-black">Sending...</h3></div><div x-show="submitState === 'done'"><div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 text-emerald-600 text-3xl"><i class="fa-solid fa-check"></i></div><h3 class="text-lg font-black">Success!</h3><button @click="location.reload()" class="w-full py-3 bg-slate-100 text-slate-700 rounded-xl font-bold text-xs hover:bg-slate-200 clickable">Reload</button></div></div></div>
-    
-    <!-- 3. Fire Location List -->
     <div x-show="modals.fireList.show" x-cloak class="fixed inset-0 z-[200] flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4"><div class="bg-white w-full max-w-sm rounded-t-[2rem] sm:rounded-[2rem] h-auto max-h-[85vh] flex flex-col shadow-2xl animate-float pb-safe" @click.away="modals.fireList.show = false"><div class="p-5 border-b border-slate-100 flex justify-between items-center bg-rose-50 sm:rounded-t-[2rem] rounded-t-[2rem] flex-shrink-0"><div><h3 class="text-lg font-black text-rose-700">Select Location</h3><p class="text-[10px] text-rose-400 font-bold uppercase tracking-wider">Fire Extinguisher Check</p></div><button @click="modals.fireList.show = false" class="w-8 h-8 rounded-full bg-white text-rose-500 flex items-center justify-center shadow-sm clickable"><i class="fa-solid fa-xmark"></i></button></div><div class="overflow-y-auto p-2 space-y-1 flex-1 overscroll-contain"><template x-for="(group, floorName) in fireLocations" :key="floorName"><div class="mb-2"><div class="sticky top-0 bg-white/95 backdrop-blur z-10 px-4 py-2 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-50" x-text="floorName"></div><div class="grid grid-cols-1 gap-1 p-1"><template x-for="loc in group" :key="loc"><button @click="checklist.infra.fire.location = loc; saveLocal(); modals.fireList.show = false; haptic()" class="w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-colors active:scale-95 clickable" :class="checklist.infra.fire.location === loc ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30' : 'hover:bg-slate-50 text-slate-600'"><i class="fa-solid fa-fire-extinguisher text-sm" :class="checklist.infra.fire.location === loc ? 'text-white' : 'text-rose-300'"></i><span class="text-xs font-bold" x-text="loc"></span><i x-show="checklist.infra.fire.location === loc" class="fa-solid fa-check ml-auto"></i></button></template></div></div></template><div class="h-10"></div></div></div></div>
-    
-    <!-- 4. Simple Alert -->
     <div x-show="modals.alert.show" x-cloak class="fixed inset-0 z-[120] flex items-center justify-center bg-black/80 backdrop-blur-md p-6"><div class="bg-white w-full max-w-xs rounded-3xl p-6 text-center shadow-2xl"><h3 class="text-lg font-black" x-text="modals.alert.title"></h3><p class="text-xs text-slate-500 mb-4" x-text="modals.alert.msg"></p><button @click="closeAlert()" class="w-full py-3 bg-slate-100 rounded-xl font-bold clickable">Okay</button></div></div>
-    
-    <!-- 5. Late Warning -->
     <div x-show="modals.lateWarning.show" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-6"><div class="bg-white w-full max-w-xs rounded-[2rem] p-6 text-center shadow-2xl relative overflow-hidden"><div class="absolute top-0 left-0 w-full h-1.5 bg-rose-500"></div><div class="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl text-rose-500"><i class="fa-solid fa-clock-rotate-left"></i></div><h3 class="text-xl font-black text-slate-800 mb-2">Shift Timeout!</h3><p class="text-xs text-slate-500 mb-6 font-medium">Flagged as <strong class="text-rose-500">LATE ENTRY</strong>.</p><div class="flex gap-3"><button @click="modals.lateWarning.show = false" class="flex-1 py-3 rounded-xl bg-slate-100 text-slate-600 font-bold text-xs clickable">BACK</button><button @click="confirmLateEntry()" class="flex-1 py-3 rounded-xl bg-rose-600 text-white font-bold text-xs shadow-lg clickable">PROCEED</button></div></div></div>
-    
-    <!-- 6. USB Check Popup -->
     <div x-show="showUsbModal" x-cloak class="fixed inset-0 z-[105] flex items-center justify-center bg-black/80 backdrop-blur-sm p-6"><div class="bg-white w-full max-w-sm rounded-3xl p-6 text-center animate-float"><i class="fa-solid fa-hand text-4xl text-amber-500 mb-4 block"></i><h3 class="text-lg font-black text-slate-800">Physical Check</h3><p class="text-xs text-slate-500 mb-6">Insert Pen Drive to verify blockage on 1 Random PC.</p><div class="flex gap-3"><button @click="showUsbModal=false" class="flex-1 py-3 rounded-xl bg-slate-100 text-xs font-bold clickable">Cancel</button><button @click="confirmUsbCheck()" class="flex-1 py-3 rounded-xl bg-amber-500 text-white text-xs font-bold shadow-lg clickable">Verified</button></div></div></div>
-    
-    <!-- 7. Sophos Check Popup -->
-    <div x-show="modals.sophos.show" x-cloak class="fixed inset-0 z-[105] flex items-center justify-center bg-black/80 backdrop-blur-sm p-6"><div class="bg-white w-full max-w-sm rounded-3xl p-6 text-center animate-float"><i class="fa-solid fa-shield-virus text-4xl text-cyan-500 mb-4 block"></i><h3 class="text-lg font-black text-slate-800">Antivirus Check</h3><p class="text-xs text-slate-500 mb-6">Verify Sophos is green on 1 Random PC.</p><div class="flex gap-3"><button @click="modals.sophos.show=false" class="flex-1 py-3 rounded-xl bg-slate-100 text-xs font-bold clickable">Cancel</button><button @click="confirmSophos()" class="flex-1 py-3 rounded-xl bg-cyan-600 text-white text-xs font-bold shadow-lg clickable">Verified</button></div></div></div>
+    <div x-show="modals.sophos.show" x-cloak class="fixed inset-0 z-[105] flex items-center justify-center bg-black/80 backdrop-blur-sm p-6"><div class="bg-white w-full max-w-sm rounded-3xl p-6 text-center animate-float"><i class="fa-solid fa-shield-virus text-4xl text-cyan-500 mb-4 block"></i><h3 class="text-lg font-black text-slate-800">Antivirus Check</h3><p class="text-xs text-slate-500 mb-6">Verify <span x-text="currentShift === 'general' ? 'Seqrite' : 'Sophos'"></span> is green on 1 Random PC.</p><div class="flex gap-3"><button @click="modals.sophos.show=false" class="flex-1 py-3 rounded-xl bg-slate-100 text-xs font-bold clickable">Cancel</button><button @click="confirmSophos()" class="flex-1 py-3 rounded-xl bg-cyan-600 text-white text-xs font-bold shadow-lg clickable">Verified</button></div></div></div>
 </body>
 </html>
