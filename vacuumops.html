@@ -162,6 +162,14 @@
         @keyframes circle-middle6123 { 0% { stroke-dashoffset: 17; } 25% { stroke-dashoffset: 0; } 65% { stroke-dashoffset: 204; } 80% { stroke-dashoffset: 187; } 100% { stroke-dashoffset: 187; } }
         @keyframes circle-inner162 { 0% { stroke-dashoffset: 9; } 25% { stroke-dashoffset: 0; } 65% { stroke-dashoffset: 106; } 80% { stroke-dashoffset: 97; } 100% { stroke-dashoffset: 97; } }
         @keyframes text-animation76 { 0% { clip-path: inset(0 100% 0 0); } 50% { clip-path: inset(0); } 100% { clip-path: inset(0 0 0 100%); } }
+		
+		.locked-state {
+    filter: grayscale(1);
+    opacity: 0.6;
+    /* pointer-events line hata di taaki user click karke message dekh sake */
+    cursor: not-allowed;
+	}
+		
     </style>
 </head>
 
@@ -291,9 +299,12 @@
             <!-- Mobile List -->
             <div class="space-y-3 pb-28 pt-1">
                 <template x-for="(pc, index) in filteredList" :key="pc.systemName + index">
-                    <div class="glass-card p-4 rounded-[1.2rem] relative overflow-hidden group animate-slide-up flex items-center justify-between shadow-sm active:scale-[0.99] transition-transform"
-                         :class="pc.status === 'DONE' ? 'border-l-[5px] border-l-emerald-500' : 'border-l-[5px] border-l-rose-500'"
-                         @click="openModal('edit', pc)">
+                    <div class="glass-card p-4 rounded-[1.2rem] relative overflow-hidden group animate-slide-up flex items-center justify-between shadow-sm transition-transform"
+					 :class="[
+						pc.status === 'DONE' ? 'border-l-[5px] border-l-emerald-500' : 'border-l-[5px] border-l-rose-500',
+						isLocked ? 'opacity-80 locked-state' : 'active:scale-[0.99]' 
+					 ]"
+					 @click="isLocked ? showLockedAlert() : openModal('edit', pc)">
                         <div class="flex items-center gap-4 w-full overflow-hidden">
                             <div class="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shadow-sm transition-colors shrink-0" :class="pc.status === 'DONE' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-600'">
                                 <i class="fa-solid" :class="pc.status === 'DONE' ? 'fa-check' : 'fa-hourglass-half'"></i>
@@ -318,7 +329,11 @@
             </div>
         </main>
         
-        <button @click="openModal('add')" class="fixed bottom-24 right-5 w-14 h-14 rounded-full text-white shadow-xl flex items-center justify-center active:scale-90 transition-transform z-40" :class="themeGradient"><i class="fa-solid fa-plus text-xl"></i></button>
+        <button @click="isLocked ? showLockedAlert() : openModal('add')" 
+        class="fixed bottom-24 right-5 w-14 h-14 rounded-full text-white shadow-xl flex items-center justify-center transition-transform z-40" 
+        :class="isLocked ? 'bg-slate-400 locked-state' : themeGradient + ' active:scale-90'">
+		<i class="fa-solid" :class="isLocked ? 'fa-lock' : 'fa-plus'"></i>
+		</button>
 
         <!-- Footer with Info & Animated Report -->
         <footer class="fixed bottom-0 left-0 w-full bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-lg border-t border-slate-100 dark:border-white/5 px-5 py-4 z-50 flex justify-between items-center">
@@ -337,10 +352,22 @@
                 </button>
                 
                 <!-- ✈️ Animated Report Button -->
-                <button @click="openConfirmModal()" class="btn-fly h-10 px-5 rounded-xl text-white font-bold text-[10px] shadow-lg" :class="themeBtn">
-                    <div class="svg-wrapper-1"><div class="svg-wrapper"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"><path fill="none" d="M0 0h24v24H0z"></path><path fill="currentColor" d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"></path></svg></div></div>
-                    <span>Report</span>
-                </button>
+                <button @click="isLocked ? showLockedAlert() : openConfirmModal()" 
+				class="btn-fly h-10 px-5 rounded-xl text-white font-bold text-[10px] shadow-lg transition-all" 
+				:class="isLocked ? 'bg-slate-400 locked-state' : themeBtn">
+			
+					<div class="svg-wrapper-1">
+						<div class="svg-wrapper">
+							<i x-show="isLocked" class="fa-solid fa-lock text-sm"></i>
+							<svg x-show="!isLocked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+								<path fill="none" d="M0 0h24v24H0z"></path>
+								<path fill="currentColor" d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"></path>
+							</svg>
+						</div>
+					</div>
+					
+					<span x-text="isLocked ? 'LOCKED' : 'Report'"></span>
+				</button>
             </div>
         </footer>
     </div>
@@ -425,10 +452,21 @@
         
             <!-- Bottom Action -->
             <div class="mt-auto p-6 border-t border-slate-100 dark:border-white/5">
-                <button @click="openConfirmModal()" class="btn-fly w-full py-4 justify-center rounded-2xl font-bold text-sm shadow-xl text-white transform hover:-translate-y-1 transition-all" :class="themeBtn">
-                    <div class="svg-wrapper-1"><div class="svg-wrapper"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"><path fill="none" d="M0 0h24v24H0z"></path><path fill="currentColor" d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"></path></svg></div></div>
-                    <span>GENERATE REPORT</span>
-                </button>
+                <button @click="isLocked ? showLockedAlert() : openConfirmModal()" 
+						class="btn-fly w-full py-4 justify-center rounded-2xl font-bold text-sm shadow-xl text-white transition-all" 
+						:class="isLocked ? 'bg-slate-400 cursor-not-allowed grayscale' : themeBtn + ' transform hover:-translate-y-1'">
+					
+					<div class="svg-wrapper-1">
+						<div class="svg-wrapper">
+							<i x-show="isLocked" class="fa-solid fa-lock text-sm"></i>
+							<svg x-show="!isLocked" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+								<path fill="none" d="M0 0h24v24H0z"></path>
+								<path fill="currentColor" d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"></path>
+							</svg>
+						</div>
+					</div>
+					<span x-text="isLocked ? 'LOCKED' : 'GENERATE REPORT'"></span>
+				</button>
             </div>
         </aside>
 
@@ -438,8 +476,11 @@
                 <div class="flex items-center gap-4"><h2 class="text-2xl font-black text-slate-800 dark:text-white" :class="themeText" x-text="activeLocation + ' Dashboard'"></h2><span class="px-3 py-1 bg-slate-100 text-slate-500 text-xs font-bold rounded-full border border-slate-200" x-text="currentCycleName"></span></div>
                 <div class="flex items-center gap-4">
                     <div class="relative w-80"><i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i><input type="text" x-model="search" placeholder="Search Assets..." class="w-full pl-10 pr-4 py-2.5 bg-slate-100 dark:bg-white/5 rounded-xl text-sm font-bold border border-transparent focus:bg-white focus:border-brand_primary focus:ring-4 focus:ring-slate-100 transition-all outline-none"></div>
-                    <button @click="openModal('add')" class="w-10 h-10 text-white rounded-xl flex items-center justify-center hover:opacity-90 transition shadow-lg" :class="themeBtn"><i class="fa-solid fa-plus"></i></button>
-                    <button @click="fetchData(true)" class="w-10 h-10 bg-white border border-slate-200 rounded-xl flex items-center justify-center text-slate-500 hover:text-brand_primary hover:border-brand_primary transition"><i class="fa-solid fa-rotate" :class="{'fa-spin': isSyncing}"></i></button>
+                    <button @click="isLocked ? showLockedAlert() : openModal('add')" 
+        class="w-10 h-10 text-white rounded-xl flex items-center justify-center hover:opacity-90 transition shadow-lg" 
+        :class="isLocked ? 'bg-slate-400 cursor-not-allowed' : themeBtn">
+    <i class="fa-solid" :class="isLocked ? 'fa-lock' : 'fa-plus'"></i>
+</button>                    <button @click="fetchData(true)" class="w-10 h-10 bg-white border border-slate-200 rounded-xl flex items-center justify-center text-slate-500 hover:text-brand_primary hover:border-brand_primary transition"><i class="fa-solid fa-rotate" :class="{'fa-spin': isSyncing}"></i></button>
                     <button @click="toggleTheme()" class="w-10 h-10 bg-white border border-slate-200 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-50 transition"><i class="fa-solid" :class="isDark ? 'fa-sun' : 'fa-moon'"></i></button>
                 </div>
             </header>
@@ -509,16 +550,18 @@
     <template x-for="pc in filteredList" :key="pc.systemName">
         
         <!-- CARD CONTAINER -->
-        <div @click="openModal('edit', pc)"
-             class="group relative p-5 rounded-[2rem] cursor-pointer border-0 bg-white dark:bg-[#1e293b]
-                    shadow-[0_0_8px_rgba(0,0,0,0.05)] 
-                    transition-all duration-500 ease-in-out 
-                    hover:shadow-[0_20px_40px_rgba(0,0,0,0.2)] hover:scale-[1.02]
-                    active:translate-y-3 active:duration-100 active:shadow-none
-                    flex flex-col justify-between min-h-[160px] w-full"
-             :class="pc.status === 'DONE' 
-                ? 'hover:bg-emerald-600 hover:shadow-emerald-500/40' 
-                : 'hover:bg-rose-600 hover:shadow-rose-500/40'">
+        <div @click="isLocked ? showLockedAlert() : openModal('edit', pc)"
+		 class="group relative p-5 rounded-[2rem] border-0 bg-white dark:bg-[#1e293b]
+				shadow-[0_0_8px_rgba(0,0,0,0.05)] 
+				transition-all duration-500 ease-in-out 
+				flex flex-col justify-between min-h-[160px] w-full"
+		 :class="[
+			isLocked 
+				? 'opacity-60 grayscale cursor-not-allowed' 
+				: 'cursor-pointer hover:shadow-[0_20px_40px_rgba(0,0,0,0.2)] hover:scale-[1.02] active:translate-y-3 active:duration-100 active:shadow-none',
+			(!isLocked && pc.status === 'DONE') ? 'hover:bg-emerald-600 hover:shadow-emerald-500/40' : '',
+			(!isLocked && pc.status !== 'DONE') ? 'hover:bg-rose-600 hover:shadow-rose-500/40' : ''
+		 ]">
 
             <!-- 1. Top Row: Icon & Date/Status -->
             <div class="flex justify-between items-start mb-3">
@@ -907,9 +950,10 @@
 					<div class="text-center py-10 opacity-50"><i class="fa-solid fa-box-open text-4xl mb-3"></i><p class="font-bold">No assets found.</p></div>
 				</template>
 				<template x-for="item in listModalItems" :key="item.systemName">
-					<div @click="showListModal = false; openModal('edit', item)" 
-						 class="bg-white dark:bg-[#1e293b] p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-white/5 flex items-center justify-between cursor-pointer group hover:scale-[1.01] hover:shadow-md transition-all">
-						<div class="flex items-center gap-4">
+					<div @click="isLocked ? showLockedAlert() : (showListModal = false, openModal('edit', item))" 
+					 class="bg-white dark:bg-[#1e293b] p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-white/5 flex items-center justify-between transition-all"
+					 :class="isLocked ? 'opacity-70 grayscale cursor-not-allowed' : 'cursor-pointer group hover:scale-[1.01] hover:shadow-md'">
+							<div class="flex items-center gap-4">
 							<div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0" :class="item.status === 'DONE' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'"><i :class="getOsIcon(item.os)"></i></div>
 							<div class="min-w-0"><h4 class="font-black text-sm text-slate-800 dark:text-white truncate" x-text="item.systemName"></h4><div class="flex items-center gap-2 mt-1"><span class="text-[10px] font-mono font-bold bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded" x-text="item.assetId || 'No ID'"></span></div></div>
 						</div>
@@ -957,12 +1001,39 @@
         }
         function vibrateDevice(pattern = [50]) { if ("vibrate" in navigator) navigator.vibrate(pattern); }
 
+			
+
         document.addEventListener('alpine:init', () => {
             Alpine.data('vacuumTracker', () => ({
+			// 👇 YE CODE PASTE KARNA HAI
+			get isLocked() {
+				const month = new Date().getMonth(); // 0 = Jan, 4 = May, 8 = Sept
+				// Agar mahina Jan, May, Sept NAHI hai, to Locked = true
+				return ![0, 4, 8].includes(month);
+			},
+			// 👆 YAHAN TAK			
+			
+			// 👇 YE FUNCTION ADD KARO (isLocked ke baad)
+			showLockedAlert() {
+				this.haptic();
+				// Toast message jo user ko batayega ki kab khulega
+				showToast(`🚫 Locked! Next Cycle: ${this.nextCycleName}`, true);
+			},
+			
 			showListModal: false,
 			listModalTitle: '',
 			listModalType: '', // 'DONE' or 'PENDING'
 			listModalItems: [],
+			
+			// Data object ke andar add karein
+			get isLocked() {
+				const now = new Date();
+				const month = now.getMonth(); // 0=Jan, 4=May, 8=Sept
+				// Sirf Jan(0), May(4), aur Sept(8) allowed hain
+				const allowedMonths = [0, 4, 8];
+				return !allowedMonths.includes(month);
+			},
+			
 			// 👇 NEW FUNCTION ADD KARO (Pop-up open karne ke liye)
 			openListModal(type) {
 				this.haptic();
