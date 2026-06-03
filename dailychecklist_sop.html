@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PBL ITOps | Official SOP & Manual</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    colors: {
+                        cyber: { 900: '#0f172a', 800: '#1e293b', blue: '#3b82f6', teal: '#14b8a6', purple: '#8b5cf6', pink: '#ec4899', red: '#f43f5e' }
+                    },
+                    animation: {
+                        'float': 'float 4s ease-in-out infinite',
+                        'float-delayed': 'float 4s ease-in-out 2s infinite',
+                        'pulse-glow': 'pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'slide-up': 'slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'scanline': 'scanline 6s linear infinite'
+                    },
+                    keyframes: {
+                        float: { '0%, 100%': { transform: 'translateY(0px)' }, '50%': { transform: 'translateY(-10px)' } },
+                        pulseGlow: { '0%, 100%': { opacity: 1, filter: 'brightness(1)' }, '50%': { opacity: 0.7, filter: 'brightness(1.2)' } },
+                        slideUp: { '0%': { opacity: 0, transform: 'translateY(40px)' }, '100%': { opacity: 1, transform: 'translateY(0)' } },
+                        scanline: { '0%': { transform: 'translateY(-100%)' }, '100%': { transform: 'translateY(100%)' } }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #f8fafc; overflow-x: hidden; }
+        
+        /* Glassmorphism Classes */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.08), inset 0 2px 0 rgba(255,255,255,1);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .glass-card:hover { transform: translateY(-3px); box-shadow: 0 25px 45px -10px rgba(0,0,0,0.12), inset 0 2px 0 rgba(255,255,255,1); }
+        
+        /* Dark Tech Header Background */
+        .tech-bg {
+            background-color: #0f172a;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.3) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.3) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, rgba(20, 184, 166, 0.3) 0px, transparent 50%);
+            position: relative;
+        }
+        .tech-grid {
+            position: absolute; inset: 0;
+            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            pointer-events: none;
+        }
+        .scan-line {
+            position: absolute; width: 100%; height: 4px; background: linear-gradient(to right, transparent, rgba(59,130,246,0.8), transparent);
+            opacity: 0.5; pointer-events: none;
+        }
+
+        /* Highlight Utilities for Reading */
+        .hl { color: #2563eb; font-weight: 800; background: #eff6ff; padding: 0 4px; border-radius: 4px; border: 1px solid #bfdbfe; }
+        .hl-red { color: #e11d48; font-weight: 800; background: #fff1f2; padding: 0 4px; border-radius: 4px; border: 1px solid #fecaca; }
+        .hl-green { color: #10b981; font-weight: 800; background: #ecfdf5; padding: 0 4px; border-radius: 4px; border: 1px solid #a7f3d0; }
+        .hl-code { font-family: 'JetBrains Mono', monospace; font-size: 0.9em; background: #1e293b; color: #38bdf8; padding: 2px 6px; border-radius: 4px; }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="antialiased selection:bg-blue-500 selection:text-white">
+
+    <!-- 🌌 HERO HEADER (Cyber Dashboard Style) -->
+    <header class="tech-bg pt-20 pb-32 px-6 relative overflow-hidden rounded-b-[3rem] sm:rounded-b-[4rem] shadow-[0_20px_50px_rgba(15,23,42,0.5)] border-b border-slate-700">
+        <div class="tech-grid"></div>
+        <div class="scan-line animate-scanline"></div>
+        
+        <div class="max-w-5xl mx-auto relative z-10 flex flex-col md:flex-row items-center gap-8 md:gap-12">
+            <!-- Animated 3D Icon Container -->
+            <div class="relative shrink-0">
+                <div class="absolute inset-0 bg-blue-500 blur-3xl opacity-40 rounded-full animate-pulse-glow"></div>
+                <div class="w-28 h-28 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-600 rounded-3xl flex items-center justify-center text-5xl shadow-2xl relative z-10 animate-float">
+                    <i class="fa-solid fa-layer-group text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-400"></i>
+                </div>
+                <!-- Small orbiting dots -->
+                <div class="absolute -top-2 -right-2 w-6 h-6 bg-rose-500 rounded-full border-2 border-slate-900 animate-float-delayed shadow-[0_0_15px_#f43f5e]"></div>
+                <div class="absolute -bottom-2 -left-2 w-5 h-5 bg-teal-400 rounded-full border-2 border-slate-900 animate-float shadow-[0_0_15px_#2dd4bf]"></div>
+            </div>
+
+            <div class="text-center md:text-left">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/50 border border-slate-700 mb-4 backdrop-blur-md">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span class="text-xs font-mono font-bold text-slate-300 tracking-widest uppercase">System v6.0 Live</span>
+                </div>
+                <h1 class="text-4xl md:text-6xl font-black text-white tracking-tight mb-4 leading-tight">
+                    PBL DailyOps <br class="hidden md:block">
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-teal-400 to-purple-400">Master SOP Manual</span>
+                </h1>
+                <p class="text-slate-400 text-sm md:text-base font-medium max-w-2xl leading-relaxed">
+                    Welcome IT Team! Yeh in-depth operational guide aapko nayi <strong class="text-slate-200">Progressive Web App (PWA)</strong> ke advanced features, rules, aur gestures samajhne mein help karegi. Is document ko dhyaan se padhein.
+                </p>
+            </div>
+        </div>
+    </header>
+
+    <!-- 📌 MAIN CONTENT CONTAINER -->
+    <main class="max-w-5xl mx-auto px-5 -mt-16 space-y-10 pb-24 relative z-20">
+
+        <!-- ⏱️ SECTION 1: SHIFT LOGIC & LATE ENTRY -->
+        <section class="glass-card rounded-[2.5rem] p-6 md:p-10 animate-slide-up" style="animation-delay: 0.1s;">
+            <div class="flex items-start gap-5 mb-8">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-2xl text-white shadow-lg shadow-blue-500/30 shrink-0">
+                    <i class="fa-solid fa-business-time"></i>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-black text-slate-800 tracking-tight">1. Smart Shifts & Late Entry Protocol</h2>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">AI Based Time Detection</p>
+                </div>
+            </div>
+            
+            <div class="space-y-6 text-slate-600 font-medium leading-relaxed">
+                <p>App open karte hi aapke device ka time read karke app <span class="hl">Automatic Shift</span> aur <span class="hl">Auditor Name</span> assign kar degi. Theme color bhi shift ke hisaab se dynamically change hoga (Morning = Blue, General = Teal, Evening = Violet).</p>
+                
+                <!-- Shifts Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-slate-50 border-2 border-slate-100 hover:border-blue-300 p-5 rounded-2xl transition-colors">
+                        <div class="text-blue-600 font-black text-lg mb-1"><i class="fa-solid fa-sun mr-1"></i> Morning</div>
+                        <div class="text-[11px] font-black text-slate-400 tracking-widest uppercase mb-3">Noida Branch</div>
+                        <div class="font-mono font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg border inline-block mb-3">08:00 AM - 03:45 PM</div>
+                        <div class="text-sm font-bold text-slate-800">Auditor: <span class="text-blue-600">Anil Singh</span></div>
+                    </div>
+                    <div class="bg-slate-50 border-2 border-slate-100 hover:border-teal-300 p-5 rounded-2xl transition-colors">
+                        <div class="text-teal-600 font-black text-lg mb-1"><i class="fa-solid fa-mountain-sun mr-1"></i> General</div>
+                        <div class="text-[11px] font-black text-slate-400 tracking-widest uppercase mb-3">Dehradun Branch</div>
+                        <div class="font-mono font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg border inline-block mb-3">09:30 AM - 05:30 PM</div>
+                        <div class="text-sm font-bold text-slate-800">Auditor: <span class="text-teal-600">Deependra</span></div>
+                    </div>
+                    <div class="bg-slate-50 border-2 border-slate-100 hover:border-purple-300 p-5 rounded-2xl transition-colors">
+                        <div class="text-purple-600 font-black text-lg mb-1"><i class="fa-solid fa-moon mr-1"></i> Evening</div>
+                        <div class="text-[11px] font-black text-slate-400 tracking-widest uppercase mb-3">Noida Branch</div>
+                        <div class="font-mono font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg border inline-block mb-3">02:15 PM - 09:30 PM</div>
+                        <div class="text-sm font-bold text-slate-800">Auditor: <span class="text-purple-600">Ashok Singh</span></div>
+                    </div>
+                </div>
+
+                <!-- Late Entry Warning Box -->
+                <div class="bg-rose-50 border border-rose-200 p-5 rounded-2xl flex gap-4 mt-6 items-start shadow-inner">
+                    <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-rose-500 shadow-sm shrink-0 border border-rose-100">
+                        <i class="fa-solid fa-siren-on animate-pulse"></i>
+                    </div>
+                    <div>
+                        <strong class="text-rose-700 text-base block mb-1">🚨 LATE ENTRY SYSTEM (Red Theme)</strong>
+                        <p class="text-sm text-rose-600/90 leading-relaxed">Agar aap apne designated time slot ke aage-peeche app use karte hain, toh pura App <span class="hl-red">Crimson Red</span> ho jayega. Aapka initial Score <span class="hl-code">0%</span> aayega aur Submit karne se pehle <span class="hl-red">Shift Logs (Remarks)</span> mein solid reason daalna <strong>MANDATORY</strong> hai, warna "Send Report" button lock rahega.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 📲 SECTION 2: GESTURES & MODULES -->
+        <section class="glass-card rounded-[2.5rem] p-6 md:p-10 animate-slide-up" style="animation-delay: 0.2s;">
+            <div class="flex items-start gap-5 mb-8">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-2xl text-white shadow-lg shadow-teal-500/30 shrink-0">
+                    <i class="fa-solid fa-mobile-screen-button"></i>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-black text-slate-800 tracking-tight">2. Interacting with Modules</h2>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Swipes, Sliders & Smart Inputs</p>
+                </div>
+            </div>
+
+            <p class="text-slate-600 font-medium mb-6">Nayi app mein checkboxes ko hata kar advanced touch gestures aur tactile elements daale gaye hain. Har ek action par aapko <span class="hl">Haptic Vibration</span> (Phone vibration) feel hogi.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Serves & Services -->
+                <div class="bg-white border-2 border-slate-100 p-6 rounded-3xl hover:border-blue-200 transition-colors group">
+                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform"><i class="fa-solid fa-server"></i></div>
+                    <h3 class="font-black text-lg text-slate-800 mb-2">Servers & Cloud Services</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">Mobile par kisi bhi service ko ON karne ke liye uspar <span class="hl">Swipe Right &rarr;</span> karein. Desktop par simple click karein.<br>
+                    Agar koi server <strong>Maintenance</strong> par hai, toh Card ke right side top par bane chote <span class="hl-code">Wrench (🛠️)</span> icon par click karein. Yeh box ko Yellow kar dega.</p>
+                </div>
+
+                <!-- ISP Network -->
+                <div class="bg-white border-2 border-slate-100 p-6 rounded-3xl hover:border-violet-200 transition-colors group">
+                    <div class="w-12 h-12 bg-violet-50 text-violet-600 rounded-xl flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform"><i class="fa-solid fa-wifi"></i></div>
+                    <h3 class="font-black text-lg text-slate-800 mb-2">ISP Network Sliders</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">Download (Blue) aur Upload (Purple) speed ko set karne ke liye DJ style sliders ko drag karein.<br>
+                    <strong>Fiber vs RF:</strong> Naye update mein aap network medium select kar sakte hain. Fiber select karne par max speed apne aap adjust ho jayegi.<br>
+                    <span class="hl-red">Ticket Rule:</span> Agar speed 50% se kam set ki gayi, toh slider RED ho jayega aur ek naya Ticket Input box open hoga. Complaint No. daalna zaruri hai.</p>
+                </div>
+
+                <!-- Security Check -->
+                <div class="bg-white border-2 border-slate-100 p-6 rounded-3xl hover:border-cyan-200 transition-colors group">
+                    <div class="w-12 h-12 bg-cyan-50 text-cyan-600 rounded-xl flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform"><i class="fa-solid fa-shield-virus"></i></div>
+                    <h3 class="font-black text-lg text-slate-800 mb-2">Security Audits (AV & USB)</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">Antivirus (Sophos/Seqrite) aur USB port block random client PC par check karne hain. Box par click karte hi ek Popup khulega. Aapko <span class="hl-green">Target PC ka naam type karna padega</span> (e.g., PBLNET005) tabhi verify button unlock hoga.</p>
+                </div>
+
+                <!-- Fire Safety -->
+                <div class="bg-white border-2 border-slate-100 p-6 rounded-3xl hover:border-rose-200 transition-colors group">
+                    <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform"><i class="fa-solid fa-fire-extinguisher"></i></div>
+                    <h3 class="font-black text-lg text-slate-800 mb-2">Facility & Fire Safety</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">AC cooling verify karne ke alawa Fire Safety toggle ON karein. ON karte hi ek <span class="hl">Location Select Dropdown</span> aayega. Isme Noida/Dehradun ke specific pillars/floors ki list hai. Aapne physical tour me jis extinguisher ko check kiya hai, wahi location select karein.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 📋 SECTION 3: SHIFT SPECIFIC PROTOCOLS -->
+        <section class="glass-card rounded-[2.5rem] p-6 md:p-10 animate-slide-up" style="animation-delay: 0.3s;">
+            <div class="flex items-start gap-5 mb-8">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-2xl text-white shadow-lg shadow-orange-500/30 shrink-0">
+                    <i class="fa-solid fa-list-check"></i>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-black text-slate-800 tracking-tight">3. Shift Specific Action Items</h2>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Engineer Responsibilities</p>
+                </div>
+            </div>
+
+            <p class="text-slate-600 font-medium mb-6">Niche diye gaye tasks sirf usi shift mein dikhai denge jiski timing chal rahi hai. In fields ke andar inputs daalna track kiya jata hai.</p>
+
+            <div class="space-y-4">
+                <!-- Morning Protocol -->
+                <div class="bg-blue-50/50 border border-blue-100 p-5 rounded-3xl">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center shadow-md"><i class="fa-solid fa-sun"></i></div>
+                        <h3 class="text-lg font-black text-blue-900">Morning Shift (Noida - Anil)</h3>
+                    </div>
+                    <ul class="space-y-2 text-sm text-slate-700 ml-14">
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-caret-right text-blue-400 mt-1"></i> <p><strong>Temp Sync:</strong> Server room temp slide karke set karein. Bahar ka weather API ke through automatically aayega.</p></li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-caret-right text-blue-400 mt-1"></i> <p><strong>Prod PCs:</strong> Floor verify karein. Agar koi system raat se ON chhut gaya hai, toh box red hoga aur slide-down command line me <span class="hl">PC ka ID likhna hoga</span>.</p></li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-caret-right text-blue-400 mt-1"></i> <p><strong>Manual Backups:</strong> DC aur ADC ka backup button click karein, aur <span class="hl-code">Completion Time (e.g. 02:15 AM)</span> input box mein type karein.</p></li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-caret-right text-blue-400 mt-1"></i> <p><strong>eTokens & FTP:</strong> Safe se 15 tokens issue karein aur Client FTP sync status ko verify karke click karein.</p></li>
+                    </ul>
+                </div>
+
+                <!-- General Protocol -->
+                <div class="bg-teal-50/50 border border-teal-100 p-5 rounded-3xl">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 bg-teal-500 text-white rounded-full flex items-center justify-center shadow-md"><i class="fa-solid fa-mountain-sun"></i></div>
+                        <h3 class="text-lg font-black text-teal-900">General Shift (Dehradun - Deependra)</h3>
+                    </div>
+                    <ul class="space-y-2 text-sm text-slate-700 ml-14">
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-caret-right text-teal-400 mt-1"></i> <p><strong>Temp Limit:</strong> Dehradun ke liye max temp limit 28°C set ki gayi hai. Usey exceed karne par alert aayega.</p></li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-caret-right text-teal-400 mt-1"></i> <p><strong>Guard Register Audit:</strong> Security desk par physical register ki entry ko CCTV timings ke sath random cross-verify karna mandatory hai.</p></li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-caret-right text-teal-400 mt-1"></i> <p><strong>FTP Server Start:</strong> Ensure karein ki subah PBLDD027 properly power ON ho chuka hai.</p></li>
+                    </ul>
+                </div>
+
+                <!-- Evening Protocol -->
+                <div class="bg-violet-50/50 border border-violet-100 p-5 rounded-3xl">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 bg-violet-500 text-white rounded-full flex items-center justify-center shadow-md"><i class="fa-solid fa-moon"></i></div>
+                        <h3 class="text-lg font-black text-violet-900">Evening Shift (Noida - Ashok)</h3>
+                    </div>
+                    <ul class="space-y-2 text-sm text-slate-700 ml-14">
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-caret-right text-violet-400 mt-1"></i> <p><strong>eTokens Vault:</strong> Morning me issue hue sabhi tokens wapis Vault (Safehouse) mein count karke secure karein.</p></li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-caret-right text-violet-400 mt-1"></i> <p><strong>FTP Monitoring:</strong> Active client sync check karein. Toggle ON karne par ek input box aayega, jisme <span class="hl-code">Client A Uploading</span> type ka status likhna hai. Yeh automatically final report me attach hoga.</p></li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-caret-right text-violet-400 mt-1"></i> <p><strong>pblnet020 Status:</strong> Agar system mein data download chal raha hai toh box Orange rahega, input me <span class="hl">Job name</span> daalein. Agar download complete hai toh toggle off karke Green karein (System Shutdown verified).</p></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 🤝 SECTION 4: SMART HANDOVER & SUBMIT -->
+        <section class="glass-card rounded-[2.5rem] p-6 md:p-10 animate-slide-up" style="animation-delay: 0.4s;">
+            <div class="flex items-start gap-5 mb-8">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-2xl text-white shadow-lg shadow-pink-500/30 shrink-0">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-black text-slate-800 tracking-tight">4. Shift Logs, Handover & Submit</h2>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Closing the Cycle</p>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Smart Handover Feature -->
+                <div class="bg-slate-800 text-white p-6 rounded-3xl shadow-xl relative overflow-hidden">
+                    <i class="fa-solid fa-comment-dots absolute -right-6 -bottom-6 text-9xl text-slate-700/50"></i>
+                    <h3 class="text-lg font-black text-pink-400 flex items-center gap-2 mb-3 relative z-10"><i class="fa-solid fa-bolt"></i> Smart Handover Feature</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed mb-4 relative z-10">Bottom mein diye gaye <strong>"Shift Logs"</strong> text area ka ek special purpose hai. Agar score 100% nahi hai ya koi important pending ticket hai, toh wahan detailed message type karein.</p>
+                    <div class="bg-white/10 border border-white/20 p-4 rounded-xl relative z-10">
+                        <strong class="text-emerald-400 block mb-1">Magic Trick ✨</strong>
+                        <p class="text-xs text-slate-200">Jab aap message type karke submit karenge, aur jab agle din/shift mein next engineer (e.g. Ashok) app open karega, toh app usko turant ek <span class="hl-green text-slate-800">Popup Alert</span> dikhayegi ki <strong>"Message from Anil: STPI Link down ticket #441 pending"</strong>. Isse manual WhatsApp message ki zarurat nahi padegi!</p>
+                    </div>
+                </div>
+
+                <!-- Submit & Receipt -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    <!-- Identity Verification (Secret PINs) -->
+                    <div class="bg-white border-2 border-slate-100 p-5 rounded-2xl relative overflow-hidden group">
+                        <h4 class="font-black text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-shield-halved text-blue-500"></i> Identity Verification</h4>
+                        <p class="text-sm text-slate-600 mb-4">Submit dabane par App aapse ek 4-digit PIN mangegi fake entries rokne ke liye. Yeh aapka secure digital signature hai.</p>
+                        
+                        <!-- Secret Warning Box -->
+                        <div class="bg-slate-900 rounded-xl p-4 relative overflow-hidden border border-slate-700 shadow-inner">
+                            <i class="fa-solid fa-user-secret absolute -right-2 -bottom-2 text-6xl text-slate-800/80 transition-transform group-hover:scale-110"></i>
+                            <div class="relative z-10 flex items-start gap-3">
+                                <div class="w-8 h-8 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0 border border-rose-500/30">
+                                    <i class="fa-solid fa-key"></i>
+                                </div>
+                                <div>
+                                    <strong class="text-white text-sm block mb-1">Top Secret PIN 🤫</strong>
+                                    <p class="text-[11px] text-slate-300 leading-relaxed font-medium">Har individual engineer ka 4-digit secret PIN unhe <span class="text-blue-400 font-bold">personally bata diya jayega</span>.</p>
+                                    <div class="mt-2 inline-flex items-center gap-1.5 bg-rose-500/10 border border-rose-500/30 px-2 py-1 rounded text-[10px] font-bold text-rose-400 uppercase tracking-widest">
+                                        <i class="fa-solid fa-triangle-exclamation"></i> Do not disclose to anyone
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- HTML Receipt -->
+                    <div class="bg-white border-2 border-slate-100 p-5 rounded-2xl group hover:border-emerald-200 transition-colors">
+                        <h4 class="font-black text-slate-800 mb-2 flex items-center gap-2"><i class="fa-solid fa-receipt text-emerald-500"></i> HTML Receipt Generation</h4>
+                        <p class="text-sm text-slate-600">PIN verify hone ke baad, report backend par Vikas Sir ke email aur master Google Sheet par bhej di jayegi. <br><br>
+                        Uske turant baad screen par ek <span class="hl-green">Image Receipt</span> aayegi jisme apka score, name aur audit ki summary hogi. Niche diye <span class="hl">"Share"</span> button se usey direct IT WhatsApp group mein bheji ja sakti hai.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ⚖️ SECTION 5: GOLDEN RULES (Cheat Sheet) -->
+        <section class="glass-card rounded-[2.5rem] p-6 md:p-10 relative overflow-hidden animate-slide-up" style="animation-delay: 0.5s;">
+            <div class="absolute -right-10 -bottom-10 text-9xl opacity-5 pointer-events-none text-blue-900"><i class="fa-solid fa-scale-balanced"></i></div>
+            <div class="flex items-center gap-4 mb-6 border-b border-slate-100 pb-4 relative z-10">
+                <div class="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-xl text-amber-400 shrink-0 shadow-lg"><i class="fa-solid fa-star"></i></div>
+                <div>
+                    <h2 class="text-xl font-black text-slate-800 tracking-tight">5. Top 3 Golden Rules</h2>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">IT Discipline</p>
+                </div>
+            </div>
+
+            <div class="space-y-4 relative z-10">
+                <div class="flex items-start gap-4 bg-white/50 p-4 rounded-xl border border-white">
+                    <div class="w-8 h-8 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center shrink-0 font-black">1</div>
+                    <p class="text-sm text-slate-700"><strong class="text-slate-900">No Fake Entries:</strong> App aapka session duration ("TimeTaken") track karti hai aur report me attach karti hai. Exact physical verification ke baad hi elements tick karein.</p>
+                </div>
+                <div class="flex items-start gap-4 bg-white/50 p-4 rounded-xl border border-white">
+                    <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center shrink-0 font-black">2</div>
+                    <p class="text-sm text-slate-700"><strong class="text-slate-900">Auto-Save Rescue:</strong> Agar beech mein app band ho jaye ya refresh ho jaye, don't panic. App ka <span class="hl-code">LocalStorage</span> engine form ko auto-save rakhta hai. Wapis aane par sab bhara hua milega.</p>
+                </div>
+                <div class="flex items-start gap-4 bg-white/50 p-4 rounded-xl border border-white">
+                    <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-500 flex items-center justify-center shrink-0 font-black">3</div>
+                    <p class="text-sm text-slate-700"><strong class="text-slate-900">Cloud Status URLs:</strong> Email report ke andar ek nayi <span class="hl-green">🔍 View Report</span> link hogi jisme management click karke aapki report ka ek sundar graphical HTML version web par dekh sakti hai.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="text-center py-8 opacity-80">
+            <div class="inline-block w-16 h-1 bg-slate-300 rounded-full mb-5"></div>
+            <p class="text-sm font-black text-slate-500 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-code text-blue-400"></i> Engineered for PBL IT Department
+            </p>
+            <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-2">v6.0 • INTERNAL CONFIDENTIAL</p>
+        </footer>
+
+    </main>
+
+</body>
+</html>
