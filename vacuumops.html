@@ -1,29 +1,43 @@
 <!DOCTYPE html>
+<!-- HTML5 ka standard declaration -->
 <html lang="en">
 <head>
+    <!-- Character set aur mobile responsivenes ke liye viewport settings -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Browser tab par dikhne wala title -->
     <title>PBL VacuumOps | Ultimate Pro</title>
     
-    <!-- ✅ Favicon -->
+    <!-- ✅ Favicon (Browser tab ka logo) -->
     <link rel="icon" type="image/png" href="pbl-logo.png">
     
-    <!-- Dependencies -->
+    <!-- Dependencies / External Libraries load kar rahe hain -->
+    <!-- Tailwind CSS styling ke liye -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome icons ke liye -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts (Outfit aur JetBrains Mono) -->
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;800&family=Outfit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <!-- Alpine.js (State management aur interactivity ke liye) -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
 
+    <!-- Tailwind CSS ki custom configuration (Dark mode aur colors) -->
     <script>
         tailwind.config = {
-            darkMode: 'class',
+            darkMode: 'class', // Dark mode class ke basis par chalega
             theme: {
                 extend: {
                     colors: {
-                        dark_bg: '#0f172a'
+                        dark_bg: '#0f172a' // Dark mode ka background color
                     },
-                    fontFamily: { sans: ['Outfit', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
-                    animation: { 'slide-up': 'slideUp 0.3s ease-out forwards', 'fade-in': 'fadeIn 0.2s ease-out forwards' },
+                    fontFamily: { 
+                        sans: ['Outfit', 'sans-serif'], // Normal text ka font
+                        mono: ['JetBrains Mono', 'monospace'] // Code/ID text ka font
+                    },
+                    animation: { 
+                        'slide-up': 'slideUp 0.3s ease-out forwards', // Niche se upar aane wala animation
+                        'fade-in': 'fadeIn 0.2s ease-out forwards' // Halka sa zoom hoke aane wala animation
+                    },
                     keyframes: { 
                         slideUp: { 'from': { opacity: 0, transform: 'translateY(10px)' }, 'to': { opacity: 1, transform: 'translateY(0)' } },
                         fadeIn: { 'from': { opacity: 0, transform: 'scale(0.95)' }, 'to': { opacity: 1, transform: 'scale(1)' } }
@@ -33,15 +47,19 @@
         }
     </script>
 
+    <!-- Custom CSS Styles -->
     <style>
+        /* Alpine.js load hone se pehle elements ko hide rakhne ke liye */
         [x-cloak] { display: none !important; }
+        
+        /* Body ka default background aur mobile tap highlight hatane ke liye */
         body { background-color: #f8fafc; -webkit-tap-highlight-color: transparent; }
         
-        /* 🔥 DYNAMIC THEMES */
-        .bg-gradient-noida { background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); } /* Blue */
-        .bg-gradient-ddn { background: linear-gradient(135deg, #10b981 0%, #047857 100%); }   /* Green */
+        /* 🔥 DYNAMIC THEMES (Noida aur Dehradun ke liye alag gradient colors) */
+        .bg-gradient-noida { background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); } /* Noida = Blue */
+        .bg-gradient-ddn { background: linear-gradient(135deg, #10b981 0%, #047857 100%); }   /* Dehradun = Green */
 
-        /* Glass Card */
+        /* Glass Card Effect (Semi-transparent background blur ke sath) */
         .glass-card {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(15px);
@@ -49,14 +67,16 @@
             box-shadow: 0 10px 30px -5px rgba(0,0,0,0.1);
             transition: transform 0.2s;
         }
+        /* Dark mode mein glass card ka style */
         .dark .glass-card {
             background: rgba(30, 41, 59, 0.95);
             border: 1px solid rgba(255, 255, 255, 0.05);
             box-shadow: 0 10px 30px -5px rgba(0,0,0,0.5);
         }
+        /* Click karne par thoda chota (shrink) hone ka effect */
         .glass-card:active { transform: scale(0.98); }
 
-        /* Input Fields */
+        /* Input Fields ka custom design */
         .input-box {
             width: 100%; padding: 14px; background: #f1f5f9; border: 2px solid transparent;
             border-radius: 14px; font-size: 0.9rem; outline: none; transition: 0.2s; font-weight: 700;
@@ -64,24 +84,19 @@
         .dark .input-box { background: #0f172a; color: white; }
         .input-box:focus { background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
 
-        /* Scrollbar */
+        /* Scrollbar ki styling taaki wo thoda sundar dikhe */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #64748b; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar::-webkit-scrollbar { display: none; } /* Scrollbar hide karne ki class */
         
-        /* Custom Dropdown Scroll */
+        /* Dropdown ki max height aur scroll setting */
         .custom-dropdown-list { max-height: 200px; overflow-y: auto; scrollbar-width: thin; }
 
-        /* ✈️ ANIMATED REPORT BUTTON STYLES */
+        /* ✈️ ANIMATED REPORT BUTTON STYLES (Hover karne par jahaj udne ka animation) */
         .btn-fly {
-            font-family: inherit;
-            display: flex;
-            align-items: center;
-            border: none;
-            overflow: hidden;
-            transition: all 0.2s;
-            cursor: pointer;
+            font-family: inherit; display: flex; align-items: center; border: none;
+            overflow: hidden; transition: all 0.2s; cursor: pointer;
         }
         .btn-fly span { display: block; margin-left: 0.3em; transition: all 0.3s ease-in-out; }
         .btn-fly svg { display: block; transform-origin: center center; transition: transform 0.3s ease-in-out; }
@@ -91,40 +106,17 @@
         .btn-fly:active { transform: scale(0.95); }
         @keyframes fly-1 { from { transform: translateY(0.1em); } to { transform: translateY(-0.1em); } }
 
-        /* 📡 WIFI LOADER STYLES (UPDATED) */
+        /* 📡 WIFI LOADER STYLES (Syncing ke time ghoomne wala animation) */
         #wifi-loader {
-            --background: #62abff;
-            --front-color: #2563eb;
-            --back-color: #cbd5e1;
-            --text-color: #64748b;
-            width: 64px;
-            height: 64px;
-            border-radius: 50px;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            --background: #62abff; --front-color: #2563eb; --back-color: #cbd5e1; --text-color: #64748b;
+            width: 64px; height: 64px; border-radius: 50px; position: relative;
+            display: flex; justify-content: center; align-items: center;
         }
-        #wifi-loader.theme-green { --front-color: #10b981; }
-        #wifi-loader svg {
-            position: absolute;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transform: scale(0.75); /* 📉 Animation Size Reduced */
-        }
-        #wifi-loader svg circle {
-            position: absolute;
-            fill: none;
-            stroke-width: 6px;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            transform: rotate(-100deg);
-            transform-origin: center;
-        }
+        #wifi-loader.theme-green { --front-color: #10b981; } /* Dehradun ke liye loader green hoga */
+        #wifi-loader svg { position: absolute; display: flex; justify-content: center; align-items: center; transform: scale(0.75); }
+        #wifi-loader svg circle { position: absolute; fill: none; stroke-width: 6px; stroke-linecap: round; stroke-linejoin: round; transform: rotate(-100deg); transform-origin: center; }
         #wifi-loader svg circle.back { stroke: var(--back-color); }
         #wifi-loader svg circle.front { stroke: var(--front-color); }
-        
         #wifi-loader svg.circle-outer { height: 86px; width: 86px; }
         #wifi-loader svg.circle-outer circle { stroke-dasharray: 62.75 188.25; }
         #wifi-loader svg.circle-outer circle.back { animation: circle-outer135 1.8s ease infinite 0.3s; }
@@ -137,62 +129,48 @@
         #wifi-loader svg.circle-inner circle { stroke-dasharray: 22 66; }
         #wifi-loader svg.circle-inner circle.back { animation: circle-inner162 1.8s ease infinite 0.2s; }
         #wifi-loader svg.circle-inner circle.front { animation: circle-inner162 1.8s ease infinite 0.05s; }
-
-        #wifi-loader .text {
-            position: absolute;
-            bottom: -48px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-transform: uppercase;
-            font-weight: 900;
-            font-size: 15px;
-            letter-spacing: 2px;
-            color: var(--text-color);
-        }
+        #wifi-loader .text { position: absolute; bottom: -48px; display: flex; justify-content: center; align-items: center; text-transform: uppercase; font-weight: 900; font-size: 15px; letter-spacing: 2px; color: var(--text-color); }
         #wifi-loader .text::before, #wifi-loader .text::after { content: attr(data-text); }
         #wifi-loader .text::before { color: var(--text-color); }
-        #wifi-loader .text::after {
-            color: var(--front-color);
-            animation: text-animation76 3.6s ease infinite;
-            position: absolute;
-            left: 0;
-        }
+        #wifi-loader .text::after { color: var(--front-color); animation: text-animation76 3.6s ease infinite; position: absolute; left: 0; }
+        
+        /* Keyframes for loader animation */
         @keyframes circle-outer135 { 0% { stroke-dashoffset: 25; } 25% { stroke-dashoffset: 0; } 65% { stroke-dashoffset: 301; } 80% { stroke-dashoffset: 276; } 100% { stroke-dashoffset: 276; } }
         @keyframes circle-middle6123 { 0% { stroke-dashoffset: 17; } 25% { stroke-dashoffset: 0; } 65% { stroke-dashoffset: 204; } 80% { stroke-dashoffset: 187; } 100% { stroke-dashoffset: 187; } }
         @keyframes circle-inner162 { 0% { stroke-dashoffset: 9; } 25% { stroke-dashoffset: 0; } 65% { stroke-dashoffset: 106; } 80% { stroke-dashoffset: 97; } 100% { stroke-dashoffset: 97; } }
         @keyframes text-animation76 { 0% { clip-path: inset(0 100% 0 0); } 50% { clip-path: inset(0); } 100% { clip-path: inset(0 0 0 100%); } }
 		
+		/* Locked State (Jab time nikal jaye to grey karne ke liye class) */
 		.locked-state {
-    filter: grayscale(1);
-    opacity: 0.6;
-    /* pointer-events line hata di taaki user click karke message dekh sake */
-    cursor: not-allowed;
-	}
-		
+            filter: grayscale(1);
+            opacity: 0.6;
+            cursor: not-allowed;
+	    }
     </style>
 </head>
 
+<!-- Body start, Alpine.js (x-data="vacuumTracker()") yahan se saara logic chalata hai -->
 <body class="text-slate-800 transition-colors duration-300 min-h-screen font-sans bg-slate-50 dark:bg-dark_bg dark:text-slate-200" x-data="vacuumTracker()">
 
     <!-- =========================================================
-         📱 MOBILE LAYOUT (Fixed Overlap Issue & New Features)
+         📱 MOBILE LAYOUT (Choti screen jaise phones ke liye)
     ========================================================== -->
-    <div class="block md:hidden pb-32 relative">
+	<div class="block md:hidden pb-32 relative">
         
-        <!-- LAYER 1: BACKGROUND -->
+        <!-- LAYER 1: BACKGROUND (Upar ka colored gradient box) -->
         <div class="absolute top-0 left-0 w-full rounded-b-[3rem] shadow-xl z-10 transition-all duration-300 overflow-hidden"
              :class="[headerGradient, showSearchInput ? 'h-[360px]' : 'h-[320px]']">
+            <!-- Background mein halki white glow (blur circles) -->
             <div class="absolute top-[-20px] left-[-20px] w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
             <div class="absolute bottom-[-10px] right-[-10px] w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
         </div>
 
-        <!-- LAYER 3: HEADER CONTENT -->
+        <!-- LAYER 3: HEADER CONTENT (Logo, Name, Dropdown) -->
         <header class="relative z-50 pt-8 px-5">
             <div>
                 <div class="flex justify-between items-center mb-4">
+                    <!-- Left Side: Logo aur App Name -->
                     <div class="flex items-center gap-3">
-                        <!-- ✅ LOGO with White Background & Shadow -->
                         <div class="w-11 h-11 bg-white rounded-2xl flex items-center justify-center shadow-lg shadow-black/10 border border-white/50">
                             <img src="pbl-logo.png" alt="Logo" class="w-6 h-6 object-contain">
                         </div>
@@ -204,8 +182,9 @@
                         </div>
                     </div>
                     
+                    <!-- Right Side: Location Dropdown aur Search Button -->
                     <div class="flex items-center gap-2">
-                        <!-- Dropdown -->
+                        <!-- Location Dropdown Alpine.js state ke sath -->
                         <div class="relative" x-data="{ open: false }">
                             <button @click="open = !open" @click.away="open = false" 
                                 class="flex items-center gap-2 bg-white/20 text-white text-xs font-bold py-2.5 pl-3 pr-3 rounded-xl border border-white/20 outline-none backdrop-blur-md active:scale-95 transition">
@@ -213,6 +192,7 @@
                                 <i class="fa-solid fa-caret-down text-[10px] text-white/80 transition-transform" :class="open ? 'rotate-180' : ''"></i>
                             </button>
 
+                            <!-- Dropdown Menu List -->
                             <div x-show="open" x-cloak class="absolute right-0 top-full mt-2 w-32 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-100 dark:border-slate-700 overflow-hidden z-[100] animate-fade-in">
                                 <div @click="activeLocation = 'Noida'; open = false; handleLocationChange()" 
                                      class="px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer flex items-center justify-between group">
@@ -228,11 +208,14 @@
                             </div>
                         </div>
 
+                        <!-- Search Button toggle logic -->
                         <button @click="showSearchInput = !showSearchInput; if(!showSearchInput) search='';" class="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/10 active:scale-95 transition">
                             <i class="fa-solid" :class="showSearchInput ? 'fa-xmark' : 'fa-magnifying-glass'"></i>
                         </button>
                     </div>
                 </div>
+                
+                <!-- Search Input Field (Hidden by default, click karne par open hota hai) -->
                 <div x-show="showSearchInput" x-collapse x-cloak class="mt-4 animate-slide-up">
                     <div class="relative">
                         <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-white/60"></i>
@@ -242,7 +225,7 @@
             </div>
         </header>
 
-        <!-- LAYER 2: MAIN CARD -->
+        <!-- LAYER 2: MAIN CARD (Progress dial aur Filters wala safed box) -->
         <main class="relative z-40 px-4 mt-14 max-w-lg mx-auto space-y-2">
             <div class="glass-card relative px-5 py-6 rounded-[2.5rem] flex items-center justify-between shadow-xl overflow-visible">
                 <div class="flex flex-col gap-1.5">
@@ -250,16 +233,35 @@
                         <i class="fa-solid fa-calendar-days text-sm" :class="themeText"></i>
                         <p class="text-[10px] font-black uppercase tracking-widest">Current</p>
                     </div>
+                    <!-- Current Cycle Ka Naam (e.g., MAY 2026) -->
                     <p class="text-xl font-black leading-none" :class="themeText" x-text="currentCycleName">...</p>
-                    <div class="flex items-center gap-1.5 mt-1 bg-slate-100 dark:bg-white/10 px-3 py-1 rounded-full w-fit border border-slate-200 dark:border-white/5">
+                
+                <!-- 🔄 DYNAMIC BADGE (Normal vs Grace Period) -->
+                <div class="mt-1">
+                    <!-- Normal State: Jab time bacha ho to simple next cycle dikhayega -->
+                    <div x-show="!isGracePeriod" class="flex items-center gap-1.5 bg-slate-100 dark:bg-white/10 px-3 py-1 rounded-full w-fit border border-slate-200 dark:border-white/5 transition-all">
                         <span class="text-[9px] font-bold text-slate-400 uppercase">Next:</span>
                         <span class="text-[10px] font-bold text-slate-700 dark:text-white" x-text="nextCycleName">...</span>
                     </div>
+                    
+                    <!-- ⚠️ Grace Period Alert: Jab mahine ki shuruwat ke 7 din ho, tab Amber alert dikhayega -->
+                    <div x-show="isGracePeriod" x-cloak class="flex items-center gap-1.5 bg-amber-50 dark:bg-amber-500/10 px-3 py-1 rounded-full w-fit border border-amber-200 dark:border-amber-500/20 shadow-sm shadow-amber-500/20 transition-all">
+                        <!-- Ghadi ka ghoomta hua icon -->
+                        <i class="fa-solid fa-hourglass-half text-[10px] text-amber-500 animate-pulse"></i>
+                        <span class="text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">
+                            Grace: Ends <span x-text="graceEndDate"></span>
+                        </span>
+                    </div>
                 </div>
+            </div>
+            
+                <!-- Circular Progress Bar (Bich me rakha hua percent ring) -->
                 <div class="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-white dark:bg-[#1e293b] rounded-full p-2 shadow-2xl flex items-center justify-center z-50 border-4 border-slate-50 dark:border-slate-700">
                     <div class="relative w-full h-full">
                         <svg class="w-full h-full transform -rotate-90">
+                            <!-- Grey background circle -->
                             <circle cx="50%" cy="50%" r="32" stroke="#e2e8f0" stroke-width="6" fill="transparent" />
+                            <!-- Colored progress circle jo percent ke hisaab se bharega -->
                             <circle cx="50%" cy="50%" r="32" :stroke="themeColorHex" stroke-width="6" fill="transparent" :stroke-dasharray="200" :stroke-dashoffset="200 - (200 * percentage) / 100" stroke-linecap="round" class="transition-all duration-1000"/>
                         </svg>
                         <div class="absolute inset-0 flex flex-col items-center justify-center leading-none">
@@ -268,7 +270,7 @@
                     </div>
                 </div>
                 
-                <!-- 🔥 FILTERS: Pushed down with mt-8 to fix overlap -->
+                <!-- 🔥 FILTERS: List ko chhanne wale buttons (Today, Done, Pending) -->
                 <div class="flex gap-2 mt-8 self-end">
                     <!-- Today Button -->
                     <button @click="toggleFilter('TODAY')" class="flex flex-col items-center justify-center w-14 h-14 rounded-2xl transition-all shadow-md active:scale-95" :class="filterStatus === 'TODAY' ? 'bg-amber-500 text-white shadow-amber-200' : 'bg-amber-50 text-amber-600 hover:bg-amber-100'">
@@ -285,9 +287,9 @@
                 </div>
             </div>
 
-            <!-- 🔄 WIFI LOADER (Centered) -->
+            <!-- 🔄 WIFI LOADER (List fetch hone tak ghoomne wala animation) -->
             <div x-show="loading" class="w-full flex justify-center items-center py-20 animate-fade-in">
-                <!-- Dynamic Class: Adds 'theme-green' if activeLocation is Dehradun -->
+                <!-- Location ke base par loader ka color change hoga -->
                 <div id="wifi-loader" :class="activeLocation === 'Dehradun' ? 'theme-green' : ''">
                     <svg class="circle-outer" viewBox="0 0 86 86"><circle class="back" cx="43" cy="43" r="40"></circle><circle class="front" cx="43" cy="43" r="40"></circle><circle class="new" cx="43" cy="43" r="40"></circle></svg>
                     <svg class="circle-middle" viewBox="0 0 60 60"><circle class="back" cx="30" cy="30" r="27"></circle><circle class="front" cx="30" cy="30" r="27"></circle></svg>
@@ -296,7 +298,7 @@
                 </div>
             </div>
 
-            <!-- Mobile List -->
+            <!-- Mobile List (PC details show karne ke liye loop) -->
             <div class="space-y-3 pb-28 pt-1">
                 <template x-for="(pc, index) in filteredList" :key="pc.systemName + index">
                     <div class="glass-card p-4 rounded-[1.2rem] relative overflow-hidden group animate-slide-up flex items-center justify-between shadow-sm transition-transform"
@@ -306,9 +308,11 @@
 					 ]"
 					 @click="isLocked ? showLockedAlert() : openModal('edit', pc)">
                         <div class="flex items-center gap-4 w-full overflow-hidden">
+                            <!-- Left Icon (Tick or Hourglass based on status) -->
                             <div class="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shadow-sm transition-colors shrink-0" :class="pc.status === 'DONE' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-600'">
                                 <i class="fa-solid" :class="pc.status === 'DONE' ? 'fa-check' : 'fa-hourglass-half'"></i>
                             </div>
+                            <!-- Middle PC Info -->
                             <div class="flex-1 min-w-0">
                                 <h3 class="font-extrabold text-base text-slate-800 dark:text-white truncate" x-text="pc.systemName"></h3>
                                 <div class="mt-1 flex flex-wrap gap-2">
@@ -320,6 +324,7 @@
                                 <div class="flex items-center gap-1.5 mt-1 text-slate-400"><i :class="getOsIcon(pc.os)"></i> <span class="text-[9px] font-bold uppercase tracking-wide whitespace-nowrap" x-text="pc.os"></span></div>
                             </div>
                         </div>
+                        <!-- Right Status Indicator -->
                         <div class="text-right shrink-0 pl-2">
                             <template x-if="pc.status === 'DONE'"><div class="flex flex-col items-end"><span class="text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">CLEAN</span><p class="text-[9px] font-bold text-slate-400 mt-0.5 whitespace-nowrap" x-text="formatDateDisplay(pc.date)"></p></div></template>
                             <template x-if="pc.status !== 'DONE'"><i class="fa-solid fa-chevron-right text-slate-300 text-sm"></i></template>
@@ -329,29 +334,30 @@
             </div>
         </main>
         
+        <!-- Naya Asset Add karne ka Floating Button (Plus Icon) -->
         <button @click="isLocked ? showLockedAlert() : openModal('add')" 
         class="fixed bottom-24 right-5 w-14 h-14 rounded-full text-white shadow-xl flex items-center justify-center transition-transform z-40" 
         :class="isLocked ? 'bg-slate-400 locked-state' : themeGradient + ' active:scale-90'">
 		<i class="fa-solid" :class="isLocked ? 'fa-lock' : 'fa-plus'"></i>
 		</button>
 
-        <!-- Footer with Info & Animated Report -->
+        <!-- Footer Bar jisme Info aur Report button hain -->
         <footer class="fixed bottom-0 left-0 w-full bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-lg border-t border-slate-100 dark:border-white/5 px-5 py-4 z-50 flex justify-between items-center">
             <div><p class="text-[9px] font-bold opacity-60 uppercase tracking-widest" :class="themeText">Operator</p><p class="text-xs font-black text-slate-800 dark:text-white" x-text="currentOperator">...</p></div>
             <div class="flex gap-2">
-                <!-- ℹ️ INFO BUTTON -->
+                <!-- ℹ️ INFO BUTTON (Guide kholne ke liye) -->
                 <button @click="showInfoModal = true" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-500 dark:text-slate-300 active:scale-95 transition group overflow-hidden">
                     <svg class="fill-current w-5 h-5 duration-700 group-hover:rotate-[360deg] group-active:rotate-[360deg]" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 22c-5.518 0-10-4.482-10-10s4.482-10 10-10 10 4.482 10 10-4.482 10-10 10zm-1-16h2v6h-2zm0 8h2v2h-2z"></path>
                     </svg>
                 </button>
 
-                <!-- Sync Button -->
+                <!-- Sync Button (Sheet se fresh data laane ke liye) -->
                 <button @click="fetchData(true)" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-500 dark:text-slate-300 active:scale-95 transition">
                     <i class="fa-solid fa-rotate" :class="{'fa-spin': isSyncing}"></i>
                 </button>
                 
-                <!-- ✈️ Animated Report Button -->
+                <!-- ✈️ Animated Report Button (Mail bhejne ke liye) -->
                 <button @click="isLocked ? showLockedAlert() : openConfirmModal()" 
 				class="btn-fly h-10 px-5 rounded-xl text-white font-bold text-[10px] shadow-lg transition-all" 
 				:class="isLocked ? 'bg-slate-400 locked-state' : themeBtn">
@@ -373,17 +379,16 @@
     </div>
 
     <!-- =======================================================
-         🖥️ DESKTOP LAYOUT (Visible only on lg: screens)
+         🖥️ DESKTOP LAYOUT (Sirf bade screens par dikhega)
     ======================================================== -->
     <div class="hidden md:flex h-screen bg-slate-50 dark:bg-dark_bg text-slate-800 dark:text-slate-200 overflow-hidden">
         
-        <!-- 1. LEFT SIDEBAR -->
+        <!-- 1. LEFT SIDEBAR (Desktop Menu) -->
         <aside class="w-72 bg-white dark:bg-[#111827] border-r border-slate-200 dark:border-white/5 flex flex-col shadow-2xl z-20 relative overflow-hidden">
-            <!-- Background Decor -->
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-slate-200 to-transparent opacity-50"></div>
         
             <div class="p-6 pb-2">
-                <!-- Brand -->
+                <!-- Brand Logo & Title -->
                 <div class="flex items-center gap-4 mb-8">
                     <div class="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center shadow-inner border border-slate-100">
                         <img src="pbl-logo.png" alt="Logo" class="w-8 h-8 object-contain">
@@ -394,7 +399,7 @@
                     </div>
                 </div>
         
-                <!-- Location Switcher (Pill Style) -->
+                <!-- Location Switcher Buttons (Noida / Dehradun) -->
                 <div class="mb-8 bg-slate-100 dark:bg-white/5 p-1.5 rounded-2xl flex relative">
                     <button @click="activeLocation='Noida'; filterStatus='ALL'; fetchData(false)" 
                         class="flex-1 py-2.5 text-xs font-black rounded-xl transition-all duration-300 flex items-center justify-center gap-2" 
@@ -408,7 +413,7 @@
                     </button>
                 </div>
         
-                <!-- 🎨 COLORFUL OPERATOR CARD -->
+                <!-- 🎨 COLORFUL OPERATOR CARD (Engineer info) -->
                 <div class="p-5 rounded-2xl shadow-lg mb-8 relative overflow-hidden group transition-all hover:-translate-y-1" :class="themeGradient">
                     <div class="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition"></div>
                     <div class="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-black/10 to-transparent"></div>
@@ -424,7 +429,7 @@
                     </div>
                 </div>
         
-                <!-- NAVIGATION MENU -->
+                <!-- NAVIGATION MENU (Filters jaise All, Today, Done, Pending) -->
                 <nav class="space-y-3">
                     <p class="px-2 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Workflows</p>
                     
@@ -450,7 +455,7 @@
                 </nav>
             </div>
         
-            <!-- Bottom Action -->
+            <!-- Bottom Action Button for Reporting -->
             <div class="mt-auto p-6 border-t border-slate-100 dark:border-white/5">
                 <button @click="isLocked ? showLockedAlert() : openConfirmModal()" 
 						class="btn-fly w-full py-4 justify-center rounded-2xl font-bold text-sm shadow-xl text-white transition-all" 
@@ -470,10 +475,23 @@
             </div>
         </aside>
 
-        <!-- 2. RIGHT MAIN CONTENT -->
+        <!-- 2. RIGHT MAIN CONTENT (Desktop Dashboard View) -->
         <main class="flex-1 flex flex-col h-full relative">
             <header class="h-20 bg-white/80 dark:bg-[#111827]/80 backdrop-blur-md border-b border-slate-200 dark:border-white/5 px-8 flex items-center justify-between z-10">
-                <div class="flex items-center gap-4"><h2 class="text-2xl font-black text-slate-800 dark:text-white" :class="themeText" x-text="activeLocation + ' Dashboard'"></h2><span class="px-3 py-1 bg-slate-100 text-slate-500 text-xs font-bold rounded-full border border-slate-200" x-text="currentCycleName"></span></div>
+                <!-- Dashboard Title aur Cycle Info (Desktop) -->
+                <div class="flex items-center gap-4">
+                    <h2 class="text-2xl font-black text-slate-800 dark:text-white" :class="themeText" x-text="activeLocation + ' Dashboard'"></h2>
+                    
+                    <!-- Desktop Normal Cycle Badge -->
+                    <span x-show="!isGracePeriod" class="px-3 py-1 bg-slate-100 text-slate-500 text-xs font-bold rounded-full border border-slate-200" x-text="currentCycleName"></span>
+                    
+                    <!-- ⚠️ Desktop Grace Period Alert Badge (Same logic as mobile but horizontal for desktop) -->
+                    <span x-show="isGracePeriod" x-cloak class="px-3 py-1 bg-amber-50 text-amber-600 text-xs font-bold rounded-full border border-amber-200 flex items-center gap-1.5 shadow-sm shadow-amber-500/10">
+                        <i class="fa-solid fa-hourglass-half animate-pulse"></i> Grace: Ends <span x-text="graceEndDate"></span>
+                    </span>
+                </div>
+
+                <!-- Search aur Top Buttons -->
                 <div class="flex items-center gap-4">
                     <div class="relative w-80"><i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i><input type="text" x-model="search" placeholder="Search Assets..." class="w-full pl-10 pr-4 py-2.5 bg-slate-100 dark:bg-white/5 rounded-xl text-sm font-bold border border-transparent focus:bg-white focus:border-brand_primary focus:ring-4 focus:ring-slate-100 transition-all outline-none"></div>
                     <button @click="isLocked ? showLockedAlert() : openModal('add')" 
@@ -487,23 +505,23 @@
 
             <div class="flex-1 overflow-y-auto p-8 relative">
                 
-                <!-- 📊 STATS GRID (Highlighter Style) -->
+                <!-- 📊 STATS GRID (Desktop ke liye 4 boxes) -->
                 <div class="grid grid-cols-4 gap-6 mb-8">
                     
-                    <!-- 1. TOTAL PROGRESS (Gradient Card) -->
+                    <!-- 1. TOTAL PROGRESS (Color gradient box percent ke sath) -->
                     <div class="col-span-1 rounded-2xl p-6 text-white shadow-xl shadow-blue-900/10 relative overflow-hidden group" :class="themeGradient">
                         <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:scale-110 transition duration-700"></div>
                         <p class="text-[10px] font-bold opacity-70 uppercase tracking-widest mb-1">Overall Status</p>
                         <div class="flex items-baseline gap-1 mt-2">
                             <h3 class="text-6xl font-black tracking-tighter"><span x-text="percentage">0</span><span class="text-3xl opacity-50">%</span></h3>
                         </div>
-                        <!-- Progress Bar -->
+                        <!-- Underneath Progress Bar Line -->
                         <div class="w-full bg-black/20 h-2 rounded-full mt-6 overflow-hidden backdrop-blur-sm">
                             <div class="bg-white h-full shadow-[0_0_10px_white] transition-all duration-1000 ease-out" :style="`width: ${percentage}%`"></div>
                         </div>
                     </div>
 
-                    <!-- 2. NEXT DUE (Cyan Highlighter) -->
+                    <!-- 2. NEXT DUE (Cyan color ka info box) -->
                     <div class="col-span-1 bg-cyan-50 dark:bg-[#1e293b] rounded-2xl p-6 shadow-sm border-t-4 border-cyan-400 relative overflow-hidden group hover:shadow-md transition">
                         <div class="absolute right-4 top-4 text-cyan-200 group-hover:text-cyan-100 transition-colors text-6xl opacity-20 -rotate-12"><i class="fa-solid fa-calendar-days"></i></div>
                         <div class="relative z-10">
@@ -513,13 +531,10 @@
                         </div>
                     </div>
 
-                    <!-- 3. PENDING (Clickable) -->
+                    <!-- 3. PENDING (Red box, list open karne ke liye click kar sakte hain) -->
 					<div @click="openListModal('PENDING')" 
 						 class="col-span-1 bg-rose-50 dark:bg-[#1e293b] rounded-2xl p-6 shadow-sm border-t-4 border-rose-500 relative overflow-hidden group hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer">
-						
-						<!-- Hover Glow -->
 						<div class="absolute inset-0 bg-rose-500/0 group-hover:bg-rose-500/5 transition-colors"></div>
-						
 						<div class="absolute right-4 top-4 text-rose-200 group-hover:text-rose-300 transition-colors text-6xl opacity-20 -rotate-12"><i class="fa-regular fa-clock"></i></div>
 						<div class="relative z-10">
 							<div class="w-10 h-10 bg-white text-rose-500 rounded-xl flex items-center justify-center text-lg mb-3 shadow-sm group-hover:scale-110 transition-transform"><i class="fa-solid fa-hourglass-start"></i></div>
@@ -529,13 +544,10 @@
 						</div>
 					</div>
 
-					<!-- 4. COMPLETED (Clickable) -->
+					<!-- 4. COMPLETED (Green box, saaf kiye hue system dekhne ke liye click karein) -->
 					<div @click="openListModal('DONE')" 
 						 class="col-span-1 bg-emerald-50 dark:bg-[#1e293b] rounded-2xl p-6 shadow-sm border-t-4 border-emerald-500 relative overflow-hidden group hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer">
-						
-						<!-- Hover Glow -->
 						<div class="absolute inset-0 bg-emerald-500/0 group-hover:bg-emerald-500/5 transition-colors"></div>
-
 						<div class="absolute right-4 top-4 text-emerald-200 group-hover:text-emerald-300 transition-colors text-6xl opacity-20 -rotate-12"><i class="fa-solid fa-circle-check"></i></div>
 						<div class="relative z-10">
 							<div class="w-10 h-10 bg-white text-emerald-600 rounded-xl flex items-center justify-center text-lg mb-3 shadow-sm group-hover:scale-110 transition-transform"><i class="fa-solid fa-check-double"></i></div>
@@ -546,10 +558,11 @@
 					</div>
                 </div>
 
+               <!-- Grid Layout (Desktop PC cards dikhane ke liye) -->
                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 pb-20">
     <template x-for="pc in filteredList" :key="pc.systemName">
         
-        <!-- CARD CONTAINER -->
+        <!-- Individual Card Box -->
         <div @click="isLocked ? showLockedAlert() : openModal('edit', pc)"
 		 class="group relative p-5 rounded-[2rem] border-0 bg-white dark:bg-[#1e293b]
 				shadow-[0_0_8px_rgba(0,0,0,0.05)] 
@@ -563,9 +576,9 @@
 			(!isLocked && pc.status !== 'DONE') ? 'hover:bg-rose-600 hover:shadow-rose-500/40' : ''
 		 ]">
 
-            <!-- 1. Top Row: Icon & Date/Status -->
+            <!-- 1. Top Row: Icon aur Date/Status -->
             <div class="flex justify-between items-start mb-3">
-                <!-- Icon: Color Invert on Hover -->
+                <!-- Status icon box (Hover par invert hota hai color) -->
                 <div class="w-11 h-11 rounded-2xl flex items-center justify-center text-lg transition-colors duration-500 shadow-sm"
                      :class="pc.status === 'DONE' 
                         ? 'bg-emerald-50 text-emerald-600 group-hover:bg-white group-hover:text-emerald-600' 
@@ -573,7 +586,7 @@
                     <i class="fa-solid" :class="pc.status === 'DONE' ? 'fa-check' : 'fa-hourglass-half'"></i>
                 </div>
 
-                <!-- Status Badge -->
+                <!-- Right Side Badge (Clean Date ya Pending Text) -->
                 <template x-if="pc.status === 'DONE'">
                     <span class="text-[10px] font-black px-3 py-1 rounded-lg transition-colors duration-500"
                           :class="'bg-emerald-50 text-emerald-600 group-hover:bg-white/20 group-hover:text-white'"
@@ -587,14 +600,14 @@
                 </template>
             </div>
 
-            <!-- 2. Middle: System Name (ELASTIC TEXT) -->
+            <!-- 2. Middle: PC Ka Naam aur ID (Hover karne pe elastic / track banta hai) -->
             <div>
                 <h3 class="font-extrabold text-base truncate transition-all duration-500 ease-in-out"
                     :class="'text-slate-800 dark:text-white group-hover:text-white group-hover:tracking-[3px]'" 
                     x-text="pc.systemName">
                 </h3>
 
-                <!-- Asset ID -->
+                <!-- Asset Tag ID -->
                 <div class="mt-2">
                     <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded border transition-colors duration-500 inline-flex items-center gap-1.5"
                           :class="'bg-slate-50 border-slate-100 text-slate-500 group-hover:bg-white/10 group-hover:border-white/20 group-hover:text-white/90'">
@@ -604,7 +617,7 @@
                 </div>
             </div>
 
-            <!-- 3. Bottom: OS Info -->
+            <!-- 3. Bottom: Operating System Details -->
             <div class="mt-4 flex items-center gap-2 text-[10px] font-bold uppercase transition-colors duration-500"
                  :class="'text-slate-400 group-hover:text-white/80'">
                 <i :class="getOsIcon(pc.os)"></i> <span x-text="pc.os"></span>
@@ -619,11 +632,11 @@
 
 
    <!-- ==========================================
-     ℹ️ NEW GUIDE / INFO MODAL (With Report Step)
+     ℹ️ NEW GUIDE / INFO MODAL (Documentation pop-up)
 	=========================================== -->
 	<div x-show="showInfoModal" x-cloak class="fixed inset-0 z-[150] flex items-end sm:items-center justify-center pointer-events-none">
 		
-		<!-- 🌑 Backdrop with Blur -->
+		<!-- 🌑 Background Black Blur -->
 		<div x-show="showInfoModal" 
 			 x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
 			 x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
@@ -631,7 +644,7 @@
 			 class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm pointer-events-auto">
 		</div>
 
-		<!-- 📱 Content Card (Half-Screen Sheet) -->
+		<!-- 📱 White Documentation Card (Neeche se upar aayega mobile mein) -->
 		<div x-show="showInfoModal"
 			 x-transition:enter="transition ease-out duration-500 cubic-bezier(0.16, 1, 0.3, 1)" 
 			 x-transition:enter-start="translate-y-full" 
@@ -641,7 +654,7 @@
 			 x-transition:leave-end="translate-y-full"
 			 class="bg-white dark:bg-[#0f172a] w-full max-w-lg rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl relative z-10 pointer-events-auto h-[65vh] sm:h-auto sm:max-h-[85vh] flex flex-col border-t border-white/20 overflow-hidden">
 			
-			<!-- 🎨 Header (Sticky Top) -->
+			<!-- Modal Header -->
 			<div class="px-6 py-5 flex justify-between items-center border-b border-slate-100 dark:border-white/5 bg-white/80 dark:bg-[#0f172a]/90 backdrop-blur-xl z-20 shrink-0">
 				<div class="flex items-center gap-3">
 					<div class="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 shadow-sm border border-blue-100 dark:border-blue-500/20">
@@ -652,20 +665,20 @@
 						<h3 class="text-xl font-black text-slate-800 dark:text-white leading-none">VacuumOps Guide</h3>
 					</div>
 				</div>
+				<!-- Close Button -->
 				<button @click="showInfoModal = false" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-white/10 text-slate-500 hover:bg-rose-50 hover:text-rose-500 transition-colors flex items-center justify-center active:scale-90">
 					<i class="fa-solid fa-xmark text-lg"></i>
 				</button>
 			</div>
 
-			<!-- 📜 Scrollable Body -->
+			<!-- Guide Content Area -->
 			<div class="flex-1 overflow-y-auto bg-slate-50/50 dark:bg-[#0f172a] p-6 space-y-8 pb-20">
 				
-				<!-- Section 1: Workflow -->
+				<!-- Workflow Steps Design -->
 				<div class="relative">
 					<h4 class="font-black text-sm uppercase tracking-wider text-slate-400 mb-4 flex items-center gap-2">
 						<span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Operating Procedure
 					</h4>
-					
 					<div class="space-y-4">
 						<!-- Step 1 -->
 						<div class="flex gap-4 group">
@@ -680,7 +693,6 @@
 								<p class="text-xs text-slate-500 mt-1 leading-relaxed">Header dropdown se <span class="font-bold text-blue-500">Noida</span> ya <span class="font-bold text-emerald-500">Dehradun</span> select karein.</p>
 							</div>
 						</div>
-
 						<!-- Step 2 -->
 						<div class="flex gap-4 group">
 							<div class="flex flex-col items-center">
@@ -694,7 +706,6 @@
 								<p class="text-xs text-slate-500 mt-1 leading-relaxed">System list check karein aur status ko <span class="font-bold text-emerald-600">CLEANED</span> mark karein.</p>
 							</div>
 						</div>
-
 						<!-- Step 3 -->
 						<div class="flex gap-4 group">
 							<div class="flex flex-col items-center">
@@ -708,16 +719,13 @@
 								<p class="text-xs text-slate-500 mt-1 leading-relaxed">Passkey enter karke save karein. Data cloud par sync ho jayega.</p>
 							</div>
 						</div>
-
-						<!-- 🔥 STEP 4: REPORTING (New) -->
+						<!-- Step 4 (Report Send Info) -->
 						<div class="flex gap-4 group">
 							<div class="flex flex-col items-center">
-								<!-- Blue Highlight Border -->
 								<div class="w-8 h-8 rounded-full bg-indigo-50 dark:bg-indigo-900/30 border-2 border-indigo-500 flex items-center justify-center z-10 shadow-lg shadow-indigo-500/20">
 									<span class="text-xs font-black text-indigo-600 dark:text-indigo-400">4</span>
 								</div>
 							</div>
-							<!-- Highlighted Card -->
 							<div class="bg-indigo-50 dark:bg-indigo-900/10 p-4 rounded-2xl shadow-sm border border-indigo-100 dark:border-indigo-500/20 flex-1 relative top-[-5px]">
 								<div class="flex justify-between items-start">
 									<h5 class="font-bold text-indigo-900 dark:text-indigo-300 text-sm">Send Final Report 🚀</h5>
@@ -728,11 +736,10 @@
 								</p>
 							</div>
 						</div>
-
 					</div>
 				</div>
 
-				<!-- Section 2: Color Guide -->
+				<!-- Color Indicators Explanation Box -->
 				<div>
 					<h4 class="font-black text-sm uppercase tracking-wider text-slate-400 mb-4 flex items-center gap-2">
 						<span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span> Status Indicators
@@ -756,23 +763,13 @@
 								<p class="text-[10px] text-rose-600/70 leading-tight">Needs attention.</p>
 							</div>
 						</div>
-						<div class="col-span-2 p-3 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl border border-amber-100 dark:border-amber-500/20 flex items-center gap-4">
-							<div class="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center text-sm shadow-amber-200 shadow-md shrink-0">
-								<i class="fa-solid fa-calendar-day"></i>
-							</div>
-							<div>
-								<p class="text-[10px] font-black text-amber-700 dark:text-amber-400 uppercase tracking-wide">Today's Activity</p>
-								<p class="text-[10px] text-amber-800/60">Systems cleaned within the last 24 hours.</p>
-							</div>
-						</div>
 					</div>
 				</div>
 
-				<!-- Section 3: Security -->
+				<!-- Security Key Reminder Box (Dark Mode style block) -->
 				<div class="relative overflow-hidden rounded-2xl bg-slate-900 text-white p-5 shadow-xl">
 					<div class="absolute top-0 right-0 w-32 h-32 bg-blue-500 rounded-full blur-[60px] opacity-20"></div>
 					<div class="absolute bottom-0 left-0 w-24 h-24 bg-purple-500 rounded-full blur-[50px] opacity-20"></div>
-					
 					<div class="relative z-10 flex gap-4 items-start">
 						<div class="w-10 h-10 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center text-xl backdrop-blur-md shrink-0">
 							🔑
@@ -780,7 +777,6 @@
 						<div class="w-full">
 							<h5 class="text-xs font-bold text-blue-200 uppercase tracking-widest mb-1">Authorization</h5>
 							<p class="text-xs text-slate-300 mb-3 leading-relaxed">Modifications save karne ke liye official IT Passkey ki zaroorat padegi.</p>
-							
 							<div class="bg-black/30 rounded-lg p-3 border border-white/10 flex justify-between items-center group cursor-pointer hover:bg-black/50 transition">
 								<code class="font-mono text-sm font-bold text-emerald-400 tracking-wider">PBL2026</code>
 								<i class="fa-regular fa-copy text-slate-500 group-hover:text-white transition text-xs"></i>
@@ -788,23 +784,19 @@
 						</div>
 					</div>
 				</div>
-				
 				<div class="text-center pt-4 pb-6">
-					<p class="text-[9px] font-bold text-slate-300 uppercase tracking-widest">
-						Version 2.0 • Designed by Vikas Rawat
-					</p>
+					<p class="text-[9px] font-bold text-slate-300 uppercase tracking-widest">Version 2.0 • Designed by Vikas Rawat</p>
 				</div>
-
 			</div>
 		</div>
 	</div>
 
 	<!-- ==========================================
-     ✏️ HYBRID DRAWER (Mobile: Bottom Sheet | Desktop: Floating Right Panel)
+     ✏️ HYBRID DRAWER (Form Fill karne wala panel)
 	=========================================== -->
 	<div x-show="showModal" class="fixed inset-0 z-[150] flex justify-end items-end sm:items-center" x-cloak>
 		
-		<!-- 1. Backdrop -->
+		<!-- Dark Blur Background -->
 		<div x-show="showModal" 
 			 x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
 			 x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
@@ -812,26 +804,17 @@
 			 class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm">
 		</div>
 
-		<!-- 2. The Panel -->
+		<!-- Main Form Body (Mobile me bottom sheet, Desktop me side drawer) -->
 		<div x-show="showModal"
 			 x-transition:enter="transition ease-out duration-500 cubic-bezier(0.16, 1, 0.3, 1)" 
-			 
-			 /* MOBILE ANIMATION: Slide Up (Translate Y) | DESKTOP ANIMATION: Slide Left (Translate X) */
 			 x-transition:enter-start="translate-y-full sm:translate-y-0 sm:translate-x-full sm:opacity-0" 
 			 x-transition:enter-end="translate-y-0 sm:translate-x-0 sm:opacity-100"
 			 x-transition:leave="transition ease-in duration-300" 
 			 x-transition:leave-start="translate-y-0 sm:translate-x-0 sm:opacity-100" 
 			 x-transition:leave-end="translate-y-full sm:translate-y-0 sm:translate-x-full sm:opacity-0"
-			 
-			 class="relative w-full bg-white dark:bg-[#0f172a] shadow-2xl flex flex-col overflow-hidden border border-white/10
-					
-					/* MOBILE STYLES (Bottom Sheet) */
-					h-auto max-h-[90vh] rounded-t-[2.5rem] 
-					
-					/* DESKTOP STYLES (Floating Right Drawer) */
-					sm:w-[450px] sm:h-full sm:max-h-screen sm:rounded-l-[2.5rem] sm:rounded-r-none sm:mr-0 sm:border-l-0">
+			 class="relative w-full bg-white dark:bg-[#0f172a] shadow-2xl flex flex-col overflow-hidden border border-white/10 h-auto max-h-[90vh] rounded-t-[2.5rem] sm:w-[450px] sm:h-full sm:max-h-screen sm:rounded-l-[2.5rem] sm:rounded-r-none sm:mr-0 sm:border-l-0">
 			
-			<!-- HEADER -->
+			<!-- Form Header -->
 			<div class="px-6 py-5 border-b border-slate-100 dark:border-white/5 flex justify-between items-center bg-white/50 dark:bg-white/5 backdrop-blur-xl z-20 shrink-0">
 				<div>
 					<div class="flex items-center gap-2">
@@ -846,15 +829,15 @@
 						<span x-text="mode === 'add' ? 'Add Asset' : form.systemName"></span>
 					</h3>
 				</div>
+				<!-- Close drawer -->
 				<button @click="showModal = false" class="w-10 h-10 rounded-full bg-slate-50 dark:bg-white/10 text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-colors flex items-center justify-center active:scale-90">
 					<i class="fa-solid fa-xmark text-lg"></i>
 				</button>
 			</div>
 
-			<!-- FORM BODY -->
+			<!-- Input Fields ki Body -->
 			<div class="flex-1 overflow-y-auto p-6 space-y-5 bg-slate-50/50 dark:bg-[#0b1121] overscroll-contain">
-				
-				<!-- Row 1: System Name & Asset Tag -->
+				<!-- Name aur ID Row -->
 				<div class="grid grid-cols-2 gap-4">
 					<div class="group">
 						<label class="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-1.5 block">System Name</label>
@@ -862,12 +845,11 @@
 					</div>
 					<div class="group">
 						<label class="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-1.5 block">Asset Tag</label>
-						<input type="text" x-model="form.assetId" placeholder="Tag ID" 
-						class="w-full px-3 py-3.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl font-mono text-xs sm:text-sm font-bold tracking-tight text-slate-700 dark:text-white outline-none focus:ring-2 focus:border-transparent transition-all uppercase":class="activeLocation === 'Noida' ? 'focus:ring-blue-500/20' : 'focus:ring-emerald-500/20'">
+						<input type="text" x-model="form.assetId" placeholder="Tag ID" class="w-full px-3 py-3.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl font-mono text-xs sm:text-sm font-bold tracking-tight text-slate-700 dark:text-white outline-none focus:ring-2 focus:border-transparent transition-all uppercase":class="activeLocation === 'Noida' ? 'focus:ring-blue-500/20' : 'focus:ring-emerald-500/20'">
 					</div>
 				</div>
 
-				<!-- Row 2: OS -->
+				<!-- OS Dropdown Field -->
 				<div>
 					 <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-1.5 block">Operating System</label>
 					 <div class="relative" x-data="{ open: false, options: ['Windows 11 Pro', 'Windows 10', 'Windows XP', 'Windows Server 2019', 'Windows Server 2008', 'OpenSuse', 'N/A'] }">
@@ -876,7 +858,7 @@
 					</div>
 				</div>
 
-				<!-- Row 3: Status -->
+				<!-- Status Selection Buttons (Pending / Cleaned) -->
 				<div>
 					<label class="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-1.5 block">Current Status</label>
 					<div class="grid grid-cols-2 gap-3 p-1.5 bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10">
@@ -885,46 +867,48 @@
 					</div>
 				</div>
 
-				<!-- Date -->
+				<!-- Date Field (Sirf Done status par dikhega) -->
 				<div x-show="form.status === 'DONE'" x-transition>
 					<label class="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-1.5 block">Completion Date</label>
 					<div class="relative"><i class="fa-solid fa-calendar-day absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500 text-sm"></i><input type="date" x-model="form.date" class="w-full pl-11 pr-4 py-3.5 bg-emerald-50/50 border border-emerald-100 rounded-2xl font-bold text-sm text-emerald-700 outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"></div>
 				</div>
 
-				<!-- Passkey -->
+				<!-- Passkey Password Field -->
 				<div>
 					<label class="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-1.5 block">Authorization</label>
 					<div class="relative"><i class="fa-solid fa-key absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i><input type="password" x-model="form.secret" placeholder="Enter Admin Passkey" class="w-full pl-11 pr-4 py-3.5 bg-slate-100 dark:bg-white/5 border-2 border-transparent focus:bg-white focus:border-slate-300 rounded-2xl font-bold text-sm text-slate-800 outline-none transition-all placeholder-slate-400"></div>
 				</div>
 			</div>
 
-			<!-- Footer -->
+			<!-- Drawer Footer Buttons -->
 			<div class="p-6 border-t border-slate-100 dark:border-white/5 bg-white dark:bg-[#111827] flex gap-4 shrink-0 pb-safe">
-				<button x-show="mode === 'edit'" @click="performAction('delete')" class="w-14 h-14 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center hover:bg-rose-100 active:scale-95 transition-all shadow-sm"><i class="fa-solid fa-trash-can text-lg"></i></button>
-				<button @click="performAction('save')" class="flex-1 py-4 rounded-2xl font-black text-sm uppercase tracking-[1.5px] text-white shadow-xl transition-all duration-300 ease-in-out transform hover:tracking-[3px] hover:shadow-2xl active:scale-[0.98] flex items-center justify-center gap-2" :class="activeLocation === 'Noida' ? 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/30' : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/30'"><span>Save Changes</span><i x-show="!submitting" class="fa-solid fa-arrow-right"></i><i x-show="submitting" class="fa-solid fa-circle-notch fa-spin"></i></button>
+				<!-- Delete Button (Sirf Edit mode mein aayega) -->
+                <button x-show="mode === 'edit'" @click="performAction('delete')" class="w-14 h-14 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center hover:bg-rose-100 active:scale-95 transition-all shadow-sm"><i class="fa-solid fa-trash-can text-lg"></i></button>
+				<!-- Submit / Save Changes Button -->
+                <button @click="performAction('save')" class="flex-1 py-4 rounded-2xl font-black text-sm uppercase tracking-[1.5px] text-white shadow-xl transition-all duration-300 ease-in-out transform hover:tracking-[3px] hover:shadow-2xl active:scale-[0.98] flex items-center justify-center gap-2" :class="activeLocation === 'Noida' ? 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/30' : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/30'"><span>Save Changes</span><i x-show="!submitting" class="fa-solid fa-arrow-right"></i><i x-show="submitting" class="fa-solid fa-circle-notch fa-spin"></i></button>
 			</div>
 		</div>
 	</div>
 
 	<!-- ==========================================
-		 📋 LIST VIEW MODAL (For Pending/Cleaned Cards)
+		 📋 LIST VIEW MODAL (Done ya Pending list chhanne wala card box)
 	=========================================== -->
 	<div x-show="showListModal" class="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-6" x-cloak>
 		
-		<!-- Backdrop -->
+		<!-- Piche ka Blur Background -->
 		<div x-show="showListModal" 
 			 x-transition.opacity duration.300
 			 class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" 
 			 @click="showListModal = false">
 		</div>
 
-		<!-- Modal Card -->
+		<!-- List Box (Saare pending/done PCs isme dikhenge) -->
 		<div x-show="showListModal"
 			 x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-90 translate-y-4" x-transition:enter-end="opacity-100 scale-100 translate-y-0"
 			 x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100 translate-y-0" x-transition:leave-end="opacity-0 scale-90 translate-y-4"
 			 class="relative bg-white dark:bg-[#1e293b] w-full max-w-2xl rounded-[2.5rem] shadow-2xl flex flex-col max-h-[85vh] overflow-hidden border border-white/20">
 			
-			<!-- Header -->
+			<!-- List Header -->
 			<div class="p-6 border-b border-slate-100 dark:border-white/5 flex justify-between items-center shrink-0"
 				 :class="listModalType === 'DONE' ? 'bg-emerald-50/50' : 'bg-rose-50/50'">
 				<div class="flex items-center gap-4">
@@ -939,17 +923,21 @@
 						</p>
 					</div>
 				</div>
-				<button @click="showListModal = false" class="w-10 h-10 rounded-full bg-white text-slate-400 hover:text-slate-800 hover:bg-slate-100 flex items-center justify-center transition shadow-sm">
+				<!-- Close Button -->
+                <button @click="showListModal = false" class="w-10 h-10 rounded-full bg-white text-slate-400 hover:text-slate-800 hover:bg-slate-100 flex items-center justify-center transition shadow-sm">
 					<i class="fa-solid fa-xmark text-lg"></i>
 				</button>
 			</div>
 
-			<!-- List Body -->
+			<!-- List Data Body (Scrollable) -->
 			<div class="flex-1 overflow-y-auto p-6 space-y-3 overscroll-contain bg-slate-50/50 dark:bg-[#0f172a]/50">
-				<template x-if="listModalItems.length === 0">
+				<!-- Agar list khali hai to message dikhao -->
+                <template x-if="listModalItems.length === 0">
 					<div class="text-center py-10 opacity-50"><i class="fa-solid fa-box-open text-4xl mb-3"></i><p class="font-bold">No assets found.</p></div>
 				</template>
-				<template x-for="item in listModalItems" :key="item.systemName">
+				
+                <!-- Items Loop -->
+                <template x-for="item in listModalItems" :key="item.systemName">
 					<div @click="isLocked ? showLockedAlert() : (showListModal = false, openModal('edit', item))" 
 					 class="bg-white dark:bg-[#1e293b] p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-white/5 flex items-center justify-between transition-all"
 					 :class="isLocked ? 'opacity-70 grayscale cursor-not-allowed' : 'cursor-pointer group hover:scale-[1.01] hover:shadow-md'">
@@ -964,7 +952,7 @@
 		</div>
 	</div>
 
-    <!-- Confirm Modal -->
+    <!-- Confirmation Modal (Mail bhejne se pehle pucchta hai) -->
     <div x-show="showConfirmModal" x-cloak class="fixed inset-0 z-[110] flex items-center justify-center bg-black/70 backdrop-blur-md p-6">
         <div class="bg-white w-full max-w-xs rounded-3xl p-6 text-center shadow-2xl">
             <h3 class="text-xl font-black text-slate-800 dark:text-white mb-2">Send Report?</h3>
@@ -974,7 +962,7 @@
         </div>
     </div>
 
-    <!-- Success Modal -->
+    <!-- Success Output Modal (100% data done hone par nikalta hai) -->
     <div x-show="showReportModal" x-cloak class="fixed inset-0 z-[110] flex items-center justify-center bg-black/80 backdrop-blur-md p-6">
         <div class="bg-white w-full max-w-sm rounded-[2rem] p-8 text-center shadow-2xl relative overflow-hidden">
             <div class="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl animate-bounce">🎉</div>
@@ -985,61 +973,83 @@
         </div>
     </div>
 
-    <!-- Toast -->
+    <!-- Toast Notification (Chota sa alert box upar screen par aata hai) -->
     <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-5 py-2.5 rounded-full shadow-2xl flex items-center gap-3 z-[120] transition-all duration-300 opacity-0 pointer-events-none transform -translate-y-10">
         <i class="fa-solid fa-check-circle text-emerald-400"></i><span id="toast-msg" class="text-xs font-bold">Action Done</span>
     </div>
 
-    <!-- LOGIC -->
+    <!-- JAVASCRIPT LOGIC (Alpine.js Framework) -->
     <script>
+        // Google Sheet Apps Script Backend ka Web App URL
         const API_URL = "https://script.google.com/macros/s/AKfycbyvIkwSZ5gdIBc_GHbXXMgadnBHU19twANppiq-nK8D3cGb8B6efZLix1Cxe2FPPsqyJw/exec";  
 
+        // Toast Message dikhane ka custom function
         function showToast(msg, isError = false) {
             const toast = document.getElementById('toast'); document.getElementById('toast-msg').innerText = msg;
             toast.querySelector('i').className = isError ? 'fa-solid fa-circle-exclamation text-amber-400' : 'fa-solid fa-check-circle text-emerald-400';
             toast.classList.remove('opacity-0', '-translate-y-10'); setTimeout(() => toast.classList.add('opacity-0', '-translate-y-10'), 3000);
         }
+        
+        // Mobile ko thoda vibrate (haptic feedback) dene ka function
         function vibrateDevice(pattern = [50]) { if ("vibrate" in navigator) navigator.vibrate(pattern); }
 
-			
-
+        // Alpine.js ka Data Component banaya ja raha hai
         document.addEventListener('alpine:init', () => {
             Alpine.data('vacuumTracker', () => ({
-			// 👇 YE CODE PASTE KARNA HAI
-			get isLocked() {
-				const month = new Date().getMonth(); // 0 = Jan, 4 = May, 8 = Sept
-				// Agar mahina Jan, May, Sept NAHI hai, to Locked = true
-				return ![0, 4, 8].includes(month);
-			},
-			// 👆 YAHAN TAK			
 			
-			// 👇 YE FUNCTION ADD KARO (isLocked ke baad)
-			showLockedAlert() {
-				this.haptic();
-				// Toast message jo user ko batayega ki kab khulega
-				showToast(`🚫 Locked! Next Cycle: ${this.nextCycleName}`, true);
-			},
+            // 👇 SMART GRACE PERIOD LOGIC (Naya Logic)
+            // Ye function check karta hai ki kya aaj ki tareekh grace period (month ki 1 se 7 tareekh) mein aati hai.
+            get isGracePeriod() {
+                const now = new Date();
+                const month = now.getMonth(); // Jan = 0, Feb = 1, etc.
+                const date = now.getDate();   // 1 se 31 tak date milti hai
+                const graceMonths = [1, 5, 9]; // Feb, Jun, Oct (Jin mahino mein grace milta hai)
+                // Agar month list mein hai AUR aaj ki date 7 ya usse kam hai, to TRUE return karega
+                return graceMonths.includes(month) && date <= 7;
+            },
+            
+            // Ye alert ke badge par Grace Period ke end ki exact date text ke form mein return karega
+            get graceEndDate() {
+                const now = new Date();
+                // Mahine ka chota naam nikalega, jaise 'Jun', 'Feb'
+                const monthName = now.toLocaleString('default', { month: 'short' });
+                return `7 ${monthName} ${now.getFullYear()}`;
+            },
+
+            // Pata lagayega ki UI ko click se lock karna hai ya nahi
+            get isLocked() {
+                const now = new Date();
+                const month = now.getMonth(); 
+                const allowedMonths = [0, 4, 8]; // Jan, May, Sept (Puri tarah khule mahine)
+                
+                // 1. Agar allowed month chal raha hai to fully khula rakho (lock = false)
+                if (allowedMonths.includes(month)) return false;
+                
+                // 2. Agar Grace Period (1 se 7 tareekh buffer wali) chal raha hai, to tab bhi khula rakho
+                if (this.isGracePeriod) return false;
+
+                // 3. Agar upar ki dono condition match nahi hoti, to strictly lock kar do
+                return true;
+            },
+            
+            // Jab screen Locked ho, aur user kisi card par click kare to ye function run hota hai
+            showLockedAlert() {
+                this.haptic(); // Vibrate karega
+                showToast(`🚫 Locked! Next Cycle: ${this.nextCycleName}`, true); // Pila error wala toast dikhayega
+            },
+            
+            // List wale popup ki local states
+            showListModal: false,
+            listModalTitle: '',
+            listModalType: '', 
+            listModalItems: [],
 			
-			showListModal: false,
-			listModalTitle: '',
-			listModalType: '', // 'DONE' or 'PENDING'
-			listModalItems: [],
-			
-			// Data object ke andar add karein
-			get isLocked() {
-				const now = new Date();
-				const month = now.getMonth(); // 0=Jan, 4=May, 8=Sept
-				// Sirf Jan(0), May(4), aur Sept(8) allowed hain
-				const allowedMonths = [0, 4, 8];
-				return !allowedMonths.includes(month);
-			},
-			
-			// 👇 NEW FUNCTION ADD KARO (Pop-up open karne ke liye)
+			// 👇 Function to open Filtered popups (Jaise click par sirf 'Pending' pc dikhana)
 			openListModal(type) {
 				this.haptic();
-				this.listModalType = type;
+				this.listModalType = type; // Type pass kiya: 'DONE' ya 'PENDING'
 				
-				// Data Filter Logic (Current Location Only)
+				// Data Filter Logic: Sirf currently chuni hui location (Jaise Noida) ka data nikalo
 				let rawList = this.pcs.filter(p => p.location === this.activeLocation);
 				
 				if (type === 'DONE') {
@@ -1050,59 +1060,81 @@
 					this.listModalItems = rawList.filter(p => p.status !== 'DONE');
 				}
 				
-				this.showListModal = true;
+				this.showListModal = true; // Finally screen par popup khol do
 			},
 			
+            // Database Arrays aur Modal toggles ki state variables
                 pcs: [], search: '', loading: false, isSyncing: false, submitting: false, showModal: false, showReportModal: false, showConfirmModal: false, showInfoModal: false, emailSending: false, isDark: false, mode: 'add', filterStatus: 'ALL', showSearchInput: false,
                 form: { systemName: '', assetId: '', os: 'Windows 11 Pro', status: 'PENDING', date: '', secret: '', location: 'Noida' },
                 currentCycleName: '', nextCycleName: '', cycleStartDate: null,
-                activeLocation: 'Noida',
+                activeLocation: 'Noida', // Default selected city
 
-                // 🟢 Dynamic Theme
+                // 🟢 Dynamic Theme Variables (Location ke hisaab se colors badalne wale smart functions)
                 get headerGradient() { return this.activeLocation === 'Noida' ? 'bg-gradient-noida' : 'bg-gradient-ddn'; },
                 get themeText() { return this.activeLocation === 'Noida' ? 'text-blue-600' : 'text-emerald-600'; },
                 get themeColorHex() { return this.activeLocation === 'Noida' ? '#2563eb' : '#10b981'; },
                 get themeGradient() { return this.activeLocation === 'Noida' ? 'bg-gradient-to-br from-blue-600 to-indigo-600 shadow-blue-500/40' : 'bg-gradient-to-br from-emerald-500 to-teal-600 shadow-emerald-500/40'; },
                 get themeBtn() { return this.activeLocation === 'Noida' ? 'bg-blue-600 shadow-blue-500/30' : 'bg-emerald-600 shadow-emerald-500/30'; },
                 get themeBorderT() { return this.activeLocation === 'Noida' ? 'border-t-blue-600' : 'border-t-emerald-500'; },
-                get currentOperator() { return this.activeLocation === 'Noida' ? 'Ashok Singh' : 'Deependra Singh'; },
+                get currentOperator() { return this.activeLocation === 'Noida' ? 'Ashok Singh' : 'Deependra Singh'; }, // Location change pe engineer ka naam badlega
 
+                // Ye function load hote hi sabse pehle run hota hai
                 init() { 
+                    // Theme check karega (localStorage se)
                     if(localStorage.getItem('theme') === 'dark') { this.isDark = true; document.documentElement.classList.add('dark'); }
-                    this.calculateCycle(); 
+                    this.calculateCycle(); // Mahina dekhega ki konsa cycle chal raha hai
+                    // Offline Cache check karega
                     const cached = localStorage.getItem('vacuum_data');
                     if (cached) { try { this.pcs = JSON.parse(cached); this.loading = false; } catch (e) { this.loading = true; } } else { this.loading = true; }
-                    this.fetchData(false); 
+                    this.fetchData(false); // Backend se fresh data mangayega
                 },
 
+                // Choti choti vibrations dene ka shortcut
                 haptic() { vibrateDevice(15); },
+                
+                // Dark mode On/Off karne ka logic
                 toggleTheme() { this.haptic(); this.isDark = !this.isDark; if(this.isDark) document.documentElement.classList.add('dark'); else document.documentElement.classList.remove('dark'); },
+                
+                // Filter buttons toggle (Jaise All -> Pending -> All)
                 toggleFilter(status) { this.haptic(); if (this.filterStatus === status) { this.filterStatus = 'ALL'; } else { this.filterStatus = status; } },
+                
+                // City badalne par data fetch karwane wala function
                 handleLocationChange() { this.haptic(); this.fetchData(false); },
 
+                // Current aur Next Cycle naam banane ki mathematics
                 calculateCycle() {
                     const now = new Date(); const year = now.getFullYear(); const month = now.getMonth(); 
-                    let startMonth; if (month >= 0 && month < 4) { startMonth = 0; this.currentCycleName = `JAN ${year}`; this.nextCycleName = `MAY ${year}`; } else if (month >= 4 && month < 8) { startMonth = 4; this.currentCycleName = `MAY ${year}`; this.nextCycleName = `SEPT ${year}`; } else { startMonth = 8; this.currentCycleName = `SEPT ${year}`; this.nextCycleName = `JAN ${year + 1}`; } this.cycleStartDate = new Date(year, startMonth, 1); 
+                    let startMonth; 
+                    if (month >= 0 && month < 4) { startMonth = 0; this.currentCycleName = `JAN ${year}`; this.nextCycleName = `MAY ${year}`; } 
+                    else if (month >= 4 && month < 8) { startMonth = 4; this.currentCycleName = `MAY ${year}`; this.nextCycleName = `SEPT ${year}`; } 
+                    else { startMonth = 8; this.currentCycleName = `SEPT ${year}`; this.nextCycleName = `JAN ${year + 1}`; } 
+                    this.cycleStartDate = new Date(year, startMonth, 1); 
                 },
 
+                // Google Apps Script Web App se saara data uthakar lane wala heavy function
                 async fetchData(forceRefresh = false) {
                     if (forceRefresh) { this.isSyncing = true; this.loading = true; } 
                     try {
                         const res = await fetch(API_URL + '?action=getVacuumData');
                         const data = await res.json();
+                        // Backend data ko screen ke variables mein dhaalna
                         const processedData = data.pcs.map(p => {
                             let isDone = (p.status && String(p.status).trim().toUpperCase() === 'DONE');
+                            // Puraani cycle ki dates filter karni
                             if (isDone && p.date) { const recordDate = new Date(p.date); if (recordDate < this.cycleStartDate) isDone = false; }
                             return { systemName: p.id, assetId: p.assetId || '', os: p.os, status: isDone ? 'DONE' : 'PENDING', date: isDone ? p.date : '', location: p.location || 'Noida', updating: false };
                         });
-                        this.pcs = processedData; localStorage.setItem('vacuum_data', JSON.stringify(this.pcs));
+                        this.pcs = processedData; 
+                        localStorage.setItem('vacuum_data', JSON.stringify(this.pcs)); // Offline save
                         if(forceRefresh) showToast("Synced");
                     } catch (e) { if(forceRefresh) showToast("Sync Error", true); } 
                     finally { this.loading = false; this.isSyncing = false; }
                 },
 
+                // Date ko frontend par ache tarike se (e.g., 22 Aug 26) dikhane ke liye converter
                 formatDateDisplay(dateStr) { if (!dateStr || dateStr === "N/A") return ''; let d = new Date(dateStr); return !isNaN(d.getTime()) ? d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' }) : dateStr; },
                 
+                // Date picker form element ke hisab se (YYYY-MM-DD) date theek karne wala function
                 convertDateForInput(dateStr) { 
                     if (!dateStr) return ''; 
                     let d = new Date(dateStr); 
@@ -1113,11 +1145,14 @@
                     return `${year}-${month}-${day}`;
                 },
 
+                // OS ke mutabik unka icon nikalne wala chota logic
                 getOsIcon(osName) { if (!osName) return 'fa-solid fa-desktop'; const os = osName.toLowerCase(); if (os.includes('server')) return 'fa-solid fa-server'; if (os.includes('opensuse') || os.includes('linux')) return 'fa-brands fa-linux'; if (os.includes('windows')) return 'fa-brands fa-windows'; return 'fa-solid fa-desktop'; },
 
+                // Form Drawer / Pop-up kholne ka code. Mode 'add' hoga ya 'edit'
                 openModal(mode, item = null) {
                     this.haptic(); this.mode = mode; this.form.secret = ''; 
                     if (mode === 'edit' && item) { 
+                        // Edit mein puraana data bharega
                         this.form = { 
                             systemName: item.systemName, 
                             assetId: item.assetId, 
@@ -1128,12 +1163,17 @@
                             secret: '' 
                         }; 
                     } 
-                    else { this.form = { systemName: '', assetId: '', os: 'Windows 11 Pro', status: 'PENDING', date: '', secret: '', location: this.activeLocation }; }
+                    else { 
+                        // Add mein khali data dega
+                        this.form = { systemName: '', assetId: '', os: 'Windows 11 Pro', status: 'PENDING', date: '', secret: '', location: this.activeLocation }; 
+                    }
                     this.showModal = true;
                 },
 
+                // Reporting mail bhejne se pehle ka confirm dabba
                 openConfirmModal() { this.haptic(); this.showConfirmModal = true; },
                 
+                // Jab User form me 'Cleaned' click kare to automatically aaj ki tareekh bhar dena
                 handleStatusChange() { 
                     if (this.form.status === 'DONE') { 
                         const now = new Date();
@@ -1144,21 +1184,31 @@
                     } else { this.form.date = ''; } 
                 },
 
+                // Report email automatically IT Head ko trigger karne wala function
                 async sendEmailReport() {
                     this.emailSending = true; this.haptic(); showToast("Sending...");
                     const locData = this.pcs.filter(p => p.location === this.activeLocation);
                     const totalLoc = locData.length;
                     const doneLoc = locData.filter(p => p.status === 'DONE').length;
                     const pendingLoc = locData.filter(p => p.status !== 'DONE').length;
+                    
                     const payload = { action: 'sendReport', cycle: this.currentCycleName, totalCount: totalLoc, doneCount: doneLoc, pendingCount: pendingLoc, location: this.activeLocation };
-                    try { await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); showToast("Report Sent!"); this.showReportModal = false; } catch(e) { showToast("Error", true); } finally { this.emailSending = false; }
+                    try { 
+                        await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); 
+                        showToast("Report Sent!"); 
+                        this.showReportModal = false; 
+                    } catch(e) { showToast("Error", true); } 
+                    finally { this.emailSending = false; }
                 },
 
+                // Form se data ko Add, Edit ya Delete karte hue Backend me POST bhejne ka main function
                 async performAction(type) {
+                    // Password validation (Agar galat hai to error vibration)
                     if (this.form.secret !== 'PBL2026') { vibrateDevice([50, 50, 50]); showToast("Wrong Key", true); return; }
                     this.haptic(); this.submitting = true;
                     let payloadDate = this.form.date;
                     
+                    // Backend Google sheet format date theek karna 
                     if (this.form.status === 'DONE' && this.form.date) { 
                         const [y, m, d] = this.form.date.split('-');
                         const dateObj = new Date(y, m - 1, d);
@@ -1166,18 +1216,38 @@
                         payloadDate = `${dateObj.getDate()} ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}`; 
                     }
                     
+                    // JSON bundle banakar backend ko bhejna
                     const payload = { action: 'handleVacuum', type: type === 'delete' ? 'delete' : 'save', systemName: this.form.systemName, realAssetId: this.form.assetId, os: this.form.os, status: this.form.status, date: payloadDate, secret: this.form.secret, location: this.form.location };
-                    try { const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); const result = await res.json(); if (result.status === 'success') { vibrateDevice([100, 50, 100]); this.showModal = false; showToast(type === 'delete' ? "Deleted" : "Saved"); await this.fetchData(true); const currentLocPending = this.pcs.filter(p => p.location === this.activeLocation && p.status !== 'DONE').length; if (currentLocPending === 0 && type === 'save') { setTimeout(() => { this.showReportModal = true; }, 500); } } else { showToast(result.message, true); } } catch (e) { showToast("Network Error", true); } finally { this.submitting = false; }
+                    
+                    try { 
+                        const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); 
+                        const result = await res.json(); 
+                        
+                        if (result.status === 'success') { 
+                            vibrateDevice([100, 50, 100]); 
+                            this.showModal = false; 
+                            showToast(type === 'delete' ? "Deleted" : "Saved"); 
+                            await this.fetchData(true); 
+                            
+                            // Check karega agar saare systems 100% done ho gaye, to bada completion box pop-up kar dega
+                            const currentLocPending = this.pcs.filter(p => p.location === this.activeLocation && p.status !== 'DONE').length; 
+                            if (currentLocPending === 0 && type === 'save') { setTimeout(() => { this.showReportModal = true; }, 500); } 
+                        } else { 
+                            showToast(result.message, true); 
+                        } 
+                    } catch (e) { showToast("Network Error", true); } 
+                    finally { this.submitting = false; }
                 },
 
-                // 🔥 UPDATED LOGIC FOR TODAY FILTER
+                // 🔥 LOGIC FOR TODAY FILTER (Jo system aaj ke din saaf huye hain unki ginti)
                 get todayCount() { 
                     const todayStr = new Date().toDateString();
                     return this.pcs.filter(p => p.location === this.activeLocation && p.status === 'DONE' && p.date && new Date(p.date).toDateString() === todayStr).length; 
                 },
 
+                // Screen par final list jo search aur filter ke baad render hoti hai
                 get filteredList() {
-                    let result = this.pcs.filter(p => p.location === this.activeLocation);
+                    let result = this.pcs.filter(p => p.location === this.activeLocation); // Pehle Location wise chaante ga
                     if (this.filterStatus === 'DONE') result = result.filter(p => p.status === 'DONE');
                     else if (this.filterStatus === 'PENDING') result = result.filter(p => p.status !== 'DONE');
                     else if (this.filterStatus === 'TODAY') {
@@ -1187,11 +1257,16 @@
                             return new Date(p.date).toDateString() === todayStr;
                         });
                     }
+                    // Search bar filter (Name ya tag me text dhundne ke liye)
                     if (this.search) { const s = this.search.toLowerCase(); result = result.filter(p => (p.systemName && p.systemName.toLowerCase().includes(s)) || (p.assetId && p.assetId.toLowerCase().includes(s))); }
                     return result;
                 },
+                
+                // Basic counts for math calculations
                 get doneCount() { return this.pcs.filter(p => p.location === this.activeLocation && p.status === 'DONE').length; },
                 get pendingCount() { return this.pcs.filter(p => p.location === this.activeLocation && p.status !== 'DONE').length; },
+                
+                // Ring mein kitne percent dikhana hai wo mathematics
                 get percentage() { const total = this.pcs.filter(p => p.location === this.activeLocation).length; if(total === 0) return 0; return Math.round((this.doneCount / total) * 100); }
             }))
         })
