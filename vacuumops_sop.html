@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PBL VacuumOps - Master SOP</title>
+    
+    <!-- Tailwind CSS & FontAwesome -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Premium Fonts: Outfit for sleek modern text, JetBrains for Data/Code -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { 
+                        sans: ['Outfit', 'sans-serif'], 
+                        mono: ['JetBrains Mono', 'monospace'] 
+                    },
+                    colors: { 
+                        slate: { 850: '#152033', 900: '#0f172a' },
+                        brand_blue: '#2563eb',
+                        brand_green: '#10b981'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #f1f5f9; -webkit-font-smoothing: antialiased; }
+        /* Modern Glass Panel with sharp borders */
+        .glass-panel { background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08); }
+        .gradient-text { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        /* Premium Highlight style for important keywords */
+        .highlight-amber { background: linear-gradient(120deg, #fef3c7 0%, #fde68a 100%); padding: 2px 6px; border-radius: 4px; color: #92400e; font-weight: 800; }
+        .highlight-rose { background: linear-gradient(120deg, #fee2e2 0%, #fecaca 100%); padding: 2px 6px; border-radius: 4px; color: #991b1b; font-weight: 800; }
+        .highlight-emerald { background: linear-gradient(120deg, #dcfce7 0%, #bbf7d0 100%); padding: 2px 6px; border-radius: 4px; color: #166534; font-weight: 800; }
+        
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
+    </style>
+</head>
+<body class="text-slate-800 selection:bg-blue-200 selection:text-blue-900">
+
+    <!-- 🌟 STICKY HEADER -->
+    <header class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-slate-200">
+        <div class="max-w-5xl mx-auto px-5 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg shadow-blue-500/30">
+                    <i class="fa-solid fa-book-open-reader"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black leading-none text-slate-900 tracking-tight">VacuumOps</h1>
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1 block">Master SOP Document</span>
+                </div>
+            </div>
+            <div class="hidden sm:flex flex-col items-end">
+                <span class="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-black rounded-lg border border-emerald-200 shadow-sm">VERSION 1.0</span>
+                <span class="text-[10px] font-bold text-slate-400 uppercase mt-1">IT Dept &bull; PBL</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 🌟 MAIN CONTENT CONTAINER -->
+    <main class="max-w-5xl mx-auto px-5 py-10 space-y-12">
+        
+        <!-- 1. INTRODUCTION -->
+        <section class="glass-panel rounded-3xl p-8 sm:p-12 relative overflow-hidden">
+            <div class="absolute top-[-50px] right-[-50px] w-64 h-64 bg-blue-100 rounded-full blur-[80px] opacity-70 pointer-events-none"></div>
+            
+            <h2 class="text-3xl sm:text-4xl font-black mb-6 gradient-text">System Overview 🎯</h2>
+            
+            <p class="text-base sm:text-lg text-slate-700 font-medium leading-relaxed mb-6">
+                <strong>PBL VacuumOps</strong> ek highly advanced, secure aur automated IT Asset Maintenance portal hai. Iska primary objective hai company ke saare workstations, servers, aur critical hardware ki timely physical cleaning (vacuuming) ko track karna.
+            </p>
+            <p class="text-base sm:text-lg text-slate-700 font-medium leading-relaxed mb-8">
+                Regular cleaning se computers overheating se bachte hain, unki processing speed maintain rehti hai, aur hardware failures drastically kam hote hain. Ye SOP aapko is portal ko efficiently use karne ka sahi tarika batayegi.
+            </p>
+            
+            <div class="flex flex-wrap gap-4 pt-4 border-t border-slate-100">
+                <div class="bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl flex items-center gap-3">
+                    <i class="fa-solid fa-building text-xl text-blue-500"></i>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Company</p>
+                        <p class="text-sm font-black text-slate-800">Pan Business Lists Pvt. Ltd.</p>
+                    </div>
+                </div>
+                <div class="bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl flex items-center gap-3">
+                    <i class="fa-solid fa-user-tie text-xl text-purple-500"></i>
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">IT Head</p>
+                        <p class="text-sm font-black text-slate-800">Mr. Vikas Rawat</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. ROLES & RESPONSIBILITIES (BIGGER CARDS) -->
+        <section>
+            <div class="flex items-center gap-3 mb-6 ml-2">
+                <span class="w-2 h-8 bg-blue-600 rounded-full block"></span>
+                <h3 class="text-2xl font-black text-slate-800 uppercase tracking-wide">Assigned Engineers 👨‍💻</h3>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <!-- Noida Branch -->
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 border-t-8 border-t-brand_blue flex flex-col justify-between hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 text-2xl"><i class="fa-solid fa-building"></i></div>
+                            <span class="bg-blue-100 text-blue-800 text-[10px] font-black px-3 py-1 rounded-full tracking-widest uppercase">Location 1</span>
+                        </div>
+                        <h4 class="text-2xl font-black text-slate-900 mb-1">Ashok Singh</h4>
+                        <p class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Noida Operations</p>
+                        <p class="text-base text-slate-700 font-medium leading-relaxed">
+                            Noida office ke sabhi IT assets ki maintenance, proper recording, aur cleaning cycles ko track karne ki <span class="highlight-emerald">100% responsibility</span> Ashok ki hai. Inhe directly IT Head ko report karni hoti hai.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Dehradun Branch -->
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 border-t-8 border-t-brand_green flex flex-col justify-between hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 text-2xl"><i class="fa-solid fa-tree"></i></div>
+                            <span class="bg-emerald-100 text-emerald-800 text-[10px] font-black px-3 py-1 rounded-full tracking-widest uppercase">Location 2</span>
+                        </div>
+                        <h4 class="text-2xl font-black text-slate-900 mb-1">Deependra Singh</h4>
+                        <p class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Dehradun Operations</p>
+                        <p class="text-base text-slate-700 font-medium leading-relaxed">
+                            Dehradun branch remote location hone ki wajah se yahan assets ki tracking aur unka timely maintenance bohot critical hai. Deependra ki zimmedari hai ki <span class="highlight-emerald">without delays</span> cycle close ho.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 3. TIMELINES & STRICT LOCK RULES (HIGH CONTRAST) -->
+        <section>
+            <div class="flex items-center gap-3 mb-6 ml-2">
+                <span class="w-2 h-8 bg-amber-500 rounded-full block"></span>
+                <h3 class="text-2xl font-black text-slate-800 uppercase tracking-wide">Timelines & Lock System ⏳</h3>
+            </div>
+            
+            <div class="bg-slate-900 text-white rounded-3xl p-8 sm:p-10 relative overflow-hidden shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)]">
+                <div class="absolute bottom-0 right-0 w-96 h-96 bg-amber-500 rounded-full blur-[100px] opacity-20 pointer-events-none"></div>
+                
+                <p class="text-base sm:text-lg text-slate-300 font-medium leading-relaxed mb-8">
+                    Saal mein IT assets ki cleaning <span class="highlight-amber text-slate-900">Exactly 3 Baar</span> hoti hai (Har 4 mahine mein ek cycle). System isi timeline par automatically open aur lock hota hai:
+                </p>
+                
+                <!-- Cycles Visual -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-10">
+                    <div class="bg-white/10 border border-white/20 p-6 rounded-2xl text-center backdrop-blur-md">
+                        <div class="text-4xl mb-3 drop-shadow-md">❄️</div>
+                        <h5 class="font-black text-2xl text-white">JANUARY</h5>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Cycle 1</p>
+                    </div>
+                    <div class="bg-white/10 border border-white/20 p-6 rounded-2xl text-center backdrop-blur-md">
+                        <div class="text-4xl mb-3 drop-shadow-md">☀️</div>
+                        <h5 class="font-black text-2xl text-white">MAY</h5>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Cycle 2</p>
+                    </div>
+                    <div class="bg-white/10 border border-white/20 p-6 rounded-2xl text-center backdrop-blur-md">
+                        <div class="text-4xl mb-3 drop-shadow-md">🍂</div>
+                        <h5 class="font-black text-2xl text-white">SEPTEMBER</h5>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Cycle 3</p>
+                    </div>
+                </div>
+
+                <!-- Grace Period Box -->
+                <div class="bg-amber-500/10 border border-amber-500/40 p-6 sm:p-8 rounded-2xl relative">
+                    <div class="absolute top-0 right-0 p-4 opacity-10"><i class="fa-solid fa-triangle-exclamation text-8xl text-amber-500"></i></div>
+                    
+                    <div class="flex items-center gap-4 mb-4 relative z-10">
+                        <div class="w-12 h-12 bg-amber-500/20 rounded-xl flex items-center justify-center text-amber-400 text-2xl">
+                            <i class="fa-solid fa-lock-open"></i>
+                        </div>
+                        <h4 class="font-black text-amber-400 text-xl sm:text-2xl">The 7-Day Grace Period</h4>
+                    </div>
+                    
+                    <div class="relative z-10 space-y-4 text-base text-slate-300 font-medium">
+                        <p>Agar aap upar diye gaye main mahine (e.g., Jan, May, Sept) mein apna task 100% complete nahi kar paate hain, toh VacuumOps system aapko <span class="highlight-amber text-slate-900">7 Days ka Extra Buffer</span> deta hai.</p>
+                        
+                        <ul class="list-disc pl-5 space-y-2 mt-4 text-slate-400">
+                            <li><strong>Example:</strong> May ke cycle ka grace period <span class="text-white font-bold">1st June se 7th June</span> tak chalega.</li>
+                            <li>In 7 dino mein Dashboard ke top par ek <strong class="text-amber-400">Amber Alert Banner</strong> lagatar dikhega jo countdown dikhayega.</li>
+                            <li><span class="highlight-rose text-slate-900">CRITICAL RULE:</span> 8th day aate hi system automatically aur forcefully <strong>LOCK</strong> ho jayega. Uske baad application Disable ho jayegi aur purani pending entries ko agle 4 mahine tak update nahi kiya ja sakega!</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. WORKFLOW / HOW TO USE (DETAILED) -->
+        <section>
+            <div class="flex items-center gap-3 mb-6 ml-2">
+                <span class="w-2 h-8 bg-indigo-500 rounded-full block"></span>
+                <h3 class="text-2xl font-black text-slate-800 uppercase tracking-wide">Step-by-Step Workflow 📝</h3>
+            </div>
+            
+            <div class="space-y-6">
+                <!-- Step 1 -->
+                <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-start gap-6">
+                    <div class="w-14 h-14 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-2xl font-black shrink-0 shadow-inner">1</div>
+                    <div>
+                        <h4 class="font-black text-xl text-slate-900 mb-2">Location & Filter Setup</h4>
+                        <p class="text-base text-slate-600 font-medium leading-relaxed">
+                            App kholte hi sabse pehle header dropdown se apni Location (Noida / Dehradun) chunein. 
+                            Iske baad, Left panel (ya mobile mein cards ke upar) diye gaye filters mein se <strong>"Pending"</strong> par click karein. Isse aapko wahi PCs dikhenge jo abhi saaf nahi huye hain.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-start gap-6">
+                    <div class="w-14 h-14 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-2xl font-black shrink-0 shadow-inner">2</div>
+                    <div>
+                        <h4 class="font-black text-xl text-slate-900 mb-2">Update Asset Status</h4>
+                        <p class="text-base text-slate-600 font-medium leading-relaxed">
+                            Kis bhi pending PC par click karein. Ek form pop-up hoga (Drawer). Yahan "Current Status" ko <span class="highlight-emerald text-slate-900">Cleaned</span> par set karein. Jaise hi aap Cleaned click karenge, Date field apne aap aaj ki current date se bhar jayegi.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Step 3 -->
+                <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-start gap-6">
+                    <div class="w-14 h-14 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-2xl font-black shrink-0 shadow-inner"><i class="fa-solid fa-key"></i></div>
+                    <div class="w-full">
+                        <h4 class="font-black text-xl text-slate-900 mb-2">Authorization & Save</h4>
+                        <p class="text-base text-slate-600 font-medium leading-relaxed mb-4">
+                            Fake entries rokhne ke liye, data tabhi save hoga jab aapke paas IT Admin Passkey hogi. Apna password dalein aur <strong>Save Changes</strong> dabayein.
+                        </p>
+                        <div class="bg-slate-100 p-4 rounded-xl border border-slate-200 inline-flex items-center gap-3">
+                            <span class="text-xs uppercase font-bold text-slate-500">Official Passkey:</span>
+                            <code class="text-emerald-700 font-black text-lg bg-emerald-100 px-3 py-1 rounded-lg border border-emerald-200 tracking-widest shadow-sm">PBL2026</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. BACKEND DATABASE RULES (Column G Magic) -->
+        <section>
+            <div class="flex items-center gap-3 mb-6 ml-2">
+                <span class="w-2 h-8 bg-emerald-500 rounded-full block"></span>
+                <h3 class="text-2xl font-black text-slate-800 uppercase tracking-wide">Database & History Logs 💾</h3>
+            </div>
+            
+            <div class="glass-panel p-8 sm:p-10 rounded-3xl">
+                <p class="text-base sm:text-lg text-slate-700 font-medium leading-relaxed mb-6">
+                    Sabse bada sawal: <em>"Jab main agle cycle mein purane PC ko dobara update karunga, toh uski pichli cleaning date ka kya hoga? Kya wo delete ho jayegi?"</em>
+                    <br><br>
+                    <span class="text-emerald-600 font-black text-xl">Nahi! Backend data kabhi nahi khota.</span>
+                </p>
+                
+                <div class="bg-slate-900 text-slate-300 p-6 rounded-2xl shadow-inner border border-slate-700 relative overflow-hidden">
+                    <div class="absolute top-4 right-4 text-slate-700 text-6xl opacity-30"><i class="fa-solid fa-database"></i></div>
+                    <h5 class="font-black text-white text-xl mb-2 relative z-10">The 'Column G' Magic ✨</h5>
+                    <p class="text-sm sm:text-base leading-relaxed mb-4 relative z-10">
+                        Google Apps Script (Backend) bohot intelligently design kiya gaya hai. Jab aap nayi date enter karte hain, toh script <span class="highlight-amber text-slate-900">Purani Date ko chup-chap Column G (History Log) mein shift kar deta hai</span> uske baad nayi date ko current list mein show karta hai.
+                    </p>
+                    
+                    <!-- Code Visualization Block -->
+                    <div class="mt-5 relative z-10">
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Google Sheet Audit View:</p>
+                        <div class="bg-black/50 p-4 rounded-xl font-mono text-sm border border-slate-700 overflow-x-auto text-nowrap">
+                            <span class="text-blue-400">PBLNET001</span> | <span class="text-emerald-400">15-Sep-2026 (Current)</span> | <span class="text-slate-500 text-xs">Asset-ID</span> | <span class="text-amber-400">History: 22-May-2026, 10-Jan-2026</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. MAILING & REPORTING RULES -->
+        <section>
+            <div class="flex items-center gap-3 mb-6 ml-2">
+                <span class="w-2 h-8 bg-purple-500 rounded-full block"></span>
+                <h3 class="text-2xl font-black text-slate-800 uppercase tracking-wide">Reporting & Email Triggers 📧</h3>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <!-- Manual Report -->
+                <div class="bg-white border border-slate-200 p-8 rounded-3xl shadow-sm hover:border-purple-300 transition-colors">
+                    <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center text-2xl mb-4"><i class="fa-solid fa-paper-plane"></i></div>
+                    <h4 class="font-black text-xl text-slate-900 mb-3">Mid-Cycle Report Button</h4>
+                    <p class="text-sm sm:text-base text-slate-600 font-medium leading-relaxed">
+                        Agar Head Office se progress mangi jaye, toh bottom right mein diye gaye <strong>"Report"</strong> button (Jahaj wale icon) ko dabayein. Ye current status (Kitne Done, Kitne Pending) ka ek khubsurat graphical email automatically IT Head ko bhej dega.
+                    </p>
+                </div>
+                
+                <!-- 100% Closure -->
+                <div class="bg-white border border-slate-200 p-8 rounded-3xl shadow-sm hover:border-emerald-300 transition-colors">
+                    <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-2xl mb-4"><i class="fa-solid fa-trophy"></i></div>
+                    <h4 class="font-black text-xl text-slate-900 mb-3">100% Completion Closure</h4>
+                    <p class="text-sm sm:text-base text-slate-600 font-medium leading-relaxed">
+                        Jaise hi aapki branch ke <strong>saare (100%)</strong> PCs saaf ho jayenge aur koi 'Pending' nahi bachega, screen par ek bada <span class="highlight-emerald">Complete 🎉</span> pop-up fat-te huye aayega. Usme Final Send button dabane par Cycle close ho jayegi.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. DO's AND DON'Ts / QUICK RULES -->
+        <section class="pb-10">
+            <div class="bg-gradient-to-br from-slate-850 to-slate-900 p-8 sm:p-10 rounded-3xl shadow-xl border border-slate-700 text-slate-300">
+                <h3 class="text-2xl font-black text-white mb-6 flex items-center gap-3">
+                    <i class="fa-solid fa-clipboard-list text-amber-500"></i> The Golden Rules
+                </h3>
+                
+                <div class="space-y-4">
+                    <div class="flex items-start gap-4 bg-white/5 p-4 rounded-xl border border-white/10">
+                        <i class="fa-solid fa-circle-check text-emerald-400 text-xl mt-1 shrink-0"></i> 
+                        <div>
+                            <strong class="text-white text-lg block mb-1">Use the Sync Button</strong>
+                            <p class="text-sm font-medium">Agar Noida aur Dehradun ek sath kaam kar rahe hain, toh bottom menu mein diye gaye ghoomne wale <i class="fa-solid fa-rotate px-1 text-slate-400 text-xs"></i> icon ka use karein, page refresh kiye bina naya data fetch ho jayega.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start gap-4 bg-white/5 p-4 rounded-xl border border-white/10">
+                        <i class="fa-solid fa-circle-check text-emerald-400 text-xl mt-1 shrink-0"></i> 
+                        <div>
+                            <strong class="text-white text-lg block mb-1">Dark Mode & Search</strong>
+                            <p class="text-sm font-medium">Top right corner mein 🌙 moon icon se Dark Mode on karein (Battery aur aankhon ke liye accha). Aur Magnifying glass se kis bhi system ka Tag daalkar directly usko dhundein.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start gap-4 bg-rose-500/10 p-4 rounded-xl border border-rose-500/20">
+                        <i class="fa-solid fa-circle-xmark text-rose-500 text-xl mt-1 shrink-0"></i> 
+                        <div>
+                            <strong class="text-rose-400 text-lg block mb-1">NEVER Alter Asset Tags</strong>
+                            <p class="text-sm font-medium text-slate-300">Asset Tag hamesha company format mein hona chahiye (e.g., <code class="bg-black/50 px-1 rounded text-white">PBL-NOD-IT-CPU-001</code>). Agar tag format galat hoga toh Inventory Master sheet usko reject kar degi.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 py-8 mt-10">
+        <div class="max-w-5xl mx-auto px-5 text-center flex flex-col items-center">
+            <div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 mb-3"><i class="fa-solid fa-shield-halved"></i></div>
+            <p class="text-sm font-black text-slate-500 uppercase tracking-widest">Designed & Authorized by Mr. Vikas Rawat (IT Head)</p>
+            <p class="text-xs font-bold text-slate-400 mt-2">© 2026 Pan Business Lists Pvt. Ltd. | Secure internal IT Documentation.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
