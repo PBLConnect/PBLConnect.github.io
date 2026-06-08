@@ -149,11 +149,11 @@
                         { name: 'Linux 2', ip: '192.168.0.92', status: false, maintenance: false, type: 'linux' },
                         { name: 'Linux 3', ip: '192.168.0.93', status: false, maintenance: false, type: 'linux' }
                     ],
-                    isp: [
-                        { name: 'STPI 15Mbps', speed: 0, upload: 0, max: 15, complaint: '' },
-                        { name: 'Airtel 10Mbps', speed: 0, upload: 0, max: 10, complaint: '' },
-                        { name: 'Airtel 30Mbps BB', speed: 0, upload: 0, max: 35, complaint: '' }
-                    ],
+						isp: [
+						{ name: 'STPI 15Mbps', speed: 0, upload: 0, max: 15, complaint: '' },
+						{ name: 'Airtel 15Mbps', speed: 0, upload: 0, max: 15, complaint: '' }, // 🚀 15Mbps Upgrade
+						{ name: 'Airtel 30Mbps BB', speed: 0, upload: 0, max: 35, complaint: '' }
+					],
                     // Active UI Bindings (Pre-populated URL short description)
 					services: [ 
 						{ name: 'www.panbusiness.net', status: false, icon: 'fa-globe', desc: 'Our Global Website' }, 
@@ -242,10 +242,15 @@
                                         isp.max = 10;
                                     }
                                 }
-                                // नोएडा एयरटेल ब्रॉडबैंड (35Mbps लिमिट फ़िक्स)
-                                if (isp.name.includes('Airtel 30Mbps') || isp.name.includes('Airtel 30Mbps BB')) {
-                                    isp.max = 35; // 🚀 कैश्ड डेटा को 35Mbps लिमिट पर फ़ोर्स करें
-                                }
+                                // 🔥 नोएडा एयरटेल फाइबर (10Mbps से 15Mbps अपग्रेड फ़िक्स)
+								if (isp.name.includes('Airtel 10Mbps') || isp.name.includes('Airtel 15Mbps')) {
+									isp.name = 'Airtel 15Mbps (Fibre)';
+									isp.max = 15; // 🚀 कैश्ड डेटा को 15Mbps लिमिट पर फ़ोर्स करें
+								}
+								// नोएडा एयरटेल ब्रॉडबैंड (35Mbps लिमिट फ़िक्स)
+								if (isp.name.includes('Airtel 30Mbps') || isp.name.includes('Airtel 30Mbps BB')) {
+									isp.max = 35; // 🚀 कैश्ड डेटा को 35Mbps लिमिट पर फ़ोर्स करें
+								}
                             });
                         }
                     });
@@ -314,11 +319,11 @@
                             { name: 'Linux 2', ip: '192.168.0.92', status: false, maintenance: false, type: 'linux' },
                             { name: 'Linux 3', ip: '192.168.0.93', status: false, maintenance: false, type: 'linux' }
                         ];
-                        state.isp = [
-                            { name: 'STPI 15Mbps', speed: 0, upload: 0, max: 15, complaint: '', medium: 'RF' },
-                            { name: 'Airtel 10Mbps (Fibre)', speed: 0, upload: 0, max: 10, complaint: '' },
-                            { name: 'Airtel 30Mbps BB (Copper)', speed: 0, upload: 0, max: 35, complaint: '' } // 🚀 35Mbps लिमिट सेट की गई
-                        ];
+							state.isp = [
+							{ name: 'STPI 15Mbps', speed: 0, upload: 0, max: 15, complaint: '', medium: 'RF' },
+							{ name: 'Airtel 15Mbps (Fibre)', speed: 0, upload: 0, max: 15, complaint: '' }, // 🚀 15Mbps Limit & Name Updated
+							{ name: 'Airtel 30Mbps BB (Copper)', speed: 0, upload: 0, max: 35, complaint: '' } // 🚀 35Mbps लिमिट सेट की गई
+						];
                         state.infra.acs = [
                             { name: 'Server AC 1', status: false }, { name: 'Server AC 2', status: false }, { name: 'Server AC 3', status: false }
                         ];
