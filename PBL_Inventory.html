@@ -807,9 +807,22 @@
                 form: { ParentAssetID:'', AssetID:'', DeviceType:'Desktop', Status:'In Use', Hostname:'', Make:'', Model:'', SerialNo:'', CPU:'', RAM_GB:'', Storage_GB:'', OS:'', DataClass:'Internal', Encryption:'No', IP_Address:'', BackupStatus:'', Location:'', AssignedTo:'', PurchaseDate:'', Vendor:'', Cost_INR:'', WarrantyEnd:'', AntivirusStatus:'', Notes:'', AssetOwner:'', InvoiceURL:'', secret:'' },
                 currentUser: JSON.parse(sessionStorage.getItem('userData')) || { name: 'Guest' },
 
+                // 🚀 NEW: Central Haptic Feedback Controller
+                haptic(type = 'light') {
+                    if (!window.navigator || !window.navigator.vibrate) return; // Failsafe for iOS
+                    if (type === 'light') {
+                        navigator.vibrate(15); 
+                    } else if (type === 'success') {
+                        navigator.vibrate([30, 50, 30]); 
+                    } else if (type === 'error' || type === 'delete') {
+                        navigator.vibrate([50, 50, 50, 50]); 
+                    }
+                },
+
                 async init() {
                     try {
                         if (localStorage.getItem('theme') === 'dark') { this.isDark = true; document.documentElement.classList.add('dark'); }
+                        document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
                         this.loading = true;
                         await Promise.all([ this.fetchData(false), new Promise(resolve => setTimeout(resolve, 1000)) ]);
                         this.loading = false;
@@ -817,7 +830,11 @@
                 },
 
                 async fetchData(force = false) {
-                    if (force) { this.loading = true; this.syncing = true; }
+                    if (force) { 
+                        this.haptic('light'); // 👈 VIBRATE ON SYNC BUTTON
+                        this.loading = true; 
+                        this.syncing = true; 
+                    }
                     try {
                         if (!force) {
                             const cached = localStorage.getItem('pblData');
@@ -837,27 +854,40 @@
                                 this.hardwareList = newHardware; this.softwareList = newSoftware;
                                 localStorage.setItem('pblData', JSON.stringify({ hardware: this.hardwareList, software: this.softwareList }));
                                 this.lastUpdated = new Date().toLocaleTimeString('en-US', {hour12:false, hour:'2-digit', minute:'2-digit'});
-                                if (force) this.showToast('Success', 'Data Synced', 'success');
+                                if (force) {
+                                    this.showToast('Success', 'Data Synced', 'success');
+                                    this.haptic('success'); // 👈 VIBRATE ON SYNC SUCCESS
+                                }
+                            } else if (force) {
+                                this.haptic('success'); // Also vibrate if same data but checked successfully
                             }
                         }
-                    } catch (e) { console.error(e); if (force) this.showToast('Error', 'Sync Failed', 'error'); } 
+                    } catch (e) { 
+                        console.error(e); 
+                        if (force) {
+                            this.showToast('Error', 'Sync Failed', 'error'); 
+                            this.haptic('error'); // 👈 VIBRATE ON SYNC ERROR
+                        }
+                    } 
                     finally { this.syncing = false; if (force) setTimeout(() => { this.loading = false; }, 400); }
                 },
 
                 toggleTheme() { 
+                    this.haptic('light'); // 👈 VIBRATE ON THEME TOGGLE
                     this.isDark = !this.isDark; 
                     document.documentElement.classList.toggle('dark', this.isDark); 
                     localStorage.setItem('theme', this.isDark ? 'dark' : 'light'); 
                     
-                    // 🚀 DYNAMICALLY CHANGE STATUS BAR COLOR ON CLICK
                     document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
                     
-                    // (Dashboard file mein chart update wala code yahan wapas paste kar dena agar wo Dashboard hai)
                     if(this.chartInstance) { this.chartInstance.updateOptions({ theme: { mode: this.isDark ? 'dark' : 'light' } }); }
                 },
                 setThemeColor(color) { document.documentElement.style.setProperty('--brand-color', color); },
                 
-                closeAll() { this.showModal = false; this.drawerOpen = false; this.kpiModalOpen = false; this.showHelpModal = false; this.showContextMenu = false; this.showSuggestions = false; },
+                closeAll() { 
+                    this.haptic('light'); // 👈 VIBRATE ON CLOSE
+                    this.showModal = false; this.drawerOpen = false; this.kpiModalOpen = false; this.showHelpModal = false; this.showContextMenu = false; this.showSuggestions = false; 
+                },
                 
                 handleGlobalKeys(e) {
                     if (e.key === 'Escape') {this.closeAll(); return;}
@@ -893,54 +923,102 @@
                 getInitials(name) { return name ? name.substring(0,2).toUpperCase() : '??'; },
                 formatDateDisplay(iso) { if(!iso) return 'N/A'; const d = new Date(iso); return isNaN(d.getTime()) ? iso : `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`; },
 
-                selectAll(e) { this.selectedIds = e.target.checked ? (this.currentTab==='hardware' ? this.filteredHardware.map(a => a.AssetID) : []) : []; },
-                showContext(e, item) { this.selectedContextItem = item; this.contextMenuPosition = { x: e.clientX, y: e.clientY }; this.showContextMenu = true; },
+                selectAll(e) { this.haptic('light'); this.selectedIds = e.target.checked ? (this.currentTab==='hardware' ? this.filteredHardware.map(a => a.AssetID) : []) : []; },
+                showContext(e, item) { this.haptic('light'); this.selectedContextItem = item; this.contextMenuPosition = { x: e.clientX, y: e.clientY }; this.showContextMenu = true; },
                 
-                openDrawer(item) { this.closeAll(); this.$nextTick(() => { this.selectedAsset = item; this.drawerOpen = true; }); },
+                openDrawer(item) { 
+                    this.closeAll(); 
+                    this.$nextTick(() => { 
+                        this.selectedAsset = item; 
+                        this.drawerOpen = true; 
+                        this.haptic('light'); // 👈 VIBRATE ON DRAWER OPEN
+                    }); 
+                },
                 
                 openModal(mode, item) { 
-				this.closeAll(); this.modalMode = mode; 
-				const emptyHardware = { AssetID:'', SerialNo:'', DeviceType:'Desktop', Status:'In Use', Make:'', Model:'', AssignedTo:'', Location:'', IP_Address:'', secret:'' };
-				const emptySoftware = { SoftwareID:'', SoftwareName:'', Type:'OS', TotalLicense:0, Used_Noida:0, Used_DDN:0, ExpiryDate:'', Status:'Active', secret:'' };
-				if(mode === 'edit' && item) { this.form = JSON.parse(JSON.stringify(item)); this.form.secret = ''; if(this.form.ExpiryDate) this.form.ExpiryDate = this.form.ExpiryDate.split('T')[0]; } 
-				else { this.form = (this.currentTab === 'hardware') ? emptyHardware : emptySoftware; } 
-				this.$nextTick(() => { this.showModal = true; }); 
+                    this.closeAll(); 
+                    this.modalMode = mode; 
+                    const emptyHardware = { AssetID:'', SerialNo:'', DeviceType:'Desktop', Status:'In Use', Make:'', Model:'', AssignedTo:'', Location:'', IP_Address:'', secret:'' };
+                    const emptySoftware = { SoftwareID:'', SoftwareName:'', Type:'OS', TotalLicense:0, Used_Noida:0, Used_DDN:0, ExpiryDate:'', Status:'Active', secret:'' };
+                    if(mode === 'edit' && item) { this.form = JSON.parse(JSON.stringify(item)); this.form.secret = ''; if(this.form.ExpiryDate) this.form.ExpiryDate = this.form.ExpiryDate.split('T')[0]; } 
+                    else { this.form = (this.currentTab === 'hardware') ? emptyHardware : emptySoftware; } 
+                    this.$nextTick(() => { 
+                        this.showModal = true; 
+                        this.haptic('light'); // 👈 VIBRATE ON MODAL OPEN
+                    }); 
 			    },
 
-                copyDetails(item) { navigator.clipboard.writeText(`Asset: ${item.AssetID}\nSerial: ${item.SerialNo}\nUser: ${item.AssignedTo}`); this.showToast('Copied', 'Details copied to clipboard', 'success'); },
+                copyDetails(item) { 
+                    navigator.clipboard.writeText(`Asset: ${item.AssetID}\nSerial: ${item.SerialNo}\nUser: ${item.AssignedTo}`); 
+                    this.showToast('Copied', 'Details copied to clipboard', 'success'); 
+                    this.haptic('success'); // 👈 VIBRATE ON COPY
+                },
 
                 async saveAsset() {
-                    if(!this.form.secret) { this.showToast('Validation', 'Admin Key Required', 'error'); return; }
+                    if(!this.form.secret) { 
+                        this.showToast('Validation', 'Admin Key Required', 'error'); 
+                        this.haptic('error'); // 👈 VIBRATE ON ERROR
+                        return; 
+                    }
                     this.submitting = true;
                     try {
                         await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: this.modalMode, ...this.form }) });
-                        this.showToast('Success', 'Record Saved', 'success'); this.showModal = false; this.fetchData(true);
-                    } catch(e) { this.showToast('Error', 'Save Failed', 'error'); } finally { this.submitting = false; }
+                        this.showToast('Success', 'Record Saved', 'success'); 
+                        this.haptic('success'); // 👈 VIBRATE ON SUCCESS
+                        this.showModal = false; 
+                        this.fetchData(true);
+                    } catch(e) { 
+                        this.showToast('Error', 'Save Failed', 'error'); 
+                        this.haptic('error'); // 👈 VIBRATE ON ERROR
+                    } finally { this.submitting = false; }
                 },
-                async deleteAsset(id) { const secret = prompt("Confirm Admin Key:"); if(secret !== 'PBL2026') return; try { await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: 'delete', AssetID: id, secret: secret }) }); this.showToast('Deleted', 'Asset Removed', 'success'); this.fetchData(true); } catch(e) { this.showToast('Error', 'Delete Failed', 'error'); } },
+
+                async deleteAsset(id) { 
+                    this.haptic('delete'); // 👈 VIBRATE WARNING ON DELETE INTENT
+                    const secret = prompt("Confirm Admin Key:"); 
+                    if(secret !== 'PBL2026') {
+                        this.haptic('error');
+                        return;
+                    } 
+                    try { 
+                        await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: 'delete', AssetID: id, secret: secret }) }); 
+                        this.showToast('Deleted', 'Asset Removed', 'success'); 
+                        this.haptic('success'); // 👈 VIBRATE ON DELETE SUCCESS
+                        this.fetchData(true); 
+                    } catch(e) { 
+                        this.showToast('Error', 'Delete Failed', 'error'); 
+                        this.haptic('error');
+                    } 
+                },
                 
                 exportCSV() {
+                    this.haptic('light'); // 👈 VIBRATE ON CLICK
                     if (this.currentTab === 'hardware' && this.filteredHardware.length > 0) {
                         const headers = ['Asset Tag', 'Type', 'Make', 'Model', 'Serial', 'User', 'Location', 'Status'];
                         let csv = headers.join(',') + '\n';
                         this.filteredHardware.forEach(row => { const data = [row.AssetID, row.DeviceType, row.Make, row.Model, row.SerialNo, row.AssignedTo, row.Location, row.Status].map(field => `"${(field || '').toString().replace(/"/g, '""')}"`); csv += data.join(',') + '\n'; });
                         const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = `PBL_Hardware.csv`; a.click();
                     }
+                    setTimeout(() => this.haptic('success'), 500); // 👈 VIBRATE ON EXPORT DONE
 			    },
+
                 exportPDF() {
-				const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4'); 
-				if (this.currentTab === 'hardware') {
-                    doc.text("PBL Hardware Report", 14, 15); doc.setFontSize(10); doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 20);
-                    const rows = this.filteredHardware.map(r => [r.AssetID || '-', r.DeviceType || '-', r.Model || '-', r.SerialNo || '-', r.AssignedTo || 'Unassigned', r.Location || '-', r.Status || '-']);
-                    doc.autoTable({ head: [['Asset Tag', 'Type', 'Model', 'Serial', 'User', 'Location', 'Status']], body: rows, startY: 25, theme: 'grid', styles: { fontSize: 8 }, headStyles: { fillColor: [59, 130, 246] } });
-                    doc.save(`PBL_Hardware.pdf`);
-                } else {
-                    doc.text("PBL Software Compliance Report", 14, 15); doc.setFontSize(10); doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 20);
-                    const rows = this.filteredSoftware.map(s => [s.SoftwareName, s.Type, s.TotalLicense, s.Used_Noida, s.Used_DDN, (s.TotalLicense - (s.Used_Noida + s.Used_DDN))]);
-                    doc.autoTable({ head: [['Software Name', 'Type', 'Total Lic', 'Used Noida', 'Used DDN', 'Balance']], body: rows, startY: 25, theme: 'grid', styles: { fontSize: 8 }, headStyles: { fillColor: [124, 58, 237] } });
-                    doc.save(`PBL_Software.pdf`);
-                }
-			},
+                    this.haptic('light'); // 👈 VIBRATE ON CLICK
+                    const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4'); 
+                    if (this.currentTab === 'hardware') {
+                        doc.text("PBL Hardware Report", 14, 15); doc.setFontSize(10); doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 20);
+                        const rows = this.filteredHardware.map(r => [r.AssetID || '-', r.DeviceType || '-', r.Model || '-', r.SerialNo || '-', r.AssignedTo || 'Unassigned', r.Location || '-', r.Status || '-']);
+                        doc.autoTable({ head: [['Asset Tag', 'Type', 'Model', 'Serial', 'User', 'Location', 'Status']], body: rows, startY: 25, theme: 'grid', styles: { fontSize: 8 }, headStyles: { fillColor: [59, 130, 246] } });
+                        doc.save(`PBL_Hardware.pdf`);
+                    } else {
+                        doc.text("PBL Software Compliance Report", 14, 15); doc.setFontSize(10); doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 20);
+                        const rows = this.filteredSoftware.map(s => [s.SoftwareName, s.Type, s.TotalLicense, s.Used_Noida, s.Used_DDN, (s.TotalLicense - (s.Used_Noida + s.Used_DDN))]);
+                        doc.autoTable({ head: [['Software Name', 'Type', 'Total Lic', 'Used Noida', 'Used DDN', 'Balance']], body: rows, startY: 25, theme: 'grid', styles: { fontSize: 8 }, headStyles: { fillColor: [124, 58, 237] } });
+                        doc.save(`PBL_Software.pdf`);
+                    }
+                    setTimeout(() => this.haptic('success'), 500); // 👈 VIBRATE ON EXPORT DONE
+			    },
+
                 showToast(title, message, type) { const id = Date.now(); this.toasts.push({ id, title, message, type, visible: true }); setTimeout(() => { this.toasts = this.toasts.filter(t => t.id !== id); }, 3000); }
             }))
         })
