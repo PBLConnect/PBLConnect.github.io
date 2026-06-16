@@ -773,6 +773,18 @@
                 { name: 'Ashok Singh', role: 'Desktop Support', start: '14:15', end: '21:30', avatar: 'Ak', color: 'bg-emerald-500' }
             ],
 
+            // 🚀 NEW: Central Haptic Feedback Controller
+            haptic(type = 'light') {
+                if (!window.navigator || !window.navigator.vibrate) return; // Failsafe for iOS
+                if (type === 'light') {
+                    navigator.vibrate(15); 
+                } else if (type === 'success') {
+                    navigator.vibrate([30, 50, 30]); 
+                } else if (type === 'error' || type === 'delete') {
+                    navigator.vibrate([50, 50, 50, 50]); 
+                }
+            },
+
             get openTickets() { return this.tickets ? this.tickets.filter(t => t.status === 'Open').sort((a, b) => new Date(a.date) - new Date(b.date)) : []; },
             get openTicketCount() { return this.openTickets.length; },
             get notifications() { return this.openTickets; },
@@ -780,6 +792,7 @@
             get onlineStaffCount() { return this.staffData.filter(s => this.isStaffOnline(s)).length; },
 
             closeAllModals() {
+                this.haptic('light'); // 👈 VIBRATE
                 this.showLogoutModal = false; this.showProfileModal = false; this.showSettingsModal = false; 
                 this.showGuide = false; this.showStaffModal = false; this.showOpenTicketsModal = false;
                 this.showNotifs = false; this.showProfile = false;
@@ -791,12 +804,13 @@
                 return currentMins >= (sH * 60 + sM) && currentMins <= (eH * 60 + eM);
             },
 
-            openProfile() { this.showProfile = false; setTimeout(() => this.showProfileModal = true, 100); },
-            openSettings() { this.showProfile = false; setTimeout(() => this.showSettingsModal = true, 100); },
-            confirmLogout() { this.showProfile = false; this.showLogoutModal = true; },
-            performLogout() { sessionStorage.clear(); window.location.href = 'it-login.html'; },
+            openProfile() { this.haptic('light'); this.showProfile = false; setTimeout(() => this.showProfileModal = true, 100); },
+            openSettings() { this.haptic('light'); this.showProfile = false; setTimeout(() => this.showSettingsModal = true, 100); },
+            confirmLogout() { this.haptic('light'); this.showProfile = false; this.showLogoutModal = true; },
+            performLogout() { this.haptic('success'); sessionStorage.clear(); window.location.href = 'it-login.html'; },
 
             scrollToLog() { 
+                this.haptic('light'); // 👈 VIBRATE
                 this.showNotifs = false; const el = document.getElementById('complaintLogBox'); 
                 if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); this.highlightLog = true; setTimeout(() => this.highlightLog = false, 2000); } 
             },
@@ -817,7 +831,10 @@
             },
 
             async fetchTickets(force = false) {
-                if(force) this.loading = true;
+                if(force) {
+                    this.haptic('light'); // 👈 VIBRATE ON SYNC BTN CLICK
+                    this.loading = true;
+                }
                 const cachedData = localStorage.getItem('pbl_tickets_cache');
                 if (cachedData && !force) {
                     this.tickets = JSON.parse(cachedData);
@@ -839,8 +856,14 @@
                         this.tickets = freshTickets;
                         this.updateKPIs(); this.renderChart();
                         localStorage.setItem('pbl_tickets_cache', JSON.stringify(this.tickets));
+                        if(force) this.haptic('success'); // 👈 VIBRATE ON DATA ARRIVAL
+                    } else {
+                        if(force) this.haptic('success'); // Also vibrate if same data but checked successfully
                     }
-                } catch (e) { console.error("Error fetching tickets:", e); } finally { this.loading = false; }
+                } catch (e) { 
+                    console.error("Error fetching tickets:", e); 
+                    if(force) this.haptic('error'); // 👈 VIBRATE ON ERROR
+                } finally { this.loading = false; }
             },
 
             updateKPIs() {
@@ -912,16 +935,15 @@
             formatDisplayDate(dateStr) { return dateStr ? dateStr.substring(0, 11) : 'N/A'; },
             
             toggleTheme() { 
-                    this.isDark = !this.isDark; 
-                    document.documentElement.classList.toggle('dark', this.isDark); 
-                    localStorage.setItem('theme', this.isDark ? 'dark' : 'light'); 
-                    
-                    // 🚀 DYNAMICALLY CHANGE STATUS BAR COLOR ON CLICK
-                    document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
-                    
-                    // (Dashboard file mein chart update wala code yahan wapas paste kar dena agar wo Dashboard hai)
-                    if(this.chartInstance) { this.chartInstance.updateOptions({ theme: { mode: this.isDark ? 'dark' : 'light' } }); }
-                }
+                this.haptic('light'); // 👈 VIBRATE ON THEME TOGGLE
+                this.isDark = !this.isDark; 
+                document.documentElement.classList.toggle('dark', this.isDark); 
+                localStorage.setItem('theme', this.isDark ? 'dark' : 'light'); 
+                
+                document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
+                
+                if(this.chartInstance) { this.chartInstance.updateOptions({ theme: { mode: this.isDark ? 'dark' : 'light' } }); }
+            }
         }))
     })
     </script>
