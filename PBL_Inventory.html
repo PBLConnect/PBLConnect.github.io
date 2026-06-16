@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PBL Asset Management v1.0</title>
+    <link rel="icon" type="image/x-icon" href="Assets/images/pbl-logo.ico">
+    
+    <!-- SECURITY CHECK SCRIPT -->
+    <script>
+        if (!sessionStorage.getItem('isLoggedIn')) {
+            window.location.href = 'it-login.html';
+        }
+    </script>
+    
+    <!-- Dependencies -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- PDF Libs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+    <!-- Modern Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+<script>
+    tailwind.config = {
+        darkMode: 'class',
+        theme: {
+            extend: {
+                fontFamily: { 
+                    sans: ['Inter', 'sans-serif'],
+                    heading: ['Outfit', 'sans-serif'],
+                    mono: ['JetBrains Mono', 'monospace']
+                },
+                colors: {
+                    brand: 'var(--brand-color)',
+                    brand_light: 'var(--brand-light)', 
+                    dark_bg: '#020617',       
+                    dark_surface: '#0f172a',  
+                    dark_border: '#1e293b'    
+                },
+                animation: { 'slide-in': 'slideIn 0.3s ease-out forwards' },
+                keyframes: { slideIn: { '0%': { transform: 'translateX(100%)' }, '100%': { transform: 'translateX(0)' } } }
+            }
+        }
+    }
+</script>
+
+<style>
+    :root { --brand-color: #3b82f6; --brand-light: #eff6ff; }
+    [x-cloak] { display: none !important; }
+    body { background-color: #f1f5f9; transition: background-color 0.2s; }
+    .dark body { background-color: #020617; }
+    
+    select {
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1em;
+    }
+
+    .custom-checkbox {
+        appearance: none; background-color: #fff; margin: 0; font: inherit; color: var(--brand-color); width: 1.15em; height: 1.15em; border: 2px solid #cbd5e1; border-radius: 0.25em; display: grid; place-content: center; transition: all 0.2s;
+    }
+    .custom-checkbox::before { content: ""; width: 0.65em; height: 0.65em; transform: scale(0); transition: 120ms transform ease-in-out; box-shadow: inset 1em 1em white; background-color: white; transform-origin: center; clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); }
+    .custom-checkbox:checked { background-color: var(--brand-color); border-color: var(--brand-color); }
+    .custom-checkbox:checked::before { transform: scale(1); }
+
+    .drawer-content::-webkit-scrollbar, .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; } 
+    .drawer-content::-webkit-scrollbar-track, .custom-scroll::-webkit-scrollbar-track { background: transparent; } 
+    .drawer-content::-webkit-scrollbar-thumb, .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    .dark .drawer-content::-webkit-scrollbar-thumb, .dark .custom-scroll::-webkit-scrollbar-thumb { background: #334155; }
+
+    .context-menu, .suggestion-box { position: absolute; background: white; border: 1px solid #e2e8f0; border-radius: 0.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); z-index: 100; min-width: 160px; overflow: hidden; animation: fadeIn 0.1s ease-out; }
+    .dark .context-menu, .dark .suggestion-box { background: #0f172a; border-color: #1e293b; } 
+    @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    
+    .sticky-col { position: sticky; right: 0; background-color: inherit; z-index: 10; box-shadow: -4px 0 10px rgba(0,0,0,0.05); }
+    .dark .sticky-col { box-shadow: -4px 0 10px rgba(0,0,0,0.5); }
+    .row-focused { background-color: rgba(59, 130, 246, 0.1) !important; border-left: 4px solid var(--brand-color) !important; }
+
+    /* KPI Cards Animation */
+    .kpi-card { transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); }
+    @media (hover: hover) {
+        .kpi-card:hover { transform: translateY(-5px); z-index: 20; box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.15); }
+    }
+
+    /* Modern Loader */
+    .spinnerContainer { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .spinner { width: 50px; height: 50px; display: grid; border: 4px solid #0000; border-radius: 50%; border-right-color: var(--brand-color); animation: tri-spinner 1s infinite linear; }
+    .spinner::before, .spinner::after { content: ""; grid-area: 1/1; margin: 2px; border: inherit; border-radius: 50%; animation: tri-spinner 2s infinite; }
+    .spinner::after { margin: 8px; animation-duration: 3s; }
+    @keyframes tri-spinner { 100% { transform: rotate(1turn); } }
+
+    .loader { color: #475569; font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 16px; box-sizing: content-box; height: 24px; padding: 0; display: flex; margin-top: 15px; }
+    .dark .loader { color: #94a3b8; } 
+    .words { overflow: hidden; height: 100%; }
+    .word { display: block; height: 100%; padding-left: 6px; color: var(--brand-color); animation: cycle-words 5s infinite; }
+    @keyframes cycle-words { 
+        10% { transform: translateY(-105%); } 25% { transform: translateY(-100%); } 
+        35% { transform: translateY(-205%); } 50% { transform: translateY(-200%); } 
+        60% { transform: translateY(-305%); } 75% { transform: translateY(-300%); } 
+        85% { transform: translateY(-405%); } 100% { transform: translateY(-400%); } 
+    }
+</style>
+</head>
+
+<body class="text-slate-800 dark:text-slate-200 h-[100dvh] flex flex-col overflow-hidden selection:bg-brand selection:text-white" x-data="inventorySystem()" @keydown.window="handleGlobalKeys($event)" @click="showContextMenu = false">
+
+    <!-- TOASTS -->
+    <div class="fixed bottom-16 right-6 z-[70] flex flex-col gap-3 pointer-events-none">
+        <template x-for="t in toasts" :key="t.id">
+            <div x-show="t.visible" x-transition class="pointer-events-auto flex items-center p-4 bg-white dark:bg-dark_surface rounded-2xl shadow-2xl border-l-4 w-80"
+                 :class="t.type === 'success' ? 'border-emerald-500' : 'border-red-500'">
+                <div class="mr-3 text-xl"><i class="fa-solid" :class="t.type === 'success' ? 'fa-circle-check text-emerald-500' : 'fa-circle-xmark text-red-500'"></i></div>
+                <div><h4 class="font-heading font-black text-sm dark:text-white" x-text="t.title"></h4><p class="text-xs text-slate-500 font-medium" x-text="t.message"></p></div>
+            </div>
+        </template>
+    </div>
+
+    <!-- HEADER (v1.0 Premium Hierarchy) -->
+    <header class="sticky top-0 bg-white/70 dark:bg-[#020617]/70 backdrop-blur-2xl border-b border-slate-200/80 dark:border-white/5 flex-shrink-0 h-16 sm:h-20 z-40">
+        <div class="max-w-[1920px] mx-auto px-4 sm:px-6 h-full flex justify-between items-center">
+            
+            <!-- Left: Breadcrumb Identity -->
+            <div class="flex items-center gap-4 sm:gap-6">
+                <!-- App Link -->
+                <a href="IT_Dashboard.html" class="group flex items-center gap-3 transition-transform active:scale-95" title="Return to Dashboard">
+                    <div class="relative h-9 sm:h-12 w-auto flex items-center">
+                        <img src="pbl-logo.png" alt="PBL Logo" class="h-8 sm:h-10 w-auto object-contain drop-shadow-md transition-transform group-hover:scale-105" @error="$el.style.display='none'; $refs.fbLogo.style.display='flex'">
+                        <div x-ref="fbLogo" style="display:none;" class="w-9 h-9 sm:w-11 sm:h-11 bg-gradient-to-tr from-brand to-indigo-600 text-white rounded-xl flex items-center justify-center font-black text-xl shadow-[0_0_15px_rgba(59,130,246,0.4)] group-hover:shadow-[0_0_25px_rgba(59,130,246,0.6)] transition-all">P</div>
+                    </div>
+                    <div class="hidden lg:block">
+                        <h1 class="font-heading font-black text-xl leading-none text-slate-800 dark:text-white tracking-tight group-hover:text-brand transition-colors">PBL<span class="text-brand">Connect</span></h1>
+                    </div>
+                </a>
+
+                <!-- Divider -->
+                <div class="hidden sm:block h-8 w-px bg-slate-200 dark:bg-slate-800"></div>
+
+                <!-- Page Identity -->
+                <div class="flex flex-col justify-center">
+                    <div class="flex items-center gap-2">
+                        <span class="bg-brand/10 text-brand px-1.5 py-0.5 rounded font-mono font-bold text-[8px] sm:text-[9px] leading-none border border-brand/20">v1.0</span>
+                        <span class="hidden sm:inline-block text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-md">IT Operations</span>
+                    </div>
+                    <h2 class="font-heading font-bold text-sm sm:text-lg text-slate-700 dark:text-slate-200 leading-tight mt-1">Asset Management</h2>
+                </div>
+            </div>
+
+            <!-- Right Actions (Optimized for Mobile & Desktop) -->
+            <div class="flex items-center justify-end gap-2 sm:gap-4 w-auto relative">
+                
+                <!-- Add New Button (Visible on Mobile as Square) -->
+                <button @click="openModal('add')" class="flex bg-brand hover:bg-blue-600 text-white w-9 h-9 sm:w-auto sm:px-4 sm:py-2 rounded-xl text-xs font-bold transition items-center justify-center gap-2 active:scale-95 shadow-[0_5px_15px_-3px_rgba(59,130,246,0.4)] shrink-0" title="Add New">
+                    <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">New Asset</span>
+                </button>
+                
+                <!-- Theme Toggle -->
+                <button @click="toggleTheme()" class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 transition-all border border-transparent dark:border-slate-700/50 shrink-0">
+                    <i class="fa-solid" :class="isDark ? 'fa-sun text-yellow-400' : 'fa-moon'"></i>
+                </button>
+
+                <!-- Back to Hub Button -->
+                <a href="IT_Dashboard.html" class="flex items-center justify-center gap-2 w-9 h-9 sm:w-auto sm:px-4 sm:py-2.5 bg-slate-800 hover:bg-slate-900 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 rounded-xl font-bold text-xs transition-all transform active:scale-95 shadow-[0_5px_15px_-3px_rgba(15,23,42,0.3)] dark:shadow-[0_5px_15px_-3px_rgba(255,255,255,0.2)] shrink-0" title="Back to Hub">
+                    <i class="fa-solid fa-arrow-left"></i> <span class="hidden sm:inline">Hub</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+	<main class="flex-1 flex flex-col overflow-y-auto p-4 md:p-6 bg-slate-50/50 dark:bg-[#020617]">
+        <div class="max-w-[1920px] mx-auto w-full flex flex-col gap-4 sm:gap-6 h-full">
+
+            
+            <!-- 📱 KPI CARDS (Streamlined: Compact 2x2 Mobile | 1x4 Desktop) -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 shrink-0">
+                
+                <!-- 1. TOTAL ASSETS -->
+                <div class="kpi-card bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/20 dark:to-transparent p-3 md:p-5 rounded-2xl shadow-sm border border-blue-100 dark:border-blue-800/30 flex items-center justify-between">
+                    <div class="flex flex-col justify-center">
+                        <p class="text-[8px] md:text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-0.5 md:mb-1" x-text="currentTab === 'hardware' ? 'Hardware Assets' : 'Software Licenses'"></p>
+                        <h3 class="text-xl md:text-3xl font-heading font-black text-slate-800 dark:text-white leading-none" x-text="currentTab === 'hardware' ? filteredHardware.length : filteredSoftware.length">0</h3>
+                    </div>
+                    <div class="w-7 h-7 md:w-11 md:h-11 rounded-lg bg-white dark:bg-black/20 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs md:text-lg shadow-sm border border-blue-50 dark:border-white/5 shrink-0 group-hover:scale-110 transition duration-300">
+                        <i class="fa-solid" :class="currentTab === 'hardware' ? 'fa-computer' : 'fa-compact-disc'"></i>
+                    </div>
+                </div>
+
+                <!-- 2. ACTIVE -->
+                <div class="kpi-card bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-900/20 dark:to-transparent p-3 md:p-5 rounded-2xl shadow-sm border border-emerald-100 dark:border-emerald-800/30 flex items-center justify-between">
+                    <div class="flex flex-col justify-center">
+                        <p class="text-[8px] md:text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-0.5 md:mb-1">Active / In Use</p>
+                        <h3 class="text-xl md:text-3xl font-heading font-black text-slate-800 dark:text-white leading-none" x-text="currentTab === 'hardware' ? filteredHardware.filter(a=>a.Status=='In Use').length : filteredSoftware.filter(s=>s.Status=='Active').length">0</h3>
+                    </div>
+                    <div class="w-7 h-7 md:w-11 md:h-11 rounded-lg bg-white dark:bg-black/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs md:text-lg shadow-sm border border-emerald-50 dark:border-white/5 shrink-0 group-hover:scale-110 transition duration-300">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                </div>
+
+                <!-- 3. STOCK / COMPLIANCE -->
+                <div class="kpi-card bg-gradient-to-br from-amber-50 to-white dark:from-amber-900/20 dark:to-transparent p-3 md:p-5 rounded-2xl shadow-sm border border-amber-100 dark:border-amber-800/30 flex items-center justify-between">
+                    <div class="flex flex-col justify-center">
+                        <p class="text-[8px] md:text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-0.5 md:mb-1" x-text="currentTab === 'hardware' ? 'In Stock / Spare' : 'Expiring'"></p>
+                        <h3 class="text-xl md:text-3xl font-heading font-black text-slate-800 dark:text-white leading-none" x-text="currentTab === 'hardware' ? filteredHardware.filter(a=>a.Status=='Spare').length : filteredSoftware.filter(s=>s.Type=='Subscription').length">0</h3>
+                    </div>
+                    <div class="w-7 h-7 md:w-11 md:h-11 rounded-lg bg-white dark:bg-black/20 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xs md:text-lg shadow-sm border border-amber-50 dark:border-white/5 shrink-0 group-hover:scale-110 transition duration-300">
+                        <i class="fa-solid fa-box"></i>
+                    </div>
+                </div>
+
+                <!-- 4. CRITICAL -->
+                <div class="kpi-card bg-gradient-to-br from-red-50 to-white dark:from-red-900/20 dark:to-transparent p-3 md:p-5 rounded-2xl shadow-sm border border-red-100 dark:border-red-800/30 flex items-center justify-between">
+                    <div class="flex flex-col justify-center">
+                        <p class="text-[8px] md:text-[10px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest mb-0.5 md:mb-1">Critical / Broken</p>
+                        <h3 class="text-xl md:text-3xl font-heading font-black text-slate-800 dark:text-white leading-none" x-text="currentTab === 'hardware' ? filteredHardware.filter(a=>['Decommissioned','In Repair'].includes(a.Status)).length : filteredSoftware.filter(s=> (s.TotalLicense - getTotalUsed(s)) < 0).length">0</h3>
+                    </div>
+                    <div class="w-7 h-7 md:w-11 md:h-11 rounded-lg bg-white dark:bg-black/20 text-red-600 dark:text-red-400 flex items-center justify-center text-xs md:text-lg shadow-sm border border-red-50 dark:border-white/5 shrink-0 group-hover:scale-110 transition duration-300">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTROLS & FILTERS (Condensed Layout for Space Saving) -->
+            <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl border border-slate-200 dark:border-dark_border rounded-2xl md:rounded-3xl p-2 md:p-3 shadow-sm flex flex-col md:flex-row items-center gap-2 md:gap-3 shrink-0 relative overflow-x-auto whitespace-nowrap">
+                
+                <!-- ROW 1 (Mobile): TAB SWITCHER -->
+                <div class="flex w-full md:w-auto p-1 bg-slate-100 dark:bg-black/40 rounded-lg md:rounded-xl border border-slate-200 dark:border-white/5 shrink-0">
+                    <button @click="currentTab = 'hardware'" 
+                            :class="currentTab === 'hardware' ? 'bg-white dark:bg-dark_surface text-brand shadow-sm font-bold' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-medium'"
+                            class="flex-1 md:flex-none px-3 py-1.5 md:py-2 rounded-md md:rounded-lg text-[10px] md:text-xs transition flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-computer"></i> Hardware
+                    </button>
+                    <button @click="currentTab = 'software'" 
+                            :class="currentTab === 'software' ? 'bg-white dark:bg-dark_surface text-purple-600 dark:text-purple-400 shadow-sm font-bold' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-medium'"
+                            class="flex-1 md:flex-none px-3 py-1.5 md:py-2 rounded-md md:rounded-lg text-[10px] md:text-xs transition flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-compact-disc"></i> Software
+                    </button>
+                </div>
+
+                <!-- ROW 2 (Mobile): Search + Compact CSV/PDF Buttons -->
+                <div class="flex w-full md:w-auto items-center gap-2 shrink-0">
+                    <!-- Search Bar -->
+                    <div class="relative flex-1 md:w-64 lg:w-80">
+                        <i class="fa-solid fa-search absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[10px] md:text-xs"></i>
+                        <input type="text" x-model="search" x-ref="searchInput" @focus="showSuggestions=true" @blur="setTimeout(()=>showSuggestions=false, 200)" placeholder="Search ID, Name..." class="w-full pl-7 pr-2 py-1.5 md:py-2 bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-lg md:rounded-xl text-[10px] md:text-xs font-medium focus:ring-2 focus:ring-brand outline-none transition dark:text-white placeholder-slate-400 shadow-sm">
+                        <div x-show="showSuggestions && search.length > 0" class="suggestion-box" x-cloak><template x-for="sug in suggestions" :key="sug"><div @click="search = sug" class="px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-white/5 cursor-pointer text-[10px] md:text-xs text-slate-600 dark:text-slate-300 flex items-center gap-2"><i class="fa-solid fa-arrow-right text-slate-300"></i> <span x-text="sug"></span></div></template></div>
+                    </div>
+                    
+                    <!-- Compact Action Buttons (Square on Mobile, Wide on Desktop) -->
+                    <button @click="exportCSV()" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:hover:bg-emerald-500/20 w-8 h-8 md:w-auto md:px-4 md:py-2 rounded-lg md:rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest shadow-sm transition flex items-center justify-center gap-1.5 border border-emerald-200 dark:border-emerald-500/20 shrink-0" title="Export to CSV">
+                        <i class="fa-solid fa-file-csv"></i><span class="hidden md:inline"> CSV</span>
+                    </button>
+                    <button @click="exportPDF()" class="bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-500/10 dark:text-rose-400 dark:hover:bg-rose-500/20 w-8 h-8 md:w-auto md:px-4 md:py-2 rounded-lg md:rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest shadow-sm transition flex items-center justify-center gap-1.5 border border-rose-200 dark:border-rose-500/20 shrink-0" title="Export to PDF">
+                        <i class="fa-solid fa-file-pdf"></i><span class="hidden md:inline"> PDF</span>
+                    </button>
+                </div>
+
+                <div class="hidden md:block flex-1"></div>
+
+                <!-- ROW 3 (Mobile): Dropdowns + Compact Hygiene Filter -->
+                <div class="flex w-full md:w-auto items-center gap-2 shrink-0" x-show="currentTab === 'hardware'">
+                    <div class="relative flex-1 md:w-36 lg:w-40">
+                        <select x-model="filterType" class="w-full pl-2 pr-6 py-1.5 md:py-2 bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-lg md:rounded-xl text-[10px] md:text-xs font-medium focus:ring-2 focus:ring-brand outline-none cursor-pointer appearance-none dark:text-white truncate shadow-sm">
+                            <option value="">🖥️ All Types</option>
+                            <template x-for="type in uniqueTypes" :key="type"><option :value="type" x-text="getDeviceEmoji(type) + '  ' + type"></option></template>
+                        </select>
+                    </div>
+                    <div class="relative flex-1 md:w-32 lg:w-36">
+                        <select x-model="filterStatus" class="w-full pl-2 pr-6 py-1.5 md:py-2 bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-lg md:rounded-xl text-[10px] md:text-xs font-medium focus:ring-2 focus:ring-brand outline-none cursor-pointer appearance-none dark:text-white shadow-sm">
+                            <option value="">📊 Status</option>
+                            <option value="In Use">🟢 In Use</option>
+                            <option value="Spare">📦 Spare</option>
+                            <option value="Decommissioned">🔴 Decom</option>
+                            <option value="In Repair">🔧 Repair</option>
+                        </select>
+                    </div>
+                    <!-- Compact Filter Button -->
+                    <button @click="filterHygiene = !filterHygiene" :class="filterHygiene ? 'bg-amber-100 text-amber-700 border-amber-300 dark:bg-amber-500/20 dark:text-amber-400 dark:border-amber-500/50' : 'bg-slate-100 text-slate-500 border-transparent dark:bg-white/5 dark:text-slate-400'" class="w-8 h-8 md:w-auto md:px-3 md:py-2 rounded-lg md:rounded-xl border transition flex items-center justify-center shadow-sm shrink-0" title="Show Incomplete Data">
+                        <i class="fa-solid fa-filter-circle-xmark text-[10px] md:text-sm"></i>
+                    </button>
+                </div>
+            </div>
+
+                <div class="hidden md:block flex-1"></div>
+
+                
+            <!-- MAIN DATA AREA -->
+            <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl border border-slate-200 dark:border-dark_border rounded-3xl shadow-sm overflow-hidden flex flex-col flex-1 min-h-[500px] mb-6 lg:mb-0 relative">
+                
+                <div class="bg-slate-50/50 dark:bg-black/20 px-6 py-4 border-b border-slate-100 dark:border-white/5 flex justify-between items-center text-[10px] sm:text-xs text-slate-500 font-bold shrink-0">
+                    <div class="uppercase tracking-widest">Showing <span class="font-black text-brand" x-text="currentTab === 'hardware' ? filteredHardware.length : filteredSoftware.length"></span> Records</div>
+                    <div class="flex items-center gap-1.5 cursor-pointer hover:text-brand transition" @click="fetchData(true)" title="Force Sync"><i class="fa-solid fa-rotate" :class="syncing ? 'fa-spin' : ''"></i> <span x-text="lastUpdated"></span></div>
+                </div>
+
+                <!-- OVERLAY LOADER -->
+                <div x-show="loading" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white dark:bg-[#020617] transition-opacity">
+                    <div class="spinnerContainer"> 
+                        <div class="spinner"></div>
+                        <div class="loader">
+                            <p class="mr-2">Syncing</p>
+                            <div class="words">
+                                <span class="word">Assets...</span><span class="word">Licenses...</span><span class="word">Users...</span><span class="word">Details...</span><span class="word">Assets...</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-4 animate-pulse">Please wait...</p>
+                </div>
+
+                <!-- CONTENT WRAPPER -->
+                <div class="overflow-y-auto overflow-x-hidden flex-1 w-full custom-scroll pb-20 lg:pb-0 relative" x-ref="tableRef">
+                    
+                  <!-- 📱 MOBILE VIEW: SMART CARDS -->
+                    <div class="md:hidden p-3 flex flex-col gap-3">
+                        
+                        <!-- 🔴 HARDWARE WRAPPER (Concise Mobile Layout) -->
+                        <div x-show="currentTab === 'hardware'" class="flex flex-col gap-2.5" x-cloak>
+                            <template x-for="(item, index) in filteredHardware" :key="'mob-hw-'+index">
+                                <div class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-3 shadow-sm flex flex-col relative transition-all hover:shadow-md cursor-pointer" @click="openDrawer(item)">
+                                    <div class="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-xl" :class="item.Status === 'In Use' ? 'bg-emerald-500' : (item.Status === 'Spare' ? 'bg-amber-500' : 'bg-red-500')"></div>
+                                    
+                                    <div class="flex items-start gap-3 pl-1.5">
+                                        <!-- Slightly smaller icon to save space -->
+                                        <div class="w-10 h-10 rounded-lg bg-slate-50 dark:bg-black/30 flex items-center justify-center text-xl shadow-inner shrink-0 border border-slate-100 dark:border-white/5" x-text="getDeviceEmoji(item.DeviceType)"></div>
+                                        
+                                        <div class="flex-1 min-w-0">
+                                            <!-- Top Row: ID & User Badge -->
+                                            <div class="flex justify-between items-start mb-0.5 gap-2">
+                                                <h4 class="font-heading font-black text-[13px] text-brand truncate" x-text="item.AssetID"></h4>
+                                                <span class="px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/5 shrink-0 max-w-[80px] truncate" x-text="item.AssignedTo || 'N/A'"></span>
+                                            </div>
+                                            
+                                            <!-- Middle Row: Serial Number -->
+                                            <p class="text-[9px] font-mono text-slate-400 mb-1.5 truncate" x-text="'SN: ' + (item.SerialNo || '-')"></p>
+                                            
+                                            <!-- Bottom Row: Inline IP & Specs (No bulky boxes) -->
+                                            <div class="flex items-center justify-between text-[9px] font-bold text-slate-500 border-t border-slate-100 dark:border-white/5 pt-1.5 mt-0.5">
+                                                <span class="font-mono bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400 shadow-sm" x-text="item.IP_Address || 'No IP'"></span>
+                                                <span class="truncate text-slate-700 dark:text-slate-300" x-text="(item.RAM_GB ? item.RAM_GB+'GB ' : '') + (item.Storage_GB ? '• '+item.Storage_GB+'GB' : '')"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- 🟣 SOFTWARE WRAPPER -->
+                        <div x-show="currentTab === 'software'" class="flex flex-col gap-3" x-cloak>
+                            <template x-for="sw in filteredSoftware" :key="'mob-sw-'+sw.SoftwareID">
+                                <div class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-3 shadow-sm flex flex-col relative transition-all hover:shadow-md cursor-pointer" @click="openModal('edit', sw)">
+                                    
+                                    <div class="flex justify-between items-start gap-2 mb-1.5">
+                                        <h4 class="font-bold text-[13px] text-slate-800 dark:text-slate-200 leading-tight break-words" x-text="sw.SoftwareName"></h4>
+                                        <span class="px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border shadow-sm shrink-0" 
+                                              :class="sw.Type === 'Subscription' ? 'bg-orange-50 text-orange-600 border-orange-200 dark:bg-orange-500/10 dark:text-orange-400' : 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400'" 
+                                              x-text="sw.Type || 'Perpetual'"></span>
+                                    </div>
+                                    
+                                    <div class="flex items-end justify-between mt-1">
+                                        <div class="flex gap-4 text-[10px] font-medium text-slate-500">
+                                            <div class="flex items-center gap-1"><i class="fa-solid fa-users opacity-70"></i> Used: <span class="font-black text-brand" x-text="getTotalUsed(sw)"></span>/<span x-text="sw.TotalLicense"></span></div>
+                                            <div class="flex items-center gap-1"><i class="fa-solid fa-scale-balanced opacity-70"></i> Bal: <span class="font-black" :class="(sw.TotalLicense - getTotalUsed(sw)) < 0 ? 'text-red-500' : 'text-emerald-600'" x-text="(sw.TotalLicense - getTotalUsed(sw))"></span></div>
+                                        </div>
+                                        
+                                        <div class="w-16 bg-slate-100 dark:bg-black/40 rounded-full h-1.5 overflow-hidden shadow-inner border border-slate-200 dark:border-white/5">
+                                            <div class="h-full rounded-full transition-all" :class="getTotalUsed(sw) > sw.TotalLicense ? 'bg-red-500' : 'bg-emerald-500'" :style="'width: ' + Math.min(100, getUsagePercent(sw)) + '%'"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- Mobile Empty States -->
+                        <div x-show="!loading && currentTab === 'hardware' && filteredHardware.length === 0" class="p-10 text-center text-slate-400"><i class="fa-solid fa-box-open text-4xl mb-3 opacity-30"></i><p class="text-xs font-medium">No hardware found.</p></div>
+                        <div x-show="!loading && currentTab === 'software' && filteredSoftware.length === 0" class="p-10 text-center text-slate-400"><i class="fa-solid fa-compact-disc text-4xl mb-3 opacity-30"></i><p class="text-xs font-medium">No software found.</p></div>
+                    </div>
+
+                    <!-- 💻 DESKTOP VIEW: WIDE TABLE (Hidden on Mobile) -->
+                    <div class="hidden md:block w-full overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs whitespace-nowrap min-w-[1200px]">
+                            
+                            <!-- HARDWARE HEADERS -->
+                            <thead x-show="currentTab === 'hardware'" class="bg-white/50 dark:bg-white/5 text-[9px] text-slate-400 uppercase font-black tracking-widest sticky top-0 z-20 shadow-sm backdrop-blur-md">
+                                <tr>
+                                    <th class="px-5 py-3.5 w-10 text-center"><input type="checkbox" @click="selectAll($event)" class="custom-checkbox"></th>
+                                    <th class="px-5 py-3.5">Asset Tag</th>
+                                    <th class="px-5 py-3.5">Device Info</th>
+                                    <th class="px-5 py-3.5">Network</th>
+                                    <th class="px-5 py-3.5">User</th>
+                                    <th class="px-5 py-3.5">Specs</th>
+                                    <th class="px-5 py-3.5 text-center">Status</th>
+                                    <th class="px-5 py-3.5 text-right sticky-col bg-white/90 dark:bg-[#0f172a]/90 backdrop-blur-md">Act</th>
+                                </tr>
+                            </thead>
+
+                            <!-- SOFTWARE HEADERS -->
+                            <thead x-show="currentTab === 'software'" class="bg-purple-50/50 dark:bg-white/5 text-[9px] text-slate-400 uppercase font-black tracking-widest sticky top-0 z-20 shadow-sm backdrop-blur-md">
+                                <tr>
+                                    <th class="px-5 py-3.5">Software Name</th>
+                                    <th class="px-5 py-3.5 text-center">License Type</th>
+                                    <th class="px-5 py-3.5">Usage Stats (Noida / DDN)</th>
+                                    <th class="px-5 py-3.5">Utilization</th>
+                                    <th class="px-5 py-3.5 text-center">Balance</th>
+                                    <th class="px-5 py-3.5 text-right sticky-col bg-purple-50/90 dark:bg-[#0f172a]/90 backdrop-blur-md">Act</th>
+                                </tr>
+                            </thead>
+
+                            <tbody class="divide-y divide-slate-100 dark:divide-white/5 text-sm">
+                                
+                                <!-- HARDWARE ROWS (Modernized & Structured) -->
+                                <template x-for="(item, index) in filteredHardware" :key="'desk-hw-'+index">
+                                    <tr x-show="currentTab === 'hardware'" :class="{'row-focused': focusedIndex === index}" class="hover:bg-slate-50 dark:hover:bg-white/5 transition cursor-pointer group border-b border-slate-100 dark:border-white/5" @click="openDrawer(item)" @contextmenu.prevent="showContext($event, item)">
+                                        <td class="px-4 py-3 text-center align-middle" @click.stop><input type="checkbox" :value="item.AssetID" x-model="selectedIds" class="custom-checkbox"></td>
+                                        
+                                        <!-- Asset Tag -->
+                                        <td class="px-4 py-3 align-middle">
+                                            <div class="font-bold text-brand text-[13px]" x-text="item.AssetID"></div>
+                                            <div class="text-[9px] text-slate-400 font-mono mt-0.5 tracking-widest uppercase" x-text="'SN: '+(item.SerialNo || '-')"></div>
+                                        </td>
+                                        
+                                        <!-- Device Info -->
+                                        <td class="px-4 py-3 align-middle max-w-[200px]">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-8 h-8 rounded bg-slate-50 dark:bg-white/5 flex items-center justify-center text-lg shadow-inner shrink-0" x-text="getDeviceEmoji(item.DeviceType)"></div>
+                                                <div class="truncate">
+                                                    <div class="font-bold text-slate-700 dark:text-slate-200 text-xs truncate" x-text="item.DeviceType"></div>
+                                                    <div class="text-[10px] text-slate-500 mt-0.5 truncate" x-text="item.Make + ' ' + item.Model"></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        
+                                        <!-- Network -->
+                                        <td class="px-4 py-3 align-middle">
+                                            <span class="inline-block text-[9px] font-mono font-bold bg-slate-100 dark:bg-black/30 border border-slate-200 dark:border-white/5 text-slate-500 dark:text-slate-400 px-2 py-0.5 rounded shadow-sm mb-1" x-text="item.Hostname || '-'"></span>
+                                            <div class="text-[11px] font-mono font-bold text-slate-600 dark:text-slate-400" x-text="item.IP_Address || 'N/A'"></div>
+                                        </td>
+                                        
+                                        <!-- User -->
+                                        <td class="px-4 py-3 align-middle max-w-[180px]">
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <div class="w-5 h-5 rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-[8px] font-black shrink-0 border border-indigo-100 dark:border-indigo-500/20" x-text="getInitials(item.AssignedTo)"></div>
+                                                <span class="font-bold text-slate-700 dark:text-slate-300 text-xs truncate" x-text="item.AssignedTo || 'Unassigned'"></span>
+                                            </div>
+                                            <div class="text-[9px] text-slate-400 uppercase tracking-widest font-bold flex items-center gap-1 truncate"><i class="fa-solid fa-map-pin text-rose-400 opacity-70"></i> <span x-text="item.Location"></span></div>
+                                        </td>
+                                        
+                                        <!-- Specs -->
+                                        <td class="px-4 py-3 align-middle">
+                                            <div class="flex items-center gap-1.5 mb-1 text-xs font-bold text-slate-700 dark:text-slate-300"><span x-text="getOSEmoji(item.OS)"></span> <span x-text="item.OS"></span></div>
+                                            <div class="text-[10px] text-slate-500 font-medium" x-show="item.RAM_GB" x-text="item.RAM_GB + 'GB RAM • ' + item.Storage_GB + 'GB Disk'"></div>
+                                        </td>
+                                        
+                                        <!-- Status Badge -->
+                                        <td class="px-4 py-3 align-middle text-center">
+                                            <span class="inline-flex items-center px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-wider border shadow-sm" :class="getStatusClass(item.Status)">
+                                                <i class="fa-solid fa-circle text-[6px] mr-1.5 opacity-80"></i>
+                                                <span x-text="item.Status"></span>
+                                            </span>
+                                        </td>
+                                        
+                                        <!-- Action -->
+                                        <td class="px-4 py-3 align-middle text-right sticky-col bg-white dark:bg-dark_surface group-hover:bg-slate-50 dark:group-hover:bg-white/5 transition" @click.stop>
+                                            <button @click="openModal('edit', item)" class="w-8 h-8 rounded-lg bg-white dark:bg-black/20 hover:bg-brand hover:text-white text-slate-400 transition flex items-center justify-center border border-slate-200 dark:border-white/5 hover:border-brand/50 mx-auto shadow-sm"><i class="fa-solid fa-pen text-[10px]"></i></button>
+                                        </td>
+                                    </tr>
+                                </template>
+
+                                <!-- SOFTWARE ROWS (Unabridged & Modernized) -->
+                                <template x-for="sw in filteredSoftware" :key="'desk-sw-'+sw.SoftwareID">
+                                    <tr x-show="currentTab === 'software'" class="hover:bg-purple-50/50 dark:hover:bg-white/5 transition cursor-pointer group">
+                                        
+                                        <!-- FIX: Removed truncate, added whitespace-normal and width adjustments -->
+                                        <td class="px-5 py-3 align-middle w-1/3 min-w-[280px] whitespace-normal break-words">
+                                            <div class="font-heading font-black text-sm text-slate-800 dark:text-white leading-snug" x-text="sw.SoftwareName"></div>
+                                            <div x-show="sw.ExpiryDate" class="text-[9px] font-bold uppercase tracking-wider mt-1.5" :class="isExpiring(sw.ExpiryDate) ? 'text-red-500 animate-pulse' : 'text-slate-400'"><i class="fa-regular fa-clock"></i> Exp: <span x-text="formatDate(sw.ExpiryDate)"></span></div>
+                                        </td>
+
+                                        <td class="px-5 py-3 text-center align-middle">
+                                            <span class="px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-wider border shadow-sm" :class="sw.Type === 'Subscription' ? 'bg-orange-50 text-orange-600 border-orange-200' : 'bg-blue-50 text-blue-600 border-blue-200'"><span x-text="sw.Type || 'Perpetual'"></span></span>
+                                        </td>
+
+                                        <td class="px-5 py-3 align-middle">
+                                            <div class="flex items-center gap-4">
+                                                <div class="flex flex-col"><span class="text-[9px] text-slate-400 uppercase font-black tracking-widest">Noida</span><span class="font-mono font-bold text-slate-700 dark:text-slate-200 text-[13px]" x-text="sw.Used_Noida || 0"></span></div>
+                                                <div class="h-6 w-px bg-slate-200 dark:bg-white/10"></div>
+                                                <div class="flex flex-col"><span class="text-[9px] text-slate-400 uppercase font-black tracking-widest">DDN</span><span class="font-mono font-bold text-slate-700 dark:text-slate-200 text-[13px]" x-text="sw.Used_DDN || 0"></span></div>
+                                                <div class="h-6 w-px bg-slate-200 dark:bg-white/10"></div>
+                                                <div class="flex flex-col"><span class="text-[9px] text-brand uppercase font-black tracking-widest">Total Used</span><span class="font-mono font-black text-brand text-[13px]" x-text="getTotalUsed(sw)"></span></div>
+                                            </div>
+                                        </td>
+
+                                        <td class="px-5 py-3 align-middle w-32">
+                                            <div>
+                                                <div class="flex justify-between text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5"><span x-text="getUsagePercent(sw) + '%'"></span><span x-text="'Of ' + sw.TotalLicense"></span></div>
+                                                <div class="w-full bg-slate-100 dark:bg-black/30 rounded-full h-1.5 overflow-hidden shadow-inner border border-slate-200 dark:border-white/5"><div class="h-full rounded-full transition-all" :style="'width: ' + Math.min(100, getUsagePercent(sw)) + '%'" :class="getTotalUsed(sw) > sw.TotalLicense ? 'bg-red-500' : 'bg-emerald-500'"></div></div>
+                                            </div>
+                                        </td>
+
+                                        <td class="px-5 py-3 text-center align-middle">
+                                            <span class="font-mono font-black text-xl leading-none" :class="(sw.TotalLicense - getTotalUsed(sw)) < 0 ? 'text-red-500' : 'text-emerald-600'" x-text="(sw.TotalLicense - getTotalUsed(sw))"></span>
+                                            <div x-show="(sw.TotalLicense - getTotalUsed(sw)) < 0" class="text-[8px] text-red-500 font-black uppercase tracking-widest mt-0.5">Deficit</div>
+                                        </td>
+
+                                        <td class="px-5 py-3 text-right align-middle sticky-col bg-white dark:bg-dark_surface group-hover:bg-purple-50/50 dark:group-hover:bg-white/5 transition">
+                                            <button @click="openModal('edit', sw)" class="w-8 h-8 rounded-lg bg-slate-50 dark:bg-black/20 hover:bg-purple-600 hover:text-white text-slate-400 transition flex items-center justify-center border border-transparent hover:border-purple-500/50 mx-auto shadow-sm"><i class="fa-solid fa-pen text-[10px]"></i></button>
+                                        </td>
+                                    </tr>
+                                </template>
+
+                                <!-- Desktop Empty States -->
+                                <tr x-show="!loading && currentTab === 'hardware' && filteredHardware.length === 0"><td colspan="8" class="p-16 text-center text-slate-400"><i class="fa-solid fa-box-open text-4xl mb-3 opacity-30"></i><p>No matching hardware records.</p></td></tr>
+                                <tr x-show="!loading && currentTab === 'software' && filteredSoftware.length === 0"><td colspan="6" class="p-16 text-center text-slate-400"><i class="fa-solid fa-compact-disc text-4xl mb-3 opacity-30"></i><p>No matching software records.</p></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER (Comprehensive Data-Rich Layout) -->
+    <footer class="shrink-0 bg-white/90 dark:bg-[#09090b]/95 backdrop-blur-xl border-t border-slate-200 dark:border-white/5 z-50 py-2.5 sm:py-3 w-full relative overflow-hidden">
+        
+        <!-- Glowing Top Accent Line -->
+        <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-brand to-transparent opacity-60"></div>
+        
+        <div class="max-w-[1920px] mx-auto px-3 sm:px-6 relative flex items-center justify-between text-[9px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400">
+            
+            <!-- Left: Copyright, Version & Env -->
+            <div class="flex items-center gap-1.5 sm:gap-3 z-10 shrink-0">
+                <span class="font-black text-slate-400">&copy; 26</span>
+                <span class="h-3 w-px bg-slate-300 dark:bg-white/10"></span>
+                <!-- Version -->
+                <span class="px-1.5 py-0.5 rounded-md bg-gradient-to-r from-brand to-indigo-600 text-white font-mono font-black tracking-widest shadow-[0_2px_10px_-2px_rgba(59,130,246,0.5)] cursor-default">v1.0</span>
+                <!-- Env Badge (Hidden on very small screens) -->
+                <span class="hidden sm:flex px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-white/5 text-slate-400 border border-slate-200 dark:border-white/5 font-black uppercase tracking-widest">PROD</span>
+            </div>
+
+            <!-- Center: Tech Telemetry (Ping & Security) -->
+            <div class="flex items-center justify-center gap-2.5 sm:gap-5 z-10 flex-1 px-2 overflow-hidden truncate">
+                <!-- Ping / Latency -->
+                <div class="flex items-center gap-1 text-[9px] sm:text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 cursor-default" title="Network Latency">
+                    <i class="fa-solid fa-wifi text-[8px] sm:text-[10px]"></i>
+                    <span class="hidden sm:inline">PING:</span> 12ms
+                </div>
+                <span class="h-3 w-px bg-slate-300 dark:bg-white/10"></span>
+                <!-- Security Status -->
+                <div class="flex items-center gap-1 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 cursor-default" title="Connection Secured">
+                    <i class="fa-solid fa-shield-halved text-brand"></i>
+                    <span class="hidden sm:inline">AES</span> Secured
+                </div>
+                <span class="hidden sm:block h-3 w-px bg-slate-300 dark:bg-white/10"></span>
+                <!-- Live Clock (Desktop Only) -->
+                <div class="hidden sm:flex items-center gap-1 text-[10px] font-mono font-bold text-slate-500 cursor-default">
+                    <i class="fa-regular fa-clock opacity-60"></i>
+                    <span x-text="currentTime"></span>
+                </div>
+            </div>
+
+            <!-- Right: User Session Badge -->
+            <div class="flex items-center gap-2 z-10 shrink-0">
+                <div class="px-2.5 sm:px-3 py-1 rounded-full bg-slate-800 dark:bg-white text-white dark:text-slate-900 shadow-md flex items-center gap-1.5 transition hover:scale-105 cursor-default border border-slate-700 dark:border-white/20">
+                    <div class="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-brand flex items-center justify-center text-white text-[7px] sm:text-[8px] shadow-sm"><i class="fa-solid fa-user"></i></div>
+                    <span class="font-black tracking-wide truncate max-w-[60px] sm:max-w-[100px] text-[9px] sm:text-[11px]" x-text="currentUser.name.split(' ')[0]"></span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ADD/EDIT MODAL -->
+    <div x-show="showModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4" x-transition.opacity>
+        <div class="bg-white/95 dark:bg-dark_surface/95 backdrop-blur-xl w-full max-w-5xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh] border border-slate-200 dark:border-dark_border overflow-hidden transform transition-all scale-100" @click.away="showModal = false">
+            <div class="px-6 py-5 bg-slate-50/50 dark:bg-black/20 border-b border-slate-100 dark:border-white/5 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-brand text-white flex items-center justify-center text-lg shadow-lg shadow-brand/30"><i class="fa-solid" :class="modalMode=='add' ? 'fa-plus' : 'fa-pen-to-square'"></i></div>
+                    <div>
+                        <h2 class="text-lg font-heading font-black text-slate-800 dark:text-white tracking-tight" x-text="modalMode=='add'?'Register New Asset':'Modify Asset'"></h2>
+                        <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500">Ensure Data Accuracy</p>
+                    </div>
+                </div>
+                <button @click="showModal = false" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 dark:bg-white/10 text-slate-400 hover:text-red-500 transition shadow-sm"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="p-6 sm:p-8 overflow-y-auto flex-1 custom-scroll">
+                <form @submit.prevent="saveAsset">
+    
+				<!-- HARDWARE FORM -->
+				<div x-show="currentTab === 'hardware'" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+					<div class="space-y-6">
+						<div class="bg-white dark:bg-black/20 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5">
+							<h3 class="text-[10px] font-black tracking-widest text-brand uppercase mb-4 flex items-center gap-2"><i class="fa-solid fa-fingerprint"></i> Identity</h3>
+							<div class="grid grid-cols-2 gap-4">
+								<div class="col-span-2 sm:col-span-1"><label class="text-[9px] font-black tracking-widest text-slate-400 ml-1 uppercase">Asset ID *</label><input x-model="form.AssetID" type="text" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-mono font-bold outline-none focus:ring-2 focus:ring-brand/20 transition dark:text-white" :required="currentTab === 'hardware'" :readonly="modalMode=='edit'"></div>
+								<div class="col-span-2 sm:col-span-1"><label class="text-[9px] font-black tracking-widest text-slate-400 ml-1 uppercase">Serial No</label><input x-model="form.SerialNo" type="text" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-mono outline-none focus:ring-2 focus:ring-brand/20 transition dark:text-white"></div>
+								<div><label class="text-[9px] font-black tracking-widest text-slate-400 ml-1 uppercase">Type</label><select x-model="form.DeviceType" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-brand/20 transition cursor-pointer dark:text-white"><template x-for="type in uniqueTypes" :key="type"><option :value="type" x-text="type"></option></template></select></div>
+								<div><label class="text-[9px] font-black tracking-widest text-slate-400 ml-1 uppercase">Status</label><select x-model="form.Status" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-brand/20 transition cursor-pointer dark:text-white"><option>In Use</option><option>Spare</option><option>Decommissioned</option><option>In Repair</option></select></div>
+							</div>
+						</div>
+						 <div class="bg-white dark:bg-black/20 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5">
+							<h3 class="text-[10px] font-black tracking-widest text-emerald-500 uppercase mb-4 flex items-center gap-2"><i class="fa-solid fa-user-tag"></i> Assignment</h3>
+							<div class="grid grid-cols-2 gap-4">
+								<div class="col-span-2"><label class="text-[9px] font-black tracking-widest text-slate-400 ml-1 uppercase">Assigned To</label><input x-model="form.AssignedTo" type="text" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-emerald-500/20 transition dark:text-white"></div>
+								<div class="col-span-2"><label class="text-[9px] font-black tracking-widest text-slate-400 ml-1 uppercase">Location</label><input x-model="form.Location" type="text" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-emerald-500/20 transition dark:text-white"></div>
+							</div>
+						</div>
+					</div>
+					<div class="space-y-6">
+						 <div class="bg-white dark:bg-black/20 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5">
+							<h3 class="text-[10px] font-black tracking-widest text-purple-500 uppercase mb-4 flex items-center gap-2"><i class="fa-solid fa-microchip"></i> Specs</h3>
+							<div class="grid grid-cols-2 gap-4">
+								<div><label class="text-[9px] font-black tracking-widest text-slate-400 ml-1 uppercase">Make</label><input x-model="form.Make" type="text" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-purple-500/20 transition dark:text-white"></div>
+								<div><label class="text-[9px] font-black tracking-widest text-slate-400 ml-1 uppercase">Model</label><input x-model="form.Model" type="text" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-purple-500/20 transition dark:text-white"></div>
+								<div><label class="text-[9px] font-black tracking-widest text-slate-400 ml-1 uppercase">RAM (GB)</label><input x-model="form.RAM_GB" type="text" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-mono outline-none focus:ring-2 focus:ring-purple-500/20 transition dark:text-white"></div>
+								<div><label class="text-[9px] font-black tracking-widest text-slate-400 ml-1 uppercase">Storage (GB)</label><input x-model="form.Storage_GB" type="text" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-mono outline-none focus:ring-2 focus:ring-purple-500/20 transition dark:text-white"></div>
+							</div>
+						</div>
+						<div class="bg-white dark:bg-black/20 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5">
+							<h3 class="text-[10px] font-black tracking-widest text-amber-500 uppercase mb-4 flex items-center gap-2"><i class="fa-solid fa-network-wired"></i> Network</h3>
+							<div class="grid grid-cols-2 gap-4">
+								<div><label class="text-[9px] font-black tracking-widest text-slate-400 ml-1 uppercase">IP Address</label><input x-model="form.IP_Address" type="text" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-mono outline-none focus:ring-2 focus:ring-amber-500/20 transition dark:text-white"></div>
+								<div><label class="text-[9px] font-black tracking-widest text-slate-400 ml-1 uppercase">Hostname</label><input x-model="form.Hostname" type="text" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-mono outline-none focus:ring-2 focus:ring-amber-500/20 transition dark:text-white"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- SOFTWARE FORM -->
+				<div x-show="currentTab === 'software'" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+					
+					<div class="bg-white dark:bg-black/20 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5 h-fit">
+						<h3 class="text-[10px] font-black tracking-widest text-purple-500 uppercase mb-5 flex items-center gap-2"><i class="fa-solid fa-compact-disc"></i> Software Details</h3>
+						<div class="space-y-4">
+							<div>
+								<label class="text-[9px] font-black tracking-widest text-slate-400 ml-1 uppercase">Software Name *</label>
+								<input x-model="form.SoftwareName" type="text" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-purple-500/20 transition dark:text-white" placeholder="e.g. MS Office 2021" :required="currentTab === 'software'">
+							</div>
+							<div class="grid grid-cols-2 gap-4">
+								<div>
+									<label class="text-[9px] font-black tracking-widest text-slate-400 ml-1 uppercase">License Type</label>
+									<select x-model="form.Type" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-purple-500/20 transition cursor-pointer dark:text-white">
+										<option value="OS">Operating System</option><option value="Antivirus">Antivirus</option><option value="Office">Office Suite</option><option value="Utility">Utility</option><option value="Subscription">Subscription</option>
+									</select>
+								</div>
+								<div>
+									<label class="text-[9px] font-black tracking-widest text-slate-400 ml-1 uppercase">Status</label>
+									<select x-model="form.Status" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-purple-500/20 transition cursor-pointer dark:text-white">
+										<option value="Active">Active</option><option value="Expired">Expired</option><option value="Legacy">Legacy</option>
+									</select>
+								</div>
+							</div>
+							<div>
+								<label class="text-[9px] font-black tracking-widest text-slate-400 ml-1 uppercase">Software ID (Auto)</label>
+								<input x-model="form.SoftwareID" type="text" class="w-full bg-slate-100 dark:bg-black/60 border border-transparent rounded-xl px-4 py-3 text-sm font-mono text-slate-500 cursor-not-allowed" readonly placeholder="Auto Generated">
+							</div>
+						</div>
+                    </div>
+					<div class="space-y-6">
+						<div class="bg-white dark:bg-black/20 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5">
+							<h3 class="text-[10px] font-black tracking-widest text-emerald-500 uppercase mb-5 flex items-center gap-2"><i class="fa-solid fa-chart-pie"></i> License Count</h3>
+							<div class="grid grid-cols-3 gap-4">
+								<div>
+									<label class="text-[9px] font-black tracking-widest text-slate-400 ml-1 uppercase">Total</label>
+									<input x-model="form.TotalLicense" type="number" class="w-full bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 rounded-xl px-3 py-3 text-lg font-black text-blue-600 dark:text-blue-400 outline-none focus:ring-2 focus:ring-blue-500/20 text-center transition">
+								</div>
+								<div>
+									<label class="text-[9px] font-black tracking-widest text-slate-400 ml-1 uppercase">Noida</label>
+									<input x-model="form.Used_Noida" type="number" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-emerald-500/20 text-center transition dark:text-white">
+								</div>
+								<div>
+									<label class="text-[9px] font-black tracking-widest text-slate-400 ml-1 uppercase">DDN</label>
+									<input x-model="form.Used_DDN" type="number" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-emerald-500/20 text-center transition dark:text-white">
+								</div>
+							</div>
+						</div>
+
+						<div class="bg-white dark:bg-black/20 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5">
+							<h3 class="text-[10px] font-black tracking-widest text-red-500 uppercase mb-5 flex items-center gap-2"><i class="fa-regular fa-clock"></i> Validity</h3>
+							<div>
+								<label class="text-[9px] font-black tracking-widest text-slate-400 ml-1 uppercase">Expiry Date</label>
+								<input x-model="form.ExpiryDate" type="date" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:ring-2 focus:ring-red-500/20 transition dark:text-white">
+								<p class="text-[9px] font-bold text-slate-400 mt-2 italic pl-1">* Blank for Lifetime licenses.</p>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Form Footer -->
+				<div class="mt-8 pt-6 border-t border-slate-100 dark:border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="relative w-full sm:w-48">
+                        <i class="fa-solid fa-key absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+					    <input type="password" x-model="form.secret" placeholder="Admin Key" class="w-full pl-10 pr-4 py-3 bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl text-xs font-mono font-bold outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition">
+                    </div>
+					<div class="flex gap-2 w-full sm:w-auto">
+						<button type="button" @click="showModal = false" class="px-5 py-3 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition w-full sm:w-auto">Cancel</button>
+						<button type="submit" class="bg-brand hover:bg-blue-600 text-white px-8 py-3 rounded-xl text-xs font-black uppercase tracking-wider shadow-[0_5px_15px_-3px_rgba(59,130,246,0.4)] transition active:scale-95 w-full sm:w-auto flex justify-center items-center gap-2" :disabled="submitting || ipConflict">
+                            <span x-show="!submitting">Save Record</span>
+                            <span x-show="submitting"><i class="fa-solid fa-circle-notch fa-spin"></i> Wait...</span>
+                        </button>
+					</div>
+				</div>
+			    </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT SIDE DRAWER (Hardware Details) -->
+    <div x-show="drawerOpen" class="relative z-[100]" x-cloak>
+        <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" @click="drawerOpen = false" x-transition.opacity></div>
+        <div class="fixed inset-0 overflow-hidden">
+            <div class="absolute inset-0 overflow-hidden">
+                <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-0 md:pl-10">
+                    <div class="pointer-events-auto w-screen max-w-md transform transition ease-out duration-300 bg-white dark:bg-dark_surface h-full flex flex-col shadow-2xl border-l border-slate-200 dark:border-dark_border"
+                         x-transition:enter="translate-x-full" x-transition:enter-end="translate-x-0"
+                         x-transition:leave="translate-x-0" x-transition:leave-end="translate-x-full">
+                        
+                        <div class="bg-gradient-to-r from-brand to-indigo-600 text-white px-6 py-8 relative overflow-hidden shadow-md shrink-0">
+                            <div class="relative z-10 flex gap-4 items-start pr-10"> 
+                                <div class="w-16 h-16 shrink-0 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-4xl shadow-inner border border-white/20">
+                                    <span x-text="getDeviceEmoji(selectedAsset.DeviceType)"></span>
+                                </div>
+                                <div class="overflow-hidden">
+                                    <h2 class="text-2xl font-heading font-black tracking-tight truncate" x-text="selectedAsset.AssetID"></h2>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <span class="text-xs font-mono opacity-80 truncate" x-text="'SN: ' + (selectedAsset.SerialNo || 'N/A')"></span>
+                                    </div>
+                                    <div class="mt-2">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest bg-white/20 border border-white/20 backdrop-blur-sm shadow-sm">
+                                            <span x-text="selectedAsset.Status"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button @click="drawerOpen = false" class="absolute top-4 right-4 z-50 w-8 h-8 rounded-full bg-black/10 hover:bg-black/20 text-white/70 hover:text-white transition flex items-center justify-center backdrop-blur-sm shadow-sm">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-6 custom-scroll overscroll-contain bg-slate-50/50 dark:bg-transparent">
+                            <div class="flex gap-3">
+                                <button @click="copyDetails(selectedAsset)" class="flex-1 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 py-2.5 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/10 hover:border-brand dark:hover:border-brand transition flex items-center justify-center gap-2 shadow-sm"><i class="fa-regular fa-copy text-brand"></i> Copy Info</button>
+                            </div>
+                            
+                            <div class="bg-white dark:bg-black/20 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm p-5 relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-1.5 h-full bg-brand"></div>
+                                <h3 class="text-[10px] font-black tracking-widest text-slate-400 uppercase mb-4 flex items-center gap-2"><i class="fa-solid fa-user-tag text-brand"></i> Assignment</h3>
+                                <div class="grid grid-cols-2 gap-y-4 gap-x-4">
+                                    <div><span class="block text-[9px] font-bold uppercase text-slate-400 tracking-wider mb-0.5">Assigned To</span><span class="text-sm font-bold text-slate-800 dark:text-white" x-text="selectedAsset.AssignedTo || 'Unassigned'"></span></div>
+                                    <div><span class="block text-[9px] font-bold uppercase text-slate-400 tracking-wider mb-0.5">Location</span><span class="text-sm font-bold text-slate-800 dark:text-white truncate" x-text="selectedAsset.Location"></span></div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white dark:bg-black/20 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm p-5 relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-1.5 h-full bg-purple-500"></div>
+                                <h3 class="text-[10px] font-black tracking-widest text-slate-400 uppercase mb-4 flex items-center gap-2"><i class="fa-solid fa-microchip text-purple-500"></i> Specs & System</h3>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between items-center border-b border-slate-50 dark:border-white/5 pb-2.5"><span class="text-[11px] font-bold text-slate-500">Model</span><span class="text-xs font-bold text-slate-800 dark:text-white text-right truncate w-40" x-text="selectedAsset.Make + ' ' + selectedAsset.Model"></span></div>
+                                    <div class="flex justify-between items-center border-b border-slate-50 dark:border-white/5 pb-2.5"><span class="text-[11px] font-bold text-slate-500">OS</span><div class="flex items-center gap-1.5"><span x-text="getOSEmoji(selectedAsset.OS)"></span><span class="text-xs font-bold text-slate-800 dark:text-white" x-text="selectedAsset.OS"></span></div></div>
+                                    <div class="grid grid-cols-2 gap-3 mt-3"><div class="bg-slate-50 dark:bg-black/40 p-2.5 rounded-xl text-center border border-slate-100 dark:border-white/5"><div class="text-[9px] font-black tracking-widest text-slate-400 uppercase mb-1">Memory</div><div class="font-bold text-slate-800 dark:text-white text-sm">💾 <span x-text="selectedAsset.RAM_GB"></span> GB</div></div><div class="bg-slate-50 dark:bg-black/40 p-2.5 rounded-xl text-center border border-slate-100 dark:border-white/5"><div class="text-[9px] font-black tracking-widest text-slate-400 uppercase mb-1">Storage</div><div class="font-bold text-slate-800 dark:text-white text-sm">💽 <span x-text="selectedAsset.Storage_GB"></span> GB</div></div></div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white dark:bg-black/20 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm p-5 relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-1.5 h-full bg-amber-500"></div>
+                                <h3 class="text-[10px] font-black tracking-widest text-slate-400 uppercase mb-4 flex items-center gap-2"><i class="fa-solid fa-network-wired text-amber-500"></i> Connectivity</h3>
+                                <div class="grid grid-cols-2 gap-4"><div><span class="block text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-1">IP Address</span><span class="text-sm font-mono font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-2.5 py-1 rounded-md border border-blue-100 dark:border-blue-500/20 shadow-sm" x-text="selectedAsset.IP_Address || 'DHCP'"></span></div><div><span class="block text-[9px] font-bold uppercase tracking-wider text-slate-400 mb-1">Hostname</span><span class="text-sm font-mono font-bold text-slate-800 dark:text-slate-300" x-text="selectedAsset.Hostname || '-'"></span></div></div>
+                            </div>
+
+                            <div x-show="selectedAsset.Notes" class="bg-amber-50 dark:bg-amber-500/10 p-4 rounded-2xl border border-amber-100 dark:border-amber-500/20 text-xs font-medium text-amber-900 dark:text-amber-400"><i class="fa-solid fa-sticky-note mr-1.5 opacity-60"></i> <span x-text="selectedAsset.Notes"></span></div>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-dark_surface border-t border-slate-200 dark:border-dark_border p-5 flex gap-3 shrink-0">
+                            <button @click="deleteAsset(selectedAsset.AssetID); drawerOpen=false" class="w-12 h-12 flex items-center justify-center rounded-xl bg-red-50 dark:bg-red-500/10 text-red-500 hover:bg-red-100 dark:hover:bg-red-500/20 transition border border-red-100 dark:border-red-500/20"><i class="fa-solid fa-trash text-lg"></i></button>
+                            <button @click="openModal('edit', selectedAsset); drawerOpen=false" class="flex-1 h-12 bg-brand hover:bg-blue-600 text-white shadow-[0_5px_15px_-3px_rgba(59,130,246,0.4)] rounded-xl font-black uppercase tracking-wider transition active:scale-95 flex items-center justify-center gap-2"><i class="fa-solid fa-pen"></i> Modify Asset</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+   <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbyvIkwSZ5gdIBc_GHbXXMgadnBHU19twANppiq-nK8D3cGb8B6efZLix1Cxe2FPPsqyJw/exec";
+
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('inventorySystem', () => ({
+                hardwareList: [], softwareList: [], search: '', filterType: '', filterStatus: '', filterLocation: '', filterHygiene: false,
+                isDark: false, loading: false, syncing: false, submitting: false,
+                currentTab: 'hardware', 
+                
+                showModal: false, drawerOpen: false, kpiModalOpen: false, showHelpModal: false, showContextMenu: false,
+                modalMode: 'add',
+                
+                selectedAsset: {}, toasts: [], lastUpdated: 'Never',
+                showSuggestions: false, ipConflict: false, 
+                selectedIds: [], contextMenuPosition: {x:0, y:0}, selectedContextItem: null,
+                focusedIndex: -1,
+                
+                form: { ParentAssetID:'', AssetID:'', DeviceType:'Desktop', Status:'In Use', Hostname:'', Make:'', Model:'', SerialNo:'', CPU:'', RAM_GB:'', Storage_GB:'', OS:'', DataClass:'Internal', Encryption:'No', IP_Address:'', BackupStatus:'', Location:'', AssignedTo:'', PurchaseDate:'', Vendor:'', Cost_INR:'', WarrantyEnd:'', AntivirusStatus:'', Notes:'', AssetOwner:'', InvoiceURL:'', secret:'' },
+                currentUser: JSON.parse(sessionStorage.getItem('userData')) || { name: 'Guest' },
+
+                async init() {
+                    try {
+                        if (localStorage.getItem('theme') === 'dark') { this.isDark = true; document.documentElement.classList.add('dark'); }
+                        this.loading = true;
+                        await Promise.all([ this.fetchData(false), new Promise(resolve => setTimeout(resolve, 1000)) ]);
+                        this.loading = false;
+                    } catch(e) { console.error("Data Reset", e); localStorage.removeItem('pblData'); this.loading = false; }
+                },
+
+                async fetchData(force = false) {
+                    if (force) { this.loading = true; this.syncing = true; }
+                    try {
+                        if (!force) {
+                            const cached = localStorage.getItem('pblData');
+                            if (cached) {
+                                const parsed = JSON.parse(cached);
+                                this.hardwareList = Array.isArray(parsed) ? parsed : (parsed.hardware || []);
+                                this.softwareList = parsed.software || [];
+                                this.lastUpdated = "Cached";
+                            }
+                        }
+                        const res = await fetch(API_URL + '?action=getInventory');
+                        const json = await res.json();
+                        if (json.status === 'success') {
+                            const newHardware = json.hardware.map(item => ({ ...item, DeviceType: (item.DeviceType || '').trim(), Status: (item.Status || '').trim() }));
+                            const newSoftware = json.software || [];
+                            if (JSON.stringify(this.hardwareList) !== JSON.stringify(newHardware) || JSON.stringify(this.softwareList) !== JSON.stringify(newSoftware)) {
+                                this.hardwareList = newHardware; this.softwareList = newSoftware;
+                                localStorage.setItem('pblData', JSON.stringify({ hardware: this.hardwareList, software: this.softwareList }));
+                                this.lastUpdated = new Date().toLocaleTimeString('en-US', {hour12:false, hour:'2-digit', minute:'2-digit'});
+                                if (force) this.showToast('Success', 'Data Synced', 'success');
+                            }
+                        }
+                    } catch (e) { console.error(e); if (force) this.showToast('Error', 'Sync Failed', 'error'); } 
+                    finally { this.syncing = false; if (force) setTimeout(() => { this.loading = false; }, 400); }
+                },
+
+                toggleTheme() { this.isDark = !this.isDark; document.documentElement.classList.toggle('dark', this.isDark); localStorage.setItem('theme', this.isDark ? 'dark' : 'light'); },
+                setThemeColor(color) { document.documentElement.style.setProperty('--brand-color', color); },
+                
+                closeAll() { this.showModal = false; this.drawerOpen = false; this.kpiModalOpen = false; this.showHelpModal = false; this.showContextMenu = false; this.showSuggestions = false; },
+                
+                handleGlobalKeys(e) {
+                    if (e.key === 'Escape') {this.closeAll(); return;}
+                    if(['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) { if(e.key === 'Escape') this.closeAll(); return; }
+                    if(e.key === '/') { e.preventDefault(); this.$refs.searchInput.focus(); }
+                    if(e.altKey && e.key === 'n') { e.preventDefault(); this.openModal('add'); }
+                    if(e.altKey && e.key === 'd') { e.preventDefault(); this.toggleTheme(); }
+                },
+
+                get suggestions() { 
+                    if(this.search.length < 2) return []; const s = this.search.toLowerCase(); 
+                    if (this.currentTab === 'hardware') { const allVals = this.hardwareList.flatMap(a => [a.AssetID, a.AssignedTo, a.Hostname, a.SerialNo]).filter(v => v && v.toLowerCase().includes(s)); return [...new Set(allVals)].slice(0, 5); } 
+                    else { return this.softwareList.map(sw => sw.SoftwareName).filter(n => n && n.toLowerCase().includes(s)).slice(0, 5); }
+                },
+                
+                get filteredHardware() {
+                    const q = this.search.toLowerCase().trim();
+                    return this.hardwareList.filter(a => { const rowStr = Object.values(a).join(' ').toLowerCase(); return rowStr.includes(q) && (this.filterType === '' || a.DeviceType === this.filterType) && (this.filterStatus === '' || a.Status === this.filterStatus) && (!this.filterHygiene || (!a.SerialNo || !a.IP_Address || !a.AssignedTo)); });
+                },
+
+                get filteredSoftware() { const q = this.search.toLowerCase().trim(); return this.softwareList.filter(item => item.SoftwareName && item.SoftwareName.toLowerCase().includes(q)); },
+
+                getTotalUsed(sw) { return (parseInt(sw.Used_Noida)||0) + (parseInt(sw.Used_DDN)||0); },
+                getUsagePercent(sw) { const used = this.getTotalUsed(sw); return Math.round((used / sw.TotalLicense) * 100) || 0; },
+                formatDate(d) { return d ? new Date(d).toISOString().split('T')[0] : ''; },
+                isExpiring(d) { if(!d) return false; const days = (new Date(d) - new Date())/(1000*60*60*24); return days < 30 && days > -1; },
+
+                get uniqueTypes() { const counts = {}; this.hardwareList.forEach(a => { const t = a.DeviceType; if(t) counts[t]=(counts[t]||0)+1; }); return Object.keys(counts).sort((a,b) => counts[b] - counts[a]); },
+                getBrandLogo(make) { if(!make) return null; const m = make.toLowerCase(); const domains = { 'hp':'hp.com', 'dell':'dell.com', 'lenovo':'lenovo.com', 'apple':'apple.com', 'asus':'asus.com', 'cisco':'cisco.com', 'd-link':'dlink.com' }; for (const [key, domain] of Object.entries(domains)) { if(m.includes(key)) return `https://logo.clearbit.com/${domain}`; } return null; },
+                getDeviceEmoji(type) { const map = { 'Desktop':'🖥️', 'Laptop':'💻', 'Monitor':'📺', 'Server':'🗄️', 'Switch':'🖧', 'Printer':'🖨️', 'UPS':'🔋', 'Firewall':'🛡️', 'Router':'📡', 'KVM':'⌨️' }; return map[type] || '📦'; },
+                getOSEmoji(os) { const s = String(os||'').toLowerCase(); return s.includes('win') ? '🪟' : (s.includes('mac')?'🍎':'🐧'); },
+                getStatusClass(status) { if(status === 'In Use') return 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'; if(status === 'Spare') return 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20'; if(status === 'Decommissioned') return 'bg-red-50 text-red-600 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20'; return 'bg-slate-50 text-slate-500 border-slate-200 dark:bg-white/5 dark:text-slate-400 dark:border-white/10'; },
+                getInitials(name) { return name ? name.substring(0,2).toUpperCase() : '??'; },
+                formatDateDisplay(iso) { if(!iso) return 'N/A'; const d = new Date(iso); return isNaN(d.getTime()) ? iso : `${String(d.getDate()).padStart(2,'0')}-${String(d.getMonth()+1).padStart(2,'0')}-${d.getFullYear()}`; },
+
+                selectAll(e) { this.selectedIds = e.target.checked ? (this.currentTab==='hardware' ? this.filteredHardware.map(a => a.AssetID) : []) : []; },
+                showContext(e, item) { this.selectedContextItem = item; this.contextMenuPosition = { x: e.clientX, y: e.clientY }; this.showContextMenu = true; },
+                
+                openDrawer(item) { this.closeAll(); this.$nextTick(() => { this.selectedAsset = item; this.drawerOpen = true; }); },
+                
+                openModal(mode, item) { 
+				this.closeAll(); this.modalMode = mode; 
+				const emptyHardware = { AssetID:'', SerialNo:'', DeviceType:'Desktop', Status:'In Use', Make:'', Model:'', AssignedTo:'', Location:'', IP_Address:'', secret:'' };
+				const emptySoftware = { SoftwareID:'', SoftwareName:'', Type:'OS', TotalLicense:0, Used_Noida:0, Used_DDN:0, ExpiryDate:'', Status:'Active', secret:'' };
+				if(mode === 'edit' && item) { this.form = JSON.parse(JSON.stringify(item)); this.form.secret = ''; if(this.form.ExpiryDate) this.form.ExpiryDate = this.form.ExpiryDate.split('T')[0]; } 
+				else { this.form = (this.currentTab === 'hardware') ? emptyHardware : emptySoftware; } 
+				this.$nextTick(() => { this.showModal = true; }); 
+			    },
+
+                copyDetails(item) { navigator.clipboard.writeText(`Asset: ${item.AssetID}\nSerial: ${item.SerialNo}\nUser: ${item.AssignedTo}`); this.showToast('Copied', 'Details copied to clipboard', 'success'); },
+
+                async saveAsset() {
+                    if(!this.form.secret) { this.showToast('Validation', 'Admin Key Required', 'error'); return; }
+                    this.submitting = true;
+                    try {
+                        await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: this.modalMode, ...this.form }) });
+                        this.showToast('Success', 'Record Saved', 'success'); this.showModal = false; this.fetchData(true);
+                    } catch(e) { this.showToast('Error', 'Save Failed', 'error'); } finally { this.submitting = false; }
+                },
+                async deleteAsset(id) { const secret = prompt("Confirm Admin Key:"); if(secret !== 'PBL2026') return; try { await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: 'delete', AssetID: id, secret: secret }) }); this.showToast('Deleted', 'Asset Removed', 'success'); this.fetchData(true); } catch(e) { this.showToast('Error', 'Delete Failed', 'error'); } },
+                
+                exportCSV() {
+                    if (this.currentTab === 'hardware' && this.filteredHardware.length > 0) {
+                        const headers = ['Asset Tag', 'Type', 'Make', 'Model', 'Serial', 'User', 'Location', 'Status'];
+                        let csv = headers.join(',') + '\n';
+                        this.filteredHardware.forEach(row => { const data = [row.AssetID, row.DeviceType, row.Make, row.Model, row.SerialNo, row.AssignedTo, row.Location, row.Status].map(field => `"${(field || '').toString().replace(/"/g, '""')}"`); csv += data.join(',') + '\n'; });
+                        const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = `PBL_Hardware.csv`; a.click();
+                    }
+			    },
+                exportPDF() {
+				const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4'); 
+				if (this.currentTab === 'hardware') {
+                    doc.text("PBL Hardware Report", 14, 15); doc.setFontSize(10); doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 20);
+                    const rows = this.filteredHardware.map(r => [r.AssetID || '-', r.DeviceType || '-', r.Model || '-', r.SerialNo || '-', r.AssignedTo || 'Unassigned', r.Location || '-', r.Status || '-']);
+                    doc.autoTable({ head: [['Asset Tag', 'Type', 'Model', 'Serial', 'User', 'Location', 'Status']], body: rows, startY: 25, theme: 'grid', styles: { fontSize: 8 }, headStyles: { fillColor: [59, 130, 246] } });
+                    doc.save(`PBL_Hardware.pdf`);
+                } else {
+                    doc.text("PBL Software Compliance Report", 14, 15); doc.setFontSize(10); doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 20);
+                    const rows = this.filteredSoftware.map(s => [s.SoftwareName, s.Type, s.TotalLicense, s.Used_Noida, s.Used_DDN, (s.TotalLicense - (s.Used_Noida + s.Used_DDN))]);
+                    doc.autoTable({ head: [['Software Name', 'Type', 'Total Lic', 'Used Noida', 'Used DDN', 'Balance']], body: rows, startY: 25, theme: 'grid', styles: { fontSize: 8 }, headStyles: { fillColor: [124, 58, 237] } });
+                    doc.save(`PBL_Software.pdf`);
+                }
+			},
+                showToast(title, message, type) { const id = Date.now(); this.toasts.push({ id, title, message, type, visible: true }); setTimeout(() => { this.toasts = this.toasts.filter(t => t.id !== id); }, 3000); }
+            }))
+        })
+    </script>
+</body>
+</html>

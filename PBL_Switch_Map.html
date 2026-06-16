@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PBL Network Infrastructure v1.0</title>
+    <link rel="icon" type="image/x-icon" href="Assets/images/pbl-logo.ico">
+    
+    <!-- Dependencies -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Modern Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- PDF Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { 
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    },
+                    colors: {
+                        brand: '#3b82f6',       
+                        brand_dark: '#1d4ed8',  
+                        dark_bg: '#020617',     
+                        dark_surface: '#0f172a', 
+                        dark_border: '#1e293b',
+                        sidebar_bg: '#f8fafc'
+                    },
+                    zIndex: {
+                        '100': '100',
+                        'modal': '9999',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        [x-cloak] { display: none !important; }
+        body { background-color: #f1f5f9; transition: background-color 0.2s; }
+        .dark body { background-color: #020617; }
+
+        /* Custom Scrollbar */
+        .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark .custom-scroll::-webkit-scrollbar-thumb { background: #334155; }
+
+        /* Port Box Styling */
+        .port-box {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            background-color: white;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        
+        @media (hover: hover) {
+            .port-box:hover {
+                transform: scale(1.15); 
+                z-index: 50 !important; 
+                border-color: #3b82f6; 
+                box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3);
+                cursor: pointer;
+            }
+        }
+        .dark .port-box { background-color: #1e293b; border-color: #334155; }
+
+        /* Status Colors */
+        .status-up { background: #f0fdf4 !important; border-color: #22c55e !important; color: #15803d !important; } 
+        .dark .status-up { background: rgba(21, 128, 61, 0.2) !important; border-color: #15803d !important; color: #4ade80 !important; }
+
+        .status-empty { background: #f8fafc; border-color: #e2e8f0; color: #94a3b8; } 
+        .dark .status-empty { background: #0f172a; border-color: #1e293b; color: #64748b; }
+
+        .status-uplink { background: #eff6ff !important; border-color: #3b82f6 !important; color: #1d4ed8 !important; } 
+        .dark .status-uplink { background: rgba(59, 130, 246, 0.2) !important; border-color: #2563eb !important; color: #60a5fa !important; }
+
+        /* Loader Animation */
+        .spinnerContainer { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .spinner { width: 50px; height: 50px; display: grid; border: 4px solid #0000; border-radius: 50%; border-right-color: #3b82f6; animation: tri-spinner 1s infinite linear; }
+        .spinner::before, .spinner::after { content: ""; grid-area: 1/1; margin: 2px; border: inherit; border-radius: 50%; animation: tri-spinner 2s infinite; }
+        .spinner::after { margin: 8px; animation-duration: 3s; }
+        @keyframes tri-spinner { 100% { transform: rotate(1turn); } }
+        
+        .loader { color: #475569; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 16px; box-sizing: content-box; height: 24px; padding: 0; display: flex; margin-top: 15px; }
+        .dark .loader { color: #94a3b8; } 
+        .words { overflow: hidden; height: 100%; }
+        .word { display: block; height: 100%; padding-left: 6px; color: #3b82f6; animation: cycle-words 6s infinite; }
+        @keyframes cycle-words { 
+            0% { transform: translateY(-0%); } 20% { transform: translateY(-100%); } 40% { transform: translateY(-200%); } 
+            60% { transform: translateY(-300%); } 80% { transform: translateY(-400%); } 100% { transform: translateY(-500%); } 
+        }
+
+        /* KPI Cards */
+        .kpi-card { transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        @media (hover: hover) {
+            .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1); }
+        }
+    </style>
+</head>
+
+<body class="text-slate-800 dark:text-slate-200 h-[100dvh] flex flex-col overflow-hidden selection:bg-brand selection:text-white" x-data="networkSystem()">
+
+    <!-- SAVING LOADER -->
+    <div x-show="saving" class="fixed inset-0 z-[10001] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm" x-cloak>
+        <div class="bg-white dark:bg-dark_surface px-6 py-5 rounded-3xl shadow-2xl flex flex-col items-center gap-3 border border-slate-200 dark:border-dark_border transform scale-100 transition-all">
+            <div class="w-8 h-8 border-4 border-brand border-t-transparent rounded-full animate-spin"></div>
+            <span class="font-heading font-black text-sm text-slate-800 dark:text-white uppercase tracking-wider">Saving to Cloud...</span>
+        </div>
+    </div>
+
+    <!-- EDIT PORT MODAL -->
+    <div x-show="editModalOpen" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4" x-transition.opacity>
+        <div class="bg-white/95 dark:bg-dark_surface/95 backdrop-blur-xl w-full max-w-md rounded-3xl shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden transform transition-all scale-100" @click.away="editModalOpen = false">
+            <div class="px-6 py-5 border-b border-slate-100 dark:border-white/5 flex justify-between items-center bg-slate-50/50 dark:bg-black/20">
+                <div>
+                    <h3 class="font-heading font-black text-lg text-slate-800 dark:text-white">Edit Port <span x-text="editForm.num" class="text-brand"></span></h3>
+                    <p class="text-[10px] text-slate-500 uppercase font-bold tracking-widest" x-text="selectedSwitch.id"></p>
+                </div>
+                <button @click="editModalOpen = false" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/20 transition"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Status</label>
+                    <select x-model="editForm.status" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition">
+                        <option value="empty">⚪ Empty (Available)</option>
+                        <option value="active">🟢 Active (Device)</option>
+                        <option value="uplink">🔵 Uplink (Backbone)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Description / Device</label>
+                    <input type="text" x-model="editForm.desc" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition" placeholder="e.g. HR Printer">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Network IP</label>
+                        <input type="text" x-model="editForm.vlan" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-mono outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition" placeholder="192.168...">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Cable Tag</label>
+                        <input type="text" x-model="editForm.cable" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-mono outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition" placeholder="A-01">
+                    </div>
+                </div>
+            </div>
+            <div class="bg-slate-50/50 dark:bg-black/20 px-6 py-4 flex justify-end gap-3 border-t border-slate-100 dark:border-white/5">
+                <button @click="editModalOpen = false" class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 transition">Cancel</button>
+                <button @click="savePortChanges()" class="px-6 py-2.5 rounded-xl text-sm font-black text-white bg-brand hover:bg-blue-600 shadow-[0_5px_15px_-3px_rgba(59,130,246,0.4)] transition active:scale-95">Save Port</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI MODAL -->
+    <div x-show="kpiModalOpen" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4" x-transition.opacity @click.self="kpiModalOpen = false">
+        <div class="bg-white/95 dark:bg-dark_surface/95 backdrop-blur-xl w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden flex flex-col max-h-[80vh]">
+            <div class="px-6 py-5 border-b border-slate-100 dark:border-white/5 flex justify-between items-center bg-slate-50/50 dark:bg-black/20 shrink-0">
+                <div>
+                    <h3 class="font-heading font-black text-lg text-slate-800 dark:text-white capitalize" x-text="kpiType + ' Ports'"></h3>
+                    <p class="text-[10px] text-brand uppercase font-bold tracking-widest" x-text="kpiList.length + ' Items found'"></p>
+                </div>
+                <button @click="kpiModalOpen = false" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-400 hover:text-red-500 transition"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="overflow-y-auto p-4 custom-scroll">
+                <div class="space-y-2">
+                    <template x-for="p in kpiList" :key="p.num">
+                        <div class="flex items-center justify-between p-3 rounded-2xl border border-slate-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 transition group">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-black/40 flex items-center justify-center font-mono font-black text-slate-700 dark:text-slate-300" x-text="p.num"></div>
+                                <div>
+                                    <div class="text-sm font-bold text-slate-800 dark:text-white group-hover:text-brand transition" x-text="p.desc || 'Available'"></div>
+                                    <div class="text-[10px] font-mono text-slate-400" x-text="'Cable: ' + (p.cable || 'N/A')"></div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[10px] font-mono block text-slate-500 mb-1" x-text="p.vlan || '-'"></span>
+                                <span class="text-[9px] uppercase font-black px-2 py-0.5 rounded-md tracking-wider border" 
+                                      :class="p.status==='active'?'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/20'
+                                             :(p.status==='uplink'?'bg-blue-50 text-blue-600 border-blue-200 dark:bg-brand/10 dark:border-brand/20'
+                                             :'bg-slate-50 text-slate-500 border-slate-200 dark:bg-white/5 dark:border-white/5')" 
+                                      x-text="p.status"></span>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NAVBAR (v1.0 Premium Hierarchy) -->
+    <header class="sticky top-0 bg-white/70 dark:bg-[#020617]/70 backdrop-blur-2xl border-b border-slate-200/80 dark:border-white/5 flex-shrink-0 h-16 sm:h-20 z-40">
+        <div class="max-w-[1920px] mx-auto px-4 sm:px-6 h-full flex justify-between items-center">
+            
+            <!-- Left: Breadcrumb Identity -->
+            <div class="flex items-center gap-4 sm:gap-6">
+                <!-- App Link -->
+                <a href="IT_Dashboard.html" class="group flex items-center gap-3 transition-transform active:scale-95" title="Return to Dashboard">
+                    <div class="relative h-9 sm:h-12 w-auto flex items-center">
+                        <img src="pbl-logo.png" alt="PBL Logo" class="h-8 sm:h-10 w-auto object-contain drop-shadow-md transition-transform group-hover:scale-105" @error="$el.style.display='none'; $refs.fbLogo.style.display='flex'">
+                        <div x-ref="fbLogo" style="display:none;" class="w-9 h-9 sm:w-11 sm:h-11 bg-gradient-to-tr from-brand to-indigo-600 text-white rounded-xl flex items-center justify-center font-black text-xl shadow-[0_0_15px_rgba(59,130,246,0.4)] group-hover:shadow-[0_0_25px_rgba(59,130,246,0.6)] transition-all">P</div>
+                    </div>
+                    <div class="hidden lg:block">
+                        <h1 class="font-heading font-black text-xl leading-none text-slate-800 dark:text-white tracking-tight group-hover:text-brand dark:group-hover:text-brand_glow transition-colors">PBL<span class="text-brand">Connect</span></h1>
+                    </div>
+                </a>
+
+                <!-- Divider -->
+                <div class="hidden sm:block h-8 w-px bg-slate-200 dark:bg-slate-800"></div>
+
+                <!-- Page Identity -->
+                <div class="flex flex-col justify-center">
+                    <div class="flex items-center gap-2">
+                        <span class="bg-brand/10 text-brand px-1.5 py-0.5 rounded font-mono font-bold text-[8px] sm:text-[9px] leading-none border border-brand/20">v1.0</span>
+                        <span class="hidden sm:inline-block text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-md">Network Ops</span>
+                    </div>
+                    <h2 class="font-heading font-bold text-sm sm:text-lg text-slate-700 dark:text-slate-200 leading-tight mt-1">Switch Manager</h2>
+                </div>
+            </div>
+
+            <!-- Center: Floating HUD Clock (Hidden on Mobile) -->
+            <div class="hidden xl:flex items-center absolute left-1/2 transform -translate-x-1/2">
+                <div class="bg-white/40 dark:bg-black/20 backdrop-blur-md px-5 py-2 rounded-2xl border border-slate-200/50 dark:border-white/5 flex items-center gap-6 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)]">
+                    <div class="flex items-center gap-2 text-sm font-mono font-bold text-slate-800 dark:text-white border-r border-slate-300 dark:border-white/10 pr-6">
+                        <i class="fa-regular fa-clock text-brand animate-pulse"></i> <span x-text="currentTime">--:--:--</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                        <span x-text="currentDate">-- --- ----</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Actions -->
+            <div class="flex items-center justify-end gap-3 sm:gap-4 w-auto relative">
+                
+                <!-- Live Status Indicator -->
+                <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-500/10 rounded-full border border-emerald-100 dark:border-emerald-500/20 shadow-sm">
+                    <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">System Live</span>
+                </div>
+                
+                <!-- Theme Toggle -->
+                <button @click="toggleTheme()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 transition-all border border-transparent dark:border-slate-700/50">
+                    <i class="fa-solid" :class="isDark ? 'fa-sun text-yellow-400' : 'fa-moon'"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 flex flex-col lg:flex-row gap-4 sm:gap-6 p-4 sm:p-6 overflow-y-auto lg:overflow-hidden max-w-[1920px] mx-auto w-full bg-slate-50/50 dark:bg-[#020617]">
+        
+        <!-- CSS FOR HIDING SCROLLBAR BUT KEEPING SCROLL FUNCTIONALITY -->
+        <style>
+            .hide-scroll::-webkit-scrollbar { display: none; }
+            .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+        </style>
+
+        <!-- SIDEBAR (Switch List - Solid Pill Design) -->
+        <div class="w-full lg:w-64 shrink-0 flex flex-col gap-2 sm:gap-3 lg:h-full lg:overflow-hidden relative z-20">
+            <div class="hidden lg:block text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Inventory Roster</div>
+            
+            <!-- Applied 'hide-scroll' and removed bottom padding (pb-2) since scrollbar is gone -->
+            <div class="flex lg:flex-col gap-2 sm:gap-3 overflow-x-auto lg:overflow-y-auto hide-scroll px-1 lg:px-0">
+                <template x-for="sw in switches" :key="sw.id">
+                    <div @click="switchSwitch(sw)" 
+                         class="cursor-pointer shrink-0 px-3 py-2.5 sm:p-4 rounded-xl border transition-all duration-200 group flex items-center justify-between shadow-sm"
+                         :class="selectedSwitch.id === sw.id ? 'bg-brand text-white border-brand dark:bg-brand/20 dark:border-brand/50 dark:text-brand_glow scale-[1.02]' : 'bg-white/80 border-slate-200 hover:bg-white text-slate-700 dark:bg-white/5 dark:border-white/10 dark:hover:bg-white/10 dark:text-slate-300'">
+                        
+                        <div>
+                            <div class="font-heading font-black text-xs sm:text-sm tracking-tight" 
+                                 :class="sw.type === 'backup' ? 'line-through opacity-70' : ''"
+                                 x-text="sw.id"></div>
+                            <div class="text-[9px] sm:text-[10px] font-bold flex items-center gap-1.5 mt-0.5" 
+                                 :class="selectedSwitch.id === sw.id ? 'text-white/80 dark:text-brand_glow/70' : 'text-slate-500'">
+                                <i class="fa-solid fa-server text-[8px]"></i> <span x-text="sw.location"></span>
+                            </div>
+                        </div>
+                        <i x-show="selectedSwitch.id === sw.id" class="fa-solid fa-circle-check text-white dark:text-brand_glow hidden sm:block opacity-90 text-lg"></i>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- RIGHT CONTENT (Desktop: Full Width Vertical Stack | Mobile: Vertical Scroll) -->
+        <div class="flex-1 flex flex-col gap-4 sm:gap-6 min-w-0 h-full lg:overflow-hidden relative z-10">
+            
+            <!-- MAIN LOADER -->
+            <div x-show="loading" 
+                 class="absolute inset-0 bg-white/80 dark:bg-[#020617]/80 flex flex-col items-center justify-center z-[30] backdrop-blur-sm transition-opacity duration-300"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:leave="transition ease-in duration-100"
+                 x-cloak>
+                <div class="spinnerContainer">
+                    <div class="spinner"></div>
+                    <div class="loader">
+                        <p class="mr-1.5">Scanning</p>
+                        <div class="words">
+                            <span class="word">Ports...</span>
+                            <span class="word">VLANs...</span>
+                            <span class="word">Links...</span>
+                            <span class="word">Ports...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 text-[10px] font-black text-slate-400 uppercase tracking-widest animate-pulse" x-text="loadingText"></div>
+            </div>
+
+            <!-- 1. UNIFIED HEADER (Identity + Inline KPIs for Space Saving) -->
+            <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl rounded-2xl md:rounded-3xl border border-slate-200 dark:border-dark_border shadow-sm p-4 shrink-0 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 transition-all">
+                
+                <!-- Left: Identity -->
+                <div class="w-full xl:w-auto shrink-0">
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border shadow-sm"
+                              :class="selectedSwitch.type === 'backup' ? 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-white/5 dark:border-white/10' : 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'"
+                              x-text="selectedSwitch.type === 'backup' ? 'BACKUP UNIT' : 'MANAGED'">
+                        </span>
+                        <span class="text-[10px] font-mono font-bold text-slate-400 bg-slate-50 dark:bg-white/5 px-2 py-0.5 rounded-md border border-slate-100 dark:border-white/5" x-text="'Rack: ' + (selectedSwitch.id ? selectedSwitch.id.split('-').pop() : '00')"></span>
+                    </div>
+                    <h2 class="text-xl sm:text-2xl font-heading font-black tracking-tight" 
+                        :class="selectedSwitch.type === 'backup' ? 'text-slate-400 line-through decoration-slate-300' : 'text-slate-800 dark:text-white'"
+                        x-text="selectedSwitch.id">
+                    </h2>
+                    <div class="text-[10px] sm:text-[11px] text-slate-500 font-bold flex items-center gap-3 sm:gap-4 mt-1 flex-wrap">
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-map-pin text-rose-500"></i> <span x-text="selectedSwitch.location"></span></span>
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-microchip text-brand"></i> <span x-text="selectedSwitch.model_name"></span></span>
+                    </div>
+                </div>
+                
+                <!-- Right: Inline Modern KPIs (Scrollable on Mobile) -->
+                <div class="w-full xl:w-auto flex items-center gap-2 sm:gap-3 overflow-x-auto custom-scroll pb-1 xl:pb-0 pt-2 xl:pt-0 border-t border-slate-100 dark:border-white/5 xl:border-t-0">
+                    
+                    <div class="flex items-center gap-3 bg-slate-50 dark:bg-slate-800/40 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl border border-slate-200 dark:border-white/10 shrink-0">
+                        <div class="text-slate-400 text-lg sm:text-xl"><i class="fa-solid fa-server"></i></div>
+                        <div><p class="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest leading-none mb-1">Capacity</p><h3 class="text-lg sm:text-xl font-heading font-black text-slate-800 dark:text-white leading-none" x-text="selectedSwitch.ports">0</h3></div>
+                    </div>
+                    
+                    <div @click="openKpiModal('active')" class="flex items-center gap-3 bg-emerald-50 dark:bg-emerald-900/20 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl border border-emerald-200 dark:border-emerald-800/30 cursor-pointer hover:border-emerald-400 transition shrink-0 group">
+                        <div class="text-emerald-500 text-lg sm:text-xl group-hover:scale-110 transition"><i class="fa-solid fa-network-wired"></i></div>
+                        <div><p class="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest leading-none mb-1">Active</p><h3 class="text-lg sm:text-xl font-heading font-black text-slate-800 dark:text-white leading-none" x-text="getStats().active">0</h3></div>
+                    </div>
+
+                    <div @click="openKpiModal('uplink')" class="flex items-center gap-3 bg-blue-50 dark:bg-blue-900/20 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl border border-blue-200 dark:border-blue-800/30 cursor-pointer hover:border-blue-400 transition shrink-0 group">
+                        <div class="text-brand dark:text-blue-400 text-lg sm:text-xl group-hover:scale-110 transition"><i class="fa-solid fa-arrow-up-right-from-square"></i></div>
+                        <div><p class="text-[9px] font-black text-brand dark:text-blue-400 uppercase tracking-widest leading-none mb-1">Uplinks</p><h3 class="text-lg sm:text-xl font-heading font-black text-slate-800 dark:text-white leading-none" x-text="getStats().uplink">0</h3></div>
+                    </div>
+
+                    <div @click="openKpiModal('empty')" class="flex items-center gap-3 bg-amber-50 dark:bg-amber-900/20 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl border border-amber-200 dark:border-amber-800/30 cursor-pointer hover:border-amber-400 transition shrink-0 group">
+                        <div class="text-amber-500 text-lg sm:text-xl group-hover:scale-110 transition"><i class="fa-solid fa-plug"></i></div>
+                        <div><p class="text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest leading-none mb-1">Free</p><h3 class="text-lg sm:text-xl font-heading font-black text-slate-800 dark:text-white leading-none" x-text="getStats().empty">0</h3></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. PORT GRID (Ultra-Condensed to Maximize Table Space) -->
+            <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl px-3 py-2 sm:px-4 sm:py-2.5 rounded-2xl md:rounded-3xl border border-slate-200 dark:border-dark_border shadow-sm shrink-0 relative z-20">
+                <div class="flex justify-between items-center mb-1.5">
+                    <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Physical Interfaces</h3>
+                    <button @click="refreshData(true)" class="hidden sm:flex text-[9px] font-bold text-slate-500 hover:text-brand bg-slate-50 dark:bg-black/20 px-2 py-0.5 rounded border border-slate-200 dark:border-white/5 transition items-center gap-1 shadow-sm"><i class="fa-solid fa-rotate"></i> Sync</button>
+                </div>
+                
+                <div class="w-full">
+                    <!-- Hardware Grid: Tight gaps and compact heights -->
+                    <div class="grid grid-cols-6 sm:grid-cols-12 xl:grid-cols-24 gap-1 sm:gap-1.5">
+                        <template x-for="(port, idx) in generatePortList()" :key="port.num">
+                            <!-- Reduced height (h-6 sm:h-7) to save vertical space -->
+                            <div @click="openEditModal(port)" 
+                                 class="port-box border rounded h-6 sm:h-7 flex items-center justify-center font-mono text-[9px] sm:text-[10px] font-bold cursor-pointer group relative"
+                                 :class="getPortClass(port.status)">
+                                <span x-text="port.num" :class="port.status === 'empty' ? 'opacity-40' : 'opacity-100'"></span>
+                                
+                                <!-- TOOLTIP -->
+                                <div class="hidden sm:flex absolute w-56 bg-slate-800 text-white p-3 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none flex-col gap-1 border border-slate-600" style="z-index: 1000;" :class="getTooltipPosition(idx, selectedSwitch.ports)">
+                                    <div class="absolute w-2 h-2 bg-slate-800 border-l border-b border-slate-600 rotate-45" :class="getArrowPosition(idx, selectedSwitch.ports)"></div>
+                                    <div class="flex justify-between items-center border-b border-white/10 pb-1.5">
+                                        <span class="font-black text-xs">Port <span x-text="port.num"></span></span>
+                                        <span class="text-[9px] font-mono bg-white/10 px-1.5 py-0.5 rounded" x-text="port.cable || 'NO-ID'"></span>
+                                    </div>
+                                    <div class="text-[10px] text-blue-300 font-bold truncate" x-text="port.desc || 'Available'"></div>
+                                    <div class="text-[9px] text-slate-400 font-mono mt-0.5" x-show="port.status !== 'empty'">
+                                        IP/VLAN: <span class="text-white" x-text="port.vlan || '-'"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. CONNECTION MATRIX TABLE (Maximized Height + Overflow Fixed) -->
+            <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl border border-slate-200 dark:border-dark_border rounded-2xl md:rounded-3xl shadow-sm flex-1 flex flex-col min-h-[300px] relative z-10 overflow-hidden mb-6 lg:mb-0">
+                <div class="px-5 py-3 sm:py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-black/20 flex justify-between items-center shrink-0">
+                    <h3 class="text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">Connection Matrix</h3>
+                    <div class="flex items-center gap-2">
+                        <button @click="refreshData(true)" class="sm:hidden text-slate-400 hover:text-brand transition p-2"><i class="fa-solid fa-rotate"></i></button>
+                        <button @click="exportToPDF()" class="bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-500/10 dark:text-rose-400 dark:hover:bg-rose-500/20 px-3 py-1.5 rounded-lg text-[10px] sm:text-xs font-black uppercase tracking-wider shadow-sm transition flex items-center gap-1.5 active:scale-95 border border-rose-200 dark:border-rose-500/20">
+                            <i class="fa-solid fa-file-pdf"></i> <span class="hidden sm:inline">Export PDF</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- FIX: Changed overflow-y-auto to overflow-auto to fix horizontal scrolling bug -->
+                <div class="block w-full overflow-auto flex-1 custom-scroll pb-20 lg:pb-0 relative">
+                    
+                    <!-- 📱 MOBILE VIEW: COMPACT SMART CARDS -->
+                    <div class="md:hidden flex flex-col gap-2.5 p-3">
+                        <template x-for="port in generatePortList().filter(p => p.status !== 'empty')" :key="'mob-'+port.num">
+                            <div class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-3 shadow-sm flex flex-col relative transition-all hover:shadow-md cursor-pointer" @click="openEditModal(port)">
+                                <div class="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-xl" :class="port.status === 'uplink' ? 'bg-blue-500' : 'bg-emerald-500'"></div>
+                                
+                                <div class="flex items-start gap-3 pl-1.5">
+                                    <div class="w-10 h-10 rounded-lg bg-slate-50 dark:bg-black/30 flex items-center justify-center font-mono font-black text-slate-600 dark:text-slate-300 text-lg shadow-inner shrink-0 border border-slate-100 dark:border-white/5" x-text="String(port.num).padStart(2, '0')"></div>
+                                    
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex justify-between items-start mb-0.5 gap-2">
+                                            <h4 class="font-bold text-[13px] text-slate-800 dark:text-white truncate" x-text="port.desc"></h4>
+                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border shrink-0"
+                                                  :class="port.status === 'uplink' ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-brand/10 dark:text-brand dark:border-brand/20' : 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'">
+                                                <span x-text="port.status"></span>
+                                            </span>
+                                        </div>
+                                        
+                                        <div class="flex items-center justify-between text-[9px] font-bold text-slate-500 border-t border-slate-100 dark:border-white/5 pt-1.5 mt-1">
+                                            <span class="font-mono bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400 shadow-sm" x-text="port.vlan || 'No IP'"></span>
+                                            <span class="truncate text-slate-700 dark:text-slate-300">Cable: <span class="font-mono" x-text="port.cable || 'N/A'"></span></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+
+                        <div x-show="generatePortList().filter(p => p.status !== 'empty').length === 0" class="p-8 text-center text-slate-400">
+                            <i class="fa-solid fa-plug-circle-xmark text-3xl mb-3 opacity-30"></i>
+                            <p class="font-medium text-xs">No active connections found.</p>
+                        </div>
+                    </div>
+
+                    <!-- 💻 DESKTOP VIEW: STRUCTURED TABLE -->
+                    <table class="hidden md:table w-full text-left border-collapse min-w-[800px] whitespace-nowrap" id="switchTable">
+                        <thead class="bg-white/50 dark:bg-white/5 text-[9px] text-slate-400 uppercase font-black tracking-widest sticky top-0 z-10 shadow-sm backdrop-blur-md">
+                            <tr>
+                                <th class="px-5 py-3 w-16 text-center">Port</th>
+                                <th class="px-5 py-3 w-28">Status</th>
+                                <th class="px-5 py-3">Device / Description</th>
+                                <th class="px-5 py-3 w-36">Network IP</th>
+                                <th class="px-5 py-3 w-28">Cable ID</th>
+                                <th class="px-5 py-3 w-16 text-center">Act</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 dark:divide-white/5 text-sm">
+                            <template x-for="port in generatePortList().filter(p => p.status !== 'empty')" :key="'desk-'+port.num">
+                                <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition duration-150 cursor-pointer group border-b border-slate-100 dark:border-white/5" @click="openEditModal(port)">
+                                    <td class="px-4 py-3 text-center align-middle">
+                                        <div class="w-7 h-7 rounded bg-slate-50 dark:bg-black/30 flex items-center justify-center font-mono font-black text-slate-600 dark:text-slate-300 mx-auto shadow-inner border border-slate-100 dark:border-white/5" x-text="String(port.num).padStart(2, '0')"></div>
+                                    </td>
+                                    <td class="px-4 py-3 align-middle">
+                                        <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-wider border shadow-sm"
+                                              :class="port.status === 'uplink' ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-brand/10 dark:text-brand dark:border-brand/20' : 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'">
+                                            <i class="fa-solid text-[8px]" :class="port.status === 'uplink' ? 'fa-arrow-up' : 'fa-check'"></i>
+                                            <span x-text="port.status"></span>
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-3 font-bold text-slate-800 dark:text-white text-[13px] align-middle" x-text="port.desc"></td>
+                                    <td class="px-4 py-3 font-mono font-bold text-slate-500 dark:text-slate-400 text-[11px] align-middle" x-text="port.vlan || '-'"></td>
+                                    <td class="px-4 py-3 align-middle">
+                                        <span class="font-mono text-[10px] font-bold text-slate-600 bg-slate-100 border border-slate-200 dark:bg-black/30 dark:text-slate-300 dark:border-white/10 px-2 py-0.5 rounded shadow-sm" x-text="port.cable || 'N/A'"></span>
+                                    </td>
+                                    <td class="px-4 py-3 text-center align-middle sticky-col bg-white dark:bg-dark_surface group-hover:bg-slate-50 dark:group-hover:bg-white/5 transition">
+                                        <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-white dark:bg-black/20 hover:bg-brand hover:text-white text-slate-400 transition shadow-sm border border-slate-200 dark:border-white/5 hover:border-brand/50 mx-auto"><i class="fa-solid fa-pen text-[10px]"></i></button>
+                                    </td>
+                                </tr>
+                            </template>
+                            
+                            <tr x-show="generatePortList().filter(p => p.status !== 'empty').length === 0">
+                                <td colspan="6" class="px-5 py-12 text-center text-slate-400">
+                                    <i class="fa-solid fa-plug-circle-xmark text-3xl mb-2 opacity-50"></i>
+                                    <p class="font-medium text-xs">No active connections found on this switch.</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER (Robust Comprehensive Data-Rich Layout) -->
+    <footer class="shrink-0 bg-white/90 dark:bg-[#09090b]/95 backdrop-blur-xl border-t border-slate-200 dark:border-white/5 z-50 py-2.5 sm:py-3 w-full relative overflow-hidden">
+        
+        <!-- Glowing Top Accent Line -->
+        <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-brand to-transparent opacity-60"></div>
+        
+        <div class="max-w-[1920px] mx-auto px-3 sm:px-6 relative flex items-center justify-between text-[9px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400">
+            
+            <!-- Left: Copyright, Version & Env -->
+            <div class="flex items-center gap-1.5 sm:gap-3 z-10 shrink-0">
+                <!-- Dynamically fetching full year (e.g., 2026) -->
+                <span class="font-black text-slate-500 dark:text-slate-400 flex items-center gap-1">&copy; <span x-text="new Date().getFullYear()">2026</span></span>
+                <span class="h-3 w-px bg-slate-300 dark:bg-white/10"></span>
+                <!-- Version -->
+                <span class="px-1.5 py-0.5 rounded-md bg-gradient-to-r from-brand to-indigo-600 text-white font-mono font-black tracking-widest shadow-[0_2px_10px_-2px_rgba(59,130,246,0.5)] cursor-default">v1.0</span>
+                <!-- Env Badge (Hidden on very small screens) -->
+                <span class="hidden sm:flex px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-white/5 text-slate-400 border border-slate-200 dark:border-white/5 font-black uppercase tracking-widest">PROD</span>
+            </div>
+
+            <!-- Center: Tech Telemetry (Ping & Security) -->
+            <div class="flex items-center justify-center gap-2 sm:gap-5 z-10 flex-1 px-1 sm:px-2 overflow-hidden truncate">
+                <!-- Ping / Latency -->
+                <div class="flex items-center gap-1 text-[9px] sm:text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 cursor-default" title="Network Latency">
+                    <i class="fa-solid fa-wifi text-[8px] sm:text-[10px]"></i>
+                    <span class="hidden sm:inline">PING:</span> 12ms
+                </div>
+                <span class="h-3 w-px bg-slate-300 dark:bg-white/10"></span>
+                <!-- Security Status -->
+                <div class="flex items-center gap-1 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 cursor-default" title="Connection Secured">
+                    <i class="fa-solid fa-shield-halved text-brand"></i>
+                    <span class="hidden sm:inline">AES</span> Secured
+                </div>
+                <span class="hidden sm:block h-3 w-px bg-slate-300 dark:bg-white/10"></span>
+                <!-- Live Clock (Desktop Only) -->
+                <div class="hidden sm:flex items-center gap-1 text-[10px] font-mono font-bold text-slate-500 cursor-default">
+                    <i class="fa-regular fa-clock opacity-60"></i>
+                    <span x-text="currentTime"></span>
+                </div>
+            </div>
+
+           <!-- Right: User Session Badge (Resilient Fix) -->
+            <div class="flex items-center gap-2 z-10 shrink-0">
+                <!-- Added whitespace-nowrap so it NEVER squishes -->
+                <div class="px-2.5 sm:px-3 py-1 rounded-full bg-slate-800 dark:bg-white text-white dark:text-slate-900 shadow-md flex items-center gap-1.5 transition hover:scale-105 cursor-default border border-slate-700 dark:border-white/20 whitespace-nowrap">
+                    <!-- Added shrink-0 to icon -->
+                    <div class="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-brand flex items-center justify-center text-white text-[7px] sm:text-[8px] shadow-sm shrink-0"><i class="fa-solid fa-user"></i></div>
+                    <!-- Removed truncate, added Failsafe JS logic -->
+                    <span class="font-black tracking-wide text-[9px] sm:text-[11px] pr-0.5" x-text="currentUser?.name ? currentUser.name.split(' ')[0] : 'User'">User</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- LOGIC -->
+    <script>
+        // Ensure to keep your real backend URL here
+        const API_URL = "https://script.google.com/macros/s/AKfycbyvIkwSZ5gdIBc_GHbXXMgadnBHU19twANppiq-nK8D3cGb8B6efZLix1Cxe2FPPsqyJw/exec";
+
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('networkSystem', () => ({
+                // ✅ FIX: Added currentUser to fetch name from login session
+                currentUser: JSON.parse(sessionStorage.getItem('userData')) || { name: 'Vikas' },
+                isDark: localStorage.getItem('theme') === 'dark',
+                selectedSwitch: {},
+                loading: false,
+                saving: false,
+                loadingText: 'Initializing...',
+                editModalOpen: false,
+                kpiModalOpen: false,
+                kpiType: 'all',
+                kpiList: [],
+                currentTime: '',
+                currentDate: '',
+                realPortData: {}, 
+                editForm: { num: 0, status: 'empty', desc: '', vlan: '', cable: '' },
+
+                switches: [
+                    { id: 'PBL-NOD-IT-SWT-001', ports: 52, location: 'Server Room Rack#1', model_name: 'D-Link DGS-1210-52', type: 'active' },
+                    { id: 'PBL-NOD-IT-SWT-002', ports: 24, location: 'Outside Server Room', model_name: 'TP-Link TL-SG1024DE', type: 'active' },
+                    { id: 'PBL-NOD-IT-SWT-003', ports: 24, location: 'Admin Dept', model_name: 'D-Link DGS-1024C', type: 'active' },
+                    { id: 'PBL-NOD-IT-SWT-005', ports: 24, location: 'GF- Production', model_name: 'D-Link DGS-1024C', type: 'active' },
+                    { id: 'PBL-NOD-IT-SWT-025', ports: 48, location: 'GF- Production', model_name: 'TP-Link TLSG1048', type: 'active' },
+                    { id: 'PBL-NOD-IT-SWT-006', ports: 8,  location: 'IT Store (Backup)', model_name: 'D-Link DE-809TC', type: 'backup' },
+                    { id: 'PBL-NOD-IT-SWT-007', ports: 24, location: 'FF- Production', model_name: 'D-Link DGS-1024D', type: 'active' }
+                ],
+
+                async init() {
+                    if (this.isDark) document.documentElement.classList.add('dark');
+                    this.selectedSwitch = this.switches[0];
+                    
+                    this.loading = true;
+                    this.loadingText = "Loading Topology...";
+
+                    await Promise.all([
+                        this.refreshData(false),
+                        new Promise(resolve => setTimeout(resolve, 1000)) 
+                    ]);
+
+                    this.loading = false;
+                    
+                    setInterval(() => {
+                        const now = new Date();
+                        this.currentTime = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+                        this.currentDate = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+                    }, 1000);
+                },
+
+                async refreshData(force = false) {
+                    if (force) {
+                        this.loading = true; 
+                        this.loadingText = "Force Syncing...";
+                        localStorage.removeItem('pbl_cloud_data'); 
+                    }
+                    
+                    try {
+                        const cached = localStorage.getItem('pbl_cloud_data');
+                        if (cached && !force) {
+                            this.realPortData = JSON.parse(cached);
+                            fetch(API_URL + '?action=getSwitchData').then(res => res.json()).then(data => {
+                                if(data && Object.keys(data).length > 0) {
+                                    this.realPortData = data; localStorage.setItem('pbl_cloud_data', JSON.stringify(data));
+                                }
+                            });
+                        } else {
+                            const res = await fetch(API_URL + '?action=getSwitchData');
+                            const data = await res.json();
+                            if (data && Object.keys(data).length > 0) {
+                                this.realPortData = data; localStorage.setItem('pbl_cloud_data', JSON.stringify(data)); 
+                            }
+                        }
+                    } catch (e) { 
+                        console.error("Sync Failed", e); 
+                        const cached = localStorage.getItem('pbl_cloud_data'); 
+                        if (cached) this.realPortData = JSON.parse(cached);
+                    } finally { 
+                        if (force) setTimeout(() => { this.loading = false; this.loadingText = ""; }, 500); 
+                    }
+                },
+                
+                toggleTheme() {
+                    this.isDark = !this.isDark;
+                    document.documentElement.classList.toggle('dark', this.isDark);
+                    localStorage.setItem('theme', this.isDark ? 'dark' : 'light');
+                },
+
+                switchSwitch(sw) {
+                    if (this.selectedSwitch.id === sw.id) return;
+                    this.selectedSwitch = sw; 
+                    this.loading = true; 
+                    this.loadingText = "Loading Ports...";
+                    setTimeout(() => { this.loading = false; }, 400);
+                },
+
+                openEditModal(port) {
+                    this.editForm = { num: port.num, status: port.status, desc: port.desc === 'Available' ? '' : port.desc, vlan: port.vlan === '-' ? '' : (port.vlan || port.ip), cable: port.cable === '-' ? '' : port.cable };
+                    this.editModalOpen = true;
+                },
+
+                openKpiModal(type) {
+                    this.kpiType = type;
+                    const allPorts = this.generatePortList();
+                    if (type === 'all') this.kpiList = allPorts;
+                    else this.kpiList = allPorts.filter(p => p.status === type);
+                    this.kpiModalOpen = true;
+                },
+
+                async savePortChanges() {
+                    this.editModalOpen = false; this.saving = true;
+                    const payload = { switchId: this.selectedSwitch.id, portNum: this.editForm.num, status: this.editForm.status, desc: this.editForm.desc, vlan: this.editForm.vlan, cable: this.editForm.cable };
+                    try {
+                        const swId = this.selectedSwitch.id;
+                        if (!this.realPortData[swId]) this.realPortData[swId] = [];
+                        this.realPortData[swId] = this.realPortData[swId].filter(p => p.num !== payload.portNum);
+                        if (payload.status !== 'empty' || payload.desc) { 
+                            this.realPortData[swId].push({ num: payload.portNum, status: payload.status, desc: payload.desc, vlan: payload.vlan, cable: payload.cable }); 
+                        }
+                        localStorage.setItem('pbl_cloud_data', JSON.stringify(this.realPortData));
+                        await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+                    } catch (e) { alert("Check Connection"); } finally { this.saving = false; }
+                },
+
+                generatePortList() {
+                    const currentId = this.selectedSwitch.id;
+                    const total = this.selectedSwitch.ports || 52;
+                    let rawList = [];
+                    const switchData = this.realPortData[currentId] || [];
+                    for (let i = 1; i <= total; i++) { 
+                        const found = switchData.find(p => p.num === i); 
+                        rawList.push(found ? { ...found, vlan: found.vlan || found.ip || '-' } : { num: i, status: 'empty', desc: 'Available', vlan: '', cable: '-' }); 
+                    }
+                    return rawList;
+                },
+
+                getStats() {
+                    const ports = this.generatePortList();
+                    return { 
+                        active: ports.filter(p => p.status === 'active').length, 
+                        uplink: ports.filter(p => p.status === 'uplink').length, 
+                        empty: ports.filter(p => p.status === 'empty').length 
+                    };
+                },
+
+                getTooltipPosition(index, totalPorts) {
+                    const w = window.innerWidth;
+                    let cols = 6; // Mobile Default
+                    if (w >= 1280) cols = 24; // XL Screens
+                    else if (w >= 640) cols = 12; // SM/MD/LG Screens
+                    
+                    const colPos = index % cols; 
+                    
+                    // 1. ALWAYS OPEN UPWARDS
+                    let classes = 'bottom-full mb-2.5 ';
+                    
+                    // 2. EDGE DETECTION (Left & Right)
+                    if (colPos === 0) {
+                        classes += 'left-0'; // Extreme Left edge
+                    } else if (colPos === cols - 1) {
+                        classes += 'right-0'; // Extreme Right edge
+                    } else {
+                        classes += 'left-1/2 -translate-x-1/2'; // Center alignment
+                    }
+                    
+                    return classes;
+                },
+
+                getArrowPosition(index, totalPorts) {
+                    const w = window.innerWidth;
+                    let cols = 6;
+                    if (w >= 1280) cols = 24;
+                    else if (w >= 640) cols = 12;
+                    
+                    const colPos = index % cols; 
+                    
+                    // 1. ALWAYS AT BOTTOM OF TOOLTIP
+                    let classes = '-bottom-1 bg-slate-800 rotate-45 ';
+                    
+                    // 2. ARROW POSITION (Must match tooltip body position)
+                    if (colPos === 0) {
+                        classes += 'left-4'; 
+                    } else if (colPos === cols - 1) {
+                        classes += 'right-4';
+                    } else {
+                        classes += 'left-1/2 -translate-x-1/2'; 
+                    }
+                    
+                    return classes;
+                },
+
+                getPortClass(status) {
+                    if (status === 'uplink') return 'status-uplink';
+                    if (status === 'active') return 'status-up';
+                    return 'status-empty';
+                },
+
+                exportToPDF() {
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF('l', 'mm', 'a4');
+                    doc.setFillColor(59, 130, 246); doc.rect(0, 0, 297, 20, 'F');
+                    doc.setTextColor(255, 255, 255); doc.setFontSize(14); doc.text("PBL Network Report", 14, 13);
+                    doc.setFontSize(10); doc.text("Generated: " + new Date().toLocaleString(), 280, 13, { align: 'right' });
+                    doc.setTextColor(40, 40, 40); doc.setFontSize(12); doc.text(`Switch: ${this.selectedSwitch.id}`, 14, 30);
+                    doc.setFontSize(10); doc.text(`Location: ${this.selectedSwitch.location}`, 14, 36); doc.text(`Model: ${this.selectedSwitch.model_name}`, 14, 42);
+                    const headers = [['Port', 'Status', 'Description', 'IP Address', 'Cable ID']];
+                    const activePorts = this.generatePortList().filter(p => p.status !== 'empty');
+                    const data = activePorts.map(p => [String(p.num).padStart(2, '0'), p.status.toUpperCase(), p.desc, p.vlan || '-', p.cable]);
+                    doc.autoTable({ startY: 50, head: headers, body: data, theme: 'grid', headStyles: { fillColor: [59, 130, 246] }, styles: { fontSize: 8 }, alternateRowStyles: { fillColor: [241, 245, 249] } });
+                    doc.save(`PBL_Switch_${this.selectedSwitch.id}.pdf`);
+                }
+            }))
+        })
+    </script>
+</body>
+</html>
