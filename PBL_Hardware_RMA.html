@@ -474,6 +474,7 @@
     </div>
 
     <!-- SCRIPT -->
+    <!-- SCRIPT -->
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbyvIkwSZ5gdIBc_GHbXXMgadnBHU19twANppiq-nK8D3cGb8B6efZLix1Cxe2FPPsqyJw/exec";
 
@@ -487,8 +488,21 @@
                 deleteId: null, deleteSecret: '',
                 currentTime: '', currentDate: '',
 
+                // 🚀 NEW: Central Haptic Feedback Controller
+                haptic(type = 'light') {
+                    if (!window.navigator || !window.navigator.vibrate) return; // Failsafe for iOS
+                    if (type === 'light') {
+                        navigator.vibrate(15); 
+                    } else if (type === 'success') {
+                        navigator.vibrate([30, 50, 30]); 
+                    } else if (type === 'error' || type === 'delete') {
+                        navigator.vibrate([50, 50, 50, 50]); 
+                    }
+                },
+
                 async init() { 
                     if (this.isDark) document.documentElement.classList.add('dark'); 
+                    document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
                     
                     setInterval(() => {
                         const d = new Date();
@@ -502,7 +516,10 @@
                 },
 
                 async fetchLogs(force = false) {
-                    if (force) this.loading = true;
+                    if (force) {
+                        this.haptic('light'); // 👈 VIBRATE ON SYNC BUTTON
+                        this.loading = true;
+                    }
 
                     try {
                         const cached = localStorage.getItem('pbl_rma_cache');
@@ -530,8 +547,14 @@
                             })).sort((a, b) => new Date(b.date) - new Date(a.date));
 
                             this.logs = mappedLogs; localStorage.setItem('pbl_rma_cache', JSON.stringify(this.logs));
+                            if(force) this.haptic('success'); // 👈 VIBRATE ON SUCCESSFUL SYNC
                         }
-                    } catch (e) { console.error(e); } finally { if (force) setTimeout(() => { this.loading = false; }, 400); }
+                    } catch (e) { 
+                        console.error(e); 
+                        if(force) this.haptic('error'); // 👈 VIBRATE ON SYNC ERROR
+                    } finally { 
+                        if (force) setTimeout(() => { this.loading = false; }, 400); 
+                    }
                 },
 
                 get filteredLogs() {
@@ -541,48 +564,87 @@
                 },
 
                 editLog(log) {
+                    this.haptic('light'); // 👈 VIBRATE ON EDIT CLICK
                     this.form = { id: log.id, date: this.parseDate(log.date), asset: log.asset, serial: log.serial, issue: log.issue, actionTaken: log.action, caseId: log.caseId, resolveDate: this.parseDate(log.resolveDate), status: log.status, secret: '' };
                     this.showModal = true;
                 },
 
-                confirmDelete(log) { this.deleteId = log.id; this.deleteSecret = ''; this.showDeleteModal = true; },
+                confirmDelete(log) { 
+                    this.haptic('delete'); // 👈 VIBRATE WARNING ON DELETE INTENT
+                    this.deleteId = log.id; 
+                    this.deleteSecret = ''; 
+                    this.showDeleteModal = true; 
+                },
 
                 async saveLog() {
-                    if (!this.form.secret || this.form.secret.trim() !== 'PBL2026') { alert("❌ Invalid Admin Key!"); return; }
+                    if (!this.form.secret || this.form.secret.trim() !== 'PBL2026') { 
+                        this.haptic('error'); // 👈 VIBRATE ON WRONG KEY
+                        alert("❌ Invalid Admin Key!"); 
+                        return; 
+                    }
                     this.loading = true;
                     try {
                         const response = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'saveRMA', ...this.form }) });
                         const result = await response.json();
-                        if(result.status === 'error') { alert(result.message); } 
-                        else { this.showModal = false; this.fetchLogs(true); this.resetForm(); }
-                    } catch (e) { alert("Save Failed."); } finally { this.loading = false; }
+                        if(result.status === 'error') { 
+                            this.haptic('error'); // 👈 VIBRATE ON ERROR RESPONSE
+                            alert(result.message); 
+                        } 
+                        else { 
+                            this.haptic('success'); // 👈 VIBRATE ON SAVE SUCCESS
+                            this.showModal = false; 
+                            this.fetchLogs(true); 
+                            this.resetForm(); 
+                        }
+                    } catch (e) { 
+                        this.haptic('error');
+                        alert("Save Failed."); 
+                    } finally { this.loading = false; }
                 },
 
                 async deleteLog() {
-                    if (!this.deleteSecret || this.deleteSecret.trim() !== 'PBL2026') { alert("❌ Invalid Admin Key!"); return; }
+                    if (!this.deleteSecret || this.deleteSecret.trim() !== 'PBL2026') { 
+                        this.haptic('error'); // 👈 VIBRATE ON WRONG KEY
+                        alert("❌ Invalid Admin Key!"); 
+                        return; 
+                    }
                     try {
                         const response = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'deleteRMA', id: this.deleteId, secret: this.deleteSecret }) });
                         const result = await response.json();
-                        if(result.status === 'error') { alert(result.message); } 
-                        else { this.showDeleteModal = false; this.fetchLogs(true); }
-                    } catch (e) { alert("Delete Failed"); }
+                        if(result.status === 'error') { 
+                            this.haptic('error');
+                            alert(result.message); 
+                        } 
+                        else { 
+                            this.haptic('success'); // 👈 VIBRATE ON DELETE SUCCESS
+                            this.showDeleteModal = false; 
+                            this.fetchLogs(true); 
+                        }
+                    } catch (e) { 
+                        this.haptic('error');
+                        alert("Delete Failed"); 
+                    }
                 },
 
-                openModal(mode) { this.resetForm(); this.showModal = true; },
+                openModal(mode) { 
+                    this.haptic('light'); // 👈 VIBRATE ON MODAL OPEN
+                    this.resetForm(); 
+                    this.showModal = true; 
+                },
                 resetForm() { this.form = { id: null, date: new Date().toISOString().split('T')[0], asset: '', serial: '', issue: '', actionTaken: '', caseId: '', resolveDate: '', status: 'Pending', secret: '' }; },
                 parseDate(dateStr) { if(!dateStr || dateStr === 'Pending' || dateStr === 'N/A' || dateStr.includes('1970')) return ''; const d = new Date(dateStr); return isNaN(d.getTime()) ? '' : d.toISOString().split('T')[0]; },
                 formatDisplayDate(dateStr) { if (!dateStr || dateStr === 'Pending' || dateStr === 'N/A') return '-'; if (dateStr.includes('1970') || dateStr.includes('1899')) return 'Pending'; return dateStr.substring(0, 11); },
+                
                 toggleTheme() { 
+                    this.haptic('light'); // 👈 VIBRATE ON THEME TOGGLE
                     this.isDark = !this.isDark; 
                     document.documentElement.classList.toggle('dark', this.isDark); 
                     localStorage.setItem('theme', this.isDark ? 'dark' : 'light'); 
                     
                     // 🚀 DYNAMICALLY CHANGE STATUS BAR COLOR ON CLICK
                     document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
-                    
-                    // (Dashboard file mein chart update wala code yahan wapas paste kar dena agar wo Dashboard hai)
-                    if(this.chartInstance) { this.chartInstance.updateOptions({ theme: { mode: this.isDark ? 'dark' : 'light' } }); }
                 }
+            }))
         });
     </script>
 </body>
