@@ -242,19 +242,24 @@
                 </div>
             </div>
 
-            <!-- Right Actions -->
-            <div class="flex items-center justify-end gap-3 sm:gap-4 w-auto relative">
+            <!-- Right Actions (Optimized for Mobile & Desktop) -->
+            <div class="flex items-center justify-end gap-2 sm:gap-4 w-auto relative">
                 
-                <!-- Live Status Indicator -->
-                <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-500/10 rounded-full border border-emerald-100 dark:border-emerald-500/20 shadow-sm">
+                <!-- Live Status Indicator (Hidden on Mobile) -->
+                <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-500/10 rounded-full border border-emerald-100 dark:border-emerald-500/20 shadow-sm shrink-0">
                     <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
                     <span class="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">System Live</span>
                 </div>
                 
-                <!-- Theme Toggle -->
-                <button @click="toggleTheme()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 transition-all border border-transparent dark:border-slate-700/50">
+                <!-- Theme Toggle (Compact on mobile) -->
+                <button @click="toggleTheme()" class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 transition-all border border-transparent dark:border-slate-700/50 shrink-0">
                     <i class="fa-solid" :class="isDark ? 'fa-sun text-yellow-400' : 'fa-moon'"></i>
                 </button>
+
+                <!-- Back to Hub Button (Square on Mobile, Wide on Desktop) -->
+                <a href="IT_Dashboard.html" class="flex items-center justify-center gap-2 w-9 h-9 sm:w-auto sm:px-4 sm:py-2.5 bg-slate-800 hover:bg-slate-900 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 rounded-xl font-bold text-xs transition-all transform active:scale-95 shadow-[0_5px_15px_-3px_rgba(15,23,42,0.3)] dark:shadow-[0_5px_15px_-3px_rgba(255,255,255,0.2)] shrink-0" title="Back to Hub">
+                    <i class="fa-solid fa-arrow-left"></i> <span class="hidden sm:inline">Hub</span>
+                </a>
             </div>
         </div>
     </header>
@@ -557,7 +562,6 @@
 
         document.addEventListener('alpine:init', () => {
             Alpine.data('networkSystem', () => ({
-                // ✅ FIX: Added currentUser to fetch name from login session
                 currentUser: JSON.parse(sessionStorage.getItem('userData')) || { name: 'Vikas' },
                 isDark: localStorage.getItem('theme') === 'dark',
                 selectedSwitch: {},
@@ -583,6 +587,18 @@
                     { id: 'PBL-NOD-IT-SWT-007', ports: 24, location: 'FF- Production', model_name: 'D-Link DGS-1024D', type: 'active' }
                 ],
 
+                // 🚀 NEW: Central Haptic Feedback Controller
+                haptic(type = 'light') {
+                    if (!window.navigator || !window.navigator.vibrate) return; // Failsafe for iOS
+                    if (type === 'light') {
+                        navigator.vibrate(15); 
+                    } else if (type === 'success') {
+                        navigator.vibrate([30, 50, 30]); 
+                    } else if (type === 'error' || type === 'delete') {
+                        navigator.vibrate([50, 50, 50, 50]); 
+                    }
+                },
+
                 async init() {
                     if (this.isDark) document.documentElement.classList.add('dark');
                     this.selectedSwitch = this.switches[0];
@@ -606,6 +622,7 @@
 
                 async refreshData(force = false) {
                     if (force) {
+                        this.haptic('light'); // 👈 VIBRATE ON SYNC BUTTON CLICK
                         this.loading = true; 
                         this.loadingText = "Force Syncing...";
                         localStorage.removeItem('pbl_cloud_data'); 
@@ -636,19 +653,16 @@
                     }
                 },
                 
-                toggleTheme() { 
-                    this.isDark = !this.isDark; 
-                    document.documentElement.classList.toggle('dark', this.isDark); 
-                    localStorage.setItem('theme', this.isDark ? 'dark' : 'light'); 
-                    
-                    // 🚀 DYNAMICALLY CHANGE STATUS BAR COLOR ON CLICK
+                toggleTheme() {
+                    this.haptic('light'); // 👈 VIBRATE ON THEME TOGGLE
+                    this.isDark = !this.isDark;
+                    document.documentElement.classList.toggle('dark', this.isDark);
+                    localStorage.setItem('theme', this.isDark ? 'dark' : 'light');
                     document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
-                    
-                    // (Dashboard file mein chart update wala code yahan wapas paste kar dena agar wo Dashboard hai)
-                    if(this.chartInstance) { this.chartInstance.updateOptions({ theme: { mode: this.isDark ? 'dark' : 'light' } }); }
                 },
 
                 switchSwitch(sw) {
+                    this.haptic('light'); // 👈 VIBRATE ON SWITCH TAB CLICK
                     if (this.selectedSwitch.id === sw.id) return;
                     this.selectedSwitch = sw; 
                     this.loading = true; 
@@ -657,11 +671,13 @@
                 },
 
                 openEditModal(port) {
+                    this.haptic('light'); // 👈 VIBRATE ON PORT CLICK
                     this.editForm = { num: port.num, status: port.status, desc: port.desc === 'Available' ? '' : port.desc, vlan: port.vlan === '-' ? '' : (port.vlan || port.ip), cable: port.cable === '-' ? '' : port.cable };
                     this.editModalOpen = true;
                 },
 
                 openKpiModal(type) {
+                    this.haptic('light'); // 👈 VIBRATE ON KPI CARD CLICK
                     this.kpiType = type;
                     const allPorts = this.generatePortList();
                     if (type === 'all') this.kpiList = allPorts;
@@ -681,7 +697,11 @@
                         }
                         localStorage.setItem('pbl_cloud_data', JSON.stringify(this.realPortData));
                         await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
-                    } catch (e) { alert("Check Connection"); } finally { this.saving = false; }
+                        this.haptic('success'); // 👈 VIBRATE ON SAVE SUCCESS
+                    } catch (e) { 
+                        this.haptic('error'); // 👈 VIBRATE ON SAVE ERROR
+                        alert("Check Connection"); 
+                    } finally { this.saving = false; }
                 },
 
                 generatePortList() {
@@ -707,25 +727,23 @@
 
                 getTooltipPosition(index, totalPorts) {
                     const w = window.innerWidth;
-                    let cols = 6; // Mobile Default
-                    if (w >= 1280) cols = 24; // XL Screens
-                    else if (w >= 640) cols = 12; // SM/MD/LG Screens
+                    let cols = 6; 
+                    if (w >= 1280) cols = 24; 
+                    else if (w >= 640) cols = 12; 
                     
                     const colPos = index % cols; 
+                    const currentRow = Math.floor(index / cols); 
                     
-                    // 1. ALWAYS OPEN UPWARDS
-                    let classes = 'bottom-full mb-2.5 ';
+                    let xClass = 'left-1/2 -translate-x-1/2'; 
+                    if (colPos <= 1) xClass = 'left-0 translate-x-0'; 
+                    else if (colPos >= cols - 2) xClass = 'right-0 translate-x-0'; 
                     
-                    // 2. EDGE DETECTION (Left & Right)
-                    if (colPos === 0) {
-                        classes += 'left-0'; // Extreme Left edge
-                    } else if (colPos === cols - 1) {
-                        classes += 'right-0'; // Extreme Right edge
-                    } else {
-                        classes += 'left-1/2 -translate-x-1/2'; // Center alignment
+                    let yClass = 'bottom-full mb-2.5'; 
+                    if (currentRow === 0) {
+                        yClass = 'top-full mt-2.5'; 
                     }
                     
-                    return classes;
+                    return `${xClass} ${yClass}`;
                 },
 
                 getArrowPosition(index, totalPorts) {
@@ -735,20 +753,18 @@
                     else if (w >= 640) cols = 12;
                     
                     const colPos = index % cols; 
+                    const currentRow = Math.floor(index / cols);
                     
-                    // 1. ALWAYS AT BOTTOM OF TOOLTIP
-                    let classes = '-bottom-1 bg-slate-800 rotate-45 ';
+                    let arrowPos = 'left-1/2 -translate-x-1/2';
+                    if (colPos <= 1) arrowPos = 'left-4 translate-x-0'; 
+                    else if (colPos >= cols - 2) arrowPos = 'right-4 translate-x-0'; 
                     
-                    // 2. ARROW POSITION (Must match tooltip body position)
-                    if (colPos === 0) {
-                        classes += 'left-4'; 
-                    } else if (colPos === cols - 1) {
-                        classes += 'right-4';
-                    } else {
-                        classes += 'left-1/2 -translate-x-1/2'; 
+                    let pointClass = '-bottom-1 border-b border-r'; 
+                    if (currentRow === 0) {
+                        pointClass = '-top-1 border-t border-l'; 
                     }
                     
-                    return classes;
+                    return `${arrowPos} ${pointClass} rotate-45`;
                 },
 
                 getPortClass(status) {
@@ -758,6 +774,7 @@
                 },
 
                 exportToPDF() {
+                    this.haptic('light'); // 👈 VIBRATE ON EXPORT CLICK
                     const { jsPDF } = window.jspdf;
                     const doc = new jsPDF('l', 'mm', 'a4');
                     doc.setFillColor(59, 130, 246); doc.rect(0, 0, 297, 20, 'F');
@@ -770,6 +787,7 @@
                     const data = activePorts.map(p => [String(p.num).padStart(2, '0'), p.status.toUpperCase(), p.desc, p.vlan || '-', p.cable]);
                     doc.autoTable({ startY: 50, head: headers, body: data, theme: 'grid', headStyles: { fillColor: [59, 130, 246] }, styles: { fontSize: 8 }, alternateRowStyles: { fillColor: [241, 245, 249] } });
                     doc.save(`PBL_Switch_${this.selectedSwitch.id}.pdf`);
+                    setTimeout(() => this.haptic('success'), 500); // 👈 VIBRATE ON EXPORT SUCCESS
                 }
             }))
         })
