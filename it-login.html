@@ -153,6 +153,18 @@
     </button>
 
     <script>
+        // 🚀 NEW: Central Haptic Feedback Controller (Vanilla JS)
+        function haptic(type = 'light') {
+            if (!window.navigator || !window.navigator.vibrate) return; // Failsafe for iOS
+            if (type === 'light') {
+                navigator.vibrate(15); 
+            } else if (type === 'success') {
+                navigator.vibrate([30, 50, 30]); 
+            } else if (type === 'error') {
+                navigator.vibrate([50, 50, 50, 50]); 
+            }
+        }
+
         // --- SALTED BASE64 ENCODING (Works on Local files & HTTPS) ---
         // Reality Check: Added a Salt ('PBL_' and '_2026') to make reverse-engineering harder.
         function encodePassword(password) {
@@ -188,6 +200,7 @@
         applyThemeIcons();
 
         function toggleTheme() {
+            haptic('light'); // 👈 VIBRATE ON THEME TOGGLE
             const isDark = document.documentElement.classList.toggle('dark');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
             applyThemeIcons();
@@ -201,6 +214,7 @@
         setInterval(updateClock, 1000); updateClock();
 
         function togglePassword() {
+            haptic('light'); // 👈 VIBRATE ON PASSWORD EYE CLICK
             const passInput = document.getElementById('password');
             const icon = document.getElementById('eyeIcon');
             if (passInput.type === 'password') { 
@@ -240,6 +254,7 @@
 
                 if (validUser && validUser.expectedHash === inputHash) {
                     // Success Logic
+                    haptic('success'); // 👈 VIBRATE ON SUCCESSFUL LOGIN
                     sessionStorage.setItem('isLoggedIn', 'true');
                     sessionStorage.setItem('userData', JSON.stringify({
                         name: validUser.name, role: validUser.role, empId: validUser.empId, email: validUser.email, location: validUser.location
@@ -254,6 +269,7 @@
                     }, 600);
                 } else {
                     // Error Logic
+                    haptic('error'); // 👈 VIBRATE ON FAILED LOGIN
                     error.classList.remove('hidden');
                     btn.innerHTML = originalText;
                     btn.classList.remove('opacity-80', 'cursor-not-allowed', 'pointer-events-none');
@@ -342,15 +358,14 @@
             else animate();
         });
 		
-		<!-- PWA Service Worker Registration -->
-            if ('serviceWorker' in navigator) {
+        // 🚀 PWA Service Worker Registration (Fixed Comment Syntax)
+        if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js')
                     .then(registration => console.log('ServiceWorker registered with scope:', registration.scope))
                     .catch(error => console.log('ServiceWorker registration failed:', error));
             });
         }
-    	
     </script>
 </body>
 </html>
