@@ -7,7 +7,8 @@
     <link rel="icon" type="image/x-icon" href="Assets/images/pbl-logo.ico">
 	<!-- PWA Setup -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#3b82f6">
+    <!-- ID added, color changed to light default -->
+    <meta name="theme-color" id="meta-theme-color" content="#f1f5f9">
     <link rel="apple-touch-icon" href="app-icon.png">
     
     <!-- Dependencies -->
@@ -173,6 +174,10 @@
             const icon2 = document.getElementById('themeIconMobile');
             if(icon1) icon1.className = isDark ? "fa-solid fa-sun text-yellow-400 text-lg" : "fa-solid fa-moon text-lg";
             if(icon2) icon2.className = isDark ? "fa-solid fa-sun text-yellow-400 text-lg" : "fa-solid fa-moon text-lg";
+            
+            // 🚀 SYNC STATUS BAR WITH THEME
+            const metaTheme = document.getElementById('meta-theme-color');
+            if (metaTheme) metaTheme.setAttribute("content", isDark ? "#020617" : "#f1f5f9");
         }
 
         if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
