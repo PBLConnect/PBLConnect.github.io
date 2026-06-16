@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PBL Connect | Secure Zero-Trust Access</title>
+    <title>IT Dashboard | Secure Zero-Trust Access</title>
     <link rel="icon" type="image/x-icon" href="Assets/images/pbl-logo.ico">
 	<!-- PWA Setup -->
     <link rel="manifest" href="manifest.json">
@@ -92,7 +92,7 @@
                      onerror="this.style.display='none'; document.getElementById('fallback-logo').style.display='flex'">
                 <div id="fallback-logo" style="display:none;" class="w-16 h-16 bg-gradient-to-tr from-brand to-indigo-600 text-white rounded-2xl items-center justify-center font-black text-3xl shadow-[0_0_20px_rgba(59,130,246,0.5)]">P</div>
             </div>
-            <h1 class="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white tracking-tight">PBL<span class="text-brand">Connect</span></h1>
+            <h1 class="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white tracking-tight">IT<span class="text-brand">Dashboard</span></h1>
             <p class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mt-1.5">Secure Operations Portal</p>
         </div>
 
@@ -143,7 +143,7 @@
             <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center justify-center gap-1.5">
                 <i class="fa-solid fa-lock text-[8px]"></i> Encrypted Session
             </p>
-            <p class="text-[9px] font-mono text-slate-400 dark:text-slate-500">v2.6.0 (Secure Mode)</p>
+            <p class="text-[9px] font-mono text-slate-400 dark:text-slate-500">v1.0 (Secure Mode)</p>
         </div>
     </div>
 
@@ -209,7 +209,8 @@
         // --- UI LOGIC ---
         function updateClock() {
             const timeEl = document.getElementById('liveTime');
-            if(timeEl) timeEl.textContent = new Date().toLocaleTimeString('en-US', { hour12: false, hour:'2-digit', minute:'2-digit', second:'2-digit' });
+            // 🚀 FIX: Changed hour12 to true for AM/PM format
+            if(timeEl) timeEl.textContent = new Date().toLocaleTimeString('en-US', { hour12: true, hour:'2-digit', minute:'2-digit', second:'2-digit' });
         }
         setInterval(updateClock, 1000); updateClock();
 
@@ -303,9 +304,10 @@
             constructor() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.vx = (Math.random() - 0.5) * 0.5; // Slower speed
+                this.vx = (Math.random() - 0.5) * 0.5;
                 this.vy = (Math.random() - 0.5) * 0.5;
-                this.size = Math.random() * 1.5 + 0.5;
+                // 🚀 FIX: Increased base particle size
+                this.size = Math.random() * 2 + 1; 
             }
             update() {
                 this.x += this.vx; this.y += this.vy;
@@ -313,7 +315,9 @@
                 if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
             }
             draw() {
-                ctx.fillStyle = document.documentElement.classList.contains('dark') ? "rgba(59, 130, 246, 0.3)" : "rgba(59, 130, 246, 0.2)";
+                const isDark = document.documentElement.classList.contains('dark');
+                // 🚀 FIX: Increased opacity and separated colors for better contrast
+                ctx.fillStyle = isDark ? "rgba(96, 165, 250, 0.8)" : "rgba(37, 99, 235, 0.6)"; 
                 ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
             }
         }
@@ -327,10 +331,11 @@
             for (let i = 0; i < count; i++) { particles.push(new Particle()); }
         }
 
-        function animate() {
+         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             const isDark = document.documentElement.classList.contains('dark');
-            const lineColor = isDark ? "59, 130, 246" : "59, 130, 246"; // Brand blue connections
+            // 🚀 FIX: Sharper colors for lines (Blue-400 for Dark, Blue-600 for Light)
+            const lineColor = isDark ? "96, 165, 250" : "37, 99, 235"; 
             
             for (let i = 0; i < particles.length; i++) {
                 particles[i].update(); particles[i].draw();
@@ -340,8 +345,10 @@
                     const distance = Math.sqrt(dx * dx + dy * dy);
                     if (distance < 120) {
                         ctx.beginPath(); 
-                        ctx.strokeStyle = `rgba(${lineColor}, ${(1 - distance / 120) * 0.3})`;
-                        ctx.lineWidth = 0.5; ctx.moveTo(particles[i].x, particles[i].y);
+                        // 🚀 FIX: Increased line opacity multiplier from 0.3 to 0.7, and lineWidth to 1
+                        ctx.strokeStyle = `rgba(${lineColor}, ${(1 - distance / 120) * 0.7})`;
+                        ctx.lineWidth = 1; 
+                        ctx.moveTo(particles[i].x, particles[i].y);
                         ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
                     }
                 }
