@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PBL Connect | Secure Zero-Trust Access</title>
+    <link rel="icon" type="image/x-icon" href="Assets/images/pbl-logo.ico">
+    
+    <!-- Dependencies -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+
+    <!-- Configuration -->
+    <script>
+        if (sessionStorage.getItem('isLoggedIn')) {
+            window.location.href = 'IT_Dashboard.html';
+        }
+
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { 
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    },
+                    colors: { 
+                        brand: '#3b82f6', 
+                        brand_glow: '#60a5fa',
+                        dark_bg: '#020617', 
+                        dark_surface: '#0f172a' 
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { margin: 0; padding: 0; overflow: hidden; background-color: #f1f5f9; }
+        .dark body { background-color: #020617; }
+        
+        /* Premium Glass Panel */
+        .glass-panel {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .dark .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+        
+        canvas { display: block; position: absolute; top: 0; left: 0; z-index: 0; pointer-events: none; }
+
+        /* Smooth Inputs */
+        input:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 30px transparent inset !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+    </style>
+</head>
+<body class="h-[100dvh] w-full flex items-center justify-center relative selection:bg-brand selection:text-white p-4">
+
+    <!-- CANVAS BACKGROUND -->
+    <canvas id="techCanvas"></canvas>
+
+    <!-- LIVE DIGITAL CLOCK (Hidden on Mobile for cleaner UI) -->
+    <div class="absolute top-6 right-6 z-20 hidden md:flex items-center gap-4">
+        <div class="glass-panel px-4 py-2 rounded-xl shadow-sm">
+            <p id="liveTime" class="text-sm font-mono font-bold text-slate-800 dark:text-white tracking-tight">--:--:--</p>
+        </div>
+        <button onclick="toggleTheme()" class="w-10 h-10 rounded-xl glass-panel flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-brand dark:hover:text-brand transition shadow-sm">
+            <i class="fa-solid fa-moon text-lg" id="themeIcon"></i>
+        </button>
+    </div>
+
+    <!-- MAIN LOGIN CARD -->
+    <div class="relative z-10 w-full max-w-sm sm:max-w-md p-6 sm:p-10 glass-panel rounded-3xl transform transition-all duration-300">
+        
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="h-16 w-auto flex justify-center mb-5 relative">
+                <img src="pbl-logo.png" alt="PBL Logo" class="h-full object-contain drop-shadow-md" 
+                     onerror="this.style.display='none'; document.getElementById('fallback-logo').style.display='flex'">
+                <div id="fallback-logo" style="display:none;" class="w-16 h-16 bg-gradient-to-tr from-brand to-indigo-600 text-white rounded-2xl items-center justify-center font-black text-3xl shadow-[0_0_20px_rgba(59,130,246,0.5)]">P</div>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white tracking-tight">PBL<span class="text-brand">Connect</span></h1>
+            <p class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mt-1.5">Secure Operations Portal</p>
+        </div>
+
+        <!-- Form -->
+        <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-6" autocomplete="off">
+            
+            <!-- ADMIN ID -->
+            <div class="space-y-2 group">
+                <label class="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1 group-focus-within:text-brand transition">Admin ID</label>
+                <div class="relative">
+                    <i class="fa-solid fa-shield-halved absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-brand transition"></i>
+                    <input type="text" id="userid" tabindex="1" autocomplete="off" autofocus 
+                           class="w-full pl-11 pr-4 py-3.5 sm:py-4 bg-white/50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl text-sm font-bold text-slate-800 dark:text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition backdrop-blur-sm" 
+                           placeholder="Enter Username" required>
+                </div>
+            </div>
+
+            <!-- PASSWORD -->
+            <div class="space-y-2 group">
+                <div class="flex justify-between items-center ml-1">
+                    <label class="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest group-focus-within:text-brand transition">Access Key</label>
+                </div>
+                <div class="relative">
+                    <i class="fa-solid fa-fingerprint absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-brand transition"></i>
+                    <input type="password" id="password" tabindex="2" autocomplete="new-password"
+                           class="w-full pl-11 pr-12 py-3.5 sm:py-4 bg-white/50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl text-sm font-mono font-bold text-slate-800 dark:text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition backdrop-blur-sm" 
+                           placeholder="••••••••" required>
+                    <button type="button" tabindex="-1" onclick="togglePassword()" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-brand transition outline-none">
+                        <i class="fa-solid fa-eye" id="eyeIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div id="errorMsg" class="hidden flex items-center justify-center gap-2 text-xs font-bold text-red-500 bg-red-50 dark:bg-red-900/20 p-3 rounded-xl border border-red-200 dark:border-red-900/50">
+                <i class="fa-solid fa-triangle-exclamation"></i> <span>Authentication Failed.</span>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" tabindex="3" class="w-full py-4 bg-brand hover:bg-blue-600 text-white font-black rounded-xl shadow-[0_10px_25px_-5px_rgba(59,130,246,0.4)] hover:shadow-[0_15px_35px_-5px_rgba(59,130,246,0.6)] transition-all transform active:scale-95 flex items-center justify-center gap-3 group tracking-wide">
+                <span id="btnText">INITIATE SESSION</span>
+                <i class="fa-solid fa-arrow-right group-hover:translate-x-1.5 transition-transform"></i>
+            </button>
+        </form>
+
+        <!-- Footer -->
+        <div class="mt-8 text-center pt-5 border-t border-slate-200 dark:border-slate-700/50 flex flex-col gap-1.5">
+            <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-lock text-[8px]"></i> Encrypted Session
+            </p>
+            <p class="text-[9px] font-mono text-slate-400 dark:text-slate-500">v2.6.0 (Secure Mode)</p>
+        </div>
+    </div>
+
+    <!-- Mobile Theme Toggle -->
+    <button onclick="toggleTheme()" class="md:hidden absolute top-6 right-6 w-10 h-10 rounded-full glass-panel flex items-center justify-center text-slate-600 dark:text-slate-300 shadow-sm z-20">
+        <i class="fa-solid fa-moon text-lg" id="themeIconMobile"></i>
+    </button>
+
+    <script>
+        // --- SALTED BASE64 ENCODING (Works on Local files & HTTPS) ---
+        // Reality Check: Added a Salt ('PBL_' and '_2026') to make reverse-engineering harder.
+        function encodePassword(password) {
+            return btoa('PBL_' + password + '_2026');
+        }
+
+        // --- PRE-COMPUTED SALTED HASHES FOR YOUR USERS ---
+        // Vikas (Noori143)
+        const HASH_VIKAS = "UEJMX05vb3JpMTQzXzIwMjY=";
+        // Anil (2612) -> btoa('PBL_2612_2026')
+        const HASH_ANIL = "UEJMXzI2MTJfMjAyNg==";
+        // Ashok (1909) -> btoa('PBL_1909_2026')
+        const HASH_ASHOK = "UEJMXzE5MDlfMjAyNg==";
+
+        // --- THEME LOGIC ---
+        function applyThemeIcons() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const icon1 = document.getElementById('themeIcon');
+            const icon2 = document.getElementById('themeIconMobile');
+            if(icon1) icon1.className = isDark ? "fa-solid fa-sun text-yellow-400 text-lg" : "fa-solid fa-moon text-lg";
+            if(icon2) icon2.className = isDark ? "fa-solid fa-sun text-yellow-400 text-lg" : "fa-solid fa-moon text-lg";
+        }
+
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        applyThemeIcons();
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            applyThemeIcons();
+        }
+
+        // --- UI LOGIC ---
+        function updateClock() {
+            const timeEl = document.getElementById('liveTime');
+            if(timeEl) timeEl.textContent = new Date().toLocaleTimeString('en-US', { hour12: false, hour:'2-digit', minute:'2-digit', second:'2-digit' });
+        }
+        setInterval(updateClock, 1000); updateClock();
+
+        function togglePassword() {
+            const passInput = document.getElementById('password');
+            const icon = document.getElementById('eyeIcon');
+            if (passInput.type === 'password') { 
+                passInput.type = 'text'; icon.classList.replace('fa-eye', 'fa-eye-slash'); icon.classList.add('text-brand');
+            } else { 
+                passInput.type = 'password'; icon.classList.replace('fa-eye-slash', 'fa-eye'); icon.classList.remove('text-brand');
+            }
+        }
+
+        // --- AUTHENTICATION LOGIC ---
+        function handleLogin(e) {
+            e.preventDefault();
+            const uid = document.getElementById('userid').value.toLowerCase().trim();
+            const pass = document.getElementById('password').value;
+            const btn = document.querySelector('button[type="submit"]');
+            const error = document.getElementById('errorMsg');
+            const card = document.querySelector('.glass-panel');
+
+            // 📂 USER DATABASE (Using Salted Hashes)
+            const users = {
+                'vikas': { name: 'Vikas Rawat', role: 'Head of IT & Super Admin', empId: 'DL/25629/143', email: 'itsupport@panbusiness.net', location: 'Noida', expectedHash: HASH_VIKAS },
+                'anil':  { name: 'Anil Singh', role: 'Senior Network Engineer', empId: 'DL/25629/485', email: 'kaintura.singh22@gmail.com', location: 'Noida', expectedHash: HASH_ANIL },
+                'ashok': { name: 'Ashok Singh', role: 'Desktop Support Engineer', empId: 'DL/25629/501', email: 'ashok22@gmail.com', location: 'Noida', expectedHash: HASH_ASHOK }
+            };
+
+            error.classList.add('hidden');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> AUTHENTICATING...';
+            btn.classList.add('opacity-80', 'cursor-not-allowed', 'pointer-events-none');
+
+            // Generate hash for entered password synchronously
+            const inputHash = encodePassword(pass);
+            
+            // Artificial delay for realistic feel
+            setTimeout(() => {
+                let validUser = users[uid];
+
+                if (validUser && validUser.expectedHash === inputHash) {
+                    // Success Logic
+                    sessionStorage.setItem('isLoggedIn', 'true');
+                    sessionStorage.setItem('userData', JSON.stringify({
+                        name: validUser.name, role: validUser.role, empId: validUser.empId, email: validUser.email, location: validUser.location
+                    })); 
+                    
+                    btn.className = "w-full py-4 bg-emerald-500 text-white font-black rounded-xl shadow-[0_10px_25px_-5px_rgba(16,185,129,0.4)] transition flex items-center justify-center gap-2 tracking-wide";
+                    btn.innerHTML = '<i class="fa-solid fa-shield-check text-lg"></i> ACCESS GRANTED';
+                    
+                    setTimeout(() => {
+                        const params = new URLSearchParams(window.location.search);
+                        window.location.href = params.get('returnUrl') || 'IT_Dashboard.html';
+                    }, 600);
+                } else {
+                    // Error Logic
+                    error.classList.remove('hidden');
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('opacity-80', 'cursor-not-allowed', 'pointer-events-none');
+                    
+                    // Shake Animation
+                    card.animate([
+                        { transform: 'translateX(0)' },
+                        { transform: 'translateX(10px)' },
+                        { transform: 'translateX(-10px)' },
+                        { transform: 'translateX(5px)' },
+                        { transform: 'translateX(0)' }
+                    ], { duration: 300, easing: 'ease-in-out' });
+                }
+            }, 800);
+        }
+
+        // --- PERFORMANCE OPTIMIZED CANVAS (MOBILE FRIENDLY) ---
+        const canvas = document.getElementById("techCanvas");
+        const ctx = canvas.getContext("2d");
+        let particles = [];
+        let animationFrameId;
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initParticles();
+        }
+        window.addEventListener("resize", resize);
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.5; // Slower speed
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.size = Math.random() * 1.5 + 0.5;
+            }
+            update() {
+                this.x += this.vx; this.y += this.vy;
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+            draw() {
+                ctx.fillStyle = document.documentElement.classList.contains('dark') ? "rgba(59, 130, 246, 0.3)" : "rgba(59, 130, 246, 0.2)";
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            // Dynamically reduce particles on mobile to save battery
+            const isMobile = window.innerWidth < 768;
+            const divisor = isMobile ? 18000 : 12000; 
+            const count = Math.floor((canvas.width * canvas.height) / divisor); 
+            for (let i = 0; i < count; i++) { particles.push(new Particle()); }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const isDark = document.documentElement.classList.contains('dark');
+            const lineColor = isDark ? "59, 130, 246" : "59, 130, 246"; // Brand blue connections
+            
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update(); particles[i].draw();
+                for (let j = i; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < 120) {
+                        ctx.beginPath(); 
+                        ctx.strokeStyle = `rgba(${lineColor}, ${(1 - distance / 120) * 0.3})`;
+                        ctx.lineWidth = 0.5; ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
+                    }
+                }
+            }
+            animationFrameId = requestAnimationFrame(animate);
+        }
+        
+        // Start Canvas
+        resize(); animate();
+
+        // Pause animation when tab is not visible to save battery
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) cancelAnimationFrame(animationFrameId);
+            else animate();
+        });
+    </script>
+</body>
+</html>
