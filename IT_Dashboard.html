@@ -146,15 +146,36 @@
                 </div>
             </div>
 
-            <!-- Center: Floating HUD Clock (Hidden on Mobile) -->
-            <div class="hidden xl:flex items-center absolute left-1/2 transform -translate-x-1/2">
-                <div class="bg-white/40 dark:bg-black/20 backdrop-blur-md px-5 py-2 rounded-2xl border border-slate-200/50 dark:border-white/5 flex items-center gap-6 shadow-[0_4px_20px_-5px_rgba(0,0,0,0.05)]">
-                    <div class="flex items-center gap-2 text-sm font-mono font-bold text-slate-800 dark:text-white border-r border-slate-300 dark:border-white/10 pr-6">
-                        <i class="fa-regular fa-clock text-brand animate-pulse"></i> <span x-text="currentTime">--:--:--</span>
+            <!-- Center: Dynamic Shift HUD (Hidden on Mobile) -->
+            <div class="hidden xl:flex items-center absolute left-1/2 transform -translate-x-1/2 z-20">
+                <div class="bg-white/80 dark:bg-dark_surface/90 backdrop-blur-xl px-4 py-1.5 rounded-2xl border border-slate-200 dark:border-white/10 flex items-center gap-4 shadow-sm transition-all hover:shadow-md">
+                    
+                    <!-- Time & Date -->
+                    <div class="flex items-center gap-3">
+                        <!-- Fixed width to stop jiggling when seconds change -->
+                        <div class="flex items-center gap-1.5 text-[13px] font-mono font-black text-slate-800 dark:text-white w-28">
+                            <i class="fa-regular fa-clock text-brand animate-pulse"></i> <span x-text="currentTime"></span>
+                        </div>
+                        <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-md border border-slate-200 dark:border-white/5">
+                            <span x-text="currentDate"></span>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-2 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-                        <span x-text="currentDate">-- --- ----</span>
+
+                    <div class="w-px h-6 bg-slate-200 dark:bg-white/10"></div>
+
+                    <!-- Live Shift Information -->
+                    <div class="flex items-center gap-3">
+                        <div class="flex flex-col text-left">
+                            <span class="text-[8px] font-black text-brand uppercase tracking-widest leading-none mb-1" x-text="myShiftInfo.name"></span>
+                            <span class="text-[10px] font-mono font-bold text-slate-600 dark:text-slate-300 leading-none" x-text="myShiftInfo.time"></span>
+                        </div>
+                        <!-- Live Countdown Badge -->
+                        <div class="px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border shadow-sm w-20 text-center"
+                             :class="myShiftInfo.isOver ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-500/10' : 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10'">
+                            <span x-text="myShiftInfo.timeLeft"></span>
+                        </div>
                     </div>
+
                 </div>
             </div>
 
@@ -676,12 +697,17 @@
                             </div>
                         </div>
 
-                        <div class="text-right">
-                            <span class="text-[10px] font-mono font-bold px-3 py-1.5 rounded-lg border shadow-sm inline-block mb-1"
-                                  :class="isStaffOnline(staff) ? 'bg-white dark:bg-black/20 text-emerald-600 border-emerald-100 dark:text-emerald-400 dark:border-emerald-900/50' : 'bg-slate-50 dark:bg-white/5 text-slate-400 border-slate-100 dark:border-white/5'">
+                        <div class="text-right flex flex-col items-end">
+                            <!-- Upper Right: Shift Name & Timing -->
+                            <span class="text-[10px] font-mono font-bold px-2.5 py-1.5 rounded-lg border shadow-sm text-center mb-1.5"
+                                  :class="isStaffOnline(staff) ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800/50' : 'bg-slate-50 text-slate-500 border-slate-200 dark:bg-white/5 dark:text-slate-400 dark:border-white/10'">
+                                <!-- Shift Name dynamically injected -->
+                                <span class="block text-[7px] sm:text-[8px] uppercase tracking-widest opacity-80 mb-0.5" x-text="staff.shift"></span>
                                 <span x-text="formatTimeAMPM(staff.start)"></span> - <span x-text="formatTimeAMPM(staff.end)"></span>
                             </span>
-                            <div class="flex items-center justify-end gap-1.5">
+                            <!-- Active Status -->
+                            <div class="flex items-center justify-end gap-1">
+                                <i x-show="isStaffOnline(staff)" class="fa-solid fa-circle text-[6px] text-emerald-500 animate-pulse"></i>
                                 <p class="text-[9px] font-black uppercase tracking-widest" 
                                    :class="isStaffOnline(staff) ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'">
                                     <span x-text="isStaffOnline(staff) ? 'Active Now' : 'Offline'"></span>
@@ -754,45 +780,106 @@
         </div>
     </div>
 
+    <!-- SCRIPT -->
     <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbyvIkwSZ5gdIBc_GHbXXMgadnBHU19twANppiq-nK8D3cGb8B6efZLix1Cxe2FPPsqyJw/exec";
 
     document.addEventListener('alpine:init', () => {
         Alpine.data('dashboard', () => ({
             isDark: localStorage.getItem('theme') === 'dark',
+            
+            // 🚀 FIX: Failsafe settings parsing (Ignores corrupted cache)
+            settings: (() => {
+                try { return JSON.parse(localStorage.getItem('pbl_settings')) || { notifications: true, animations: true }; } 
+                catch(e) { return { notifications: true, animations: true }; }
+            })(),
+            
             showNotifs: false, showProfile: false, highlightLog: false,
             showLogoutModal: false, showProfileModal: false, showSettingsModal: false, 
             showGuide: false, showStaffModal: false, showOpenTicketsModal: false,
             loading: true, tickets: [],
             stats: { total: 0, open: 0, resolved: 0 },
             currentTime: '', currentDate: '',
-            currentUser: JSON.parse(sessionStorage.getItem('userData')) || { name: 'Guest', role: 'Viewer', empId: '-', email: '-', location: 'Noida' },
+            
+            currentUser: (() => {
+                try { return JSON.parse(sessionStorage.getItem('userData')) || { name: 'Guest', role: 'Viewer', empId: '-', email: '-', location: 'Noida' }; } 
+                catch(e) { return { name: 'Guest', role: 'Viewer', empId: '-', email: '-', location: 'Noida' }; }
+            })(),
+            
             staffData: [
-                { name: 'Vikas Rawat', role: 'Head of IT', start: '09:30', end: '17:30', avatar: 'VR', color: 'bg-indigo-500' },
-                { name: 'Anil Singh', role: 'Sr. Network Eng.', start: '08:00', end: '15:45', avatar: 'AS', color: 'bg-blue-500' },
-                { name: 'Ashok Singh', role: 'Desktop Support', start: '14:15', end: '21:30', avatar: 'Ak', color: 'bg-emerald-500' }
+                { name: 'Vikas Rawat', role: 'Head of IT', shift: 'General Shift', start: '09:30', end: '17:30', avatar: 'VR', color: 'bg-indigo-500' },
+                { name: 'Anil Singh', role: 'Sr. Network Eng.', shift: 'Morning Shift', start: '08:00', end: '15:45', avatar: 'AS', color: 'bg-blue-500' },
+                { name: 'Ashok Singh', role: 'Desktop Support', shift: 'Evening Shift', start: '14:15', end: '21:30', avatar: 'AS', color: 'bg-emerald-500' }
             ],
 
-            // 🚀 NEW: Central Haptic Feedback Controller
+            // 🚀 Central Haptic Feedback Controller
             haptic(type = 'light') {
-                if (!window.navigator || !window.navigator.vibrate) return; // Failsafe for iOS
-                if (type === 'light') {
-                    navigator.vibrate(15); 
-                } else if (type === 'success') {
-                    navigator.vibrate([30, 50, 30]); 
-                } else if (type === 'error' || type === 'delete') {
-                    navigator.vibrate([50, 50, 50, 50]); 
-                }
+                if (!window.navigator || !window.navigator.vibrate) return; 
+                if (type === 'light') navigator.vibrate(15); 
+                else if (type === 'success') navigator.vibrate([30, 50, 30]); 
+                else if (type === 'error' || type === 'delete') navigator.vibrate([50, 50, 50, 50]); 
             },
 
-            get openTickets() { return this.tickets ? this.tickets.filter(t => t.status === 'Open').sort((a, b) => new Date(a.date) - new Date(b.date)) : []; },
+            // 🚀 Robust Array checks to prevent crash
+            get openTickets() { 
+                if (!Array.isArray(this.tickets)) return [];
+                return this.tickets.filter(t => t.status === 'Open').sort((a, b) => new Date(a.date) - new Date(b.date)); 
+            },
             get openTicketCount() { return this.openTickets.length; },
             get notifications() { return this.openTickets; },
             get userInitials() { return this.currentUser.name ? this.currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase() : '??'; },
             get onlineStaffCount() { return this.staffData.filter(s => this.isStaffOnline(s)).length; },
 
+            formatTimeAMPM(timeStr) {
+                if (!timeStr) return '-';
+                let [hours, minutes] = timeStr.split(':');
+                hours = parseInt(hours);
+                let ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12 || 12; 
+                return `${String(hours).padStart(2,'0')}:${minutes} ${ampm}`;
+            },
+
+            get myShiftInfo() {
+                let tick = this.currentTime; 
+                const myName = this.currentUser?.name || '';
+                const shiftInfo = this.staffData.find(s => s.name.includes(myName.split(' ')[0]));
+                
+                if(!shiftInfo) return { name: 'Unknown Shift', time: '--:-- to --:--', timeLeft: 'N/A', isOver: true };
+
+                const now = new Date();
+                const [eH, eM] = shiftInfo.end.split(':').map(Number);
+                const [sH, sM] = shiftInfo.start.split(':').map(Number);
+
+                const end = new Date(now); end.setHours(eH, eM, 0, 0);
+                const start = new Date(now); start.setHours(sH, sM, 0, 0);
+
+                let diff = end - now;
+                let statusStr = ""; let isOver = false;
+
+                if (now > end) { statusStr = "OVER"; isOver = true; } 
+                else if (now < start) {
+                    let startDiff = start - now;
+                    const h = Math.floor(startDiff / 3600000);
+                    const m = Math.floor((startDiff % 3600000) / 60000);
+                    statusStr = h > 0 ? `IN ${h}H ${m}M` : `IN ${m}M`;
+                    isOver = true; 
+                } else {
+                    const h = Math.floor(diff / 3600000);
+                    const m = Math.floor((diff % 3600000) / 60000);
+                    statusStr = `${h}H ${m}M LEFT`;
+                }
+
+                return { name: shiftInfo.shift, time: this.formatTimeAMPM(shiftInfo.start) + ' - ' + this.formatTimeAMPM(shiftInfo.end), timeLeft: statusStr, isOver: isOver };
+            },
+
+            toggleSettings(key) {
+                this.haptic('light');
+                this.settings[key] = !this.settings[key];
+                localStorage.setItem('pbl_settings', JSON.stringify(this.settings));
+            },
+
             closeAllModals() {
-                this.haptic('light'); // 👈 VIBRATE
+                this.haptic('light'); 
                 this.showLogoutModal = false; this.showProfileModal = false; this.showSettingsModal = false; 
                 this.showGuide = false; this.showStaffModal = false; this.showOpenTicketsModal = false;
                 this.showNotifs = false; this.showProfile = false;
@@ -810,7 +897,7 @@
             performLogout() { this.haptic('success'); sessionStorage.clear(); window.location.href = 'it-login.html'; },
 
             scrollToLog() { 
-                this.haptic('light'); // 👈 VIBRATE
+                this.haptic('light'); 
                 this.showNotifs = false; const el = document.getElementById('complaintLogBox'); 
                 if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); this.highlightLog = true; setTimeout(() => this.highlightLog = false, 2000); } 
             },
@@ -824,26 +911,26 @@
                 this.fetchTickets();
                 setInterval(() => {
                     const now = new Date();
-                    this.currentTime = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
-                    this.currentDate = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+                    this.currentTime = now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    this.currentDate = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
                 }, 1000);
                 setInterval(() => this.fetchTickets(), 300000); 
             },
 
             async fetchTickets(force = false) {
-                if(force) {
-                    this.haptic('light'); // 👈 VIBRATE ON SYNC BTN CLICK
-                    this.loading = true;
-                }
-                const cachedData = localStorage.getItem('pbl_tickets_cache');
-                if (cachedData && !force) {
-                    this.tickets = JSON.parse(cachedData);
-                    this.updateKPIs();
-                    setTimeout(() => this.renderChart(), 50); 
-                    this.loading = false;
-                }
-
+                if(force) { this.haptic('light'); this.loading = true; }
+                
                 try {
+                    // 🚀 Moved cache logic inside TRY block so errors don't stop execution!
+                    const cachedData = localStorage.getItem('pbl_tickets_cache');
+                    if (cachedData && !force) {
+                        this.tickets = JSON.parse(cachedData);
+                        if(!Array.isArray(this.tickets)) this.tickets = []; // Fallback
+                        this.updateKPIs();
+                        setTimeout(() => this.renderChart(), 50); 
+                        this.loading = false; // Turn off loader instantly
+                    }
+
                     const res = await fetch(API_URL + '?action=getTickets');
                     const data = await res.json();
                     const freshTickets = (data.tickets || []).map(t => ({
@@ -854,20 +941,24 @@
 
                     if (JSON.stringify(this.tickets) !== JSON.stringify(freshTickets)) {
                         this.tickets = freshTickets;
-                        this.updateKPIs(); this.renderChart();
+                        this.updateKPIs(); 
+                        this.renderChart();
                         localStorage.setItem('pbl_tickets_cache', JSON.stringify(this.tickets));
-                        if(force) this.haptic('success'); // 👈 VIBRATE ON DATA ARRIVAL
+                        if(force) this.haptic('success'); 
                     } else {
-                        if(force) this.haptic('success'); // Also vibrate if same data but checked successfully
+                        if(force) this.haptic('success'); 
                     }
                 } catch (e) { 
                     console.error("Error fetching tickets:", e); 
-                    if(force) this.haptic('error'); // 👈 VIBRATE ON ERROR
-                } finally { this.loading = false; }
+                    if(force) this.haptic('error'); 
+                    if(!Array.isArray(this.tickets)) this.tickets = []; 
+                } finally { 
+                    this.loading = false; // Always clear loader!
+                }
             },
 
             updateKPIs() {
-                if(!this.tickets) return;
+                if(!Array.isArray(this.tickets)) return;
                 this.stats.total = this.tickets.length;
                 this.stats.open = this.tickets.filter(t => t.status === 'Open').length;
                 this.stats.resolved = this.tickets.filter(t => t.status === 'Resolved').length;
@@ -877,11 +968,11 @@
                 const chartEl = document.querySelector("#analyticsChart");
                 if (!chartEl) return;
 
-                let filteredData = this.tickets || [];
+                let filteredData = Array.isArray(this.tickets) ? this.tickets : [];
                 if (this.chartConfig.time === 'month') {
                     const now = new Date();
-                    filteredData = this.tickets.filter(t => {
-                        if (!t.date) return false; const d = new Date(t.date);
+                    filteredData = filteredData.filter(t => {
+                        if (!t.date || t.date === '-') return false; const d = new Date(t.date);
                         return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
                     });
                 }
@@ -935,7 +1026,7 @@
             formatDisplayDate(dateStr) { return dateStr ? dateStr.substring(0, 11) : 'N/A'; },
             
             toggleTheme() { 
-                this.haptic('light'); // 👈 VIBRATE ON THEME TOGGLE
+                this.haptic('light'); 
                 this.isDark = !this.isDark; 
                 document.documentElement.classList.toggle('dark', this.isDark); 
                 localStorage.setItem('theme', this.isDark ? 'dark' : 'light'); 
