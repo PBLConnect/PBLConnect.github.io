@@ -594,6 +594,7 @@
     </div>
 
     <!-- SCRIPT -->
+    <!-- SCRIPT -->
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbyvIkwSZ5gdIBc_GHbXXMgadnBHU19twANppiq-nK8D3cGb8B6efZLix1Cxe2FPPsqyJw/exec";
 
@@ -602,16 +603,34 @@
                 isDark: localStorage.getItem('theme') === 'dark',
                 loading: false, logs: [], showModal: false, showDeleteModal: false,
                 currentDate: '', currentTime: '', activeFilter: null,
-                form: { id: null, isp: 'Airtel Leased Line (10Mbps)', type: 'Downtime', date: '', start: '', end: '', duration: '', remarks: '', status: 'Resolved', secret: '' },
+                form: { id: null, isp: 'Airtel Leased Line (15Mbps)', type: 'Downtime', date: '', start: '', end: '', duration: '', remarks: '', status: 'Resolved', secret: '' },
                 deleteId: null, deleteSecret: '',
                 currentUser: JSON.parse(sessionStorage.getItem('userData')) || { name: 'Vikas Rawat' },
 
-                filterBy(ispKeyword) { this.activeFilter = (this.activeFilter === ispKeyword) ? null : ispKeyword; },
+                // 🚀 NEW: Central Haptic Feedback Controller
+                haptic(type = 'light') {
+                    if (!window.navigator || !window.navigator.vibrate) return; // Failsafe for iOS
+                    if (type === 'light') {
+                        navigator.vibrate(15); 
+                    } else if (type === 'success') {
+                        navigator.vibrate([30, 50, 30]); 
+                    } else if (type === 'error' || type === 'delete') {
+                        navigator.vibrate([50, 50, 50, 50]); 
+                    }
+                },
+
+                filterBy(ispKeyword) { 
+                    this.haptic('light'); // 👈 VIBRATE ON FILTER CLICK
+                    this.activeFilter = (this.activeFilter === ispKeyword) ? null : ispKeyword; 
+                },
+                
                 get filteredList() { return !this.activeFilter ? this.logs : this.logs.filter(log => log.isp.toLowerCase().includes(this.activeFilter.toLowerCase())); },
+                
                 getBadgeClass() { return this.activeFilter === 'Airtel Leased Line' ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:border-rose-500/30 dark:text-rose-400' : (this.activeFilter === 'STPI Leased Line' ? 'bg-sky-50 text-sky-600 border-sky-200 dark:bg-sky-500/10 dark:border-sky-500/30 dark:text-sky-400' : (this.activeFilter === 'Airtel Broadband' ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/30 dark:text-emerald-400' : 'bg-slate-100 text-slate-600')); },
 
                 async init() {
                     if (this.isDark) document.documentElement.classList.add('dark');
+                    document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
                     
                     const now = new Date();
                     this.form.date = now.toISOString().split('T')[0];
@@ -628,7 +647,10 @@
                 },
 
                 async fetchLogs(force = false) {
-                    if (force) this.loading = true;
+                    if (force) {
+                        this.haptic('light'); // 👈 VIBRATE ON SYNC BUTTON
+                        this.loading = true;
+                    }
 
                     try {
                         const cached = localStorage.getItem('pbl_wan_cache');
@@ -645,16 +667,28 @@
                             const data = await res.json();
                             this.logs = data.logs || [];
                             localStorage.setItem('pbl_wan_cache', JSON.stringify(this.logs));
+                            if (force) this.haptic('success'); // 👈 VIBRATE ON SYNC SUCCESS
                         }
-                    } catch (e) { console.error("Network Error", e); } finally { if (force) setTimeout(() => { this.loading = false; }, 400); }
+                    } catch (e) { 
+                        console.error("Network Error", e); 
+                        if (force) this.haptic('error'); // 👈 VIBRATE ON SYNC ERROR
+                    } finally { 
+                        if (force) setTimeout(() => { this.loading = false; }, 400); 
+                    }
                 },
 
                 editLog(log) {
+                    this.haptic('light'); // 👈 VIBRATE ON EDIT CLICK
                     this.form = { id: log.id, isp: log.isp, type: log.type, date: this.parseDateForInput(log.date), start: log.start, end: log.end, duration: log.duration, remarks: log.remarks, status: log.status, secret: '' };
                     this.showModal = true;
                 },
 
-                confirmDelete(id) { this.deleteId = id; this.deleteSecret = ''; this.showDeleteModal = true; },
+                confirmDelete(id) { 
+                    this.haptic('delete'); // 👈 VIBRATE WARNING ON DELETE INTENT
+                    this.deleteId = id; 
+                    this.deleteSecret = ''; 
+                    this.showDeleteModal = true; 
+                },
 
                 calculateDuration() {
                     if (this.form.start && this.form.end) {
@@ -665,20 +699,50 @@
                 },
 
                 async saveLog() {
-                    if (!this.form.secret || this.form.secret.trim() !== 'PBL2026') { alert("❌ Invalid Admin Key!"); return; }
+                    if (!this.form.secret || this.form.secret.trim() !== 'PBL2026') { 
+                        this.haptic('error'); // 👈 VIBRATE ON INVALID PASSWORD
+                        alert("❌ Invalid Admin Key!"); 
+                        return; 
+                    }
                     this.loading = true;
-                    try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'saveWAN', ...this.form }) }); this.showModal = false; this.fetchLogs(true); this.resetForm(); } 
-                    catch (e) { alert("Save Failed"); } finally { this.loading = false; }
+                    try { 
+                        await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'saveWAN', ...this.form }) }); 
+                        this.haptic('success'); // 👈 VIBRATE ON SUCCESS
+                        this.showModal = false; 
+                        this.fetchLogs(true); 
+                        this.resetForm(); 
+                    } 
+                    catch (e) { 
+                        this.haptic('error'); // 👈 VIBRATE ON ERROR
+                        alert("Save Failed"); 
+                    } finally { this.loading = false; }
                 },
 
                 async deleteLog() {
-                    if (!this.deleteSecret || this.deleteSecret.trim() !== 'PBL2026') { alert("❌ Invalid Admin Key!"); return; }
-                    try { await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'deleteWAN', id: this.deleteId, secret: this.deleteSecret }) }); this.showDeleteModal = false; this.fetchLogs(true); } 
-                    catch (e) { alert("Delete Failed"); }
+                    if (!this.deleteSecret || this.deleteSecret.trim() !== 'PBL2026') { 
+                        this.haptic('error'); // 👈 VIBRATE ON INVALID PASSWORD
+                        alert("❌ Invalid Admin Key!"); 
+                        return; 
+                    }
+                    try { 
+                        await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'deleteWAN', id: this.deleteId, secret: this.deleteSecret }) }); 
+                        this.haptic('success'); // 👈 VIBRATE ON SUCCESS
+                        this.showDeleteModal = false; 
+                        this.fetchLogs(true); 
+                    } 
+                    catch (e) { 
+                        this.haptic('error'); // 👈 VIBRATE ON ERROR
+                        alert("Delete Failed"); 
+                    }
                 },
 
-                openModal(mode) { this.resetForm(); this.showModal = true; },
-                resetForm() { this.form = { id: null, isp: 'Airtel Leased Line (10Mbps)', type: 'Downtime', date: new Date().toISOString().split('T')[0], start: '', end: '', duration: '', remarks: '', status: 'Resolved', secret: '' }; },
+                openModal(mode) { 
+                    this.haptic('light'); // 👈 VIBRATE ON MODAL OPEN
+                    this.resetForm(); 
+                    this.showModal = true; 
+                },
+                
+                resetForm() { this.form = { id: null, isp: 'Airtel Leased Line (15Mbps)', type: 'Downtime', date: new Date().toISOString().split('T')[0], start: '', end: '', duration: '', remarks: '', status: 'Resolved', secret: '' }; },
                 
                 getISPColor(isp) { if (!isp) return 'text-slate-500'; if (isp.toLowerCase().includes('airtel') && isp.toLowerCase().includes('lease')) return 'text-airtel dark:text-rose-400'; if (isp.toLowerCase().includes('stpi')) return 'text-stpi dark:text-sky-400'; if (isp.toLowerCase().includes('broadband')) return 'text-broadband dark:text-emerald-400'; return 'text-slate-500 font-medium'; },
                 
@@ -695,16 +759,13 @@
                 parseDateForInput(dateStr) { if(!dateStr || dateStr === 'N/A') return ''; const date = new Date(dateStr); if(isNaN(date.getTime())) return ''; return date.toISOString().split('T')[0]; },
                 
                 toggleTheme() { 
+                    this.haptic('light'); // 👈 VIBRATE ON THEME TOGGLE
                     this.isDark = !this.isDark; 
                     document.documentElement.classList.toggle('dark', this.isDark); 
                     localStorage.setItem('theme', this.isDark ? 'dark' : 'light'); 
-                    
-                    // 🚀 DYNAMICALLY CHANGE STATUS BAR COLOR ON CLICK
                     document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
-                    
-                    // (Dashboard file mein chart update wala code yahan wapas paste kar dena agar wo Dashboard hai)
-                    if(this.chartInstance) { this.chartInstance.updateOptions({ theme: { mode: this.isDark ? 'dark' : 'light' } }); }
                 }
+            }))
         })
     </script>
 </body>
