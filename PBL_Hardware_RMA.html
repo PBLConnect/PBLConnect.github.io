@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PBL Hardware Warranty | RMA Tracker v1.0</title>
 	<link rel="icon" type="image/x-icon" href="Assets/images/pbl-logo.ico">
+<!-- PWA Setup -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" id="meta-theme-color" content="#f1f5f9">
+    <link rel="apple-touch-icon" href="app-icon.png">
     
     <!-- SECURITY CHECK -->
     <script>
@@ -568,8 +572,17 @@
                 resetForm() { this.form = { id: null, date: new Date().toISOString().split('T')[0], asset: '', serial: '', issue: '', actionTaken: '', caseId: '', resolveDate: '', status: 'Pending', secret: '' }; },
                 parseDate(dateStr) { if(!dateStr || dateStr === 'Pending' || dateStr === 'N/A' || dateStr.includes('1970')) return ''; const d = new Date(dateStr); return isNaN(d.getTime()) ? '' : d.toISOString().split('T')[0]; },
                 formatDisplayDate(dateStr) { if (!dateStr || dateStr === 'Pending' || dateStr === 'N/A') return '-'; if (dateStr.includes('1970') || dateStr.includes('1899')) return 'Pending'; return dateStr.substring(0, 11); },
-                toggleTheme() { this.isDark = !this.isDark; document.documentElement.classList.toggle('dark', this.isDark); localStorage.setItem('theme', this.isDark ? 'dark' : 'light'); }
-            }))
+                toggleTheme() { 
+                    this.isDark = !this.isDark; 
+                    document.documentElement.classList.toggle('dark', this.isDark); 
+                    localStorage.setItem('theme', this.isDark ? 'dark' : 'light'); 
+                    
+                    // 🚀 DYNAMICALLY CHANGE STATUS BAR COLOR ON CLICK
+                    document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
+                    
+                    // (Dashboard file mein chart update wala code yahan wapas paste kar dena agar wo Dashboard hai)
+                    if(this.chartInstance) { this.chartInstance.updateOptions({ theme: { mode: this.isDark ? 'dark' : 'light' } }); }
+                }
         });
     </script>
 </body>
