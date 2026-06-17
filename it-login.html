@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>IT Dashboard | Secure Zero-Trust Access</title>
     <link rel="icon" type="image/x-icon" href="Assets/images/pbl-logo.ico">
-	<!-- PWA Setup -->
+    <!-- PWA Setup -->
     <link rel="manifest" href="manifest.json">
-    <!-- ID added, color changed to light default -->
     <meta name="theme-color" id="meta-theme-color" content="#f1f5f9">
     <link rel="apple-touch-icon" href="app-icon.png">
     
@@ -18,6 +17,7 @@
 
     <!-- Configuration -->
     <script>
+        // Normal session check
         if (sessionStorage.getItem('isLoggedIn')) {
             window.location.href = 'IT_Dashboard.html';
         }
@@ -72,7 +72,7 @@
     <!-- CANVAS BACKGROUND -->
     <canvas id="techCanvas"></canvas>
 
-    <!-- LIVE DIGITAL CLOCK (Hidden on Mobile for cleaner UI) -->
+    <!-- LIVE DIGITAL CLOCK -->
     <div class="absolute top-6 right-6 z-20 hidden md:flex items-center gap-4">
         <div class="glass-panel px-4 py-2 rounded-xl shadow-sm">
             <p id="liveTime" class="text-sm font-mono font-bold text-slate-800 dark:text-white tracking-tight">--:--:--</p>
@@ -131,11 +131,18 @@
                 <i class="fa-solid fa-triangle-exclamation"></i> <span>Authentication Failed.</span>
             </div>
 
-            <!-- Submit Button -->
-            <button type="submit" tabindex="3" class="w-full py-4 bg-brand hover:bg-blue-600 text-white font-black rounded-xl shadow-[0_10px_25px_-5px_rgba(59,130,246,0.4)] hover:shadow-[0_15px_35px_-5px_rgba(59,130,246,0.6)] transition-all transform active:scale-95 flex items-center justify-center gap-3 group tracking-wide">
-                <span id="btnText">INITIATE SESSION</span>
-                <i class="fa-solid fa-arrow-right group-hover:translate-x-1.5 transition-transform"></i>
-            </button>
+            <!-- Submit & Biometric Button Wrapper 🧬 -->
+            <div class="flex gap-3">
+                <button type="submit" tabindex="3" class="flex-1 py-4 bg-brand hover:bg-blue-600 text-white font-black rounded-xl shadow-[0_10px_25px_-5px_rgba(59,130,246,0.4)] hover:shadow-[0_15px_35px_-5px_rgba(59,130,246,0.6)] transition-all transform active:scale-95 flex items-center justify-center gap-3 group tracking-wide">
+                    <span id="btnText">INITIATE SESSION</span>
+                    <i class="fa-solid fa-arrow-right group-hover:translate-x-1.5 transition-transform"></i>
+                </button>
+                
+                <!-- Naya Biometric Button -->
+                <button type="button" id="bioLoginBtn" onclick="triggerBiometric()" class="w-14 h-[56px] flex items-center justify-center rounded-xl bg-white/50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 text-slate-500 dark:text-slate-400 hover:text-brand dark:hover:text-brand hover:border-brand/30 transition-all backdrop-blur-sm shadow-sm active:scale-95 group" title="Biometric Login">
+                    <i class="fa-solid fa-fingerprint text-2xl group-hover:scale-110 transition-transform"></i>
+                </button>
+            </div>
         </form>
 
         <!-- Footer -->
@@ -153,30 +160,39 @@
     </button>
 
     <script>
-        // 🚀 NEW: Central Haptic Feedback Controller (Vanilla JS)
-        function haptic(type = 'light') {
-            if (!window.navigator || !window.navigator.vibrate) return; // Failsafe for iOS
-            if (type === 'light') {
-                navigator.vibrate(15); 
-            } else if (type === 'success') {
-                navigator.vibrate([30, 50, 30]); 
-            } else if (type === 'error') {
-                navigator.vibrate([50, 50, 50, 50]); 
+        // ⏱️ 30-MINUTE SESSION VALIDITY CHECK (App khulte hi chalega)
+        const SESSION_TIMEOUT = 30 * 60 * 1000; 
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const lastActive = localStorage.getItem('it_last_active');
+            const userData = localStorage.getItem('it_bio_user_data');
+            const now = new Date().getTime();
+
+            // Agar 30 minutes ke andar wapas aaya hai toh auto-login kar do 🛡️
+            if (lastActive && userData && (now - lastActive < SESSION_TIMEOUT)) {
+                sessionStorage.setItem('isLoggedIn', 'true');
+                sessionStorage.setItem('userData', userData);
+                localStorage.setItem('it_last_active', new Date().getTime()); // Renew timer
+                window.location.href = 'IT_Dashboard.html';
             }
+        });
+
+        // 🚀 Haptic Feedback
+        function haptic(type = 'light') {
+            if (!window.navigator || !window.navigator.vibrate) return;
+            if (type === 'light') navigator.vibrate(15); 
+            else if (type === 'success') navigator.vibrate([30, 50, 30]); 
+            else if (type === 'error') navigator.vibrate([50, 50, 50, 50]); 
         }
 
-        // --- SALTED BASE64 ENCODING (Works on Local files & HTTPS) ---
-        // Reality Check: Added a Salt ('PBL_' and '_2026') to make reverse-engineering harder.
+        // --- SALTED BASE64 ENCODING ---
         function encodePassword(password) {
             return btoa('PBL_' + password + '_2026');
         }
 
         // --- PRE-COMPUTED SALTED HASHES FOR YOUR USERS ---
-        // Vikas (Noori143)
         const HASH_VIKAS = "UEJMX05vb3JpMTQzXzIwMjY=";
-        // Anil (2612) -> btoa('PBL_2612_2026')
         const HASH_ANIL = "UEJMXzI2MTJfMjAyNg==";
-        // Ashok (1909) -> btoa('PBL_1909_2026')
         const HASH_ASHOK = "UEJMXzE5MDlfMjAyNg==";
 
         // --- THEME LOGIC ---
@@ -187,7 +203,6 @@
             if(icon1) icon1.className = isDark ? "fa-solid fa-sun text-yellow-400 text-lg" : "fa-solid fa-moon text-lg";
             if(icon2) icon2.className = isDark ? "fa-solid fa-sun text-yellow-400 text-lg" : "fa-solid fa-moon text-lg";
             
-            // 🚀 SYNC STATUS BAR WITH THEME
             const metaTheme = document.getElementById('meta-theme-color');
             if (metaTheme) metaTheme.setAttribute("content", isDark ? "#020617" : "#f1f5f9");
         }
@@ -200,7 +215,7 @@
         applyThemeIcons();
 
         function toggleTheme() {
-            haptic('light'); // 👈 VIBRATE ON THEME TOGGLE
+            haptic('light'); 
             const isDark = document.documentElement.classList.toggle('dark');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
             applyThemeIcons();
@@ -209,19 +224,114 @@
         // --- UI LOGIC ---
         function updateClock() {
             const timeEl = document.getElementById('liveTime');
-            // 🚀 FIX: Changed hour12 to true for AM/PM format
             if(timeEl) timeEl.textContent = new Date().toLocaleTimeString('en-US', { hour12: true, hour:'2-digit', minute:'2-digit', second:'2-digit' });
         }
         setInterval(updateClock, 1000); updateClock();
 
         function togglePassword() {
-            haptic('light'); // 👈 VIBRATE ON PASSWORD EYE CLICK
+            haptic('light');
             const passInput = document.getElementById('password');
             const icon = document.getElementById('eyeIcon');
             if (passInput.type === 'password') { 
                 passInput.type = 'text'; icon.classList.replace('fa-eye', 'fa-eye-slash'); icon.classList.add('text-brand');
             } else { 
                 passInput.type = 'password'; icon.classList.replace('fa-eye-slash', 'fa-eye'); icon.classList.remove('text-brand');
+            }
+        }
+
+        // ==========================================
+        // 🧬 FINGERPRINT / FACE ID ENGINE (WEBAUTHN)
+        // ==========================================
+
+        async function triggerBiometric() {
+            haptic('light');
+            const savedCredId = localStorage.getItem('it_bio_cred_id');
+            const savedUserData = localStorage.getItem('it_bio_user_data');
+            const error = document.getElementById('errorMsg');
+
+            if (!savedCredId || !savedUserData) {
+                haptic('error');
+                error.classList.remove('hidden');
+                error.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> <span>No Biometric Saved. Login via Password first.</span>';
+                return;
+            }
+
+            try {
+                let domain = window.location.hostname || "localhost";
+                const challenge = new Uint8Array(32); crypto.getRandomValues(challenge);
+                const credIdArray = Uint8Array.from(JSON.parse(savedCredId));
+
+                const publicKey = {
+                    challenge: challenge,
+                    rpId: domain, 
+                    allowCredentials: [{ id: credIdArray, type: "public-key" }],
+                    userVerification: "required",
+                    timeout: 60000
+                };
+
+                // Scanner popup aayega
+                await navigator.credentials.get({ publicKey });
+                
+                // 🎉 MATCH HO GAYA!
+                haptic('success');
+                sessionStorage.setItem('isLoggedIn', 'true');
+                sessionStorage.setItem('userData', savedUserData);
+                
+                localStorage.setItem('it_last_active', new Date().getTime());
+                
+                const btn = document.getElementById('bioLoginBtn');
+                btn.innerHTML = '<i class="fa-solid fa-fingerprint text-emerald-500 animate-pulse"></i>';
+                btn.classList.add('border-emerald-500', 'bg-emerald-50', 'dark:bg-emerald-900/20');
+                error.classList.add('hidden');
+
+                setTimeout(() => {
+                    const params = new URLSearchParams(window.location.search);
+                    window.location.href = params.get('returnUrl') || 'IT_Dashboard.html';
+                }, 600);
+
+            } catch (e) {
+                console.error(e);
+                haptic('error');
+                error.classList.remove('hidden');
+                error.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> <span>Biometric Cancelled/Failed.</span>';
+            }
+        }
+
+        async function setupBiometric(userDataString) {
+            if (!window.PublicKeyCredential) {
+                console.warn("WebAuthn not supported by this browser.");
+                return;
+            }
+            
+            if (localStorage.getItem('it_bio_cred_id')) {
+                localStorage.setItem('it_bio_user_data', userDataString);
+                return;
+            }
+
+            try {
+                let domain = window.location.hostname || "localhost";
+                const challenge = new Uint8Array(32); crypto.getRandomValues(challenge);
+                const userId = new Uint8Array(16); crypto.getRandomValues(userId);
+
+                const publicKey = {
+                    challenge: challenge,
+                    rp: { name: "IT Operations Vault", id: domain },
+                    user: { id: userId, name: "admin", displayName: "Admin User" },
+                    pubKeyCredParams: [{ type: "public-key", alg: -7 }],
+                    authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required" },
+                    timeout: 60000
+                };
+
+                // Native Face ID / Fingerprint creation trigger
+                const credential = await navigator.credentials.create({ publicKey });
+                const rawIdArray = Array.from(new Uint8Array(credential.rawId));
+                
+                localStorage.setItem('it_bio_cred_id', JSON.stringify(rawIdArray));
+                localStorage.setItem('it_bio_user_data', userDataString);
+                
+                alert("Biometric Lock Setup Successful! 🧬✅"); 
+            } catch (e) {
+                console.warn("Biometric setup skipped/cancelled by user.");
             }
         }
 
@@ -234,7 +344,7 @@
             const error = document.getElementById('errorMsg');
             const card = document.querySelector('.glass-panel');
 
-            // 📂 USER DATABASE (Using Salted Hashes)
+            // 📂 USER DATABASE
             const users = {
                 'vikas': { name: 'Vikas Rawat', role: 'Head of IT & Super Admin', empId: 'DL/25629/143', email: 'itsupport@panbusiness.net', location: 'Noida', expectedHash: HASH_VIKAS },
                 'anil':  { name: 'Anil Singh', role: 'Senior Network Engineer', empId: 'DL/25629/485', email: 'kaintura.singh22@gmail.com', location: 'Noida', expectedHash: HASH_ANIL },
@@ -246,23 +356,31 @@
             btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> AUTHENTICATING...';
             btn.classList.add('opacity-80', 'cursor-not-allowed', 'pointer-events-none');
 
-            // Generate hash for entered password synchronously
             const inputHash = encodePassword(pass);
             
-            // Artificial delay for realistic feel
-            setTimeout(() => {
+            setTimeout(async () => {
                 let validUser = users[uid];
 
                 if (validUser && validUser.expectedHash === inputHash) {
                     // Success Logic
-                    haptic('success'); // 👈 VIBRATE ON SUCCESSFUL LOGIN
-                    sessionStorage.setItem('isLoggedIn', 'true');
-                    sessionStorage.setItem('userData', JSON.stringify({
-                        name: validUser.name, role: validUser.role, empId: validUser.empId, email: validUser.email, location: validUser.location
-                    })); 
+                    haptic('success'); 
                     
-                    btn.className = "w-full py-4 bg-emerald-500 text-white font-black rounded-xl shadow-[0_10px_25px_-5px_rgba(16,185,129,0.4)] transition flex items-center justify-center gap-2 tracking-wide";
+                    const userDataString = JSON.stringify({
+                        name: validUser.name, role: validUser.role, empId: validUser.empId, email: validUser.email, location: validUser.location
+                    });
+
+                    sessionStorage.setItem('isLoggedIn', 'true');
+                    sessionStorage.setItem('userData', userDataString); 
+                    
+                    // ⏱️ Start 30-min valid session timer
+                    localStorage.setItem('it_last_active', new Date().getTime());
+                    localStorage.setItem('it_user_data', userDataString);
+
+                    btn.className = "flex-1 py-4 bg-emerald-500 text-white font-black rounded-xl shadow-[0_10px_25px_-5px_rgba(16,185,129,0.4)] transition flex items-center justify-center gap-2 tracking-wide";
                     btn.innerHTML = '<i class="fa-solid fa-shield-check text-lg"></i> ACCESS GRANTED';
+                    
+                    // 🧬 Prompt for Biometric Setup (Pehli baar password dalne par set hoga)
+                    await setupBiometric(userDataString);
                     
                     setTimeout(() => {
                         const params = new URLSearchParams(window.location.search);
@@ -270,18 +388,13 @@
                     }, 600);
                 } else {
                     // Error Logic
-                    haptic('error'); // 👈 VIBRATE ON FAILED LOGIN
+                    haptic('error'); 
                     error.classList.remove('hidden');
                     btn.innerHTML = originalText;
                     btn.classList.remove('opacity-80', 'cursor-not-allowed', 'pointer-events-none');
                     
-                    // Shake Animation
                     card.animate([
-                        { transform: 'translateX(0)' },
-                        { transform: 'translateX(10px)' },
-                        { transform: 'translateX(-10px)' },
-                        { transform: 'translateX(5px)' },
-                        { transform: 'translateX(0)' }
+                        { transform: 'translateX(0)' }, { transform: 'translateX(10px)' }, { transform: 'translateX(-10px)' }, { transform: 'translateX(5px)' }, { transform: 'translateX(0)' }
                     ], { duration: 300, easing: 'ease-in-out' });
                 }
             }, 800);
@@ -306,7 +419,6 @@
                 this.y = Math.random() * canvas.height;
                 this.vx = (Math.random() - 0.5) * 0.5;
                 this.vy = (Math.random() - 0.5) * 0.5;
-                // 🚀 FIX: Increased base particle size
                 this.size = Math.random() * 2 + 1; 
             }
             update() {
@@ -316,7 +428,6 @@
             }
             draw() {
                 const isDark = document.documentElement.classList.contains('dark');
-                // 🚀 FIX: Increased opacity and separated colors for better contrast
                 ctx.fillStyle = isDark ? "rgba(96, 165, 250, 0.8)" : "rgba(37, 99, 235, 0.6)"; 
                 ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
             }
@@ -324,7 +435,6 @@
 
         function initParticles() {
             particles = [];
-            // Dynamically reduce particles on mobile to save battery
             const isMobile = window.innerWidth < 768;
             const divisor = isMobile ? 18000 : 12000; 
             const count = Math.floor((canvas.width * canvas.height) / divisor); 
@@ -334,7 +444,6 @@
          function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             const isDark = document.documentElement.classList.contains('dark');
-            // 🚀 FIX: Sharper colors for lines (Blue-400 for Dark, Blue-600 for Light)
             const lineColor = isDark ? "96, 165, 250" : "37, 99, 235"; 
             
             for (let i = 0; i < particles.length; i++) {
@@ -345,7 +454,6 @@
                     const distance = Math.sqrt(dx * dx + dy * dy);
                     if (distance < 120) {
                         ctx.beginPath(); 
-                        // 🚀 FIX: Increased line opacity multiplier from 0.3 to 0.7, and lineWidth to 1
                         ctx.strokeStyle = `rgba(${lineColor}, ${(1 - distance / 120) * 0.7})`;
                         ctx.lineWidth = 1; 
                         ctx.moveTo(particles[i].x, particles[i].y);
@@ -356,20 +464,17 @@
             animationFrameId = requestAnimationFrame(animate);
         }
         
-        // Start Canvas
         resize(); animate();
 
-        // Pause animation when tab is not visible to save battery
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) cancelAnimationFrame(animationFrameId);
             else animate();
         });
-		
-        // 🚀 PWA Service Worker Registration (Fixed Comment Syntax)
+        
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js')
-                    .then(registration => console.log('ServiceWorker registered with scope:', registration.scope))
+                    .then(registration => console.log('ServiceWorker registered:', registration.scope))
                     .catch(error => console.log('ServiceWorker registration failed:', error));
             });
         }
