@@ -133,13 +133,18 @@
     75% { transform: translate(-50%, -50%) translate3d(0, 50px, 0) scale(1.1); }
     100% { transform: translate(-100%, -100%) translate3d(0, 0, 0) scale(1); }
 }
+
+/* 🔄 PULL TO REFRESH STYLES */
+#pull-indicator { height: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; transition: height 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+.pull-ready i { transform: rotate(180deg); color: #3b82f6 !important; }
 		
     </style>
 </head>
 
 <body class="text-slate-800 dark:text-slate-200 h-[100dvh] flex flex-col overflow-hidden selection:bg-brand selection:text-white" 
       x-data="dashboard()" 
-      @keydown.escape.window="closeAllModals()">
+      @keydown.escape.window="closeAllModals()"
+      @refresh-dashboard.window="fetchTickets(true)">
 
     <!-- NAVBAR (v1.0 Premium Hierarchy) -->
     <header class="bg-white/70 dark:bg-[#020617]/70 backdrop-blur-2xl border-b border-slate-200/80 dark:border-white/5 flex-shrink-0 h-16 sm:h-20 z-40">
@@ -301,7 +306,13 @@
 
     <!-- MAIN CONTENT -->
     <!-- Desktop: Locked to single screen (lg:overflow-hidden). Mobile: Scrollable -->
-    <main class="flex-1 overflow-y-auto lg:overflow-hidden p-4 sm:p-6 bg-slate-50/50 dark:bg-[#020617] flex flex-col">
+    <main id="main-scroll" class="flex-1 overflow-y-auto lg:overflow-hidden p-4 sm:p-6 bg-slate-50/50 dark:bg-[#020617] flex flex-col" style="overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch;">
+        
+        <!-- 🔄 Pull to Refresh Spinner -->
+        <div id="pull-indicator" class="w-full shrink-0 flex items-center justify-center">
+            <i class="fa-solid fa-arrow-down text-slate-400 text-xl transition-transform duration-300"></i>
+        </div>
+
         <div class="max-w-[1920px] mx-auto w-full flex flex-col gap-4 sm:gap-6 h-full pb-4 lg:pb-0">
 
             <!-- APPS GRID (Cohesive Pastel Minimalist - Crisp Edges & Modern Shadows) -->
@@ -1180,7 +1191,83 @@
                 if(this.chartInstance) { this.chartInstance.updateOptions({ theme: { mode: this.isDark ? 'dark' : 'light' } }); }
             }
         }))
-    })
+    });
+
+    // ==========================================
+    // 🔄 PULL TO REFRESH ENGINE (Touch Gestures)
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', () => {
+        const mainScroll = document.getElementById('main-scroll');
+        const pullIndicator = document.getElementById('pull-indicator');
+        if (!mainScroll || !pullIndicator) return;
+        
+        const pullIcon = pullIndicator.querySelector('i');
+        let startY = 0;
+        let isPulling = false;
+        const pullThreshold = 70; // Kitna dur kheenchne pe active hoga
+
+        mainScroll.addEventListener('touchstart', (e) => {
+            // Agar list bilkul top par hai, tabhi pull start hoga
+            if (mainScroll.scrollTop === 0) {
+                startY = e.touches[0].pageY;
+                isPulling = true;
+                pullIndicator.style.transition = 'none';
+            }
+        }, { passive: true });
+
+        mainScroll.addEventListener('touchmove', (e) => {
+            if (!isPulling) return;
+            const currentY = e.touches[0].pageY;
+            const diff = currentY - startY;
+
+            // Scroll down movement
+            if (diff > 0 && mainScroll.scrollTop <= 0) {
+                // Resistance effect: 0.5 ki speed se drag hoga
+                const height = Math.min(diff * 0.5, 100); 
+                pullIndicator.style.height = height + 'px';
+                
+                // Threshold Check
+                if (height >= pullThreshold) {
+                    pullIndicator.classList.add('pull-ready');
+                    pullIcon.className = "fa-solid fa-arrow-down text-brand transition-transform duration-300"; 
+                } else {
+                    pullIndicator.classList.remove('pull-ready');
+                    pullIcon.className = "fa-solid fa-arrow-down text-slate-400 transition-transform duration-300";
+                }
+            }
+        }, { passive: true });
+
+        mainScroll.addEventListener('touchend', () => {
+            if (!isPulling) return;
+            isPulling = false;
+            
+            pullIndicator.style.transition = 'height 0.3s ease';
+            const currentHeight = parseInt(pullIndicator.style.height || '0');
+
+            if (currentHeight >= pullThreshold) {
+                // 🚀 REFRESH TRIGGERED
+                if (window.navigator && window.navigator.vibrate) navigator.vibrate(30); // Haptic
+                
+                pullIndicator.style.height = '60px'; // Loader ki standard height
+                pullIcon.className = "fa-solid fa-circle-notch fa-spin text-brand text-xl";
+                pullIndicator.classList.remove('pull-ready');
+
+                // Alpine component ko reload karne ka signal bhejo
+                window.dispatchEvent(new CustomEvent('refresh-dashboard'));
+                
+                // Delay ke baad loader hide kardo
+                setTimeout(() => {
+                    pullIndicator.style.height = '0px';
+                    setTimeout(() => { 
+                        pullIcon.className = "fa-solid fa-arrow-down text-slate-400 text-xl transition-transform duration-300"; 
+                    }, 300);
+                }, 1500);
+            } else {
+                // User ne beech mein chhod diya (Bina refresh trigger kiye)
+                pullIndicator.style.height = '0px';
+            }
+        });
+    });
     </script>
 </body>
 </html>
