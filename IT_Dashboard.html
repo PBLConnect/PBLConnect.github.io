@@ -59,25 +59,88 @@
         .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .dark .custom-scroll::-webkit-scrollbar-thumb { background: #334155; }
 
-        /* Premium Cards */
-        .app-card {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            border: 1px solid rgba(0,0,0,0.05);
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-        }
-        .dark .app-card {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-        
-        .app-card:hover {
-            transform: translateY(-4px) scale(1.01);
-            box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.15);
-            border-color: #3b82f6;
-        }
+        /* ========================================================= */
+/* 📱 MOBILE ONLY: SKEUOMORPHIC / NEUMORPHIC OVERRIDE V1.0   */
+/* ========================================================= */
+@media (max-width: 1023px) {
+    /* 1. Base Background for 3D Depth */
+    body { 
+        background: #e0e5ec !important; 
+    }
+    .dark body { 
+        background: #1a1e24 !important; 
+    }
+
+    /* 2. Top Navbar 3D Bevel */
+    header {
+        background: #e0e5ec !important;
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 -4px 6px -2px rgba(255,255,255,0.8) inset !important;
+        border: none !important;
+        backdrop-filter: none !important;
+    }
+    .dark header {
+        background: #1a1e24 !important;
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5), 0 -4px 6px -2px rgba(255,255,255,0.05) inset !important;
+    }
+
+    /* 3. App Cards - The Real Skeuomorphic Pop-out */
+    .app-card {
+        background: linear-gradient(145deg, #f0f5fd, #cacfd5) !important;
+        box-shadow: 8px 8px 16px #bebebe, -8px -8px 16px #ffffff !important;
+        border: 1px solid rgba(255,255,255,0.5) !important;
+        border-radius: 20px !important;
+        backdrop-filter: none !important;
+        transform: translateZ(0); /* Hardware acceleration */
+    }
+    .dark .app-card {
+        background: linear-gradient(145deg, #1c2026, #171b20) !important;
+        box-shadow: 6px 6px 12px #121519, -6px -6px 12px #22272f !important;
+        border: 1px solid rgba(255,255,255,0.02) !important;
+    }
+    
+    /* Active/Press State - Skeuomorphic Inset (Dabne wala feel) */
+    .app-card:active {
+        background: #e0e5ec !important;
+        box-shadow: inset 8px 8px 16px #bebebe, inset -8px -8px 16px #ffffff !important;
+        transform: scale(0.96) !important;
+    }
+    .dark .app-card:active {
+        background: #1a1e24 !important;
+        box-shadow: inset 6px 6px 12px #121519, inset -6px -6px 12px #22272f !important;
+    }
+
+    /* 4. Ticket Log & Analytics Containers */
+    #complaintLogBox, .bg-white\\/80 {
+        background: #e0e5ec !important;
+        box-shadow: inset 2px 2px 5px rgba(255,255,255,0.7), 10px 10px 20px #bebebe, -10px -10px 20px #ffffff !important;
+        border: none !important;
+        backdrop-filter: none !important;
+    }
+    .dark #complaintLogBox, .dark .bg-white\\/80 {
+        background: #1a1e24 !important;
+        box-shadow: inset 2px 2px 5px rgba(255,255,255,0.05), 8px 8px 15px #121519, -8px -8px 15px #22272f !important;
+    }
+
+    /* 5. Quick Buttons & Icons (Inner Shadow Pill effect) */
+    .rounded-xl.bg-white, .rounded-full.bg-slate-100 {
+        background: #e0e5ec !important;
+        box-shadow: 4px 4px 8px #bebebe, -4px -4px 8px #ffffff !important;
+    }
+    .dark .rounded-xl.bg-white\\/5, .dark .rounded-full.dark\\:bg-white\\/5 {
+        background: #1a1e24 !important;
+        box-shadow: 4px 4px 8px #121519, -4px -4px 8px #22272f !important;
+    }
+
+    /* Individual Ticket Item Cards inner skeuo */
+    .divide-slate-100 > div {
+        border-bottom: 1px solid #d1d9e6 !important;
+        border-top: 1px solid #ffffff !important;
+    }
+    .dark .divide-dark_border > div {
+        border-bottom: 1px solid #121519 !important;
+        border-top: 1px solid #2a3038 !important;
+    }
+}
 
         /* Ticket Status Borders */
         .ticket-open { border-left: 3px solid #ef4444 !important; }
@@ -117,6 +180,42 @@
         @keyframes barUp3 { 0%, 100% { transform: scale(1, 0.6); } }
         @keyframes barUp4 { 0%, 40% { transform: scale(1, 0.8); } 50%, 90% { transform: scale(1, 0.4); } 100% { transform: scale(1, 0.8); } }
         @keyframes barUp5 { 0%, 40% { transform: scale(1, 1); } 50%, 90% { transform: scale(1, 0.2); } 100% { transform: scale(1, 1); } }
+		
+		/* ========================================================= */
+/* 🌌 AURORA BLOB & FROSTED GLASS EFFECTS                    */
+/* ========================================================= */
+.bento-blob {
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    left: 50%;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    opacity: 0.8;
+    filter: blur(20px);
+    animation: blob-bounce 8s infinite ease-in-out alternate;
+    mix-blend-mode: multiply;
+}
+.dark .bento-blob {
+    mix-blend-mode: screen;
+    opacity: 0.5; /* Dark mode mein zyada bright na lage */
+}
+
+/* Har card ka blob alag direction mein ghoomega thoda natural feel ke liye */
+.delay-1 { animation-delay: 0s; }
+.delay-2 { animation-delay: -2s; animation-direction: alternate-reverse; }
+.delay-3 { animation-delay: -4s; }
+.delay-4 { animation-delay: -6s; animation-direction: alternate-reverse; }
+
+@keyframes blob-bounce {
+    0% { transform: translate(-100%, -100%) translate3d(0, 0, 0) scale(1); }
+    25% { transform: translate(-50%, -100%) translate3d(50px, 0, 0) scale(1.2); }
+    50% { transform: translate(-100%, -50%) translate3d(50px, 50px, 0) scale(0.9); }
+    75% { transform: translate(-50%, -50%) translate3d(0, 50px, 0) scale(1.1); }
+    100% { transform: translate(-100%, -100%) translate3d(0, 0, 0) scale(1); }
+}
+		
     </style>
 </head>
 
@@ -290,78 +389,76 @@
     <main class="flex-1 overflow-y-auto lg:overflow-hidden p-4 sm:p-6 bg-slate-50/50 dark:bg-[#020617] flex flex-col">
         <div class="max-w-[1920px] mx-auto w-full flex flex-col gap-4 sm:gap-6 h-full pb-4 lg:pb-0">
 
-            <!-- APPS GRID (Hybrid Responsive: 2x2 Mobile, 1x4 Desktop) -->
-            <section class="shrink-0">
-                <!-- grid-cols-2 for mobile, lg:grid-cols-4 for desktop -->
-                <div class="cards-container grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
-                    
-                    <!-- 1. IT Inventory -->
-                    <a href="PBL_Inventory.html" class="app-card rounded-2xl p-3 sm:p-6 group block transition-all bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-500/10 dark:to-blue-900/5 border border-blue-200 dark:border-blue-500/20 overflow-hidden">
-                        <div class="absolute -bottom-2 -right-2 sm:-bottom-4 sm:-right-4 opacity-10 group-hover:opacity-20 transition duration-500">
-                            <i class="fa-solid fa-computer text-5xl sm:text-8xl text-blue-600 dark:text-blue-400"></i>
-                        </div>
-                        <!-- flex-col on mobile, flex-row on larger screens -->
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-5 relative z-10">
-                            <div class="w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-white dark:bg-black/20 text-blue-600 dark:text-blue-400 flex items-center justify-center text-lg sm:text-2xl shadow-sm group-hover:scale-110 group-hover:rotate-3 transition duration-300 shrink-0">
-                                <i class="fa-solid fa-computer"></i>
-                            </div>
-                            <div class="flex-1 min-w-0 w-full">
-                                <h4 class="text-sm sm:text-xl font-heading font-black text-slate-800 dark:text-white tracking-tight group-hover:text-blue-600 transition truncate">Inventory</h4>
-                                <p class="text-[10px] sm:text-sm font-bold text-slate-500 dark:text-slate-400 mt-0.5 truncate">Assets & Users</p>
-                            </div>
-                        </div>
-                    </a>
-
-                    <!-- 2. Switch Map -->
-                    <a href="PBL_Switch_Map.html" class="app-card rounded-2xl p-3 sm:p-6 group block transition-all bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-500/10 dark:to-emerald-900/5 border border-emerald-200 dark:border-emerald-500/20 overflow-hidden">
-                        <div class="absolute -bottom-2 -right-2 sm:-bottom-4 sm:-right-4 opacity-10 group-hover:opacity-20 transition duration-500">
-                            <i class="fa-solid fa-sitemap text-5xl sm:text-8xl text-emerald-600 dark:text-emerald-400"></i>
-                        </div>
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-5 relative z-10">
-                            <div class="w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-white dark:bg-black/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-lg sm:text-2xl shadow-sm group-hover:scale-110 group-hover:rotate-3 transition duration-300 shrink-0">
-                                <i class="fa-solid fa-sitemap"></i>
-                            </div>
-                            <div class="flex-1 min-w-0 w-full">
-                                <h4 class="text-sm sm:text-xl font-heading font-black text-slate-800 dark:text-white tracking-tight group-hover:text-emerald-600 transition truncate">Switches</h4>
-                                <p class="text-[10px] sm:text-sm font-bold text-slate-500 dark:text-slate-400 mt-0.5 truncate">Network Ports</p>
-                            </div>
-                        </div>
-                    </a>
-
-                    <!-- 3. WAN Monitor -->
-                    <a href="PBL_WAN_Monitor.html" class="app-card rounded-2xl p-3 sm:p-6 group block transition-all bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-500/10 dark:to-orange-900/5 border border-orange-200 dark:border-orange-500/20 overflow-hidden">
-                        <div class="absolute -bottom-2 -right-2 sm:-bottom-4 sm:-right-4 opacity-10 group-hover:opacity-20 transition duration-500">
-                            <i class="fa-solid fa-globe text-5xl sm:text-8xl text-orange-600 dark:text-orange-400"></i>
-                        </div>
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-5 relative z-10">
-                            <div class="w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-white dark:bg-black/20 text-orange-600 dark:text-orange-400 flex items-center justify-center text-lg sm:text-2xl shadow-sm group-hover:scale-110 group-hover:rotate-3 transition duration-300 shrink-0">
-                                <i class="fa-solid fa-globe"></i>
-                            </div>
-                            <div class="flex-1 min-w-0 w-full">
-                                <h4 class="text-sm sm:text-xl font-heading font-black text-slate-800 dark:text-white tracking-tight group-hover:text-orange-600 transition truncate">WAN Logs</h4>
-                                <p class="text-[10px] sm:text-sm font-bold text-slate-500 dark:text-slate-400 mt-0.5 truncate">ISP Tracking</p>
-                            </div>
-                        </div>
-                    </a>
-
-                    <!-- 4. RMA Tracker -->
-                    <a href="PBL_Hardware_RMA.html" class="app-card rounded-2xl p-3 sm:p-6 group block transition-all bg-gradient-to-br from-rose-50 to-rose-100/50 dark:from-rose-500/10 dark:to-rose-900/5 border border-rose-200 dark:border-rose-500/20 overflow-hidden">
-                        <div class="absolute -bottom-2 -right-2 sm:-bottom-4 sm:-right-4 opacity-10 group-hover:opacity-20 transition duration-500">
-                            <i class="fa-solid fa-screwdriver-wrench text-5xl sm:text-8xl text-rose-600 dark:text-rose-400"></i>
-                        </div>
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-5 relative z-10">
-                            <div class="w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-white dark:bg-black/20 text-rose-600 dark:text-rose-400 flex items-center justify-center text-lg sm:text-2xl shadow-sm group-hover:scale-110 group-hover:rotate-3 transition duration-300 shrink-0">
-                                <i class="fa-solid fa-screwdriver-wrench"></i>
-                            </div>
-                            <div class="flex-1 min-w-0 w-full">
-                                <h4 class="text-sm sm:text-xl font-heading font-black text-slate-800 dark:text-white tracking-tight group-hover:text-rose-600 transition truncate">RMA Hub</h4>
-                                <p class="text-[10px] sm:text-sm font-bold text-slate-500 dark:text-slate-400 mt-0.5 truncate">Repair & Vendor</p>
-                            </div>
-                        </div>
-                    </a>
-
+            <!-- APPS GRID (Compact Height + Original Design + Tactile Vibrate) -->
+<section class="shrink-0">
+    <div class="cards-container grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        
+        <!-- CARD 1: IT INVENTORY -->
+        <a href="PBL_Inventory.html" @click="haptic('light')" class="relative overflow-hidden rounded-[1.5rem] sm:rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 active:scale-95 group block min-h-[105px] sm:min-h-[120px] border border-transparent dark:border-white/5">
+            <div class="bento-blob delay-1 bg-gradient-to-tr from-blue-600 to-cyan-400"></div>
+            
+            <div class="relative z-10 h-full w-full bg-white/70 dark:bg-[#0f172a]/80 backdrop-blur-2xl rounded-[1.5rem] sm:rounded-[2rem] border border-white/60 dark:border-white/10 p-3 sm:p-4 flex flex-col justify-between group-hover:bg-white/80 transition-colors">
+                <div class="flex justify-between items-start">
+                    <span class="text-2xl sm:text-3xl drop-shadow-sm filter grayscale-[20%]">💻</span>
+                    <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:text-cyan-500 group-hover:-rotate-45 transition-all"><i class="fa-solid fa-arrow-right text-[9px] sm:text-[10px]"></i></div>
                 </div>
-            </section>
+                <div class="mt-1 sm:mt-2">
+                    <h4 class="text-sm sm:text-base font-heading font-black text-slate-800 dark:text-white leading-tight">IT Inventory</h4>
+                    <p class="text-[8px] sm:text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">Assets & Users</p>
+                </div>
+            </div>
+        </a>
+
+        <!-- CARD 2: SWITCH MAP -->
+        <a href="PBL_Switch_Map.html" @click="haptic('light')" class="relative overflow-hidden rounded-[1.5rem] sm:rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 active:scale-95 group block min-h-[105px] sm:min-h-[120px] border border-transparent dark:border-white/5">
+            <div class="bento-blob delay-2 bg-gradient-to-tr from-emerald-500 to-teal-400"></div>
+            
+            <div class="relative z-10 h-full w-full bg-white/70 dark:bg-[#0f172a]/80 backdrop-blur-2xl rounded-[1.5rem] sm:rounded-[2rem] border border-white/60 dark:border-white/10 p-3 sm:p-4 flex flex-col justify-between group-hover:bg-white/80 transition-colors">
+                <div class="flex justify-between items-start">
+                    <span class="text-2xl sm:text-3xl drop-shadow-sm filter grayscale-[20%]">🔌</span>
+                    <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:text-emerald-500 group-hover:-rotate-45 transition-all"><i class="fa-solid fa-arrow-right text-[9px] sm:text-[10px]"></i></div>
+                </div>
+                <div class="mt-1 sm:mt-2">
+                    <h4 class="text-sm sm:text-base font-heading font-black text-slate-800 dark:text-white leading-tight">Switch Map</h4>
+                    <p class="text-[8px] sm:text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">Network Ports</p>
+                </div>
+            </div>
+        </a>
+
+        <!-- CARD 3: WAN MONITOR -->
+        <a href="PBL_WAN_Monitor.html" @click="haptic('light')" class="relative overflow-hidden rounded-[1.5rem] sm:rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 active:scale-95 group block min-h-[105px] sm:min-h-[120px] border border-transparent dark:border-white/5">
+            <div class="bento-blob delay-3 bg-gradient-to-tr from-orange-500 to-amber-400"></div>
+            
+            <div class="relative z-10 h-full w-full bg-white/70 dark:bg-[#0f172a]/80 backdrop-blur-2xl rounded-[1.5rem] sm:rounded-[2rem] border border-white/60 dark:border-white/10 p-3 sm:p-4 flex flex-col justify-between group-hover:bg-white/80 transition-colors">
+                <div class="flex justify-between items-start">
+                    <span class="text-2xl sm:text-3xl drop-shadow-sm filter grayscale-[20%]">📡</span>
+                    <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:text-orange-500 group-hover:-rotate-45 transition-all"><i class="fa-solid fa-arrow-right text-[9px] sm:text-[10px]"></i></div>
+                </div>
+                <div class="mt-1 sm:mt-2">
+                    <h4 class="text-sm sm:text-base font-heading font-black text-slate-800 dark:text-white leading-tight">WAN Monitor</h4>
+                    <p class="text-[8px] sm:text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">ISP Tracking</p>
+                </div>
+            </div>
+        </a>
+
+        <!-- CARD 4: RMA TRACKER -->
+        <a href="PBL_Hardware_RMA.html" @click="haptic('light')" class="relative overflow-hidden rounded-[1.5rem] sm:rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 active:scale-95 group block min-h-[105px] sm:min-h-[120px] border border-transparent dark:border-white/5">
+            <div class="bento-blob delay-4 bg-gradient-to-tr from-violet-600 to-fuchsia-500"></div>
+            
+            <div class="relative z-10 h-full w-full bg-white/70 dark:bg-[#0f172a]/80 backdrop-blur-2xl rounded-[1.5rem] sm:rounded-[2rem] border border-white/60 dark:border-white/10 p-3 sm:p-4 flex flex-col justify-between group-hover:bg-white/80 transition-colors">
+                <div class="flex justify-between items-start">
+                    <span class="text-2xl sm:text-3xl drop-shadow-sm filter grayscale-[20%]">🛠️</span>
+                    <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:text-fuchsia-500 group-hover:-rotate-45 transition-all"><i class="fa-solid fa-arrow-right text-[9px] sm:text-[10px]"></i></div>
+                </div>
+                <div class="mt-1 sm:mt-2">
+                    <h4 class="text-sm sm:text-base font-heading font-black text-slate-800 dark:text-white leading-tight">RMA Tracker</h4>
+                    <p class="text-[8px] sm:text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">Repair & Vendor</p>
+                </div>
+            </div>
+        </a>
+
+    </div>
+</section>
 
             <!-- MAIN SPLIT (Tickets & Analytics) -->
             <section class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 flex-1 min-h-[500px] lg:min-h-0">
@@ -392,108 +489,163 @@
                             </div>
                         </template>
 
-                        <div class="divide-y divide-slate-100 dark:divide-dark_border">
-                            <template x-for="ticket in tickets" :key="ticket.id">
-                                <div class="p-4 sm:p-5 flex items-start gap-3 sm:gap-4 transition group hover:bg-slate-50 dark:hover:bg-white/5" :class="ticket.status === 'Open' ? 'ticket-open' : 'ticket-resolved'">
-                                    
-                                    <div class="mt-1 w-10 h-10 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center text-lg sm:text-xl shrink-0 shadow-sm border border-black/5" :class="getIssueConfig(ticket.issue).color">
-                                        <i class="fa-solid" :class="getIssueConfig(ticket.issue).icon"></i>
-                                    </div>
-                                    
-                                    <div class="flex-1 min-w-0">
-                                        <div class="flex justify-between items-start">
-                                            <p class="text-sm sm:text-base font-bold text-slate-800 dark:text-white truncate pr-2" x-text="ticket.issue"></p>
-                                            <span class="text-[9px] px-2 py-1 rounded-md font-black uppercase tracking-widest shrink-0" :class="ticket.status === 'Open' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'" x-text="ticket.status === 'Open' ? 'OPEN' : 'CLOSED'"></span>
-                                        </div>
-                                        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 line-clamp-1 sm:line-clamp-2" x-text="ticket.desc"></p>
-                                        
-                                        <div class="flex items-center gap-3 sm:gap-4 mt-3 flex-wrap">
-                                            <span class="flex items-center text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-300 font-bold uppercase tracking-wide">
-                                                <i class="fa-solid fa-user text-[9px] mr-1.5 opacity-50"></i> <span x-text="ticket.name"></span>
-                                            </span>
-                                            <span class="flex items-center text-[10px] text-slate-500 font-mono bg-slate-100 dark:bg-white/10 px-1.5 rounded">
-                                                <span x-text="ticket.asset || 'N/A'"></span>
-                                            </span>
-                                            <span class="flex items-center text-[9px] sm:text-[10px] text-slate-400 ml-auto font-mono">
-                                                <i class="fa-regular fa-calendar mr-1"></i> <span x-text="formatDisplayDate(ticket.date)"></span>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </template>
-                            
-                            <template x-if="!loading && tickets.length === 0">
-                                <div class="p-12 text-center text-slate-400">
-                                    <i class="fa-solid fa-mug-hot text-4xl mb-3 opacity-50"></i>
-                                    <p class="text-sm font-medium">All clear! No tickets found.</p>
-                                </div>
-                            </template>
-                        </div>
+                        <!-- Compact Floating Ticket List -->
+<div class="p-2 sm:p-3 bg-slate-50/50 dark:bg-transparent space-y-2.5">
+    <template x-for="ticket in tickets" :key="ticket.id">
+        <!-- Floating Card Design -->
+        <div class="p-3 flex items-start gap-3 transition-all duration-300 rounded-[1.25rem] border bg-white dark:bg-dark_surface hover:shadow-md hover:-translate-y-0.5 group relative overflow-hidden" 
+             :class="ticket.status === 'Open' ? 'border-red-100 dark:border-red-900/30 hover:border-red-300' : 'border-slate-100 dark:border-white/5 hover:border-emerald-300'">
+            
+            <!-- Sleek Left Status Indicator Bar -->
+            <div class="absolute left-0 top-0 bottom-0 w-1.5 transition-all group-hover:w-2" 
+                 :class="ticket.status === 'Open' ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]' : 'bg-emerald-400 opacity-50'"></div>
+
+            <!-- Compact Icon -->
+            <div class="ml-1.5 w-9 h-9 rounded-xl flex items-center justify-center text-base shrink-0 shadow-sm border border-black/5 transition-transform group-hover:scale-105" 
+                 :class="getIssueConfig(ticket.issue).color">
+                <i class="fa-solid" :class="getIssueConfig(ticket.issue).icon"></i>
+            </div>
+            
+            <!-- Compact Details -->
+            <div class="flex-1 min-w-0">
+                <div class="flex justify-between items-center mb-0.5">
+                    <p class="text-[13px] sm:text-sm font-bold text-slate-800 dark:text-white truncate pr-2 group-hover:text-brand transition-colors" x-text="ticket.issue"></p>
+                    <!-- Modern Pill Badge -->
+                    <span class="text-[8px] px-2 py-0.5 rounded-md font-black uppercase tracking-widest shrink-0 border" 
+                          :class="ticket.status === 'Open' ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20' : 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'" 
+                          x-text="ticket.status === 'Open' ? 'OPEN' : 'CLOSED'"></span>
+                </div>
+                
+                <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 line-clamp-1 group-hover:text-slate-700 dark:group-hover:text-slate-300 transition-colors" x-text="ticket.desc"></p>
+                
+                <!-- Compact Meta Tags -->
+                <div class="flex items-center gap-2 mt-2 flex-wrap">
+                    <span class="flex items-center text-[9px] text-slate-600 dark:text-slate-300 font-bold bg-slate-100 dark:bg-white/5 px-1.5 py-0.5 rounded shadow-sm">
+                        <i class="fa-solid fa-user text-[8px] mr-1 opacity-50 text-brand"></i> <span x-text="ticket.name"></span>
+                    </span>
+                    <span class="flex items-center text-[9px] text-slate-500 font-mono bg-white dark:bg-dark_bg px-1.5 py-0.5 rounded border border-slate-200 dark:border-white/10 shadow-sm">
+                        <span x-text="ticket.asset || 'N/A'"></span>
+                    </span>
+                    <span class="flex items-center text-[9px] text-slate-400 ml-auto font-mono group-hover:text-brand transition-colors">
+                        <i class="fa-regular fa-clock mr-1"></i> <span x-text="formatDisplayDate(ticket.date)"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </template>
+    
+    <template x-if="!loading && tickets.length === 0">
+        <div class="p-8 text-center text-slate-400 bg-white dark:bg-dark_surface rounded-3xl border border-slate-100 dark:border-white/5">
+            <i class="fa-solid fa-mug-hot text-3xl mb-2 opacity-50 text-brand animate-pulse"></i>
+            <p class="text-xs font-bold uppercase tracking-widest">No pending tickets.</p>
+        </div>
+    </template>
+</div>
                     </div>
                 </div>
 
-                <!-- RIGHT: ANALYTICS MODULE -->
-                <div class="bg-white/80 dark:bg-dark_surface/80 backdrop-blur-xl rounded-3xl border border-slate-200 dark:border-dark_border shadow-lg overflow-hidden flex flex-col h-[500px] lg:h-full relative">
-                    
-                    <!-- Header -->
-                    <div class="p-4 sm:p-5 border-b border-slate-100 dark:border-dark_border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 shrink-0 bg-slate-50/50 dark:bg-white/5">
-                        <div>
-                            <h3 class="font-heading font-bold text-sm sm:text-base uppercase text-slate-800 dark:text-white flex items-center gap-2">
-                                <i class="fa-solid fa-chart-pie text-purple-500"></i> IT Analytics
-                            </h3>
-                        </div>
-                        <div class="flex items-center gap-2 bg-white dark:bg-black/30 p-1 rounded-lg border border-slate-200 dark:border-white/10 shadow-sm w-full sm:w-auto">
-                            <select x-model="chartConfig.type" @change="renderChart()" class="bg-transparent text-[10px] sm:text-xs font-bold text-slate-600 dark:text-slate-300 outline-none px-2 py-1 cursor-pointer flex-1">
-                                <option value="status">📊 Status View</option>
-                                <option value="category">🔧 Category</option>
-                            </select>
-                            <div class="w-px h-4 bg-slate-200 dark:bg-white/10"></div>
-                            <select x-model="chartConfig.time" @change="renderChart()" class="bg-transparent text-[10px] sm:text-xs font-bold text-slate-600 dark:text-slate-300 outline-none px-2 py-1 cursor-pointer flex-1">
-                                <option value="all">📅 All Time</option>
-                                <option value="month">📅 This Month</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <!-- Body -->
-                    <div class="flex-1 flex flex-col p-4 min-h-0 relative">
-                        <!-- Chart Area -->
-                        <div class="flex-1 w-full min-h-[200px] relative">
-                            <div id="analyticsChart" class="w-full h-full"></div>
-                        </div>
+                <!-- RIGHT: ANALYTICS MODULE (Refined Glassmorphism & Custom Dropdowns) -->
+<div class="relative rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(168,85,247,0.1)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-500 border border-white/80 dark:border-white/10 flex flex-col h-[500px] lg:h-full group bg-white/40 dark:bg-[#0f172a]/60 backdrop-blur-3xl z-10">
+    
+    <!-- 🌌 Large Ambient Blob for depth -->
+    <div class="bento-blob delay-3 bg-[#a855f7]" style="width: 200px; height: 200px; filter: blur(70px); opacity: 0.2; top: -10%; left: 50%;"></div>
 
-                        <!-- KPI Stats Grid -->
-                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4 border-t border-slate-100 dark:border-dark_border pt-4 shrink-0">
-                            
-                            <!-- KPI 1 -->
-                            <div class="bg-blue-50 dark:bg-brand/10 p-3 sm:p-4 rounded-2xl border border-blue-100 dark:border-brand/20 flex items-center justify-between transition hover:-translate-y-1">
-                                <div>
-                                    <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-brand mb-1">Avg Res</p>
-                                    <h4 class="text-base sm:text-xl font-black text-slate-800 dark:text-white">~45m</h4>
-                                </div>
-                                <div class="w-8 h-8 rounded-xl bg-white dark:bg-white/10 text-brand flex items-center justify-center shadow-sm"><i class="fa-solid fa-stopwatch"></i></div>
-                            </div>
-
-                            <!-- KPI 2 -->
-                            <div @click="showOpenTicketsModal = true" class="bg-red-50 dark:bg-red-500/10 p-3 sm:p-4 rounded-2xl border border-red-100 dark:border-red-500/20 flex items-center justify-between cursor-pointer transition hover:-translate-y-1 hover:shadow-lg">
-                                <div>
-                                    <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-red-500 mb-1">Pending</p>
-                                    <h4 class="text-base sm:text-xl font-black text-slate-800 dark:text-white" x-text="openTickets.length">0</h4>
-                                </div>
-                                <div class="w-8 h-8 rounded-xl bg-white dark:bg-white/10 text-red-500 flex items-center justify-center shadow-sm"><i class="fa-solid fa-ticket"></i></div>
-                            </div>
-
-                            <!-- KPI 3 (Hidden on very small screens, visible on SM+) -->
-                            <div @click="showStaffModal = true" class="hidden sm:flex bg-emerald-50 dark:bg-emerald-500/10 p-4 rounded-2xl border border-emerald-100 dark:border-emerald-500/20 items-center justify-between cursor-pointer transition hover:-translate-y-1 hover:shadow-lg">
-                                <div>
-                                    <p class="text-[10px] font-black uppercase tracking-widest text-emerald-600 mb-1">Staff</p>
-                                    <div class="flex items-baseline gap-1"><h4 class="text-xl font-black text-slate-800 dark:text-white" x-text="onlineStaffCount">0</h4><span class="text-[10px] font-mono text-slate-400">/ 3</span></div>
-                                </div>
-                                <div class="w-8 h-8 rounded-xl bg-white dark:bg-white/10 text-emerald-600 flex items-center justify-center shadow-sm"><i class="fa-solid fa-user-clock"></i></div>
-                            </div>
-                        </div>
-                    </div>
+    <!-- Header Section (Glassy & Clean) -->
+    <div class="p-4 sm:p-5 border-b border-white/60 dark:border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0 relative z-30">
+        <div>
+            <h3 class="font-heading font-black text-sm sm:text-base uppercase text-slate-800 dark:text-white flex items-center gap-2 tracking-wide">
+                <div class="w-8 h-8 rounded-full bg-white/80 dark:bg-purple-500/20 flex items-center justify-center text-purple-600 dark:text-purple-400 shadow-sm border border-white/50 dark:border-purple-500/30">
+                    <i class="fa-solid fa-chart-pie"></i>
+                </div> 
+                IT Analytics
+            </h3>
+        </div>
+        
+        <!-- Custom Alpine.js Filters (No more ugly native dropdowns) -->
+        <div class="flex items-center gap-2 w-full sm:w-auto bg-white/50 dark:bg-black/20 p-1.5 rounded-2xl border border-white/80 dark:border-white/5 shadow-sm backdrop-blur-md">
+            
+            <!-- Custom Dropdown 1: View Type -->
+            <div x-data="{ open: false }" class="relative flex-1 sm:w-32">
+                <button @click="open = !open" @click.outside="open = false" class="w-full flex items-center justify-between gap-2 px-3 py-1.5 bg-white/70 hover:bg-white dark:bg-white/5 dark:hover:bg-white/10 rounded-xl shadow-sm text-[11px] font-bold text-slate-700 dark:text-slate-300 transition border border-white/50 dark:border-transparent">
+                    <span x-text="chartConfig.type === 'status' ? '📊 Status' : '🔧 Category'"></span>
+                    <i class="fa-solid fa-chevron-down text-[9px] text-slate-400 transition-transform duration-300" :class="open ? 'rotate-180' : ''"></i>
+                </button>
+                <div x-show="open" x-transition.origin.top class="absolute z-[100] top-full left-0 mt-1 w-full bg-white/95 dark:bg-[#1e293b]/95 backdrop-blur-xl rounded-xl shadow-xl border border-slate-100 dark:border-slate-700 overflow-hidden py-1" style="display: none;">
+                    <div @click="chartConfig.type = 'status'; renderChart(); open = false" class="px-3 py-2 text-[11px] font-bold hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer text-slate-700 dark:text-slate-300 transition">📊 Status View</div>
+                    <div @click="chartConfig.type = 'category'; renderChart(); open = false" class="px-3 py-2 text-[11px] font-bold hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer text-slate-700 dark:text-slate-300 transition">🔧 Category</div>
                 </div>
+            </div>
+
+            <div class="w-px h-5 bg-slate-300/50 dark:bg-white/10"></div>
+
+            <!-- Custom Dropdown 2: Time -->
+            <div x-data="{ open: false }" class="relative flex-1 sm:w-32">
+                <button @click="open = !open" @click.outside="open = false" class="w-full flex items-center justify-between gap-2 px-3 py-1.5 bg-white/70 hover:bg-white dark:bg-white/5 dark:hover:bg-white/10 rounded-xl shadow-sm text-[11px] font-bold text-slate-700 dark:text-slate-300 transition border border-white/50 dark:border-transparent">
+                    <span x-text="chartConfig.time === 'all' ? '📅 All Time' : '📅 This Month'"></span>
+                    <i class="fa-solid fa-chevron-down text-[9px] text-slate-400 transition-transform duration-300" :class="open ? 'rotate-180' : ''"></i>
+                </button>
+                <div x-show="open" x-transition.origin.top class="absolute z-[100] top-full right-0 mt-1 w-full bg-white/95 dark:bg-[#1e293b]/95 backdrop-blur-xl rounded-xl shadow-xl border border-slate-100 dark:border-slate-700 overflow-hidden py-1" style="display: none;">
+                    <div @click="chartConfig.time = 'all'; renderChart(); open = false" class="px-3 py-2 text-[11px] font-bold hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer text-slate-700 dark:text-slate-300 transition">📅 All Time</div>
+                    <div @click="chartConfig.time = 'month'; renderChart(); open = false" class="px-3 py-2 text-[11px] font-bold hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer text-slate-700 dark:text-slate-300 transition">📅 This Month</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Body Section -->
+    <div class="flex-1 flex flex-col p-4 sm:p-5 min-h-0 relative z-20">
+        
+        <!-- Chart Area -->
+        <div class="flex-1 w-full min-h-[200px] relative z-20">
+            <div id="analyticsChart" class="w-full h-full drop-shadow-md"></div>
+        </div>
+
+        <!-- KPI Stats Grid (Ultra-Modern, Gradients applied) -->
+<div class="grid grid-cols-2 gap-3 sm:gap-4 mt-4 border-t border-slate-200/50 dark:border-white/10 pt-4 shrink-0 relative z-20">
+    
+    <!-- KPI 1: Pending Tickets (Crimson Rose Gradient) -->
+    <div @click="showOpenTicketsModal = true" class="relative overflow-hidden rounded-[1.25rem] border border-white/80 dark:border-white/10 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer group/kpi bg-white/70 dark:bg-[#0f172a]/80 backdrop-blur-xl">
+        
+        <!-- Premium Gradient Corner Glow -->
+        <div class="absolute -top-8 -right-8 w-28 h-28 bg-gradient-to-br from-rose-500 to-red-600 opacity-20 dark:opacity-30 rounded-full blur-2xl group-hover/kpi:opacity-50 transition-opacity duration-500"></div>
+
+        <div class="p-3 sm:p-4 relative z-10 flex flex-col justify-center">
+            <!-- Inline Title & Icon -->
+            <div class="flex items-center gap-2 mb-1.5 sm:mb-2">
+                <div class="w-6 h-6 rounded-md bg-rose-50 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center text-[10px] sm:text-xs border border-rose-100 dark:border-rose-500/30"><i class="fa-solid fa-ticket"></i></div>
+                <p class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Pending</p>
+            </div>
+            <!-- Massive Dynamic Number -->
+            <div class="flex items-end gap-2 mt-1">
+                <h4 class="text-4xl sm:text-5xl font-black text-slate-800 dark:text-white leading-none tracking-tighter drop-shadow-sm" x-text="openTickets.length">0</h4>
+                <span class="text-[9px] font-black text-rose-500 uppercase tracking-widest mb-1.5 animate-pulse" x-show="openTickets.length > 0">Action Req</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI 2: Active Staff (Aurora Green Gradient) -->
+    <div @click="showStaffModal = true" class="relative overflow-hidden rounded-[1.25rem] border border-white/80 dark:border-white/10 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer group/kpi bg-white/70 dark:bg-[#0f172a]/80 backdrop-blur-xl">
+        
+        <!-- Premium Gradient Corner Glow -->
+        <div class="absolute -top-8 -right-8 w-28 h-28 bg-gradient-to-br from-teal-400 to-emerald-600 opacity-20 dark:opacity-30 rounded-full blur-2xl group-hover/kpi:opacity-50 transition-opacity duration-500"></div>
+
+        <div class="p-3 sm:p-4 relative z-10 flex flex-col justify-center">
+            <!-- Inline Title & Icon -->
+            <div class="flex items-center gap-2 mb-1.5 sm:mb-2">
+                <div class="w-6 h-6 rounded-md bg-teal-50 dark:bg-teal-500/20 text-teal-600 dark:text-teal-400 flex items-center justify-center text-[10px] sm:text-xs border border-teal-100 dark:border-teal-500/30"><i class="fa-solid fa-user-clock"></i></div>
+                <p class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">IT Staff</p>
+            </div>
+            <!-- Massive Dynamic Number -->
+            <div class="flex items-baseline gap-1 mt-1">
+                <h4 class="text-4xl sm:text-5xl font-black text-slate-800 dark:text-white leading-none tracking-tighter drop-shadow-sm" x-text="onlineStaffCount">0</h4>
+                <span class="text-xs sm:text-sm font-mono text-slate-400 font-bold mb-1.5">/ 3</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+    </div>
+</div>
             </section>
         </div>
     </main>
