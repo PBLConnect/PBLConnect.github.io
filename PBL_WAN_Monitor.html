@@ -298,35 +298,13 @@
 
             </div>
 
-            <!-- LOGS TABLE WRAPPER -->
+         <!-- LOGS TABLE WRAPPER -->
             <div class="flex-1 flex flex-col relative z-10">
-                
-                <!-- SINGLE PREMIUM LOADER (Centered fixed position) -->
-                <div x-show="loading" 
-                     class="absolute inset-[-10px] sm:inset-[-15px] bg-slate-50/80 dark:bg-[#020617]/80 z-[50] backdrop-blur-md rounded-2xl md:rounded-3xl"
-                     x-transition:enter="transition ease-out duration-300"
-                     x-transition:leave="transition ease-in duration-200"
-                     x-cloak>
-                    <div class="fixed top-[65%] lg:top-[60%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center w-full">
-                        <div class="spinnerContainer scale-90 sm:scale-100">
-                            <div class="spinner"></div>
-                            <div class="loader">
-                                <p class="mr-1.5">Scanning</p>
-                                <div class="words">
-                                    <span class="word">Logs...</span>
-                                    <span class="word">Events...</span>
-                                    <span class="word">ISPs...</span>
-                                    <span class="word">Logs...</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mt-5 text-[10px] font-black text-brand dark:text-brand_glow uppercase tracking-widest animate-pulse">Syncing Network Data...</div>
-                    </div>
-                </div>
 
                 <!-- TABLE CONTAINER -->
                 <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl rounded-3xl border border-slate-200 dark:border-dark_border shadow-sm flex flex-col flex-1 h-[450px] md:h-[500px] overflow-hidden relative mb-6 lg:mb-0">
                     
+                    <!-- HEADER -->
                     <div class="px-3 py-2.5 sm:px-5 sm:py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-black/20 flex justify-between items-center shrink-0">
                         <div class="flex items-center gap-3">
                             <h3 class="font-heading font-black text-xs sm:text-base text-slate-800 dark:text-white flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-brand opacity-80"></i> Event Logs</h3>
@@ -343,10 +321,28 @@
                         </div> 
                     </div>
                     
+                    <!-- SCROLLABLE AREA -->
                     <div class="w-full flex-1 overflow-y-auto overflow-x-hidden custom-scroll relative bg-white/50 dark:bg-transparent">
                         
+                        <!-- PREMIUM INLINE LOADER -->
+                        <div x-show="loading" class="flex flex-col items-center justify-center h-64 mt-4" x-cloak>
+                            <div class="spinnerContainer scale-90 sm:scale-100">
+                                <div class="spinner"></div>
+                                <div class="loader">
+                                    <p class="mr-1.5">Scanning</p>
+                                    <div class="words">
+                                        <span class="word">Logs...</span>
+                                        <span class="word">Events...</span>
+                                        <span class="word">ISPs...</span>
+                                        <span class="word">Logs...</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-5 text-[10px] font-black text-brand dark:text-brand_glow uppercase tracking-widest animate-pulse">Syncing Network Data...</div>
+                        </div>
+
                         <!-- 📱 MOBILE VIEW: SMART CARD LAYOUT -->
-                        <div class="md:hidden flex flex-col gap-2.5 p-2.5 pb-6">
+                        <div class="md:hidden flex flex-col gap-2.5 p-2.5 pb-6" x-show="!loading" x-cloak>
                             <template x-for="(log, index) in filteredList" :key="'mob-'+index">
                                 <div class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-3 shadow-sm flex flex-col gap-3 relative overflow-hidden transition-all hover:shadow-md cursor-pointer" @click="editLog(log)">
                                     
@@ -397,14 +393,14 @@
                                 </div>
                             </template>
                             
-                            <div x-show="!loading && filteredList.length === 0" class="p-8 text-center text-slate-400">
+                            <div x-show="filteredList.length === 0" class="p-8 text-center text-slate-400">
                                 <i class="fa-solid fa-server text-3xl mb-3 opacity-30"></i>
                                 <p class="text-xs font-medium">No logs found. Connectivity is stable! 🚀</p>
                             </div>
                         </div>
 
                         <!-- 💻 DESKTOP VIEW: TRADITIONAL TABLE -->
-                        <table class="hidden md:table w-full text-left border-collapse table-fixed text-xs sm:text-sm">
+                        <table class="hidden md:table w-full text-left border-collapse table-fixed text-xs sm:text-sm" x-show="!loading" x-cloak>
                             <thead class="bg-white/50 dark:bg-white/5 text-[9px] text-slate-400 uppercase font-black tracking-widest sticky top-0 z-10 shadow-sm backdrop-blur-md">
                                 <tr>
                                     <th class="px-3 py-3 w-[10%] text-center">Date</th>
