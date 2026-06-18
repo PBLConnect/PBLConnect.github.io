@@ -373,43 +373,37 @@
             <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl rounded-2xl md:rounded-3xl border border-slate-200 dark:border-dark_border shadow-sm p-4 sm:p-5 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 sm:gap-6 transition-all relative z-10 shrink-0">
                 
                 <!-- LEFT: Identity & Sub-details -->
-                <div class="w-full xl:w-auto shrink-0 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5">
+                <div class="w-full xl:w-auto shrink-0 flex flex-col justify-center">
                     
-                    <!-- Switch Name (Left on PC, Top on Mobile) -->
-                    <h2 class="text-2xl sm:text-4xl font-heading font-black tracking-tight text-slate-800 dark:text-white leading-none mb-1 sm:mb-0" 
+                    <!-- Top Row: Capacity Tag -->
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-[9px] sm:text-[10px] font-mono font-bold text-brand bg-blue-50 dark:bg-brand/10 px-2.5 py-1 rounded-md border border-blue-200 dark:border-brand/20 shadow-sm leading-none" x-text="selectedSwitch.ports + ' PORTS CAPACITY'"></span>
+                    </div>
+                    
+                    <!-- Switch Name -->
+                    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-heading font-black tracking-tight text-slate-800 dark:text-white leading-none mb-3" 
                         :class="selectedSwitch.type === 'backup' ? 'text-slate-400 line-through decoration-slate-300' : ''"
                         x-text="selectedSwitch.id">
                     </h2>
                     
-                    <!-- Details Badges (Right of Name on PC, Bottom Grid on Mobile) -->
-                    <div class="flex flex-col gap-2 w-full sm:w-auto">
+                    <!-- Bottom Row: Space-Efficient Badges -->
+                    <div class="grid grid-cols-2 sm:flex sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
                         
-                        <!-- Top Row: Capacity Tag -->
-                        <div class="flex sm:justify-start">
-                            <span class="text-[9px] sm:text-[10px] font-mono font-bold text-brand bg-blue-50 dark:bg-brand/10 px-2.5 py-1 rounded-md border border-blue-200 dark:border-brand/20 shadow-sm leading-none" x-text="selectedSwitch.ports + ' PORTS CAPACITY'"></span>
+                        <!-- Location Badge (Rose Colored) -->
+                        <div class="flex items-center gap-1.5 sm:gap-2 text-[9px] sm:text-[11px] font-bold text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 px-2 sm:px-2.5 py-1.5 rounded-lg border border-rose-100 dark:border-rose-500/20 shadow-sm w-full sm:w-auto overflow-hidden">
+                            <i class="fa-solid fa-map-pin text-rose-500 shrink-0"></i> 
+                            <span class="truncate sm:break-words leading-tight" x-text="selectedSwitch.location"></span>
                         </div>
                         
-                        <!-- Bottom Row: Location & Model -->
-                        <div class="grid grid-cols-2 sm:flex sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2.5 w-full sm:w-auto">
-                            
-                            <!-- Location Badge (Rose Colored) -->
-                            <div class="flex items-center gap-2 text-[10px] sm:text-[11px] font-bold text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 px-2.5 py-1.5 rounded-lg border border-rose-100 dark:border-rose-500/20 shadow-sm w-full sm:w-auto">
-                                <i class="fa-solid fa-map-pin text-rose-500 shrink-0"></i> 
-                                <span class="break-words leading-tight" x-text="selectedSwitch.location"></span>
-                            </div>
-                            
-                            <!-- Model Badge (Indigo Colored) -->
-                            <div class="flex items-center gap-2 text-[10px] sm:text-[11px] font-bold text-indigo-700 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-2.5 py-1.5 rounded-lg border border-indigo-100 dark:border-indigo-500/20 shadow-sm w-full sm:w-auto">
-                                <i class="fa-solid fa-microchip text-indigo-500 shrink-0"></i> 
-                                <span class="break-words leading-tight" x-text="selectedSwitch.model_name"></span>
-                            </div>
+                        <!-- Model Badge (Indigo Colored) -->
+                        <div class="flex items-center gap-1.5 sm:gap-2 text-[9px] sm:text-[11px] font-bold text-indigo-700 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-2 sm:px-2.5 py-1.5 rounded-lg border border-indigo-100 dark:border-indigo-500/20 shadow-sm w-full sm:w-auto overflow-hidden">
+                            <i class="fa-solid fa-microchip text-indigo-500 shrink-0"></i> 
+                            <span class="truncate sm:break-words leading-tight" x-text="selectedSwitch.model_name"></span>
                         </div>
 
                     </div>
                 </div>
-
-                <!-- Divider for mobile only -->
-                <div class="w-full h-px bg-slate-100 dark:bg-white/5 xl:hidden mt-1 mb-1"></div>
+                
 
                 <!-- RIGHT: 3 KPIs (IP Manager Style: Watermark Icons, Pastel Bg) -->
                 <div class="w-full xl:w-auto grid grid-cols-3 gap-2 sm:gap-4 shrink-0">
@@ -450,16 +444,16 @@
                 </div>
             </div>
 
-            <!-- 🚀 DATA AREA WRAPPER (Loader sirf is hisse par aayega) --> 
+            <!-- 🚀 DATA AREA WRAPPER (Map + Table) --> 
             <div class="flex flex-col gap-4 sm:gap-6 relative z-10">
-                
-                <!-- MAIN LOADER --> 
+
+                <!-- SINGLE PREMIUM LOADER (Ye dono boxes ke theek center me aayega) -->
                 <div x-show="loading" 
-                     class="absolute inset-0 bg-white/80 dark:bg-[#020617]/80 flex flex-col items-center justify-center z-[30] backdrop-blur-sm transition-opacity duration-300 rounded-2xl md:rounded-3xl"
-                     x-transition:enter="transition ease-out duration-200"
-                     x-transition:leave="transition ease-in duration-100"
+                     class="absolute inset-[-10px] sm:inset-[-15px] bg-slate-50/70 dark:bg-[#020617]/70 flex flex-col items-center justify-center z-[50] backdrop-blur-md rounded-[2rem]"
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:leave="transition ease-in duration-200"
                      x-cloak>
-                    <div class="spinnerContainer">
+                    <div class="spinnerContainer scale-90 sm:scale-100">
                         <div class="spinner"></div>
                         <div class="loader">
                             <p class="mr-1.5">Scanning</p>
@@ -471,49 +465,46 @@
                             </div>
                         </div>
                     </div>
-                    <div class="mt-4 text-[10px] font-black text-slate-400 uppercase tracking-widest animate-pulse" x-text="loadingText"></div>
+                    <div class="mt-5 text-[10px] font-black text-brand dark:text-brand_glow uppercase tracking-widest animate-pulse" x-text="loadingText"></div>
                 </div>
 
-                <!-- PORT VISUAL GRID (Compact Height) --> 
-                <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl px-3 py-2 sm:px-4 sm:py-2.5 rounded-2xl md:rounded-3xl border border-slate-200 dark:border-dark_border shadow-sm shrink-0 relative z-20"> 
-                    <div class="flex justify-between items-center mb-1.5"> <!-- Header title -->
-                        <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Physical Interfaces Map</h3> <!-- Title -->
-                    </div> <!-- Header title khatam -->
+                <!-- PORT VISUAL GRID (Without inside loader) --> 
+                <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl px-3 py-2 sm:px-4 sm:py-2.5 rounded-2xl md:rounded-3xl border border-slate-200 dark:border-dark_border shadow-sm shrink-0 relative z-20 overflow-hidden"> 
+                    <div class="flex justify-between items-center mb-1.5"> 
+                        <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Physical Interfaces Map</h3> 
+                    </div> 
                     
-                    <div class="w-full"> <!-- Container pura width lega -->
-                        <!-- Hardware Grid: Tighter gaps and smaller heights --> <!-- Grid system ports ko lines me set karne ke liye -->
-                        <div class="grid grid-cols-6 sm:grid-cols-12 xl:grid-cols-24 gap-1 sm:gap-1.5"> <!-- Grid column settings responsive screens pe -->
-                            <template x-for="(port, idx) in generatePortList()" :key="port.num"> <!-- Har port ke liye loop -->
-                                <!-- Port box render with Search Filter Logic -->
+                    <div class="w-full"> 
+                        <div class="grid grid-cols-6 sm:grid-cols-12 xl:grid-cols-24 gap-1 sm:gap-1.5"> 
+                            <template x-for="(port, idx) in generatePortList()" :key="port.num"> 
                                 <div @click="openEditModal(port)" 
                                      class="port-box border rounded h-6 sm:h-7 flex items-center justify-center font-mono text-[9px] sm:text-[10px] font-bold cursor-pointer group relative transition-all duration-300"
                                      :class="[getPortClass(port.status), (searchQuery && !isMatch(port)) ? 'opacity-20 grayscale scale-95 pointer-events-none' : '']"> 
-                                    <span x-text="port.num" :class="port.status === 'empty' ? 'opacity-40' : 'opacity-100'"></span> <!-- Port number -->
+                                    <span x-text="port.num" :class="port.status === 'empty' ? 'opacity-40' : 'opacity-100'"></span> 
                                     
-                                    <!-- TOOLTIP (Hover par detail dikhane ke liye) -->
-                                    <div class="hidden sm:flex absolute w-56 bg-slate-800 text-white p-3 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none flex-col gap-1 border border-slate-600" style="z-index: 1000;" :class="getTooltipPosition(idx, selectedSwitch.ports)"> <!-- Kaale rang ka tooltip popup -->
-                                        <div class="absolute w-2 h-2 bg-slate-800 border-l border-b border-slate-600 rotate-45" :class="getArrowPosition(idx, selectedSwitch.ports)"></div> <!-- Tooltip ki choch (arrow) -->
-                                        <div class="flex justify-between items-center border-b border-white/10 pb-1.5"> <!-- Title line -->
-                                            <span class="font-black text-xs">Port <span x-text="port.num"></span></span> <!-- Port num -->
-                                            <span class="text-[9px] font-mono bg-white/10 px-1.5 py-0.5 rounded" x-text="port.cable || 'NO-ID'"></span> <!-- Cable id -->
-                                        </div> <!-- Title line khatam -->
-                                        <div class="text-[10px] text-blue-300 font-bold truncate" x-text="port.desc || 'Available'"></div> <!-- Description neele rang me -->
-                                        <div class="text-[9px] text-slate-400 font-mono mt-0.5" x-show="port.status !== 'empty'"> <!-- IP line -->
-                                            IP/VLAN: <span class="text-white" x-text="port.vlan || '-'"></span> <!-- IP address safed me -->
-                                        </div> <!-- IP line khatam -->
-                                    </div> <!-- Tooltip khatam -->
-                                </div> <!-- Port box khatam -->
-                            </template> <!-- Loop khatam -->
-                        </div> <!-- Grid khatam -->
-                    </div> <!-- Container khatam -->
+                                    <!-- Tooltip... -->
+                                    <div class="hidden sm:flex absolute w-56 bg-slate-800 text-white p-3 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none flex-col gap-1 border border-slate-600" style="z-index: 1000;" :class="getTooltipPosition(idx, selectedSwitch.ports)"> 
+                                        <div class="absolute w-2 h-2 bg-slate-800 border-l border-b border-slate-600 rotate-45" :class="getArrowPosition(idx, selectedSwitch.ports)"></div> 
+                                        <div class="flex justify-between items-center border-b border-white/10 pb-1.5"> 
+                                            <span class="font-black text-xs">Port <span x-text="port.num"></span></span> 
+                                            <span class="text-[9px] font-mono bg-white/10 px-1.5 py-0.5 rounded" x-text="port.cable || 'NO-ID'"></span> 
+                                        </div> 
+                                        <div class="text-[10px] text-blue-300 font-bold truncate" x-text="port.desc || 'Available'"></div> 
+                                        <div class="text-[9px] text-slate-400 font-mono mt-0.5" x-show="port.status !== 'empty'"> 
+                                            IP/VLAN: <span class="text-white" x-text="port.vlan || '-'"></span> 
+                                        </div> 
+                                    </div> 
+                                </div> 
+                            </template> 
+                        </div> 
+                    </div> 
                 </div>
 
-                <!-- CONNECTION MATRIX TABLE --> 
-                <!-- Fixed Height (h-[450px] Mobile, h-[500px] Desktop) lagaya taaki entries iske ANDAR scroll hon -->
+                <!-- CONNECTION MATRIX TABLE (Without inside loader) --> 
                 <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl border border-slate-200 dark:border-dark_border rounded-2xl md:rounded-3xl shadow-sm flex flex-col h-[450px] md:h-[500px] shrink-0 relative z-10 overflow-hidden mb-6 lg:mb-0">
                     
                     <!-- Header -->
-                    <div class="px-3 py-2.5 sm:px-5 sm:py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-black/20 flex justify-between items-center shrink-0"> 
+                    <div class="px-3 py-2.5 sm:px-5 sm:py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-black/20 flex justify-between items-center shrink-0">
                         <h3 class="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">Active Connection Matrix</h3> 
                         
                         <div class="flex items-center gap-1.5 sm:gap-2"> 
@@ -530,12 +521,12 @@
                         </div> 
                     </div> 
                     
-                    <!-- Inner Scrollable Container -->
-                    <div class="w-full flex-1 overflow-y-auto overflow-x-auto custom-scroll relative bg-white/50 dark:bg-transparent"> 
+                    <!-- Inner Scrollable Container (NO Horizontal Scroll) -->
+                    <!-- Added overflow-x-hidden to strictly block left-right scrolling -->
+                    <div class="w-full flex-1 overflow-y-auto overflow-x-hidden custom-scroll relative bg-white/50 dark:bg-transparent"> 
                         
-                        <!-- 📱 MOBILE VIEW: COMPACT SMART CARDS --> 
+                        <!-- 📱 MOBILE VIEW: COMPACT SMART CARDS (No Changes Here) --> 
                         <div class="md:hidden flex flex-col gap-2 p-2.5 pb-6"> 
-                            <!-- Used filteredTablePorts to support searching -->
                             <template x-for="port in filteredTablePorts" :key="'mob-'+port.num"> 
                                 <div class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-2.5 shadow-sm flex items-center relative transition-all hover:shadow-md cursor-pointer" @click="openEditModal(port)"> 
                                     <div class="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-xl" :class="port.status === 'uplink' ? 'bg-blue-500' : 'bg-emerald-500'"></div> 
@@ -560,7 +551,6 @@
                                 </div> 
                             </template> 
 
-                            <!-- Empty message with filtering in mind -->
                             <div x-show="!loading && filteredTablePorts.length === 0" class="p-8 text-center text-slate-400"> 
                                 <i class="fa-solid fa-plug-circle-xmark text-3xl mb-3 opacity-30"></i> 
                                 <p class="font-medium text-xs">No active connections found.</p> 
@@ -568,52 +558,64 @@
                         </div> 
 
                         <!-- 💻 DESKTOP VIEW: STRUCTURED TABLE --> 
-                        <table class="hidden md:table w-full text-left border-collapse min-w-[800px] whitespace-nowrap" id="switchTable"> 
+                        <!-- Changed: Removed min-w-[800px] and whitespace-nowrap. Added table-fixed. -->
+                        <table class="hidden md:table w-full text-left border-collapse table-fixed" id="switchTable"> 
                             <thead class="bg-white/50 dark:bg-white/5 text-[9px] text-slate-400 uppercase font-black tracking-widest sticky top-0 z-10 shadow-sm backdrop-blur-md"> 
                                 <tr> 
-                                    <th class="px-5 py-3 w-16 text-center">Port</th> 
-                                    <th class="px-5 py-3 w-28">Status</th> 
-                                    <th class="px-5 py-3">Device / Description</th> 
-                                    <th class="px-5 py-3 w-36">Network IP</th> 
-                                    <th class="px-5 py-3 w-28">Cable ID</th> 
-                                    <th class="px-5 py-3 w-16 text-center">Act</th> 
+                                    <!-- Changed: Using Percentages so it auto-fits perfectly without scrolling -->
+                                    <th class="px-3 py-3 w-[8%] text-center">Port</th> 
+                                    <th class="px-3 py-3 w-[15%]">Status</th> 
+                                    <th class="px-3 py-3 w-[35%]">Device / Description</th> 
+                                    <th class="px-3 py-3 w-[20%]">Network IP</th> 
+                                    <th class="px-3 py-3 w-[14%]">Cable ID</th> 
+                                    <th class="px-3 py-3 w-[8%] text-center">Act</th> 
                                 </tr> 
                             </thead> 
                             <tbody class="divide-y divide-slate-100 dark:divide-white/5 text-sm"> 
                                 <template x-for="port in filteredTablePorts" :key="'desk-'+port.num"> 
                                     <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition duration-150 cursor-pointer group border-b border-slate-100 dark:border-white/5" @click="openEditModal(port)"> 
-                                        <td class="px-4 py-3 text-center align-middle"> 
+                                        
+                                        <!-- Port Num -->
+                                        <td class="px-3 py-3 text-center align-middle"> 
                                             <div class="w-7 h-7 rounded bg-slate-50 dark:bg-black/30 flex items-center justify-center font-mono font-black text-slate-600 dark:text-slate-300 mx-auto shadow-inner border border-slate-100 dark:border-white/5" x-text="String(port.num).padStart(2, '0')"></div> 
                                         </td> 
-                                        <td class="px-4 py-3 align-middle"> 
-                                            <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-wider border shadow-sm"
+                                        
+                                        <!-- Status -->
+                                        <td class="px-3 py-3 align-middle"> 
+                                            <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-wider border shadow-sm truncate max-w-full"
                                                   :class="port.status === 'uplink' ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-brand/10 dark:text-brand dark:border-brand/20' : 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'"> 
                                                 <i class="fa-solid text-[8px]" :class="port.status === 'uplink' ? 'fa-arrow-up' : 'fa-check'"></i> 
-                                                <span x-text="port.status"></span> 
+                                                <span class="truncate" x-text="port.status"></span> 
                                             </span> 
                                         </td> 
-                                        <td class="px-4 py-3 font-bold text-slate-800 dark:text-white text-[13px] align-middle" x-text="port.desc"></td> 
-                                        <td class="px-4 py-3 font-mono font-bold text-slate-500 dark:text-slate-400 text-[11px] align-middle" x-text="port.vlan || '-'"></td> 
-                                        <td class="px-4 py-3 align-middle"> 
+                                        
+                                        <!-- Description (Truncate applied to prevent stretch) -->
+                                        <td class="px-3 py-3 font-bold text-slate-800 dark:text-white text-[13px] align-middle truncate" :title="port.desc" x-text="port.desc"></td> 
+                                        
+                                        <!-- IP (Truncate applied) -->
+                                        <td class="px-3 py-3 font-mono font-bold text-slate-500 dark:text-slate-400 text-[11px] align-middle truncate" x-text="port.vlan || '-'"></td> 
+                                        
+                                        <!-- Cable (Truncate applied) -->
+                                        <td class="px-3 py-3 align-middle truncate"> 
                                             <span class="font-mono text-[10px] font-bold text-slate-600 bg-slate-100 border border-slate-200 dark:bg-black/30 dark:text-slate-300 dark:border-white/10 px-2 py-0.5 rounded shadow-sm" x-text="port.cable || 'N/A'"></span> 
                                         </td> 
-                                        <td class="px-4 py-3 text-center align-middle sticky-col bg-white dark:bg-dark_surface group-hover:bg-slate-50 dark:group-hover:bg-white/5 transition"> 
+                                        
+                                        <!-- Action -->
+                                        <td class="px-3 py-3 text-center align-middle sticky-col bg-transparent"> 
                                             <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-white dark:bg-black/20 hover:bg-brand hover:text-white text-slate-400 transition shadow-sm border border-slate-200 dark:border-white/5 hover:border-brand/50 mx-auto"><i class="fa-solid fa-pen text-[10px]"></i></button> 
                                         </td> 
                                     </tr> 
-                                </template> 
+                                </template>
                                 
                                 <tr x-show="!loading && filteredTablePorts.length === 0"> 
                                     <td colspan="6" class="px-5 py-12 text-center text-slate-400"> 
                                         <i class="fa-solid fa-plug-circle-xmark text-3xl mb-2 opacity-50"></i> 
-                                        <p class="font-medium text-xs">No active connections found.</p> 
+                                        <p class="font-medium text-xs">No active connections found on this switch.</p> 
                                     </td> 
                                 </tr> 
                             </tbody> 
                         </table> 
                     </div>
-                </div> <!-- END CONNECTION MATRIX TABLE -->
-            </div> <!-- END DATA AREA WRAPPER -->
         </div> <!-- END RIGHT CONTENT AREA -->
     </main> <!-- Main layout area khatam -->
 
