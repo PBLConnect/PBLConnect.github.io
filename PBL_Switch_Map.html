@@ -206,314 +206,469 @@
         </div> <!-- Main modal dabba khatam -->
     </div> <!-- Overlay khatam -->
 
-    <!-- NAVBAR (v1.0 Premium Hierarchy) --> <!-- Top Navigation Bar shuru -->
+    <!-- NAVBAR (Redesigned Header) --> <!-- Top Navigation Bar shuru -->
     <header class="sticky top-0 bg-white/70 dark:bg-[#020617]/70 backdrop-blur-2xl border-b border-slate-200/80 dark:border-white/5 flex-shrink-0 h-16 sm:h-20 z-40"> <!-- Header container glassy effect ke sath -->
-        <div class="max-w-[1920px] mx-auto px-4 sm:px-6 h-full flex justify-between items-center"> <!-- Centered container -->
+        <div class="max-w-[1920px] mx-auto px-4 sm:px-6 h-full flex justify-between items-center relative"> <!-- Centered container -->
             
-            <!-- Left: Breadcrumb Identity --> <!-- Navigation ka left hissa -->
-            <div class="flex items-center gap-4 sm:gap-6"> <!-- Flexbox alignment ke liye -->
-                <!-- App Link --> <!-- Logo wala button -->
-                <a href="IT_Dashboard.html" @click="haptic('light')" class="group flex items-center gap-3 transition-transform active:scale-95" title="Return to Dashboard"> <!-- Haptic aur click effect lagaya -->
-                    <div class="relative h-9 sm:h-12 w-auto flex items-center"> <!-- Logo image container -->
-                        <img src="pbl-logo.png" alt="PBL Logo" class="h-8 sm:h-10 w-auto object-contain drop-shadow-md transition-transform group-hover:scale-105" @error="$el.style.display='none'; $refs.fbLogo.style.display='flex'"> <!-- Main Logo -->
-                        <div x-ref="fbLogo" style="display:none;" class="w-9 h-9 sm:w-11 sm:h-11 bg-gradient-to-tr from-brand to-indigo-600 text-white rounded-xl flex items-center justify-center font-black text-xl shadow-[0_0_15px_rgba(59,130,246,0.4)] group-hover:shadow-[0_0_25px_rgba(59,130,246,0.6)] transition-all">P</div> <!-- Fallback Logo -->
+            <!-- Left: Logo & Identity --> <!-- Navigation ka left hissa -->
+            <div class="flex items-center gap-3 sm:gap-4"> <!-- Flexbox alignment ke liye -->
+                <!-- App Logo --> <!-- Logo wala button -->
+                <a href="IT_Dashboard.html" @click="haptic('light')" class="group flex items-center gap-2.5 transition-transform active:scale-95" title="Return to Dashboard"> <!-- Haptic aur click effect lagaya -->
+                    <div class="relative h-8 sm:h-10 w-auto flex items-center"> <!-- Logo image container -->
+                        <img src="pbl-logo.png" alt="PBL Logo" class="h-full w-auto object-contain drop-shadow-sm transition-transform group-hover:scale-105" @error="$el.style.display='none'; $refs.fbLogo.style.display='flex'"> <!-- Main Logo -->
+                        <div x-ref="fbLogo" style="display:none;" class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-tr from-brand to-indigo-600 text-white rounded-xl flex items-center justify-center font-black text-lg shadow-sm">P</div> <!-- Fallback Logo -->
                     </div> <!-- Logo container khatam -->
                     <div class="hidden lg:block"> <!-- Badi screen pe text dikhane ke liye -->
-                        <h1 class="font-heading font-black text-xl leading-none text-slate-800 dark:text-white tracking-tight group-hover:text-brand dark:group-hover:text-brand_glow transition-colors">PBL<span class="text-brand">Connect</span></h1> <!-- App naam -->
+                        <h1 class="font-heading font-black text-lg sm:text-xl leading-none text-slate-800 dark:text-white tracking-tight">PBL<span class="text-brand">Connect</span></h1> <!-- App naam -->
                     </div> <!-- Text container khatam -->
                 </a> <!-- App link khatam -->
 
-                <!-- Divider --> <!-- Do sections ke beech ki line -->
-                <div class="hidden sm:block h-8 w-px bg-slate-200 dark:bg-slate-800"></div> <!-- Vertical line divider -->
+                <!-- Vertical Line --> <!-- Do sections ke beech ki line -->
+                <div class="hidden sm:block h-8 w-px bg-slate-200 dark:bg-slate-700/50 mx-1"></div> <!-- Vertical line divider -->
 
                 <!-- Page Identity --> <!-- Pange ki jaankari -->
                 <div class="flex flex-col justify-center"> <!-- Upar niche text set karne ke liye -->
-                    <div class="flex items-center gap-2"> <!-- Chote badges ki line -->
-                        <span class="bg-brand/10 text-brand px-1.5 py-0.5 rounded font-mono font-bold text-[8px] sm:text-[9px] leading-none border border-brand/20">v1.0</span> <!-- Version badge -->
-                        <span class="hidden sm:inline-block text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-md">Network Ops</span> <!-- Module badge -->
+                    <div class="flex items-center gap-1.5 mb-0.5"> <!-- Chote badges ki line -->
+                        <span class="bg-brand/10 text-brand px-1.5 py-0.5 rounded font-mono font-bold text-[8px] leading-none border border-brand/20">v1.0</span> <!-- Version badge -->
+                        <span class="hidden sm:inline-block text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-md">Network Ops</span> <!-- Module badge -->
                     </div> <!-- Choti line khatam -->
-                    <h2 class="font-heading font-bold text-sm sm:text-lg text-slate-700 dark:text-slate-200 leading-tight mt-1">Switch Manager</h2> <!-- Page ka naam -->
+                    <h2 class="font-heading font-black text-base sm:text-xl text-slate-800 dark:text-slate-200 leading-tight">Switch Manager</h2> <!-- Page ka naam -->
                 </div> <!-- Identity container khatam -->
             </div> <!-- Left hissa khatam -->
 
-            <!-- Center: Floating HUD Clock (Hidden on Mobile) --> <!-- Samay dikhane wala center block -->
-            <div class="hidden xl:flex items-center absolute left-[45%] xl:left-[46%] transform -translate-x-1/2 z-20 w-max transition-all duration-300"> <!-- Badi screen pe bich me rakha -->
-                <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl p-1 rounded-full border border-slate-200 dark:border-white/10 flex items-center shadow-sm hover:shadow-md transition-all"> <!-- Pill jaisa dabba -->
-                    <div class="flex items-center gap-2.5 px-3 xl:px-4 py-1.5 whitespace-nowrap"> <!-- Andar ka content -->
-                        <i class="fa-regular fa-clock text-brand text-[13px] xl:text-[15px] animate-pulse"></i> <!-- Ghadi ka icon -->
-                        <span class="text-[14px] xl:text-[16px] font-mono font-black text-slate-800 dark:text-white tracking-tight leading-none" x-text="currentTime">--:--:--</span> <!-- Time text -->
-                        <div class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600 mx-0.5"></div> <!-- Chota sa dot -->
-                        <span class="text-[9px] xl:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest" x-text="currentDate">-- --- ----</span> <!-- Date text -->
-                    </div> <!-- Andar ka content khatam -->
-                </div> <!-- Pill dabba khatam -->
-            </div> <!-- Center block khatam -->
+            <!-- Center: Global Command Center (Spotlight Search) -->
+            <div class="hidden xl:flex items-center absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 transition-all duration-500 ease-out"
+                 x-data="{ isFocused: false }"
+                 @keydown.window="if ($event.ctrlKey && $event.key === '/') { $event.preventDefault(); $refs.globalSearch.focus(); }"
+                 :class="isFocused ? 'w-[450px]' : 'w-[320px]'">
+                
+                <!-- Spinning Border Wrapper -->
+                <div class="relative w-full h-10 rounded-full p-[1.5px] overflow-hidden flex items-center justify-center group shadow-sm transition-all"
+                     :class="isFocused ? 'shadow-[0_0_20px_rgba(168,85,247,0.25)]' : ''">
+                    
+                    <!-- Default Idle Border -->
+                    <div class="absolute inset-0 bg-slate-200 dark:bg-white/10 transition-opacity duration-300" 
+                         :class="isFocused ? 'opacity-0' : 'opacity-100'"></div>
+
+                    <!-- Spinning Neon Gradient (Active on Focus) -->
+                    <div class="absolute w-[300%] h-[300%] animate-[spin_2.5s_linear_infinite] opacity-0 transition-opacity duration-500"
+                         :class="isFocused ? 'opacity-100' : 'opacity-0'"
+                         style="background: conic-gradient(transparent 40%, #3b82f6, #a855f7, #ec4899, transparent 70%);"></div>
+
+                    <!-- Inner Input Field Background -->
+                    <div class="relative z-10 w-full h-full bg-white dark:bg-dark_surface rounded-full flex items-center px-4 gap-3 transition-colors duration-300">
+                        <i class="fa-solid fa-magnifying-glass transition-colors duration-300" :class="isFocused ? 'text-brand' : 'text-slate-400 dark:text-slate-500'"></i>
+                        
+                        <input type="text"
+                               x-ref="globalSearch"
+                               x-model="searchQuery" 
+                               @focus="isFocused = true; haptic('light')"
+                               @blur="isFocused = false"
+                               placeholder="Search Ports, Cable, IPs..."
+                               class="w-full bg-transparent border-none outline-none text-xs font-medium text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500">
+                        
+                        <!-- Keyboard Shortcut Badges -->
+                        <div class="shrink-0 flex items-center gap-1 transition-all duration-300 pointer-events-none" :class="isFocused ? 'opacity-0 translate-x-2' : 'opacity-100 translate-x-0'">
+                            <kbd class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/5 text-[9px] font-mono font-bold text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-white/10 shadow-sm">CTRL</kbd>
+                            <kbd class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/5 text-[9px] font-mono font-bold text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-white/10 shadow-sm">/</kbd>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- Right Actions (Streamlined Modern Layout matching IP Manager) --> <!-- Buttons ka right hissa -->
             <div class="flex items-center justify-end gap-2 sm:gap-3 w-auto relative z-30"> <!-- Flex row right side align kiya -->
                 
-                <!-- Unified Controls Container (Modern Grouped Pill) --> <!-- Buttons ko ek capsule me group kiya -->
+                <!-- Unified Controls Container (Modern Grouped Pill exactly like IP Manager) --> <!-- Buttons ko ek capsule me group kiya -->
                 <div class="flex items-center gap-1.5 sm:gap-2 bg-slate-100/80 dark:bg-black/40 p-1 sm:p-1.5 rounded-full border border-slate-200/50 dark:border-white/5 shadow-inner backdrop-blur-sm shrink-0"> <!-- Capsule design start -->
                     
+                    <!-- Mobile Search Button -->
+                    <button type="button" @click="mobileSearchOpen = !mobileSearchOpen; if(mobileSearchOpen) setTimeout(()=> $refs.mobSearchInput.focus(), 100); haptic('light')" class="xl:hidden w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-white dark:bg-dark_surface hover:bg-slate-50 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-all border border-slate-200 dark:border-white/10 shadow-sm hover:shadow-md hover:text-brand dark:hover:text-brand_glow">
+                        <i class="fa-solid fa-magnifying-glass text-[12px] sm:text-[14px]"></i>
+                    </button>
+
                     <!-- Theme Toggle --> <!-- Dark/Light mode button -->
                     <button type="button" @click.prevent="toggleTheme()" class="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-white dark:bg-dark_surface hover:bg-slate-50 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-all border border-slate-200 dark:border-white/10 shadow-sm hover:shadow-md hover:text-brand dark:hover:text-brand_glow"> <!-- Gol safed button -->
                         <i class="fa-solid text-[13px] sm:text-[15px]" :class="isDark ? 'fa-sun text-amber-400 drop-shadow-[0_0_5px_rgba(251,191,36,0.5)]' : 'fa-moon'"></i> <!-- Chand aur suraj icon switch -->
                     </button> <!-- Theme button khatam -->
 
-                    <!-- Back to Hub Button --> <!-- Dashboard pe wapas jane ka button -->
-                    <a href="IT_Dashboard.html" @click="haptic('light')" class="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-slate-800 dark:bg-white hover:bg-slate-900 dark:hover:bg-slate-100 text-white dark:text-slate-900 transition-all border border-transparent shadow-sm hover:shadow-md active:scale-95" title="Back to Dashboard"> <!-- Kala gol button -->
-                        <i class="fa-solid fa-arrow-left text-[13px] sm:text-[15px]"></i> <!-- Teer ka nishan -->
+                    <!-- Back to Hub Button (IP Manager Style) --> <!-- Dashboard pe wapas jane ka button -->
+                    <a href="IT_Dashboard.html" @click="haptic('light')" class="flex items-center justify-center gap-1.5 h-8 sm:h-10 px-3 sm:px-4 rounded-full bg-slate-800 dark:bg-white hover:bg-slate-900 dark:hover:bg-slate-100 text-white dark:text-slate-900 transition-all border border-transparent shadow-sm hover:shadow-md active:scale-95" title="Back to Dashboard"> <!-- Kala gol button text ke sath -->
+                        <i class="fa-solid fa-arrow-left text-[11px] sm:text-[13px]"></i> <span class="text-[10px] sm:text-xs font-bold">Hub</span> <!-- Teer aur text -->
                     </a> <!-- Back button khatam -->
                     
                 </div> <!-- Capsule design khatam -->
             </div> <!-- Right hissa khatam -->
         </div> <!-- Header container khatam -->
+
+        <!-- 🚀 MOBILE SEARCH SLIDE-DOWN BAR -->
+        <div x-show="mobileSearchOpen" 
+             x-transition:enter="transition ease-out duration-200 transform"
+             x-transition:enter-start="-translate-y-full opacity-0"
+             x-transition:enter-end="translate-y-0 opacity-100"
+             x-transition:leave="transition ease-in duration-150 transform"
+             x-transition:leave-start="translate-y-0 opacity-100"
+             x-transition:leave-end="-translate-y-full opacity-0"
+             x-cloak
+             class="absolute top-full left-0 w-full p-3 bg-white/95 dark:bg-dark_surface/95 backdrop-blur-xl border-b border-slate-200 dark:border-dark_border shadow-xl xl:hidden -mt-px" style="z-index: 35;">
+            <div class="relative w-full max-w-md mx-auto">
+                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-brand text-sm"></i>
+                <input type="text" 
+                       x-ref="mobSearchInput" 
+                       x-model="searchQuery" 
+                       placeholder="Search Ports, Cable, IPs..." 
+                       class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl pl-10 pr-10 py-3 text-xs sm:text-sm font-bold text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-brand/30 transition shadow-inner placeholder-slate-400">
+                
+                <!-- Clear / Close Search -->
+                <button @click="searchQuery = ''; mobileSearchOpen = false; haptic('light')" class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-slate-200 dark:hover:bg-white/10 transition">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+        </div>
     </header> <!-- Header tag khatam -->
 
     <!-- MAIN CONTENT --> <!-- Asli page ka content yahan shuru hoga -->
-    <main class="flex-1 flex flex-col p-4 sm:p-6 overflow-y-auto max-w-[1920px] mx-auto w-full bg-slate-50/50 dark:bg-[#020617] gap-4 sm:gap-6"> <!-- Main body jisme scroll hogi -->
+    <main class="flex-1 flex flex-col lg:flex-row gap-4 sm:gap-6 p-4 sm:p-6 overflow-y-auto lg:overflow-hidden max-w-[1920px] mx-auto w-full bg-slate-50/50 dark:bg-[#020617]"> <!-- Main body jisme scroll hogi -->
         
-        <!-- TOP ROW: SWITCH SELECTION (Modern horizontal scroll chips) --> <!-- Upar switch chunne ka menu -->
-        <div class="w-full shrink-0 flex flex-col gap-2 relative z-20"> <!-- Upar ka dabba -->
-            <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Select Switch Array</div> <!-- Label -->
+        <!-- SIDEBAR (Switch List - Vertical on Desktop, Horizontal on Mobile) --> <!-- Upar switch chunne ka menu -->
+        <div class="w-full lg:w-72 shrink-0 flex flex-col gap-2 sm:gap-3 lg:h-full lg:overflow-hidden relative z-20"> <!-- Upar ka dabba -->
+            <!-- Title hides on mobile, shows on Desktop -->
+            <div class="hidden lg:block text-[10px] font-black text-slate-400 uppercase tracking-widest px-2">Inventory Roster</div> <!-- Label -->
             
             <!-- Horizontal scrollable sleek pills --> <!-- Switch list ghumane ke liye -->
-            <div class="flex gap-2 sm:gap-3 overflow-x-auto hide-scroll pb-1 px-1"> <!-- Row layout jisme extra nikalte elements scroll honge -->
+            <div class="flex lg:flex-col gap-2.5 sm:gap-3 overflow-x-auto lg:overflow-y-auto hide-scroll px-1 lg:px-1 pb-2 lg:pb-0"> <!-- Row layout jisme extra nikalte elements scroll honge -->
                 <template x-for="sw in switches" :key="sw.id"> <!-- Alpine loop switches ke liye -->
-                    <button @click="switchSwitch(sw)" 
-                         class="cursor-pointer shrink-0 px-4 py-2.5 rounded-full border transition-all duration-300 flex items-center gap-3 shadow-sm hover:shadow-md whitespace-nowrap"
-                         :class="selectedSwitch.id === sw.id ? 'bg-brand text-white border-brand dark:bg-brand/20 dark:border-brand/50 dark:text-brand_glow scale-[1.02] shadow-[0_4px_10px_-2px_rgba(59,130,246,0.4)]' : 'bg-white/80 border-slate-200 hover:bg-white text-slate-700 dark:bg-white/5 dark:border-white/10 dark:hover:bg-white/10 dark:text-slate-300'"> <!-- Gol capsule shape button -->
+                    <button @click="haptic('light'); switchSwitch(sw)" 
+                         class="cursor-pointer shrink-0 min-w-[200px] lg:min-w-0 px-4 py-3 sm:py-3.5 rounded-2xl border transition-all duration-300 flex items-center justify-between relative overflow-hidden group shadow-sm hover:shadow-md whitespace-nowrap lg:whitespace-normal text-left"
+                         :class="selectedSwitch.id === sw.id ? 'bg-brand text-white border-brand shadow-[0_8px_20px_-6px_rgba(59,130,246,0.5)] dark:bg-brand/20 dark:border-brand/50' : 'bg-white border-slate-200/80 hover:border-slate-300 text-slate-700 dark:bg-dark_surface dark:border-white/10 dark:hover:bg-white/5 dark:text-slate-300'"> <!-- Gol capsule shape button -->
                         
-                        <div class="text-left flex flex-col"> <!-- Name aur location -->
-                            <div class="font-heading font-black text-xs sm:text-sm tracking-tight" 
+                        <div class="flex flex-col gap-1 z-10 w-full pr-2"> <!-- Name aur location -->
+                            <div class="font-heading font-black text-[13px] sm:text-[15px] tracking-tight" 
                                  :class="sw.type === 'backup' ? 'line-through opacity-70' : ''"
                                  x-text="sw.id"></div> <!-- Switch ki id -->
-                            <div class="text-[9px] font-bold flex items-center gap-1 mt-0.5" 
-                                 :class="selectedSwitch.id === sw.id ? 'text-white/80 dark:text-brand_glow/70' : 'text-slate-500'"> <!-- Rang change hoga selection par -->
-                                <i class="fa-solid fa-server text-[8px]"></i> <span x-text="sw.location"></span> <!-- Location icon aur text -->
+                            <div class="text-[9px] sm:text-[10px] font-bold flex items-center gap-1.5" 
+                                 :class="selectedSwitch.id === sw.id ? 'text-white/90' : 'text-slate-500'"> <!-- Rang change hoga selection par -->
+                                <i class="fa-solid fa-server opacity-80 text-[10px]"></i> <span x-text="sw.location"></span> <!-- Location icon aur text -->
                             </div> <!-- Location khatam -->
                         </div> <!-- Text left khatam -->
-                        <i x-show="selectedSwitch.id === sw.id" class="fa-solid fa-circle-check text-white dark:text-brand_glow text-lg ml-1"></i> <!-- Selected hone par tick dikhega -->
+                        <!-- White Circle Checkmark exactly like screenshot -->
+                        <div x-show="selectedSwitch.id === sw.id" 
+                             class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white flex items-center justify-center shadow-sm z-10 shrink-0 ml-1"
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 scale-50"
+                             x-transition:enter-end="opacity-100 scale-100">
+                            <i class="fa-solid fa-check text-brand text-[10px] sm:text-xs"></i>
+                        </div> <!-- Check mark khatam -->
+                        <!-- Subtle gradient light effect inside active card -->
+                        <div x-show="selectedSwitch.id === sw.id" class="absolute inset-0 bg-gradient-to-r from-transparent to-white/10 pointer-events-none"></div>
                     </button> <!-- Button khatam -->
                 </template> <!-- Loop khatam -->
             </div> <!-- Row layout khatam -->
         </div> <!-- Upar ka dabba khatam -->
 
-        <!-- MIDDLE: SWITCH INFO & INLINE KPIs (Ek hi dabe me combined aur modern layout) --> <!-- Switch ki jaankari aur inline stats cards -->
-        <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl rounded-2xl md:rounded-3xl border border-slate-200 dark:border-dark_border shadow-sm p-4 sm:p-5 flex flex-col gap-4 relative z-10 shrink-0"> <!-- Container block -->
+        <!-- RIGHT CONTENT AREA (Takes remaining width on Desktop) --> 
+        <div class="flex-1 flex flex-col gap-4 sm:gap-6 min-w-0 h-full overflow-y-auto custom-scroll relative z-10 pr-1 pb-4"> 
             
-            <!-- Modern Switch Identity (Image refer karke design kiya) --> <!-- Kon sa switch chuna hai uski detail -->
-            <div> <!-- Identity text wrapper -->
-                <div class="flex items-center gap-2 mb-2"> <!-- Chote tag line -->
-                    <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border shadow-sm bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20" x-text="selectedSwitch.type === 'backup' ? 'BACKUP UNIT' : 'MANAGED'"></span> <!-- Managed ya backup ka tag -->
-                    <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border shadow-sm bg-blue-50 text-brand border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20" x-text="selectedSwitch.ports + ' PORTS CAPACITY'"></span> <!-- Capacity KPI yahan par shift kar diya modern tarike se -->
-                </div> <!-- Chote tag khatam -->
+            <!-- MIDDLE: SWITCH INFO & INLINE KPIs (Screenshot Perfect Layout) --> 
+            <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl rounded-2xl md:rounded-3xl border border-slate-200 dark:border-dark_border shadow-sm p-4 sm:p-5 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 sm:gap-6 transition-all relative z-10 shrink-0">
                 
-                <h2 class="text-2xl sm:text-3xl font-heading font-black tracking-tight text-slate-800 dark:text-white leading-none mb-2.5" 
-                    :class="selectedSwitch.type === 'backup' ? 'text-slate-400 line-through decoration-slate-300' : ''"
-                    x-text="selectedSwitch.id">
-                </h2> <!-- Switch ID bada sa aur bold -->
-                
-                <div class="text-[10px] sm:text-xs text-slate-500 font-bold flex items-center gap-4 flex-wrap"> <!-- Location aur model details -->
-                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-map-pin text-rose-500 text-sm"></i> <span x-text="selectedSwitch.location"></span></span> <!-- Pin icon ke sath location -->
-                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-microchip text-brand text-sm"></i> <span x-text="selectedSwitch.model_name"></span></span> <!-- Chip icon ke sath model -->
-                </div> <!-- Details khatam -->
-            </div> <!-- Identity text khatam -->
-
-            <!-- Old Style KPIs (Lekin 3-col grid me taaki mobile pe ek screen me fit aayein) --> <!-- Inline compact KPIs -->
-            <div class="grid grid-cols-3 gap-2 sm:gap-4 pt-4 border-t border-slate-100 dark:border-white/5"> <!-- Grid layout lagayi 3 column wali -->
-                
-                <!-- Active Ports KPI --> <!-- Hare rang ka active port card -->
-                <div @click="openKpiModal('active')" class="flex items-center gap-2 sm:gap-3 bg-emerald-50 dark:bg-emerald-900/20 px-2 sm:px-4 py-2 rounded-xl border border-emerald-200 dark:border-emerald-800/30 cursor-pointer hover:border-emerald-400 transition group shadow-sm"> <!-- Compact card -->
-                    <div class="text-emerald-500 text-sm sm:text-lg group-hover:scale-110 transition"><i class="fa-solid fa-network-wired"></i></div> <!-- Icon -->
-                    <div><p class="text-[8px] sm:text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest leading-none mb-0.5">Active</p><h3 class="text-base sm:text-xl font-heading font-black text-slate-800 dark:text-white leading-none" x-text="getStats().active">0</h3></div> <!-- Text aur number -->
-                </div> <!-- Active card khatam -->
-
-                <!-- Uplink Ports KPI --> <!-- Neele rang ka uplink card -->
-                <div @click="openKpiModal('uplink')" class="flex items-center gap-2 sm:gap-3 bg-blue-50 dark:bg-blue-900/20 px-2 sm:px-4 py-2 rounded-xl border border-blue-200 dark:border-blue-800/30 cursor-pointer hover:border-blue-400 transition group shadow-sm"> <!-- Compact card -->
-                    <div class="text-brand dark:text-blue-400 text-sm sm:text-lg group-hover:scale-110 transition"><i class="fa-solid fa-arrow-up-right-from-square"></i></div> <!-- Icon -->
-                    <div><p class="text-[8px] sm:text-[9px] font-black text-brand dark:text-blue-400 uppercase tracking-widest leading-none mb-0.5">Uplink</p><h3 class="text-base sm:text-xl font-heading font-black text-slate-800 dark:text-white leading-none" x-text="getStats().uplink">0</h3></div> <!-- Text aur number -->
-                </div> <!-- Uplink card khatam -->
-
-                <!-- Empty Ports KPI --> <!-- Peele rang ka khali port card -->
-                <div @click="openKpiModal('empty')" class="flex items-center gap-2 sm:gap-3 bg-amber-50 dark:bg-amber-900/20 px-2 sm:px-4 py-2 rounded-xl border border-amber-200 dark:border-amber-800/30 cursor-pointer hover:border-amber-400 transition group shadow-sm"> <!-- Compact card -->
-                    <div class="text-amber-500 text-sm sm:text-lg group-hover:scale-110 transition"><i class="fa-solid fa-plug"></i></div> <!-- Icon -->
-                    <div><p class="text-[8px] sm:text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest leading-none mb-0.5">Free</p><h3 class="text-base sm:text-xl font-heading font-black text-slate-800 dark:text-white leading-none" x-text="getStats().empty">0</h3></div> <!-- Text aur number -->
-                </div> <!-- Free card khatam -->
-
-            </div> <!-- Grid 3 columns khatam -->
-        </div> <!-- Middle section container khatam -->
-
-        <!-- BOTTOM: PORT GRID AND MATRIX (Flex grow to fill space) --> <!-- Port boxes aur table ke liye jagah -->
-        <div class="flex-1 flex flex-col gap-4 relative z-10 min-h-0"> <!-- Flex column taaki space le sake -->
-            
-            <!-- PORT VISUAL GRID --> <!-- Boxes wali visual mapping -->
-            <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl px-3 py-3 sm:px-5 sm:py-4 rounded-2xl md:rounded-3xl border border-slate-200 dark:border-dark_border shadow-sm shrink-0 relative z-20"> <!-- Safed thoda dabba -->
-                <div class="flex justify-between items-center mb-2.5"> <!-- Header title -->
-                    <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Physical Interfaces Map</h3> <!-- Title -->
-                </div> <!-- Header title khatam -->
-                
-                <div class="w-full"> <!-- Container pura width lega -->
-                    <!-- Hardware Grid: Tight gaps and compact heights --> <!-- Grid system ports ko lines me set karne ke liye -->
-                    <div class="grid grid-cols-6 sm:grid-cols-12 xl:grid-cols-24 gap-1.5 sm:gap-2"> <!-- Grid column settings responsive screens pe -->
-                        <template x-for="(port, idx) in generatePortList()" :key="port.num"> <!-- Har port ke liye loop -->
-                            <!-- Port box render -->
-                            <div @click="openEditModal(port)" 
-                                 class="port-box border rounded-md h-8 sm:h-9 flex items-center justify-center font-mono text-[10px] sm:text-xs font-bold cursor-pointer group relative"
-                                 :class="getPortClass(port.status)"> <!-- Rang status ke basis par aayega -->
-                                <span x-text="port.num" :class="port.status === 'empty' ? 'opacity-40' : 'opacity-100'"></span> <!-- Port number -->
-                                
-                                <!-- TOOLTIP (Hover par detail dikhane ke liye) -->
-                                <div class="hidden sm:flex absolute w-56 bg-slate-800 text-white p-3 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none flex-col gap-1 border border-slate-600" style="z-index: 1000;" :class="getTooltipPosition(idx, selectedSwitch.ports)"> <!-- Kaale rang ka tooltip popup -->
-                                    <div class="absolute w-2 h-2 bg-slate-800 border-l border-b border-slate-600 rotate-45" :class="getArrowPosition(idx, selectedSwitch.ports)"></div> <!-- Tooltip ki choch (arrow) -->
-                                    <div class="flex justify-between items-center border-b border-white/10 pb-1.5"> <!-- Title line -->
-                                        <span class="font-black text-xs">Port <span x-text="port.num"></span></span> <!-- Port num -->
-                                        <span class="text-[9px] font-mono bg-white/10 px-1.5 py-0.5 rounded" x-text="port.cable || 'NO-ID'"></span> <!-- Cable id -->
-                                    </div> <!-- Title line khatam -->
-                                    <div class="text-[10px] text-blue-300 font-bold truncate" x-text="port.desc || 'Available'"></div> <!-- Description neele rang me -->
-                                    <div class="text-[9px] text-slate-400 font-mono mt-0.5" x-show="port.status !== 'empty'"> <!-- IP line -->
-                                        IP/VLAN: <span class="text-white" x-text="port.vlan || '-'"></span> <!-- IP address safed me -->
-                                    </div> <!-- IP line khatam -->
-                                </div> <!-- Tooltip khatam -->
-                            </div> <!-- Port box khatam -->
-                        </template> <!-- Loop khatam -->
-                    </div> <!-- Grid khatam -->
-                </div> <!-- Container khatam -->
-            </div> <!-- Safed dabba khatam -->
-
-            <!-- CONNECTION MATRIX TABLE --> <!-- Niche wali list/table -->
-            <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl border border-slate-200 dark:border-dark_border rounded-2xl md:rounded-3xl shadow-sm flex-1 flex flex-col min-h-[300px] relative z-10 overflow-hidden mb-6 lg:mb-0"> <!-- Table ka dabba flex grow ke sath -->
-                
-                <div class="px-4 py-3 sm:px-5 sm:py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-black/20 flex justify-between items-center shrink-0"> <!-- Table header -->
-                    <h3 class="text-[11px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">Active Connection Matrix</h3> <!-- Table title -->
+                <!-- LEFT: Identity & Sub-details -->
+                <div class="w-full xl:w-auto shrink-0 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5">
                     
-                    <!-- RIGHT ME SYNC AUR PDF SATH ME (Mobile & Desktop dono ke liye) --> <!-- Sync and PDF Action Buttons -->
-                    <div class="flex items-center gap-2"> 
-                        <button @click="refreshData(true)" class="flex items-center gap-1.5 bg-white dark:bg-white/5 text-slate-500 hover:text-brand px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-bold border border-slate-200 dark:border-white/10 shadow-sm transition active:scale-95"> <!-- Grey sync button -->
-                            <i class="fa-solid fa-rotate" :class="loading ? 'fa-spin' : ''"></i> <span class="hidden sm:inline">Sync</span> <!-- Ghoomne wala icon aur text -->
-                        </button> <!-- Sync button khatam -->
-                        <button @click="haptic('light'); exportToPDF()" class="flex items-center gap-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-500/10 dark:text-rose-400 dark:hover:bg-rose-500/20 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-black uppercase tracking-wider shadow-sm transition active:scale-95 border border-rose-200 dark:border-rose-500/20"> <!-- Chota gulabi button PDF ke liye -->
-                            <i class="fa-solid fa-file-pdf"></i> <span class="hidden sm:inline">PDF</span> <!-- Text aur icon -->
-                        </button> <!-- Button khatam -->
-                    </div> <!-- Right action buttons container khatam -->
-                </div> <!-- Table header khatam -->
-                
-                <div class="block w-full overflow-auto flex-1 custom-scroll pb-20 lg:pb-0 relative"> <!-- Scrollable area jisme list ayegi -->
+                    <!-- Switch Name (Left on PC, Top on Mobile) -->
+                    <h2 class="text-2xl sm:text-4xl font-heading font-black tracking-tight text-slate-800 dark:text-white leading-none mb-1 sm:mb-0" 
+                        :class="selectedSwitch.type === 'backup' ? 'text-slate-400 line-through decoration-slate-300' : ''"
+                        x-text="selectedSwitch.id">
+                    </h2>
                     
-                    <!-- 📱 MOBILE VIEW: COMPACT SMART CARDS --> <!-- Mobile par patle card design me dikhega data -->
-                    <div class="md:hidden flex flex-col gap-2.5 p-3"> <!-- Vertial gap wali list -->
-                        <template x-for="port in generatePortList().filter(p => p.status !== 'empty')" :key="'mob-'+port.num"> <!-- Sirf bhare hue ports ke liye loop -->
-                            <div class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-3 shadow-sm flex flex-col relative transition-all hover:shadow-md cursor-pointer" @click="openEditModal(port)"> <!-- Card container -->
-                                <div class="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-xl" :class="port.status === 'uplink' ? 'bg-blue-500' : 'bg-emerald-500'"></div> <!-- Color tag line -->
-                                
-                                <div class="flex items-start gap-3 pl-1.5"> <!-- Card details flex -->
-                                    <div class="w-10 h-10 rounded-lg bg-slate-50 dark:bg-black/30 flex items-center justify-center font-mono font-black text-slate-600 dark:text-slate-300 text-lg shadow-inner shrink-0 border border-slate-100 dark:border-white/5" x-text="String(port.num).padStart(2, '0')"></div> <!-- Port number dabba -->
-                                    
-                                    <div class="flex-1 min-w-0"> <!-- Text wrapper -->
-                                        <div class="flex justify-between items-start mb-0.5 gap-2"> <!-- First line -->
-                                            <h4 class="font-bold text-[13px] text-slate-800 dark:text-white truncate" x-text="port.desc"></h4> <!-- Device naam -->
-                                            <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border shrink-0"
-                                                  :class="port.status === 'uplink' ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-brand/10 dark:text-brand dark:border-brand/20' : 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'"> <!-- Status tag -->
-                                                <span x-text="port.status"></span> <!-- Status text -->
-                                            </span> <!-- Status tag khatam -->
-                                        </div> <!-- First line khatam -->
-                                        
-                                        <div class="flex items-center justify-between text-[9px] font-bold text-slate-500 border-t border-slate-100 dark:border-white/5 pt-1.5 mt-1"> <!-- Second line -->
-                                            <span class="font-mono bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-400 shadow-sm" x-text="port.vlan || 'No IP'"></span> <!-- IP box -->
-                                            <span class="truncate text-slate-700 dark:text-slate-300">Cable: <span class="font-mono" x-text="port.cable || 'N/A'"></span></span> <!-- Cable ID -->
-                                        </div> <!-- Second line khatam -->
-                                    </div> <!-- Text wrapper khatam -->
-                                </div> <!-- Card details flex khatam -->
-                            </div> <!-- Card container khatam -->
-                        </template> <!-- Loop khatam -->
-
-                        <div x-show="generatePortList().filter(p => p.status !== 'empty').length === 0" class="p-8 text-center text-slate-400"> <!-- Agar list khali hui toh empty message -->
-                            <i class="fa-solid fa-plug-circle-xmark text-3xl mb-3 opacity-30"></i> <!-- Plug icon -->
-                            <p class="font-medium text-xs">No active connections found.</p> <!-- Text message -->
-                        </div> <!-- Empty message khatam -->
-                    </div> <!-- Mobile list khatam -->
-
-                    <!-- 💻 DESKTOP VIEW: STRUCTURED TABLE --> <!-- PC ke liye table format me list -->
-                    <table class="hidden md:table w-full text-left border-collapse min-w-[800px] whitespace-nowrap" id="switchTable"> <!-- Normal table layout -->
-                        <thead class="bg-white/50 dark:bg-white/5 text-[9px] text-slate-400 uppercase font-black tracking-widest sticky top-0 z-10 shadow-sm backdrop-blur-md"> <!-- Table head -->
-                            <tr> <!-- Row -->
-                                <th class="px-5 py-3 w-16 text-center">Port</th> <!-- Col -->
-                                <th class="px-5 py-3 w-28">Status</th> <!-- Col -->
-                                <th class="px-5 py-3">Device / Description</th> <!-- Col -->
-                                <th class="px-5 py-3 w-36">Network IP</th> <!-- Col -->
-                                <th class="px-5 py-3 w-28">Cable ID</th> <!-- Col -->
-                                <th class="px-5 py-3 w-16 text-center">Act</th> <!-- Col -->
-                            </tr> <!-- Row khatam -->
-                        </thead> <!-- Table head khatam -->
-                        <tbody class="divide-y divide-slate-100 dark:divide-white/5 text-sm"> <!-- Table body rows -->
-                            <template x-for="port in generatePortList().filter(p => p.status !== 'empty')" :key="'desk-'+port.num"> <!-- Sirf active ports ka loop -->
-                                <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition duration-150 cursor-pointer group border-b border-slate-100 dark:border-white/5" @click="openEditModal(port)"> <!-- Hover effect wali row -->
-                                    <td class="px-4 py-3 text-center align-middle"> <!-- Port num cell -->
-                                        <div class="w-7 h-7 rounded bg-slate-50 dark:bg-black/30 flex items-center justify-center font-mono font-black text-slate-600 dark:text-slate-300 mx-auto shadow-inner border border-slate-100 dark:border-white/5" x-text="String(port.num).padStart(2, '0')"></div> <!-- Dabba -->
-                                    </td> <!-- Cell khatam -->
-                                    <td class="px-4 py-3 align-middle"> <!-- Status cell -->
-                                        <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-wider border shadow-sm"
-                                              :class="port.status === 'uplink' ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-brand/10 dark:text-brand dark:border-brand/20' : 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'"> <!-- Status box -->
-                                            <i class="fa-solid text-[8px]" :class="port.status === 'uplink' ? 'fa-arrow-up' : 'fa-check'"></i> <!-- Arrow ya check -->
-                                            <span x-text="port.status"></span> <!-- Status likha hua -->
-                                        </span> <!-- Status box khatam -->
-                                    </td> <!-- Cell khatam -->
-                                    <td class="px-4 py-3 font-bold text-slate-800 dark:text-white text-[13px] align-middle" x-text="port.desc"></td> <!-- Description -->
-                                    <td class="px-4 py-3 font-mono font-bold text-slate-500 dark:text-slate-400 text-[11px] align-middle" x-text="port.vlan || '-'"></td> <!-- IP -->
-                                    <td class="px-4 py-3 align-middle"> <!-- Cable ID -->
-                                        <span class="font-mono text-[10px] font-bold text-slate-600 bg-slate-100 border border-slate-200 dark:bg-black/30 dark:text-slate-300 dark:border-white/10 px-2 py-0.5 rounded shadow-sm" x-text="port.cable || 'N/A'"></span> <!-- Boxed text -->
-                                    </td> <!-- Cell khatam -->
-                                    <td class="px-4 py-3 text-center align-middle sticky-col bg-white dark:bg-dark_surface group-hover:bg-slate-50 dark:group-hover:bg-white/5 transition"> <!-- Edit Action -->
-                                        <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-white dark:bg-black/20 hover:bg-brand hover:text-white text-slate-400 transition shadow-sm border border-slate-200 dark:border-white/5 hover:border-brand/50 mx-auto"><i class="fa-solid fa-pen text-[10px]"></i></button> <!-- Pencil button -->
-                                    </td> <!-- Cell khatam -->
-                                </tr> <!-- Row khatam -->
-                            </template> <!-- Loop khatam -->
+                    <!-- Details Badges (Right of Name on PC, Bottom Grid on Mobile) -->
+                    <div class="flex flex-col gap-2 w-full sm:w-auto">
+                        
+                        <!-- Top Row: Capacity Tag -->
+                        <div class="flex sm:justify-start">
+                            <span class="text-[9px] sm:text-[10px] font-mono font-bold text-brand bg-blue-50 dark:bg-brand/10 px-2.5 py-1 rounded-md border border-blue-200 dark:border-brand/20 shadow-sm leading-none" x-text="selectedSwitch.ports + ' PORTS CAPACITY'"></span>
+                        </div>
+                        
+                        <!-- Bottom Row: Location & Model -->
+                        <div class="grid grid-cols-2 sm:flex sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2.5 w-full sm:w-auto">
                             
-                            <tr x-show="generatePortList().filter(p => p.status !== 'empty').length === 0"> <!-- Empty state PC par -->
-                                <td colspan="6" class="px-5 py-12 text-center text-slate-400"> <!-- Pura spread kiya hua row -->
-                                    <i class="fa-solid fa-plug-circle-xmark text-3xl mb-2 opacity-50"></i> <!-- Bada sa icon -->
-                                    <p class="font-medium text-xs">No active connections found on this switch.</p> <!-- Message -->
-                                </td> <!-- Cell khatam -->
-                            </tr> <!-- Row khatam -->
-                        </tbody> <!-- Table body khatam -->
-                    </table> <!-- Table khatam -->
-                </div> <!-- Scrollable list khatam -->
-            </div> <!-- Matrix dabba khatam -->
-        </div> <!-- Right content area khatam -->
+                            <!-- Location Badge (Rose Colored) -->
+                            <div class="flex items-center gap-2 text-[10px] sm:text-[11px] font-bold text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 px-2.5 py-1.5 rounded-lg border border-rose-100 dark:border-rose-500/20 shadow-sm w-full sm:w-auto">
+                                <i class="fa-solid fa-map-pin text-rose-500 shrink-0"></i> 
+                                <span class="break-words leading-tight" x-text="selectedSwitch.location"></span>
+                            </div>
+                            
+                            <!-- Model Badge (Indigo Colored) -->
+                            <div class="flex items-center gap-2 text-[10px] sm:text-[11px] font-bold text-indigo-700 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-2.5 py-1.5 rounded-lg border border-indigo-100 dark:border-indigo-500/20 shadow-sm w-full sm:w-auto">
+                                <i class="fa-solid fa-microchip text-indigo-500 shrink-0"></i> 
+                                <span class="break-words leading-tight" x-text="selectedSwitch.model_name"></span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Divider for mobile only -->
+                <div class="w-full h-px bg-slate-100 dark:bg-white/5 xl:hidden mt-1 mb-1"></div>
+
+                <!-- RIGHT: 3 KPIs (IP Manager Style: Watermark Icons, Pastel Bg) -->
+                <div class="w-full xl:w-auto grid grid-cols-3 gap-2 sm:gap-4 shrink-0">
+                    
+                    <!-- Active KPI (Emerald Theme) -->
+                    <div @click="haptic('light'); openKpiModal('active')" class="relative p-2.5 sm:p-3.5 rounded-[1.25rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between bg-emerald-50/80 border border-emerald-200/70 shadow-sm hover:shadow-md hover:border-emerald-300 dark:bg-emerald-900/10 dark:border-emerald-800/50 dark:hover:border-emerald-700/50 w-full xl:w-[150px]">
+                        <i class="fa-solid fa-network-wired absolute -bottom-3 -right-2 text-5xl sm:text-6xl text-emerald-500 opacity-20 dark:opacity-10 group-hover:scale-110 transition-transform duration-500"></i>
+                        <div class="flex items-center gap-1.5 sm:gap-2 relative z-10 mb-1 sm:mb-2">
+                            <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white dark:bg-dark_surface shadow-sm flex items-center justify-center text-emerald-500 text-[9px] sm:text-[10px] shrink-0"><i class="fa-solid fa-network-wired"></i></div>
+                            <span class="text-[10px] sm:text-[20px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest leading-none truncate">Active</span>
+                        </div>
+                        <h3 class="text-3xl sm:text-5xl font-black font-heading tracking-tight text-slate-800 dark:text-white relative z-10 leading-none mt-0.5" x-text="getStats().active">0</h3>
+                        <p class="text-[10px] sm:text-[15px] font-bold text-slate-500 dark:text-slate-400 mt-1 sm:mt-1.5 relative z-10 truncate">Devices 🟢</p>
+                    </div>
+
+                    <!-- Uplink KPI (Blue Theme) -->
+                    <div @click="haptic('light'); openKpiModal('uplink')" class="relative p-2.5 sm:p-3.5 rounded-[1.25rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between bg-blue-50/80 border border-blue-200/70 shadow-sm hover:shadow-md hover:border-blue-300 dark:bg-blue-900/10 dark:border-blue-800/50 dark:hover:border-blue-700/50 w-full xl:w-[150px]">
+                        <i class="fa-solid fa-arrow-up-right-from-square absolute -bottom-3 -right-2 text-5xl sm:text-6xl text-brand opacity-20 dark:opacity-10 group-hover:scale-110 transition-transform duration-500"></i>
+                        <div class="flex items-center gap-1.5 sm:gap-2 relative z-10 mb-1 sm:mb-2">
+                            <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white dark:bg-dark_surface shadow-sm flex items-center justify-center text-brand text-[9px] sm:text-[10px] shrink-0"><i class="fa-solid fa-arrow-up-right-from-square"></i></div>
+                            <span class="text-[10px] sm:text-[20px] font-black text-brand dark:text-blue-400 uppercase tracking-widest leading-none truncate">Uplinks</span>
+                        </div>
+                        <h3 class="text-3xl sm:text-5xl font-black font-heading tracking-tight text-slate-800 dark:text-white relative z-10 leading-none mt-0.5" x-text="getStats().uplink">0</h3>
+                        <p class="text-[10px] sm:text-[15px] font-bold text-slate-500 dark:text-slate-400 mt-1 sm:mt-1.5 relative z-10 truncate">Backbone 🔵</p>
+                    </div>
+
+                    <!-- Free KPI (Amber Theme) -->
+                    <div @click="haptic('light'); openKpiModal('empty')" class="relative p-2.5 sm:p-3.5 rounded-[1.25rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between bg-amber-50/80 border border-amber-200/70 shadow-sm hover:shadow-md hover:border-amber-300 dark:bg-amber-900/10 dark:border-amber-800/50 dark:hover:border-amber-700/50 w-full xl:w-[150px]">
+                        <i class="fa-solid fa-plug absolute -bottom-3 -right-2 text-5xl sm:text-6xl text-amber-500 opacity-20 dark:opacity-10 group-hover:scale-110 transition-transform duration-500"></i>
+                        <div class="flex items-center gap-1.5 sm:gap-2 relative z-10 mb-1 sm:mb-2">
+                            <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white dark:bg-dark_surface shadow-sm flex items-center justify-center text-amber-500 text-[9px] sm:text-[10px] shrink-0"><i class="fa-solid fa-plug"></i></div>
+                            <span class="text-[10px] sm:text-[20px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest leading-none truncate">Free</span>
+                        </div>
+                        <h3 class="text-3xl sm:text-5xl font-black font-heading tracking-tight text-slate-800 dark:text-white relative z-10 leading-none mt-0.5" x-text="getStats().empty">0</h3>
+                        <p class="text-[10px] sm:text-[15px] font-bold text-slate-500 dark:text-slate-400 mt-1 sm:mt-1.5 relative z-10 truncate">Available 🟡</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- 🚀 DATA AREA WRAPPER (Loader sirf is hisse par aayega) --> 
+            <div class="flex flex-col gap-4 sm:gap-6 relative z-10">
+                
+                <!-- MAIN LOADER --> 
+                <div x-show="loading" 
+                     class="absolute inset-0 bg-white/80 dark:bg-[#020617]/80 flex flex-col items-center justify-center z-[30] backdrop-blur-sm transition-opacity duration-300 rounded-2xl md:rounded-3xl"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:leave="transition ease-in duration-100"
+                     x-cloak>
+                    <div class="spinnerContainer">
+                        <div class="spinner"></div>
+                        <div class="loader">
+                            <p class="mr-1.5">Scanning</p>
+                            <div class="words">
+                                <span class="word">Ports...</span>
+                                <span class="word">VLANs...</span>
+                                <span class="word">Links...</span>
+                                <span class="word">Ports...</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-[10px] font-black text-slate-400 uppercase tracking-widest animate-pulse" x-text="loadingText"></div>
+                </div>
+
+                <!-- PORT VISUAL GRID (Compact Height) --> 
+                <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl px-3 py-2 sm:px-4 sm:py-2.5 rounded-2xl md:rounded-3xl border border-slate-200 dark:border-dark_border shadow-sm shrink-0 relative z-20"> 
+                    <div class="flex justify-between items-center mb-1.5"> <!-- Header title -->
+                        <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Physical Interfaces Map</h3> <!-- Title -->
+                    </div> <!-- Header title khatam -->
+                    
+                    <div class="w-full"> <!-- Container pura width lega -->
+                        <!-- Hardware Grid: Tighter gaps and smaller heights --> <!-- Grid system ports ko lines me set karne ke liye -->
+                        <div class="grid grid-cols-6 sm:grid-cols-12 xl:grid-cols-24 gap-1 sm:gap-1.5"> <!-- Grid column settings responsive screens pe -->
+                            <template x-for="(port, idx) in generatePortList()" :key="port.num"> <!-- Har port ke liye loop -->
+                                <!-- Port box render with Search Filter Logic -->
+                                <div @click="openEditModal(port)" 
+                                     class="port-box border rounded h-6 sm:h-7 flex items-center justify-center font-mono text-[9px] sm:text-[10px] font-bold cursor-pointer group relative transition-all duration-300"
+                                     :class="[getPortClass(port.status), (searchQuery && !isMatch(port)) ? 'opacity-20 grayscale scale-95 pointer-events-none' : '']"> 
+                                    <span x-text="port.num" :class="port.status === 'empty' ? 'opacity-40' : 'opacity-100'"></span> <!-- Port number -->
+                                    
+                                    <!-- TOOLTIP (Hover par detail dikhane ke liye) -->
+                                    <div class="hidden sm:flex absolute w-56 bg-slate-800 text-white p-3 rounded-xl shadow-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none flex-col gap-1 border border-slate-600" style="z-index: 1000;" :class="getTooltipPosition(idx, selectedSwitch.ports)"> <!-- Kaale rang ka tooltip popup -->
+                                        <div class="absolute w-2 h-2 bg-slate-800 border-l border-b border-slate-600 rotate-45" :class="getArrowPosition(idx, selectedSwitch.ports)"></div> <!-- Tooltip ki choch (arrow) -->
+                                        <div class="flex justify-between items-center border-b border-white/10 pb-1.5"> <!-- Title line -->
+                                            <span class="font-black text-xs">Port <span x-text="port.num"></span></span> <!-- Port num -->
+                                            <span class="text-[9px] font-mono bg-white/10 px-1.5 py-0.5 rounded" x-text="port.cable || 'NO-ID'"></span> <!-- Cable id -->
+                                        </div> <!-- Title line khatam -->
+                                        <div class="text-[10px] text-blue-300 font-bold truncate" x-text="port.desc || 'Available'"></div> <!-- Description neele rang me -->
+                                        <div class="text-[9px] text-slate-400 font-mono mt-0.5" x-show="port.status !== 'empty'"> <!-- IP line -->
+                                            IP/VLAN: <span class="text-white" x-text="port.vlan || '-'"></span> <!-- IP address safed me -->
+                                        </div> <!-- IP line khatam -->
+                                    </div> <!-- Tooltip khatam -->
+                                </div> <!-- Port box khatam -->
+                            </template> <!-- Loop khatam -->
+                        </div> <!-- Grid khatam -->
+                    </div> <!-- Container khatam -->
+                </div>
+
+                <!-- CONNECTION MATRIX TABLE --> 
+                <!-- Fixed Height (h-[450px] Mobile, h-[500px] Desktop) lagaya taaki entries iske ANDAR scroll hon -->
+                <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl border border-slate-200 dark:border-dark_border rounded-2xl md:rounded-3xl shadow-sm flex flex-col h-[450px] md:h-[500px] shrink-0 relative z-10 overflow-hidden mb-6 lg:mb-0">
+                    
+                    <!-- Header -->
+                    <div class="px-3 py-2.5 sm:px-5 sm:py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-black/20 flex justify-between items-center shrink-0"> 
+                        <h3 class="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">Active Connection Matrix</h3> 
+                        
+                        <div class="flex items-center gap-1.5 sm:gap-2"> 
+                            <!-- Sync Button -->
+                            <button @click="refreshData(true)" class="flex items-center justify-center w-7 h-7 sm:w-auto sm:px-3 sm:py-1.5 bg-white dark:bg-white/5 text-slate-500 hover:text-brand rounded-md sm:rounded-lg text-[10px] sm:text-xs font-bold border border-slate-200 dark:border-white/10 shadow-sm transition active:scale-95"> 
+                                <i class="fa-solid fa-rotate" :class="loading ? 'fa-spin' : ''"></i> 
+                                <span class="hidden sm:inline ml-1.5">Sync</span> 
+                            </button> 
+                            <!-- PDF Button -->
+                            <button @click="haptic('light'); exportToPDF()" class="flex items-center justify-center w-7 h-7 sm:w-auto sm:px-3 sm:py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-500/10 dark:text-rose-400 dark:hover:bg-rose-500/20 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-black uppercase tracking-wider border border-rose-200 dark:border-rose-500/20 shadow-sm transition active:scale-95"> 
+                                <i class="fa-solid fa-file-pdf"></i> 
+                                <span class="hidden sm:inline ml-1.5">PDF</span> 
+                            </button> 
+                        </div> 
+                    </div> 
+                    
+                    <!-- Inner Scrollable Container -->
+                    <div class="w-full flex-1 overflow-y-auto overflow-x-auto custom-scroll relative bg-white/50 dark:bg-transparent"> 
+                        
+                        <!-- 📱 MOBILE VIEW: COMPACT SMART CARDS --> 
+                        <div class="md:hidden flex flex-col gap-2 p-2.5 pb-6"> 
+                            <!-- Used filteredTablePorts to support searching -->
+                            <template x-for="port in filteredTablePorts" :key="'mob-'+port.num"> 
+                                <div class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-2.5 shadow-sm flex items-center relative transition-all hover:shadow-md cursor-pointer" @click="openEditModal(port)"> 
+                                    <div class="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-xl" :class="port.status === 'uplink' ? 'bg-blue-500' : 'bg-emerald-500'"></div> 
+                                    <div class="flex w-full items-center gap-3 pl-1.5"> 
+                                        <div class="w-9 h-9 rounded-lg bg-slate-50 dark:bg-black/40 flex items-center justify-center font-mono font-black text-slate-700 dark:text-slate-300 text-sm shadow-inner shrink-0 border border-slate-100 dark:border-white/10">
+                                            <span x-text="String(port.num).padStart(2, '0')"></span>
+                                        </div> 
+                                        <div class="flex-1 min-w-0 flex flex-col justify-center gap-0.5"> 
+                                            <div class="flex justify-between items-center w-full"> 
+                                                <h4 class="font-bold text-xs text-slate-800 dark:text-white truncate pr-2" x-text="port.desc"></h4> 
+                                                <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border shrink-0"
+                                                      :class="port.status === 'uplink' ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-brand/10 dark:text-brand dark:border-brand/20' : 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'"> 
+                                                    <span x-text="port.status"></span> 
+                                                </span> 
+                                            </div> 
+                                            <div class="flex items-center justify-between w-full mt-0.5"> 
+                                                <span class="text-[10px] font-mono font-bold text-slate-500 dark:text-slate-400 truncate pr-2" x-text="port.vlan || 'No IP'"></span> 
+                                                <span class="text-[9px] text-slate-400 shrink-0">Cable: <span class="font-mono font-bold text-slate-600 dark:text-slate-300" x-text="port.cable || 'N/A'"></span></span> 
+                                            </div> 
+                                        </div> 
+                                    </div> 
+                                </div> 
+                            </template> 
+
+                            <!-- Empty message with filtering in mind -->
+                            <div x-show="!loading && filteredTablePorts.length === 0" class="p-8 text-center text-slate-400"> 
+                                <i class="fa-solid fa-plug-circle-xmark text-3xl mb-3 opacity-30"></i> 
+                                <p class="font-medium text-xs">No active connections found.</p> 
+                            </div> 
+                        </div> 
+
+                        <!-- 💻 DESKTOP VIEW: STRUCTURED TABLE --> 
+                        <table class="hidden md:table w-full text-left border-collapse min-w-[800px] whitespace-nowrap" id="switchTable"> 
+                            <thead class="bg-white/50 dark:bg-white/5 text-[9px] text-slate-400 uppercase font-black tracking-widest sticky top-0 z-10 shadow-sm backdrop-blur-md"> 
+                                <tr> 
+                                    <th class="px-5 py-3 w-16 text-center">Port</th> 
+                                    <th class="px-5 py-3 w-28">Status</th> 
+                                    <th class="px-5 py-3">Device / Description</th> 
+                                    <th class="px-5 py-3 w-36">Network IP</th> 
+                                    <th class="px-5 py-3 w-28">Cable ID</th> 
+                                    <th class="px-5 py-3 w-16 text-center">Act</th> 
+                                </tr> 
+                            </thead> 
+                            <tbody class="divide-y divide-slate-100 dark:divide-white/5 text-sm"> 
+                                <template x-for="port in filteredTablePorts" :key="'desk-'+port.num"> 
+                                    <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition duration-150 cursor-pointer group border-b border-slate-100 dark:border-white/5" @click="openEditModal(port)"> 
+                                        <td class="px-4 py-3 text-center align-middle"> 
+                                            <div class="w-7 h-7 rounded bg-slate-50 dark:bg-black/30 flex items-center justify-center font-mono font-black text-slate-600 dark:text-slate-300 mx-auto shadow-inner border border-slate-100 dark:border-white/5" x-text="String(port.num).padStart(2, '0')"></div> 
+                                        </td> 
+                                        <td class="px-4 py-3 align-middle"> 
+                                            <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-wider border shadow-sm"
+                                                  :class="port.status === 'uplink' ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-brand/10 dark:text-brand dark:border-brand/20' : 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'"> 
+                                                <i class="fa-solid text-[8px]" :class="port.status === 'uplink' ? 'fa-arrow-up' : 'fa-check'"></i> 
+                                                <span x-text="port.status"></span> 
+                                            </span> 
+                                        </td> 
+                                        <td class="px-4 py-3 font-bold text-slate-800 dark:text-white text-[13px] align-middle" x-text="port.desc"></td> 
+                                        <td class="px-4 py-3 font-mono font-bold text-slate-500 dark:text-slate-400 text-[11px] align-middle" x-text="port.vlan || '-'"></td> 
+                                        <td class="px-4 py-3 align-middle"> 
+                                            <span class="font-mono text-[10px] font-bold text-slate-600 bg-slate-100 border border-slate-200 dark:bg-black/30 dark:text-slate-300 dark:border-white/10 px-2 py-0.5 rounded shadow-sm" x-text="port.cable || 'N/A'"></span> 
+                                        </td> 
+                                        <td class="px-4 py-3 text-center align-middle sticky-col bg-white dark:bg-dark_surface group-hover:bg-slate-50 dark:group-hover:bg-white/5 transition"> 
+                                            <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-white dark:bg-black/20 hover:bg-brand hover:text-white text-slate-400 transition shadow-sm border border-slate-200 dark:border-white/5 hover:border-brand/50 mx-auto"><i class="fa-solid fa-pen text-[10px]"></i></button> 
+                                        </td> 
+                                    </tr> 
+                                </template> 
+                                
+                                <tr x-show="!loading && filteredTablePorts.length === 0"> 
+                                    <td colspan="6" class="px-5 py-12 text-center text-slate-400"> 
+                                        <i class="fa-solid fa-plug-circle-xmark text-3xl mb-2 opacity-50"></i> 
+                                        <p class="font-medium text-xs">No active connections found.</p> 
+                                    </td> 
+                                </tr> 
+                            </tbody> 
+                        </table> 
+                    </div>
+                </div> <!-- END CONNECTION MATRIX TABLE -->
+            </div> <!-- END DATA AREA WRAPPER -->
+        </div> <!-- END RIGHT CONTENT AREA -->
     </main> <!-- Main layout area khatam -->
 
-    <!-- FOOTER (Robust Comprehensive Data-Rich Layout matching IP Manager) --> <!-- Footer design bilkul dusre page jaisa -->
-    <footer class="shrink-0 bg-white/90 dark:bg-[#09090b]/95 backdrop-blur-xl border-t border-slate-200 dark:border-white/5 z-50 py-2.5 sm:py-3 w-full relative overflow-hidden"> <!-- Niche ka footer container -->
-        
-        <!-- Glowing Top Accent Line --> <!-- Ek chamkili line uper design ke liye -->
-        <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-brand to-transparent opacity-60"></div> <!-- Line styling -->
-        
-        <div class="max-w-[1920px] mx-auto px-3 sm:px-6 relative flex items-center justify-between text-[9px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400"> <!-- Main footer flex box -->
+    <!-- FOOTER (Ultra-Slim & Modern Layout based on Screenshot) -->
+    <footer class="shrink-0 bg-white/95 dark:bg-[#020617]/95 backdrop-blur-xl border-t border-slate-200 dark:border-white/5 z-50 py-1.5 sm:py-2 w-full relative">
+        <div class="max-w-[1920px] mx-auto px-4 sm:px-6 flex items-center justify-between">
             
-            <!-- Left: Copyright, Version & Env --> <!-- Left side info -->
-            <div class="flex items-center gap-1.5 sm:gap-3 z-10 shrink-0"> <!-- Details line me -->
-                <span class="font-black text-slate-500 dark:text-slate-400 flex items-center gap-1">&copy; <span x-text="new Date().getFullYear()"></span></span> <!-- Copyright saal automatic -->
-                <span class="h-3 w-px bg-slate-300 dark:bg-white/10"></span> <!-- Line divider -->
-                <span class="px-1.5 py-0.5 rounded-md bg-gradient-to-r from-brand to-indigo-600 text-white font-mono font-black tracking-widest shadow-[0_2px_10px_-2px_rgba(59,130,246,0.5)] cursor-default">v1.0</span> <!-- Version badge -->
-                <span class="hidden sm:flex px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-white/5 text-slate-400 border border-slate-200 dark:border-white/5 font-black uppercase tracking-widest">PROD</span> <!-- Production badge -->
-            </div> <!-- Left details khatam -->
+            <!-- LEFT: User Session & App Info -->
+            <div class="flex items-center gap-2.5 sm:gap-4 shrink-0">
+                <!-- User Pill -->
+                <div class="px-2.5 py-1 rounded-full bg-slate-800 dark:bg-white text-white dark:text-slate-900 shadow-sm flex items-center gap-1.5 cursor-default border border-slate-700 dark:border-white/20">
+                    <div class="w-3.5 h-3.5 rounded-full bg-brand flex items-center justify-center text-white text-[8px] shrink-0"><i class="fa-solid fa-user"></i></div>
+                    <span class="font-black tracking-wide text-[10px] sm:text-xs pr-1" x-text="currentUser?.name ? currentUser.name.split(' ')[0] : 'User'">User</span>
+                </div>
+                
+                <span class="hidden sm:block h-3 w-px bg-slate-300 dark:bg-white/10"></span>
+                
+                <!-- Copyright -->
+                <span class="hidden sm:flex items-center text-[10px] font-bold text-slate-500 dark:text-slate-400 gap-1">&copy; <span x-text="new Date().getFullYear()"></span></span>
+                
+                <span class="hidden sm:block h-3 w-px bg-slate-300 dark:bg-white/10"></span>
+                
+                <!-- Badges -->
+                <div class="flex items-center gap-1.5">
+                    <span class="px-2 py-0.5 rounded bg-brand text-white font-mono font-black tracking-widest text-[9px] shadow-sm">v1.0</span>
+                    <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-white/10 font-black uppercase tracking-widest text-[9px]">PROD</span>
+                </div>
+            </div>
 
-            <!-- Center: Tech Telemetry (Ping & Security) --> <!-- Center detail -->
-            <div class="flex items-center justify-center gap-2 sm:gap-5 z-10 flex-1 px-1 sm:px-2 overflow-hidden truncate"> <!-- Technical text center me -->
-                <div class="flex items-center gap-1 text-[9px] sm:text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 cursor-default"><i class="fa-solid fa-wifi text-[8px] sm:text-[10px]"></i><span class="hidden sm:inline">PING:</span> 12ms</div> <!-- Internet status -->
-                <span class="h-3 w-px bg-slate-300 dark:bg-white/10"></span> <!-- Line divider -->
-                <div class="flex items-center gap-1 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 cursor-default"><i class="fa-solid fa-shield-halved text-brand"></i><span class="hidden sm:inline">AES</span> Secured</div> <!-- Security status -->
-                <span class="hidden sm:block h-3 w-px bg-slate-300 dark:bg-white/10"></span> <!-- Line divider -->
-                <div class="hidden sm:flex items-center gap-1 text-[10px] font-mono font-bold text-slate-500 cursor-default"><i class="fa-regular fa-clock opacity-60"></i><span x-text="currentTime"></span></div> <!-- Live ghadi -->
-            </div> <!-- Center detail khatam -->
-
-            <!-- Right: User Session Badge --> <!-- User ki info right side -->
-            <div class="flex items-center gap-2 z-10 shrink-0"> <!-- Capsule design -->
-                <div class="px-2.5 sm:px-3 py-1 rounded-full bg-slate-800 dark:bg-white text-white dark:text-slate-900 shadow-md flex items-center gap-1.5 transition hover:scale-105 cursor-default border border-slate-700 dark:border-white/20 whitespace-nowrap"> <!-- Dark pill box -->
-                    <div class="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-brand flex items-center justify-center text-white text-[7px] sm:text-[8px] shadow-sm shrink-0"><i class="fa-solid fa-user"></i></div> <!-- Chota user icon -->
-                    <span class="font-black tracking-wide text-[9px] sm:text-[11px] pr-0.5" x-text="currentUser?.name ? currentUser.name.split(' ')[0] : 'User'">User</span> <!-- User ka pehla naam dikhega -->
-                </div> <!-- Dark pill box khatam -->
-            </div> <!-- Right user info khatam -->
-        </div> <!-- Main footer flex box khatam -->
+            <!-- RIGHT: Telemetry Data -->
+            <div class="flex items-center gap-2.5 sm:gap-4 shrink-0">
+                <!-- Ping -->
+                <div class="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400" title="Network Latency">
+                    <i class="fa-solid fa-wifi text-[10px]"></i>
+                    <span class="font-black uppercase tracking-widest text-[9px] sm:text-[10px]">Ping: 12ms</span>
+                </div>
+                
+                <span class="h-3 w-px bg-slate-300 dark:bg-white/10"></span>
+                
+                <!-- Security -->
+                <div class="hidden sm:flex items-center gap-1.5 text-slate-600 dark:text-slate-300" title="Connection Secured">
+                    <i class="fa-solid fa-shield-halved text-brand text-[10px]"></i>
+                    <span class="font-black uppercase tracking-widest text-[9px] sm:text-[10px]">AES Secured</span>
+                </div>
+                
+                <span class="hidden sm:block h-3 w-px bg-slate-300 dark:bg-white/10"></span>
+                
+                <!-- Clock -->
+                <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+                    <i class="fa-regular fa-clock text-[10px]"></i>
+                    <span class="font-mono font-bold text-[10px] sm:text-xs" x-text="currentTime"></span>
+                </div>
+            </div>
+            
+        </div>
     </footer> <!-- Footer tag khatam -->
 
     <!-- LOGIC --> <!-- Saara JavaScript backend yahan se shuru hota hai -->
@@ -537,6 +692,9 @@
                 currentDate: '', // Aaj ki date
                 realPortData: {}, // Server se aayi hui asal jankari sabhi switches ke ports ki
                 editForm: { num: 0, status: 'empty', desc: '', vlan: '', cable: '' }, // Modal me jo values edit ho rahi hain wo isme jayengi
+                
+                searchQuery: '', // NAYA: Search query store karne ke liye variable
+                mobileSearchOpen: false, // NAYA: Mobile search bar ko toggle karne ke liye
 
                 switches: [ // List of hardware switches jo mere pas hain
                     { id: 'PBL-NOD-IT-SWT-001', ports: 52, location: 'Server Room Rack#1', model_name: 'D-Link DGS-1210-52', type: 'active' }, // Switch 1 detail
@@ -665,6 +823,18 @@
                     } finally { this.saving = false; } // Sab hone pe saving band kr di display wali loader ki
                 }, // savePortChanges khatam
 
+                // NAYA FUNCTION: Check karta hai ki port search text se match karta hai ya nahi
+                isMatch(port) {
+                    if (!this.searchQuery) return true; // Agar search khali hai toh sab match hain
+                    const q = this.searchQuery.toLowerCase().trim();
+                    // Port Number, Description, VLAN/IP, Cable ID, ya Status kisi me bhi match kare toh dikhao
+                    return String(port.num).includes(q) ||
+                           (port.desc && port.desc.toLowerCase().includes(q)) ||
+                           (port.vlan && port.vlan.toLowerCase().includes(q)) ||
+                           (port.cable && port.cable.toLowerCase().includes(q)) ||
+                           (port.status && port.status.toLowerCase().includes(q));
+                },
+
                 generatePortList() { // 1 se leke capacity tak saare port UI me list karne ka loop function
                     const currentId = this.selectedSwitch.id; // Konsa switch dikhana hai uski id
                     const total = this.selectedSwitch.ports || 52; // Kitne boxes render honge iska count
@@ -676,6 +846,11 @@
                     } // Loop finish
                     return rawList; // Box lists pass kardi component ko screen draw krne ko
                 }, // generatePortList khatam
+
+                // NAYA GETTER: Table ke liye pre-filtered list deta hai (khali ports exclude karke)
+                get filteredTablePorts() {
+                    return this.generatePortList().filter(p => p.status !== 'empty' && this.isMatch(p));
+                },
 
                 getStats() { // KPI cards (Upar numbers) generate karne wala hissa
                     const ports = this.generatePortList(); // Pehle loop se sara box status mangwaya
