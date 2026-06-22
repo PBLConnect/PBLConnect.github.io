@@ -3,7 +3,7 @@
 <head> <!-- Head section jisme saari meta information aur links hote hain -->
     <meta charset="UTF-8"> <!-- Character encoding UTF-8 set ki hai taaki sabhi symbols sahi se dikhein -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> <!-- Mobile screens par responsive aur zoom disable karne ke liye -->
-    <title>PBL Network Infrastructure v1.0</title> <!-- Tab me dikhne wala page ka title -->
+    <title>PBL Network Infrastructure v1.1</title> <!-- Tab me dikhne wala page ka title -->
     <link rel="icon" type="image/x-icon" href="Assets/images/pbl-logo.ico"> <!-- Browser tab ke liye chota sa icon (favicon) -->
     
     <!-- PWA Setup --> <!-- Progressive Web App ke configurations yahan se shuru -->
@@ -139,30 +139,53 @@
                 </div> <!-- Title container khatam -->
                 <button @click="editModalOpen = false; haptic('light')" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/20 transition"><i class="fa-solid fa-xmark"></i></button> <!-- Modal band karne ka X button, sath me vibrate -->
             </div> <!-- Header khatam -->
-            <div class="p-6 space-y-4"> <!-- Modal ki body jisme inputs aayenge -->
-                <div> <!-- Dropdown ka container -->
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Status</label> <!-- Input ke upar ka label -->
-                    <select x-model="editForm.status" @change="haptic('light')" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition"> <!-- Dropdown jisse status chunege -->
-                        <option value="empty">⚪ Empty (Available)</option> <!-- Khali option -->
-                        <option value="active">🟢 Active (Device)</option> <!-- Active option -->
-                        <option value="uplink">🔵 Uplink (Backbone)</option> <!-- Uplink option -->
-                    </select> <!-- Dropdown khatam -->
-                </div> <!-- Dropdown container khatam -->
-                <div> <!-- Text input ka container -->
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Description / Device</label> <!-- Input ka label -->
-                    <input type="text" x-model="editForm.desc" @input="haptic('light')" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition" placeholder="e.g. HR Printer"> <!-- Kya connect hai likhne ke liye input -->
-                </div> <!-- Text input container khatam -->
-                <div class="grid grid-cols-2 gap-4"> <!-- IP aur Cable ke liye double column grid -->
-                    <div> <!-- IP input container -->
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Network IP</label> <!-- IP ka label -->
-                        <input type="text" x-model="editForm.vlan" @input="haptic('light')" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-mono outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition" placeholder="192.168..."> <!-- IP dalne ka input -->
-                    </div> <!-- IP container khatam -->
-                    <div> <!-- Cable input container -->
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Cable Tag</label> <!-- Cable ka label -->
-                        <input type="text" x-model="editForm.cable" @input="haptic('light')" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-mono outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition" placeholder="A-01"> <!-- Cable ID dalne ka input -->
-                    </div> <!-- Cable container khatam -->
-                </div> <!-- Double column grid khatam -->
-            </div> <!-- Modal body khatam -->
+            <div class="p-6 space-y-4">
+                <!-- Status Selection -->
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Status</label>
+                    <select x-model="editForm.status" @change="assetSearchQuery = ''; editForm.desc = ''; editForm.vlan = ''; haptic('light')" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition cursor-pointer">
+                        <option value="empty">⚪ Empty (Available)</option>
+                        <option value="active">🟢 Active (Device)</option>
+                        <option value="uplink">🔵 Uplink (Backbone)</option>
+                    </select>
+                </div>
+                
+                <!-- Dynamic Description / Asset Selection (Only for Active) -->
+                <div x-show="editForm.status === 'active'" class="relative" @click.away="showAssetDropdown = false" x-cloak>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Connected Asset *</label>
+                    <input type="text" x-model="assetSearchQuery" @focus="showAssetDropdown = true" @input="showAssetDropdown = true" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition shadow-sm" placeholder="Search Hostname...">
+                    
+                    <div x-show="showAssetDropdown" x-transition class="absolute z-[100] top-[100%] left-0 w-full mt-1 bg-white dark:bg-dark_surface border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl max-h-48 overflow-y-auto custom-scroll">
+                        <template x-for="asset in filteredAssets" :key="asset.AssetID">
+                            <div @click="selectAsset(asset)" class="px-4 py-2.5 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-brand hover:text-white cursor-pointer transition border-b border-slate-100 dark:border-white/5 last:border-0 flex justify-between items-center group">
+                                <span x-text="asset.Hostname"></span>
+                                <span class="text-[9px] font-mono opacity-50 group-hover:opacity-100" x-text="asset.Live_IP || 'No IP'"></span>
+                            </div>
+                        </template>
+                        <div x-show="filteredAssets.length === 0" class="px-4 py-3 text-xs font-bold text-rose-500 text-center bg-rose-50 dark:bg-rose-900/10">No Matches Found</div>
+                    </div>
+                </div>
+
+                <!-- Manual Route Description (For Uplink/Empty) -->
+                <div x-show="editForm.status === 'uplink' || editForm.status === 'empty'">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Description / Route</label>
+                    <input type="text" x-model="editForm.desc" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition disabled:opacity-50" :disabled="editForm.status === 'empty'" placeholder="e.g. Core Switch To Floor 2">
+                </div>
+
+                <!-- Network IP & Cable -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1 flex justify-between items-center">
+                            Network IP <span x-show="editForm.status === 'active'" class="text-[8px] bg-brand/10 text-brand px-1.5 py-0.5 rounded">Auto</span>
+                        </label>
+                        <input type="text" x-model="editForm.vlan" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-mono outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition disabled:opacity-50" :readonly="editForm.status === 'active'" :disabled="editForm.status === 'empty'" :class="editForm.status === 'active' ? 'cursor-not-allowed opacity-70 border-transparent bg-slate-100 dark:bg-black/60 shadow-inner' : ''" placeholder="192.168...">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Cable Tag</label>
+                        <input type="text" x-model="editForm.cable" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-mono outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition disabled:opacity-50" :disabled="editForm.status === 'empty'" placeholder="e.g. A-01">
+                    </div>
+                </div>
+            </div>
             <div class="bg-slate-50/50 dark:bg-black/20 px-6 py-4 flex justify-end gap-3 border-t border-slate-100 dark:border-white/5"> <!-- Modal ka footer -->
                 <button @click="editModalOpen = false; haptic('light')" class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 transition">Cancel</button> <!-- Cancel button -->
                 <button @click="savePortChanges(); haptic('success')" class="px-6 py-2.5 rounded-xl text-sm font-black text-white bg-brand hover:bg-blue-600 shadow-[0_5px_15px_-3px_rgba(59,130,246,0.4)] transition active:scale-95">Save Port</button> <!-- Save karne ka button -->
@@ -224,7 +247,8 @@
                 <!-- Page Identity (Divider removed, properly aligned) -->
                 <div class="flex flex-col justify-center">
                     <div class="flex items-center gap-1.5 sm:gap-2 mb-0.5 sm:mb-1">
-                        <span class="bg-brand/10 text-brand px-1.5 py-0.5 rounded font-mono font-bold text-[8px] sm:text-[9px] leading-none border border-brand/20">v1.0</span>
+                        <span class="bg-brand/10 text-brand px-1.5 py-0.5 rounded font-mono font-bold text-[8px] sm:text-[9px] leading-none border border-brand/20">v1.1</span>
+
                         <span class="inline-block text-[8px] sm:text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-md">NETWORK OPS</span>
                     </div>
                     <!-- Two-color text exactly like ITDashboard -->
@@ -443,7 +467,7 @@
             <div class="flex flex-col gap-4 sm:gap-6 relative z-10 flex-1">
 
                 <!-- PORT VISUAL GRID (Hidden gracefully during load) --> 
-                <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl px-3 py-2 sm:px-4 sm:py-2.5 rounded-2xl md:rounded-3xl border border-slate-200 dark:border-dark_border shadow-sm shrink-0 relative z-20 overflow-hidden transition-opacity duration-300" x-show="!loading" x-cloak> 
+                <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl px-3 py-2 sm:px-4 sm:py-2.5 rounded-2xl md:rounded-3xl border border-slate-200 dark:border-dark_border shadow-sm shrink-0 relative z-30 transition-opacity duration-300" x-show="!loading" x-cloak> 
                     <div class="flex justify-between items-center mb-1.5"> 
                         <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Physical Interfaces Map</h3> 
                     </div> 
@@ -451,9 +475,9 @@
                     <div class="w-full"> 
                         <div class="grid grid-cols-6 sm:grid-cols-12 xl:grid-cols-24 gap-1 sm:gap-1.5"> 
                             <template x-for="(port, idx) in generatePortList()" :key="port.num"> 
-                                <div @click="openEditModal(port)" 
-                                     class="port-box border rounded h-6 sm:h-7 flex items-center justify-center font-mono text-[9px] sm:text-[10px] font-bold cursor-pointer group relative transition-all duration-300"
-                                     :class="[getPortClass(port.status), (searchQuery && !isMatch(port)) ? 'opacity-20 grayscale scale-95 pointer-events-none' : '']"> 
+    <div @click.stop="handlePortClick(port)" 
+         class="port-box border rounded h-6 sm:h-7 flex items-center justify-center font-mono text-[9px] sm:text-[10px] font-bold cursor-pointer group relative transition-all duration-300"
+         :class="[getPortClass(port.status), (searchQuery && !isMatch(port)) ? 'opacity-20 grayscale scale-95 pointer-events-none' : '', (mobileSelectedPort && mobileSelectedPort.num === port.num) ? 'ring-2 ring-brand scale-110 shadow-lg z-40' : '']">
                                     <span x-text="port.num" :class="port.status === 'empty' ? 'opacity-40' : 'opacity-100'"></span> 
                                     
                                     <!-- Tooltip... -->
@@ -606,6 +630,40 @@
                     </div>
                 </div>
             </div>
+			
+			<!-- 📱 MOBILE FLOATING PORT INFO CARD -->
+        <div x-show="mobileSelectedPort" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 translate-y-10"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 translate-y-0"
+             x-transition:leave-end="opacity-0 translate-y-10"
+             @click.away="mobileSelectedPort = null"
+             class="sm:hidden fixed bottom-6 left-4 right-4 bg-slate-800 dark:bg-slate-900 text-white p-4 rounded-3xl shadow-2xl z-[100] border border-slate-700 flex flex-col gap-3" x-cloak>
+            
+            <div class="flex justify-between items-start">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-slate-700 flex items-center justify-center font-mono font-black text-lg text-brand shadow-inner" x-text="mobileSelectedPort?.num"></div>
+                    <div>
+                        <h4 class="font-bold text-sm text-white" x-text="mobileSelectedPort?.desc || 'Available Port'"></h4>
+                        <span class="text-[10px] font-mono text-slate-400 bg-slate-700/50 px-2 py-0.5 rounded shadow-sm border border-slate-600" x-text="'Cable: ' + (mobileSelectedPort?.cable || 'N/A')"></span>
+                    </div>
+                </div>
+                <button @click="mobileSelectedPort = null" class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition"><i class="fa-solid fa-xmark text-sm"></i></button>
+            </div>
+            
+            <div class="flex justify-between items-center bg-slate-700/40 p-3 rounded-2xl border border-slate-600">
+                <div class="flex flex-col">
+                    <span class="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Network IP</span>
+                    <span class="font-mono font-bold text-blue-400 text-xs" x-text="mobileSelectedPort?.vlan || '-'"></span>
+                </div>
+                <button @click="openEditModal(mobileSelectedPort); mobileSelectedPort = null" class="bg-brand text-white px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-[0_5px_15px_-3px_rgba(59,130,246,0.4)] flex items-center gap-2 active:scale-95 transition">
+                    <i class="fa-solid fa-pen"></i> Edit
+                </button>
+            </div>
+        </div>
+			
     </main> <!-- Main layout area khatam -->
 
     <!-- FOOTER (Ultra-Slim & Modern Layout based on Screenshot) -->
@@ -629,7 +687,8 @@
                 
                 <!-- Badges -->
                 <div class="flex items-center gap-1.5">
-                    <span class="px-2 py-0.5 rounded bg-brand text-white font-mono font-black tracking-widest text-[9px] shadow-sm">v1.0</span>
+                    <span class="px-2 py-0.5 rounded bg-brand text-white font-mono font-black tracking-widest text-[9px] shadow-sm">v1.1</span>
+
                     <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-white/10 font-black uppercase tracking-widest text-[9px]">PROD</span>
                 </div>
             </div>
@@ -663,261 +722,247 @@
     </footer> <!-- Footer tag khatam -->
 
     <!-- LOGIC --> <!-- Saara JavaScript backend yahan se shuru hota hai -->
+       <!-- LOGIC -->
     <script>
-        // Ensure to keep your real backend URL here
-        const API_URL = "https://script.google.com/macros/s/AKfycbxmA6oLB_zN40YUBVlYovH6Ss8XmTgg9_2nCL6GKMo3iefYXgakKh09uzwUSd8RfZJA-g/exec"; // Database link Google Sheets se
+        const API_URL = "https://script.google.com/macros/s/AKfycby4H5eCFAB8mifuuQwzmCTOfa3J7J6rSvhEwjHSvaSfBsgmLFLq7s6UhhgnWQSQrGBy8g/exec";
 
-        document.addEventListener('alpine:init', () => { // Alpine.js setup function
-            Alpine.data('networkSystem', () => ({ // Component ka naam aur state declare kar rahe
-                currentUser: JSON.parse(sessionStorage.getItem('userData')) || { name: 'Vikas' }, // Logged in user ka data le rahe
-                isDark: localStorage.getItem('theme') === 'dark', // Theme pehle se dark thi kya check kar rahe
-                selectedSwitch: {}, // Currently konsa switch dikh raha hai uski details
-                loading: false, // Kya background me processing chal rahi hai
-                saving: false, // Kya data cloud par save ho raha hai
-                loadingText: 'Initializing...', // Loader ke niche kya likhna hai
-                editModalOpen: false, // Edit port wala popup khula hai kya
-                kpiModalOpen: false, // Statistics wala popup khula hai kya
-                kpiType: 'all', // Stats me kya filter chalu hai
-                kpiList: [], // Stats me dikhane ke liye data list
-                currentTime: '', // Ghadi ka current time
-                currentDate: '', // Aaj ki date
-                realPortData: {}, // Server se aayi hui asal jankari sabhi switches ke ports ki
-                editForm: { num: 0, status: 'empty', desc: '', vlan: '', cable: '' }, // Modal me jo values edit ho rahi hain wo isme jayengi
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('networkSystem', () => ({
+                currentUser: JSON.parse(sessionStorage.getItem('userData')) || { name: 'Vikas' },
+                isDark: localStorage.getItem('theme') === 'dark',
+                selectedSwitch: {},
+                loading: false, saving: false, loadingText: 'Initializing...',
+                editModalOpen: false, kpiModalOpen: false, kpiType: 'all', kpiList: [],
+                currentTime: '', currentDate: '', realPortData: {},
                 
-                searchQuery: '', // NAYA: Search query store karne ke liye variable
-                mobileSearchOpen: false, // NAYA: Mobile search bar ko toggle karne ke liye
+                editForm: { num: 0, status: 'empty', desc: '', vlan: '', cable: '' },
+                searchQuery: '', mobileSearchOpen: false,
 
-                switches: [ // List of hardware switches jo mere pas hain
-                    { id: 'PBL-NOD-IT-SWT-001', ports: 52, location: 'Server Room Rack#1', model_name: 'D-Link DGS-1210-52', type: 'active' }, // Switch 1 detail
-                    { id: 'PBL-NOD-IT-SWT-002', ports: 24, location: 'Outside Server Room', model_name: 'TP-Link TL-SG1024DE', type: 'active' }, // Switch 2 detail
-                    { id: 'PBL-NOD-IT-SWT-003', ports: 24, location: 'Admin Dept', model_name: 'D-Link DGS-1024C', type: 'active' }, // Switch 3 detail
-                    { id: 'PBL-NOD-IT-SWT-005', ports: 24, location: 'GF- Production', model_name: 'D-Link DGS-1024C', type: 'active' }, // Switch 4 detail
-                    { id: 'PBL-NOD-IT-SWT-025', ports: 48, location: 'GF- Production', model_name: 'TP-Link TLSG1048', type: 'active' }, // Switch 5 detail
-                    { id: 'PBL-NOD-IT-SWT-006', ports: 8,  location: 'IT Store (Backup)', model_name: 'D-Link DE-809TC', type: 'backup' }, // Backup Switch
-                    { id: 'PBL-NOD-IT-SWT-007', ports: 24, location: 'FF- Production', model_name: 'D-Link DGS-1024D', type: 'active' } // Switch 7 detail
-                ], // Switches ki list khatam
-
-                // 🚀 NEW: Central Haptic Feedback Controller
-                haptic(type = 'light') { // Phone ko vibrate karwane wala function
-                    if (!window.navigator || !window.navigator.vibrate) return; // Agar phone haptic support nahi karta toh aage mat jao
-                    if (type === 'light') { // Halke touch ke liye
-                        navigator.vibrate(15);  // 15ms vibrate karo
-                    } else if (type === 'success') { // Safalta wale kaam pe
-                        navigator.vibrate([30, 50, 30]); // Ek pattern me vibrate karo
-                    } else if (type === 'error' || type === 'delete') { // Galti ya delete pe
-                        navigator.vibrate([50, 50, 50, 50]); // Lamba warning vibration pattern
-                    } // Conditions khatam
-                }, // Haptic function khatam
-
-                async init() { // Page start hote hi kya hoga
-                    if (this.isDark) document.documentElement.classList.add('dark'); // Agar dark mode on hai toh classes laga do
-                    this.selectedSwitch = this.switches[0]; // Sabse pehla switch default select kar lo
-                    
-                    this.loading = true; // Loader on karo
-                    this.loadingText = "Loading Topology..."; // Loader me text badlo
-
-                    await Promise.all([ // Data lane ka wait karo
-                        this.refreshData(false), // Data fetch maro
-                        new Promise(resolve => setTimeout(resolve, 1000)) // Kam se kam 1 second loader dikhao style ke liye
-                    ]); // Wait finish
-
-                    this.loading = false; // Loader band karo
-                    
-                    setInterval(() => { // Har ek second me ghadi chalane wala function
-                        const now = new Date(); // Current date time uthao
-                        this.currentTime = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }); // Sirf hours aur minutes nikalo
-                        this.currentDate = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }); // Day aur mahine ka text nikalo
-                    }, 1000); // 1000ms delay set kiya
-                }, // Init function khatam
-
-                async refreshData(force = false) { // Data ko naya lane wala function
-                    if (force) { // Agar zabardasti naya mang rahe ho toh
-                        this.haptic('light'); // 👈 VIBRATE ON SYNC BUTTON CLICK
-                        this.loading = true;  // Loader lagao
-                        this.loadingText = "Force Syncing..."; // Message badlo
-                        localStorage.removeItem('pbl_cloud_data'); // Purana data uda do phone se
-                    } // Force if khatam
-                    
-                    try { // Error handling try catch block
-                        const cached = localStorage.getItem('pbl_cloud_data'); // Phone se save data mango
-                        if (cached && !force) { // Agar data hai aur jabardasti naya nahi mang rahe
-                            this.realPortData = JSON.parse(cached); // Phone wale data ko display pe dal do turant
-                            fetch(API_URL + '?action=getSwitchData').then(res => res.json()).then(data => { // Phir background me naya data mango cloud se
-                                if(data && Object.keys(data).length > 0) { // Agar data aya
-                                    this.realPortData = data; localStorage.setItem('pbl_cloud_data', JSON.stringify(data)); // Naye data ko lagao aur phone me save kar lo
-                                } // If khatam
-                            }); // Promise chain khatam
-                        } else { // Agar data nahi hai phone me
-                            const res = await fetch(API_URL + '?action=getSwitchData'); // Cloud se hi direct mango await lagake
-                            const data = await res.json(); // Usko text se json objects banao
-                            if (data && Object.keys(data).length > 0) { // Agar sahi me mila
-                                this.realPortData = data; localStorage.setItem('pbl_cloud_data', JSON.stringify(data)); // Usse set aur save karo
-                            } // If khatam
-                        } // Else block khatam
-                    } catch (e) { // Agar net nahi chal raha ya koi error aaya
-                        console.error("Sync Failed", e); // Console me error log karo
-                        const cached = localStorage.getItem('pbl_cloud_data'); // Wapas phone ka purana data try karo
-                        if (cached) this.realPortData = JSON.parse(cached); // Mila toh usiko use kar lo offline
-                    } finally { // Jab sab khatam ho jaye
-                        if (force) setTimeout(() => { this.loading = false; this.loadingText = ""; }, 500); // Thoda ruk kar loader hata lo
-                    } // Try catch khatam
-                }, // refreshData khatam
+                inventoryList: [],
+                assetSearchQuery: '',
+                showAssetDropdown: false,
                 
-                toggleTheme() { // Dark aur light mode ko palatne wala button
-                    this.haptic('light'); // 👈 VIBRATE ON THEME TOGGLE
-                    this.isDark = !this.isDark; // Value ko ulta kar do
-                    document.documentElement.classList.toggle('dark', this.isDark); // HTML tag pe class hatao ya lagao
-                    localStorage.setItem('theme', this.isDark ? 'dark' : 'light'); // Phone me choice save karo
-                    document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9"); // Browser ke top bar ka color badlo
-                }, // toggleTheme khatam
+                // 🧠 NAYA VARIABLE: Mobile pe selected port track karne ke liye
+                mobileSelectedPort: null,
 
-                switchSwitch(sw) { // Kisi aur switch ki list dekhne par click karna
-                    this.haptic('light'); // 👈 VIBRATE ON SWITCH TAB CLICK
-                    if (this.selectedSwitch.id === sw.id) return; // Agar pehle se wahi select hai toh kuch mat karo
-                    this.selectedSwitch = sw; // Naya switch active switch maan lo
-                    this.loading = true; // Loader on karo visual transition ke liye
-                    this.loadingText = "Loading Ports..."; // Message badal do
-                    setTimeout(() => { this.loading = false; }, 400); // Adhe second baad hata lo smoothly naye data ke sath
-                }, // switchSwitch khatam
+                switches: [
+                    { id: 'PBL-NOD-IT-SWT-001', ports: 52, location: 'Server Room Rack#1', model_name: 'D-Link DGS-1210-52', type: 'active' },
+                    { id: 'PBL-NOD-IT-SWT-002', ports: 24, location: 'Outside Server Room', model_name: 'TP-Link TL-SG1024DE', type: 'active' },
+                    { id: 'PBL-NOD-IT-SWT-003', ports: 24, location: 'Admin Dept', model_name: 'D-Link DGS-1024C', type: 'active' },
+                    { id: 'PBL-NOD-IT-SWT-005', ports: 24, location: 'GF- Production', model_name: 'D-Link DGS-1024C', type: 'active' },
+                    { id: 'PBL-NOD-IT-SWT-025', ports: 48, location: 'GF- Production', model_name: 'TP-Link TLSG1048', type: 'active' },
+                    { id: 'PBL-NOD-IT-SWT-006', ports: 8,  location: 'IT Store (Backup)', model_name: 'D-Link DE-809TC', type: 'backup' },
+                    { id: 'PBL-NOD-IT-SWT-007', ports: 24, location: 'FF- Production', model_name: 'D-Link DGS-1024D', type: 'active' }
+                ],
 
-                openEditModal(port) { // Edit wala box kholne wala action
-                    this.haptic('light'); // 👈 VIBRATE ON PORT CLICK
-                    this.editForm = { num: port.num, status: port.status, desc: port.desc === 'Available' ? '' : port.desc, vlan: port.vlan === '-' ? '' : (port.vlan || port.ip), cable: port.cable === '-' ? '' : port.cable }; // Existing details ko edit form me bhara
-                    this.editModalOpen = true; // Box display allow kiya
-                }, // openEditModal khatam
+                haptic(type = 'light') {
+                    if (!window.navigator || !window.navigator.vibrate) return;
+                    try{
+                        if (type === 'light') navigator.vibrate(15);
+                        else if (type === 'success') navigator.vibrate([30, 50, 30]);
+                        else if (type === 'error' || type === 'delete') navigator.vibrate([50, 50, 50, 50]);
+                    } catch(e){}
+                },
 
-                openKpiModal(type) { // Status cards (e.g. Free, Active) click karne par action
-                    this.haptic('light'); // 👈 VIBRATE ON KPI CARD CLICK
-                    this.kpiType = type; // Type of port (empty/active) set kiya
-                    const allPorts = this.generatePortList(); // Sabhi port ko generate kar liya pehle
-                    if (type === 'all') this.kpiList = allPorts; // Agar sab dekhne hain toh
-                    else this.kpiList = allPorts.filter(p => p.status === type); // Warna filter karke wahi types filter kare jinpe click kiya hai
-                    this.kpiModalOpen = true; // Dabba display kar do
-                }, // openKpiModal khatam
+                async init() {
+                    if (this.isDark) document.documentElement.classList.add('dark');
+                    this.selectedSwitch = this.switches[0];
+                    this.loading = true; this.loadingText = "Loading Topology...";
 
-                async savePortChanges() { // Jab user edit karle usko save karne wala function
-                    this.editModalOpen = false; this.saving = true; // Modal band karke bada cloud loading start kiya
-                    const payload = { switchId: this.selectedSwitch.id, portNum: this.editForm.num, status: this.editForm.status, desc: this.editForm.desc, vlan: this.editForm.vlan, cable: this.editForm.cable }; // Kya data cloud jayega usko pack kiya
-                    try { // Error testing block
-                        const swId = this.selectedSwitch.id; // Switch ka nam uthaya
-                        if (!this.realPortData[swId]) this.realPortData[swId] = []; // Agar is switch ka data exist nahi karta the toh khali array bna li
-                        this.realPortData[swId] = this.realPortData[swId].filter(p => p.num !== payload.portNum); // Jisko edit karna hai uski purani entry mita li logic se
-                        if (payload.status !== 'empty' || payload.desc) { // Agar wo port puri tarah delete nai hua the
-                            this.realPortData[swId].push({ num: payload.portNum, status: payload.status, desc: payload.desc, vlan: payload.vlan, cable: payload.cable }); // Usme nayi value dal di array me
-                        } // If condition end
-                        localStorage.setItem('pbl_cloud_data', JSON.stringify(this.realPortData)); // Offline temporary save immediately karke UI update fast kar dia
-                        await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }); // Aur phir online bheja background processs mai
-                        this.haptic('success'); // 👈 VIBRATE ON SAVE SUCCESS
-                    } catch (e) { // Agar net nhi chla toh
-                        this.haptic('error'); // 👈 VIBRATE ON SAVE ERROR
-                        alert("Check Connection"); // Alert dedia warning ki connection error the
-                    } finally { this.saving = false; } // Sab hone pe saving band kr di display wali loader ki
-                }, // savePortChanges khatam
+                    await Promise.all([
+                        this.refreshData(false),
+                        this.fetchInventoryMaster(),
+                        new Promise(resolve => setTimeout(resolve, 1000))
+                    ]);
+                    this.loading = false;
+                    
+                    setInterval(() => {
+                        const now = new Date();
+                        this.currentTime = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+                        this.currentDate = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+                    }, 1000);
+                },
 
-                // NAYA FUNCTION: Check karta hai ki port search text se match karta hai ya nahi
+                // 🧠 NAYA FUNCTION: Desktop vs Mobile Click Intelligence
+                handlePortClick(port) {
+                    this.haptic('light');
+                    // Check if screen is small (Mobile view)
+                    if (window.innerWidth < 640) {
+                        // Agar same port pe dubara tap kiya, toh card hide kar do
+                        if (this.mobileSelectedPort && this.mobileSelectedPort.num === port.num) {
+                            this.mobileSelectedPort = null;
+                        } else {
+                            this.mobileSelectedPort = port;
+                        }
+                    } else {
+                        // Desktop me seedha edit modal kholo
+                        this.openEditModal(port);
+                    }
+                },
+
+                async fetchInventoryMaster() {
+                    try {
+                        const res = await fetch(API_URL + '?action=getInventory');
+                        const data = await res.json();
+                        if(data.hardware) {
+                            this.inventoryList = data.hardware.filter(h => h.Hostname && h.Hostname.trim() !== '');
+                        }
+                    } catch(e) { console.error("Inventory Fetch Error", e); }
+                },
+
+                get filteredAssets() {
+                    if (!this.assetSearchQuery) return this.inventoryList;
+                    return this.inventoryList.filter(a => a.Hostname && a.Hostname.toLowerCase().includes(this.assetSearchQuery.toLowerCase()));
+                },
+
+                selectAsset(asset) {
+                    this.editForm.desc = asset.Hostname;
+                    this.assetSearchQuery = asset.Hostname;
+                    this.editForm.vlan = (asset.Live_IP && asset.Live_IP !== 'Not Allocated') ? asset.Live_IP : '';
+                    this.showAssetDropdown = false;
+                    this.haptic('light');
+                },
+
+                async refreshData(force = false) {
+                    if (force) { this.haptic('light'); this.loading = true; this.loadingText = "Force Syncing..."; try{ localStorage.removeItem('pbl_cloud_data'); }catch(e){} }
+                    try {
+                        let cached = null; try{ cached = localStorage.getItem('pbl_cloud_data'); }catch(e){}
+                        if (cached && !force) {
+                            this.realPortData = JSON.parse(cached);
+                            fetch(API_URL + '?action=getSwitchData').then(res => res.json()).then(data => {
+                                if(data && Object.keys(data).length > 0) { this.realPortData = data; try{ localStorage.setItem('pbl_cloud_data', JSON.stringify(data));}catch(e){} }
+                            });
+                        } else {
+                            const res = await fetch(API_URL + '?action=getSwitchData');
+                            const data = await res.json();
+                            if (data && Object.keys(data).length > 0) { this.realPortData = data; try{localStorage.setItem('pbl_cloud_data', JSON.stringify(data));}catch(e){} }
+                        }
+                    } catch (e) {
+                        console.error("Sync Failed", e);
+                        let cached = null; try{ cached = localStorage.getItem('pbl_cloud_data'); }catch(e){}
+                        if (cached) this.realPortData = JSON.parse(cached);
+                    } finally { if (force) setTimeout(() => { this.loading = false; this.loadingText = ""; }, 500); }
+                },
+                
+                toggleTheme() {
+                    this.haptic('light'); this.isDark = !this.isDark;
+                    document.documentElement.classList.toggle('dark', this.isDark);
+                    try{ localStorage.setItem('theme', this.isDark ? 'dark' : 'light'); }catch(e){}
+                    document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
+                },
+
+                switchSwitch(sw) {
+                    this.haptic('light'); if (this.selectedSwitch.id === sw.id) return;
+                    this.mobileSelectedPort = null; // Switch badalne pe mobile card chupao
+                    this.selectedSwitch = sw; this.loading = true; this.loadingText = "Loading Ports...";
+                    setTimeout(() => { this.loading = false; }, 400);
+                },
+
+                openEditModal(port) {
+                    this.haptic('light');
+                    this.editForm = { num: port.num, status: port.status, desc: port.desc === 'Available' ? '' : port.desc, vlan: port.vlan === '-' ? '' : (port.vlan || port.ip), cable: port.cable === '-' ? '' : port.cable };
+                    this.assetSearchQuery = this.editForm.status === 'active' ? this.editForm.desc : '';
+                    this.editModalOpen = true;
+                },
+
+                openKpiModal(type) {
+                    this.haptic('light'); this.kpiType = type;
+                    const allPorts = this.generatePortList();
+                    if (type === 'all') this.kpiList = allPorts; else this.kpiList = allPorts.filter(p => p.status === type);
+                    this.kpiModalOpen = true;
+                },
+
+                async savePortChanges() {
+                    if(this.editForm.status === 'active') { this.editForm.desc = this.assetSearchQuery; }
+                    this.editModalOpen = false; this.saving = true;
+                    const payload = { switchId: this.selectedSwitch.id, portNum: this.editForm.num, status: this.editForm.status, desc: this.editForm.desc, vlan: this.editForm.vlan, cable: this.editForm.cable };
+                    try {
+                        const swId = this.selectedSwitch.id;
+                        if (!this.realPortData[swId]) this.realPortData[swId] = [];
+                        this.realPortData[swId] = this.realPortData[swId].filter(p => p.num !== payload.portNum);
+                        if (payload.status !== 'empty' || payload.desc) { this.realPortData[swId].push({ num: payload.portNum, status: payload.status, desc: payload.desc, vlan: payload.vlan, cable: payload.cable }); }
+                        try{ localStorage.setItem('pbl_cloud_data', JSON.stringify(this.realPortData)); }catch(e){}
+                        await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+                        this.haptic('success');
+                    } catch (e) {
+                        this.haptic('error'); alert("Check Connection");
+                    } finally { this.saving = false; }
+                },
+
                 isMatch(port) {
-                    if (!this.searchQuery) return true; // Agar search khali hai toh sab match hain
+                    if (!this.searchQuery) return true;
                     const q = this.searchQuery.toLowerCase().trim();
-                    // Port Number, Description, VLAN/IP, Cable ID, ya Status kisi me bhi match kare toh dikhao
-                    return String(port.num).includes(q) ||
-                           (port.desc && port.desc.toLowerCase().includes(q)) ||
-                           (port.vlan && port.vlan.toLowerCase().includes(q)) ||
-                           (port.cable && port.cable.toLowerCase().includes(q)) ||
-                           (port.status && port.status.toLowerCase().includes(q));
+                    return String(port.num).includes(q) || (port.desc && port.desc.toLowerCase().includes(q)) || (port.vlan && port.vlan.toLowerCase().includes(q)) || (port.cable && port.cable.toLowerCase().includes(q)) || (port.status && port.status.toLowerCase().includes(q));
                 },
 
-                generatePortList() { // 1 se leke capacity tak saare port UI me list karne ka loop function
-                    const currentId = this.selectedSwitch.id; // Konsa switch dikhana hai uski id
-                    const total = this.selectedSwitch.ports || 52; // Kitne boxes render honge iska count
-                    let rawList = []; // Khali table tayar ki
-                    const switchData = this.realPortData[currentId] || []; // Live loaded data me us id ka record khola
-                    for (let i = 1; i <= total; i++) { // Loop chalya har number of port tak
-                        const found = switchData.find(p => p.num === i); // Check kiya list me is number ki details bhari hui hai kya kisi data row me
-                        rawList.push(found ? { ...found, vlan: found.vlan || found.ip || '-' } : { num: i, status: 'empty', desc: 'Available', vlan: '', cable: '-' }); // Mili ho toh use daala werna empty box format daal dia
-                    } // Loop finish
-                    return rawList; // Box lists pass kardi component ko screen draw krne ko
-                }, // generatePortList khatam
-
-                // NAYA GETTER: Table ke liye pre-filtered list deta hai (khali ports exclude karke)
-                get filteredTablePorts() {
-                    return this.generatePortList().filter(p => p.status !== 'empty' && this.isMatch(p));
+                generatePortList() {
+                    const currentId = this.selectedSwitch.id; const total = this.selectedSwitch.ports || 52;
+                    let rawList = []; const switchData = this.realPortData[currentId] || [];
+                    for (let i = 1; i <= total; i++) {
+                        const found = switchData.find(p => p.num === i);
+                        rawList.push(found ? { ...found, vlan: found.vlan || found.ip || '-' } : { num: i, status: 'empty', desc: 'Available', vlan: '', cable: '-' });
+                    } return rawList;
                 },
 
-                getStats() { // KPI cards (Upar numbers) generate karne wala hissa
-                    const ports = this.generatePortList(); // Pehle loop se sara box status mangwaya
-                    return { // Results calculate aur wapas pass kiya map banakar
-                        active: ports.filter(p => p.status === 'active').length, // Kitno ka nam active
-                        uplink: ports.filter(p => p.status === 'uplink').length, // Kitno ka status uplink
-                        empty: ports.filter(p => p.status === 'empty').length // Kitne free/empty dikh rahe
-                    }; // Return mapping finish
-                }, // getStats khatam
+                get filteredTablePorts() { return this.generatePortList().filter(p => p.status !== 'empty' && this.isMatch(p)); },
 
-                getTooltipPosition(index, totalPorts) { // Visual ports pe hover pe jo pop up darka hai uski calculation
-                    const w = window.innerWidth; // Screen ki chudai pta ki
-                    let cols = 6; // Mobile me 6 column man lie the css grid me
-                    if (w >= 1280) cols = 24; // Agar tv pc h to 24 dabe hote 1 line me
-                    else if (w >= 640) cols = 12; // Tablet me 12 hote ek line me
-                    
-                    const colPos = index % cols; // Position in horizontal grid row by modulus math
-                    const currentRow = Math.floor(index / cols); // Kis vertical row pe box stith hai
-                    
-                    let xClass = 'left-1/2 -translate-x-1/2'; // Standard middle class
-                    if (colPos <= 1) xClass = 'left-0 translate-x-0'; // Agar left corner wale daba me click h toh left me push na kro window ke bahar nikal jaega dabba pop up text ka
-                    else if (colPos >= cols - 2) xClass = 'right-0 translate-x-0'; // Agar right wall par port daba hai toh use window limit ke andar left pop side force karo class se
-                    
-                    let yClass = 'bottom-full mb-2.5'; // Standard text tool tip dabe ke uppar hawa me khulta hai
-                    if (currentRow === 0) { // Par box pehli row/upper deewar me hi latka ho to window bar me popup nhi dikh paega the upar jagah ni hoti 
-                        yClass = 'top-full mt-2.5'; // Use ulta box ke nichle area ke drop down disha force direction de do class variable banake pass out karke
-                    } // First row conditon finish
-                    
-                    return `${xClass} ${yClass}`; // Tailwind ki generated classes wapas HTML rendering element logic ko do string form
-                }, // toolTip calculation logic function exit
+                getStats() {
+                    const ports = this.generatePortList();
+                    return { active: ports.filter(p => p.status === 'active').length, uplink: ports.filter(p => p.status === 'uplink').length, empty: ports.filter(p => p.status === 'empty').length };
+                },
 
-                getArrowPosition(index, totalPorts) { // Uss the popup message ki teer ki dandi kidhar modni hai text calculation
-                    const w = window.innerWidth; // Responsive display calculate again
-                    let cols = 6; // Again same assumption rules of grids based breakpoints
-                    if (w >= 1280) cols = 24;
-                    else if (w >= 640) cols = 12;
+                getTooltipPosition(index, totalPorts) {
+                    const w = window.innerWidth; let cols = 6;
+                    if (w >= 1280) cols = 24; else if (w >= 640) cols = 12;
+                    const colPos = index % cols; const currentRow = Math.floor(index / cols);
                     
-                    const colPos = index % cols;  // Logic identical copy
-                    const currentRow = Math.floor(index / cols); // Check if logic is identical
-                    
-                    let arrowPos = 'left-1/2 -translate-x-1/2'; // Center needle default assignment
-                    if (colPos <= 1) arrowPos = 'left-4 translate-x-0'; // Slide needle to specific left pixel margin
-                    else if (colPos >= cols - 2) arrowPos = 'right-4 translate-x-0'; // Slide right border margin if popup box shift done logic apply above
-                    
-                    let pointClass = '-bottom-1 border-b border-r'; // Draw point bottom tail tailwind css shapes
-                    if (currentRow === 0) { // Arrow draw head condition reverse if popup inverse top drop down
-                        pointClass = '-top-1 border-t border-l'; // Upper tail shape draw classes definition tailwind
-                    } // Return finish bracket
-                    
-                    return `${arrowPos} ${pointClass} rotate-45`; // Assemble arrow full structure 45 degree tilt corner point and output text definition var
-                }, // Arrow dynamic rendering functions block ends the calculations processing memory save stack
+                    let xClass = 'left-1/2 -translate-x-1/2'; 
+                    if (colPos < Math.floor(cols / 3)) xClass = 'left-0 translate-x-0';
+                    else if (colPos >= Math.floor(cols * 2 / 3)) xClass = 'right-0 translate-x-0';
 
-                getPortClass(status) { // Chote box me unki current assignment kya h pata krke classes deni hai functions call map loop mapping HTML view ko connect
-                    if (status === 'uplink') return 'status-uplink'; // CSS mapping variable out pass blue rang function up
-                    if (status === 'active') return 'status-up'; // Function variable pass out green class name return parameter mapped
-                    return 'status-empty'; // Default condition logic rendering fallback design classes apply execution default param returned to alpine model
-                }, // Simple check condition end execution
+                    let yClass = 'bottom-full mb-2.5';
+                    if (currentRow === 0) yClass = 'top-full mt-2.5';
 
-                exportToPDF() { // Table matrix export download feature library generate functions
-                    this.haptic('light'); // 👈 VIBRATE ON EXPORT CLICK
-                    const { jsPDF } = window.jspdf; // Libs namespace destructuring loading from cache downloaded script object definition
-                    const doc = new jsPDF('l', 'mm', 'a4'); // New blank object paper model a4 config definitions initialize object class var assigning structure instance object mem allocating
-                    doc.setFillColor(59, 130, 246); doc.rect(0, 0, 297, 20, 'F'); // Draw blue header on raw blank pdf using draw coordinates methods math API calculations coordinate system standard mapping
-                    doc.setTextColor(255, 255, 255); doc.setFontSize(14); doc.text("PBL Network Report", 14, 13); // Put text above colored mapped shape coordinates parameters
-                    doc.setFontSize(10); doc.text("Generated: " + new Date().toLocaleString(), 280, 13, { align: 'right' }); // Right align date coordinates methods implementation syntax logic code
-                    doc.setTextColor(40, 40, 40); doc.setFontSize(12); doc.text(`Switch: ${this.selectedSwitch.id}`, 14, 30); // Sub details dynamic value text coordinate map draw operations code memory pointer fetching
-                    doc.setFontSize(10); doc.text(`Location: ${this.selectedSwitch.location}`, 14, 36); doc.text(`Model: ${this.selectedSwitch.model_name}`, 14, 42); // Second details draw text operations coordinates mapped dynamic code
-                    const headers = [['Port', 'Status', 'Description', 'IP Address', 'Cable ID']]; // Table header defining array array mapping column heading definitions variables array struct declarations definition
-                    const activePorts = this.generatePortList().filter(p => p.status !== 'empty'); // Exclude blank from mapped row objects before loop array execution variable allocations assignment
-                    const data = activePorts.map(p => [String(p.num).padStart(2, '0'), p.status.toUpperCase(), p.desc, p.vlan || '-', p.cable]); // Prepare matrix map parsing rows and extract values to flat array index variable allocation mapping code
-                    doc.autoTable({ startY: 50, head: headers, body: data, theme: 'grid', headStyles: { fillColor: [59, 130, 246] }, styles: { fontSize: 8 }, alternateRowStyles: { fillColor: [241, 245, 249] } }); // Library plugin auto table parsing rendering parameters definitions object format styles
-                    doc.save(`PBL_Switch_${this.selectedSwitch.id}.pdf`); // Compile save prompt force browser API definitions execute operations
-                    setTimeout(() => this.haptic('success'), 500); // 👈 VIBRATE ON EXPORT SUCCESS
-                } // Export PDF method functions memory allocation block execution ends 
-            })) // Alpine component execution logic block object definitions pass configuration closing scopes syntax validations passing out function components architecture layout architecture definitions
-        }) // Listener block execution scopes definitions component mapping DOM load events executions block scope limits syntax formatting validation closing 
-    </script> <!-- Javascript runtime engine definition scope exit html tags definitions validations limits out structures  -->
+                    return `${xClass} ${yClass}`;
+                },
+
+                getArrowPosition(index, totalPorts) {
+                    const w = window.innerWidth; let cols = 6;
+                    if (w >= 1280) cols = 24; else if (w >= 640) cols = 12;
+                    const colPos = index % cols; const currentRow = Math.floor(index / cols);
+                    
+                    let arrowPos = 'left-1/2 -translate-x-1/2';
+                    if (colPos < Math.floor(cols / 3)) arrowPos = 'left-4 translate-x-0';
+                    else if (colPos >= Math.floor(cols * 2 / 3)) arrowPos = 'right-4 translate-x-0';
+
+                    let pointClass = '-bottom-1 border-b border-r';
+                    if (currentRow === 0) pointClass = '-top-1 border-t border-l';
+
+                    return `${arrowPos} ${pointClass} rotate-45`;
+                },
+
+                getPortClass(status) {
+                    if (status === 'uplink') return 'status-uplink';
+                    if (status === 'active') return 'status-up';
+                    return 'status-empty';
+                },
+
+                exportToPDF() {
+                    this.haptic('light'); const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4');
+                    doc.setFillColor(59, 130, 246); doc.rect(0, 0, 297, 20, 'F');
+                    doc.setTextColor(255, 255, 255); doc.setFontSize(14); doc.text("PBL Network Report", 14, 13);
+                    doc.setFontSize(10); doc.text("Generated: " + new Date().toLocaleString(), 280, 13, { align: 'right' });
+                    doc.setTextColor(40, 40, 40); doc.setFontSize(12); doc.text(`Switch: ${this.selectedSwitch.id}`, 14, 30);
+                    doc.setFontSize(10); doc.text(`Location: ${this.selectedSwitch.location}`, 14, 36); doc.text(`Model: ${this.selectedSwitch.model_name}`, 14, 42);
+                    const headers = [['Port', 'Status', 'Description', 'IP Address', 'Cable ID']];
+                    const activePorts = this.generatePortList().filter(p => p.status !== 'empty');
+                    const data = activePorts.map(p => [String(p.num).padStart(2, '0'), p.status.toUpperCase(), p.desc, p.vlan || '-', p.cable]);
+                    doc.autoTable({ startY: 50, head: headers, body: data, theme: 'grid', headStyles: { fillColor: [59, 130, 246] }, styles: { fontSize: 8 }, alternateRowStyles: { fillColor: [241, 245, 249] } });
+                    doc.save(`PBL_Switch_${this.selectedSwitch.id}.pdf`);
+                    setTimeout(() => this.haptic('success'), 500);
+                }
+            }));
+        });
+    </script>
 </body> <!-- Body content boundaries execution syntax tags DOM out limit validations bounds out format -->
 </html> <!-- Root node definition end tag bounds limit file architecture closing validation scope operations -->
