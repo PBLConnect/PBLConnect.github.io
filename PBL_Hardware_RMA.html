@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PBL Network Monitor | RMA Hub v1.0</title>
+    <title>PBL Network Monitor | RMA Hub v1.1</title>
     <link rel="icon" type="image/x-icon" href="Assets/images/pbl-logo.ico">
     
     <!-- PWA Setup -->
@@ -122,7 +122,8 @@
                 <!-- Page Identity (Divider removed, properly aligned) -->
                 <div class="flex flex-col justify-center">
                     <div class="flex items-center gap-1.5 sm:gap-2 mb-0.5 sm:mb-1">
-                        <span class="bg-brand/10 text-brand px-1.5 py-0.5 rounded font-mono font-bold text-[8px] sm:text-[9px] leading-none border border-brand/20">v1.0</span>
+                        <span class="bg-brand/10 text-brand px-1.5 py-0.5 rounded font-mono font-bold text-[8px] sm:text-[9px] leading-none border border-brand/20">v1.1</span>
+
                         <span class="inline-block text-[8px] sm:text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-md">HARDWARE OPS</span>
                     </div>
                     <!-- Two-color text exactly like ITDashboard -->
@@ -221,7 +222,7 @@
             <div class="cards-container grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 shrink-0">
                 
                 <!-- CARD 1: Total Claims -->
-                <div @click="filterBy(null)" class="rma-card bg-gradient-to-br from-violet-50 to-white dark:from-violet-900/10 dark:to-transparent rounded-2xl md:rounded-[1.25rem] p-3 sm:p-4 shadow-sm hover:shadow-md border cursor-pointer select-none group flex flex-col justify-between min-h-[90px] sm:min-h-[125px] relative" :class="activeFilter === null ? 'border-violet-500 ring-2 ring-violet-500/30 transform scale-[1.02]' : 'opacity-80 border-violet-100 dark:border-violet-900/50'">
+                <div @click="filterBy(null)" class="rma-card bg-gradient-to-br from-violet-50 to-white dark:from-violet-900/10 dark:to-transparent rounded-2xl md:rounded-[1.25rem] p-3 sm:p-4 shadow-sm hover:shadow-md border cursor-pointer select-none group flex flex-col justify-between min-h-[90px] sm:min-h-[125px] relative transition-all duration-300" :class="activeFilter ? 'opacity-40 border-violet-100 dark:border-violet-900/50' : 'border-violet-200 dark:border-violet-800/50'">
                     
                     <i class="fa-solid fa-clipboard-list absolute -bottom-2 -right-2 text-8xl sm:text-8xl text-violet-500 opacity-20 dark:opacity-10 group-hover:scale-110 transition-transform duration-500"></i>
 
@@ -391,50 +392,65 @@
                             </div>
                         </div>
 
-                        <!-- 💻 DESKTOP VIEW: TRADITIONAL TABLE -->
+                        <!-- 💻 DESKTOP VIEW: PREMIUM STRUCTURED TABLE -->
                         <table class="hidden md:table w-full text-left border-collapse table-fixed text-xs sm:text-sm" x-show="!loading" x-cloak>
-                            <thead class="bg-white/50 dark:bg-white/5 text-[9px] text-slate-400 uppercase font-black tracking-widest sticky top-0 z-10 shadow-sm backdrop-blur-md">
+                            <thead class="bg-slate-50/80 dark:bg-white/5 text-[9px] text-slate-400 uppercase font-black tracking-widest sticky top-0 z-10 shadow-sm backdrop-blur-md border-b border-slate-100 dark:border-white/5">
                                 <tr>
-                                    <th class="px-3 py-3 w-[12%] text-center">Log Date</th>
-                                    <th class="px-3 py-3 w-[15%]">Asset Info</th>
-                                    <th class="px-3 py-3 w-[20%]">Problem Reported</th>
-                                    <th class="px-3 py-3 w-[20%]">Action Taken</th>
-                                    <th class="px-3 py-3 w-[12%] text-center">Case ID</th>
-                                    <th class="px-3 py-3 w-[12%] text-center">Status</th>
-                                    <th class="px-3 py-3 w-[9%] text-right pr-5">Manage</th>
+                                    <th class="px-4 py-3.5 w-[10%] text-center">Log Date</th>
+                                    <th class="px-4 py-3.5 w-[18%]">Asset Details</th>
+                                    <th class="px-4 py-3.5 w-[20%]">Problem Reported</th>
+                                    <th class="px-4 py-3.5 w-[20%]">Action Taken</th>
+                                    <th class="px-4 py-3.5 w-[12%] text-center">Case ID</th>
+                                    <th class="px-4 py-3.5 w-[12%] text-center">Status</th>
+                                    <th class="px-4 py-3.5 w-[8%] text-right pr-5">Manage</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100 dark:divide-white/5 text-xs">
                                 
                                 <template x-for="(log, index) in filteredLogs" :key="'desk-'+index">
-                                    <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition cursor-pointer group" @click="editLog(log)">
+                                    <tr class="hover:bg-slate-50/80 dark:hover:bg-white/5 transition duration-200 cursor-pointer group" @click="editLog(log)">
                                         
-                                        <!-- Date -->
-                                        <td class="px-3 py-3.5 font-mono font-bold text-slate-600 dark:text-slate-300 align-middle text-center truncate" x-text="formatDisplayDate(log.date)"></td>
-                                        
-                                        <!-- Asset Info -->
-                                        <td class="px-3 py-3.5 align-middle truncate">
-                                            <div class="font-black text-brand text-[13px] truncate" x-text="log.asset"></div>
-                                            <div class="text-[9px] text-slate-500 font-bold mt-1 truncate">S/N: <span class="font-mono text-slate-700 dark:text-slate-300" x-text="log.serial || 'N/A'"></span></div>
+                                        <!-- 1. Premium Date Pill -->
+                                        <td class="px-4 py-3 align-middle text-center">
+                                            <div class="inline-flex flex-col items-center justify-center bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-lg px-2.5 py-1 shadow-sm group-hover:border-brand/30 transition-colors">
+                                                <span class="text-[11px] font-black text-slate-700 dark:text-slate-200 leading-tight" x-text="formatDisplayDate(log.date).split('-')[0] + ' ' + formatDisplayDate(log.date).split('-')[1]"></span>
+                                                <span class="text-[8px] font-bold text-slate-400 tracking-widest" x-text="formatDisplayDate(log.date).split('-')[2]"></span>
+                                            </div>
                                         </td>
                                         
-                                        <!-- Issue -->
-                                        <td class="px-3 py-3.5 align-middle truncate" :title="log.issue">
-                                            <div class="text-[11px] font-bold text-slate-800 dark:text-slate-200 truncate" x-text="log.issue || '-'"></div>
+                                        <!-- 2. Enhanced Asset Info -->
+                                        <td class="px-4 py-3 align-middle truncate">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 flex items-center justify-center text-sm shrink-0 border border-indigo-100 dark:border-indigo-500/20 shadow-sm"><i class="fa-solid fa-desktop"></i></div>
+                                                <div class="truncate">
+                                                    <div class="font-black text-brand dark:text-brand_glow text-[13px] truncate leading-tight group-hover:text-blue-600 transition-colors" x-text="log.asset"></div>
+                                                    <div class="text-[9px] text-slate-500 font-bold mt-0.5 truncate uppercase tracking-widest flex items-center gap-1"><i class="fa-solid fa-barcode opacity-50"></i> <span class="font-mono text-slate-700 dark:text-slate-300" x-text="log.serial || 'N/A'"></span></div>
+                                                </div>
+                                            </div>
                                         </td>
                                         
-                                        <!-- Action -->
-                                        <td class="px-3 py-3.5 align-middle truncate" :title="log.actionTaken">
-                                            <div class="text-[10px] font-medium text-slate-500 dark:text-slate-400 truncate" x-text="log.actionTaken || 'Pending...'"></div>
+                                        <!-- 3. Stylized Problem Badge -->
+                                        <td class="px-4 py-3 align-middle truncate" :title="log.issue">
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/10 text-[10px] font-bold text-slate-700 dark:text-slate-300 truncate max-w-full shadow-sm">
+                                                <span class="truncate" x-text="log.issue || '-'"></span>
+                                            </span>
+                                        </td>
+                                        
+                                        <!-- 4. Action Taken with Icon -->
+                                        <td class="px-4 py-3 align-middle truncate" :title="log.actionTaken">
+                                            <div class="flex items-start gap-1.5">
+                                                <i class="fa-solid fa-wrench text-brand opacity-60 text-[10px] mt-0.5"></i>
+                                                <span class="text-[11px] font-medium text-slate-600 dark:text-slate-400 truncate leading-tight" x-text="log.actionTaken || 'Pending...'"></span>
+                                            </div>
                                         </td>
 
-                                        <!-- Case ID -->
-                                        <td class="px-3 py-3.5 text-center align-middle truncate">
-                                            <span class="font-mono text-[10px] font-bold text-slate-600 bg-slate-100 border border-slate-200 dark:bg-black/30 dark:text-slate-300 dark:border-white/10 px-2 py-1 rounded shadow-sm" x-text="log.caseId || 'N/A'"></span>
+                                        <!-- 5. Clear Case ID Tag -->
+                                        <td class="px-4 py-3 text-center align-middle truncate">
+                                            <span class="font-mono text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 px-2.5 py-1 rounded-md shadow-sm" x-text="log.caseId || 'N/A'"></span>
                                         </td>
 
-                                        <!-- Status -->
-                                        <td class="px-3 py-3.5 text-center align-middle">
+                                        <!-- 6. Status Badge -->
+                                        <td class="px-4 py-3 text-center align-middle">
                                             <span class="px-2 py-1 rounded-md text-[9px] font-black uppercase inline-flex items-center gap-1 border shadow-sm truncate max-w-full" 
                                                   :class="log.status === 'Resolved' ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30' : (log.status === 'Part Ordered' ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/30' : 'bg-red-50 text-red-600 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/30')">
                                                 <i class="fa-solid text-[8px]" :class="log.status === 'Resolved' ? 'fa-check' : (log.status === 'Part Ordered' ? 'fa-box' : 'fa-clock')"></i>
@@ -442,20 +458,20 @@
                                             </span>
                                         </td>
 
-                                        <!-- Action -->
-                                        <td class="px-3 py-3.5 text-right align-middle pr-5 sticky-col bg-transparent">
-                                            <div class="flex items-center justify-end gap-1.5 opacity-50 group-hover:opacity-100 transition">
-                                                <button @click.stop="editLog(log)" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-black/30 hover:bg-brand hover:text-white text-slate-500 dark:text-slate-400 transition flex items-center justify-center border border-slate-200 dark:border-white/5 hover:border-brand/50 shadow-sm"><i class="fa-solid fa-pen text-[10px]"></i></button>
-                                                <button @click.stop="confirmDelete(log)" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-black/30 hover:bg-red-500 hover:text-white text-slate-500 dark:text-slate-400 transition flex items-center justify-center border border-slate-200 dark:border-white/5 hover:border-red-500/50 shadow-sm"><i class="fa-solid fa-trash text-[10px]"></i></button>
+                                        <!-- 7. Action Buttons -->
+                                        <td class="px-4 py-3 text-right align-middle pr-5 sticky-col bg-transparent">
+                                            <div class="flex items-center justify-end gap-1.5 opacity-40 group-hover:opacity-100 transition-opacity duration-300">
+                                                <button @click.stop="editLog(log)" class="w-7 h-7 rounded-lg bg-white dark:bg-black/40 hover:bg-brand hover:text-white text-slate-500 dark:text-slate-400 transition flex items-center justify-center border border-slate-200 dark:border-white/10 hover:border-brand/50 shadow-sm"><i class="fa-solid fa-pen text-[10px]"></i></button>
+                                                <button @click.stop="confirmDelete(log)" class="w-7 h-7 rounded-lg bg-white dark:bg-black/40 hover:bg-red-500 hover:text-white text-slate-500 dark:text-slate-400 transition flex items-center justify-center border border-slate-200 dark:border-white/10 hover:border-red-500/50 shadow-sm"><i class="fa-solid fa-trash text-[10px]"></i></button>
                                             </div>
                                         </td>
                                     </tr>
                                 </template>
                                 
                                 <tr x-show="filteredLogs.length === 0">
-                                    <td colspan="7" class="p-12 text-center text-slate-400">
-                                        <i class="fa-solid fa-server text-4xl mb-3 opacity-30"></i>
-                                        <p class="text-xs font-medium">No matching records found.</p>
+                                    <td colspan="7" class="p-16 text-center text-slate-400">
+                                        <i class="fa-solid fa-box-open text-4xl mb-3 opacity-30 text-brand"></i>
+                                        <p class="text-xs font-bold uppercase tracking-widest">No matching records found.</p>
                                     </td>
                                 </tr>
                             </tbody>
@@ -480,7 +496,7 @@
                 <span class="hidden sm:flex items-center text-[10px] font-bold text-slate-500 dark:text-slate-400 gap-1">&copy; <span x-text="new Date().getFullYear()"></span></span>
                 <span class="hidden sm:block h-3 w-px bg-slate-300 dark:bg-white/10"></span>
                 <div class="flex items-center gap-1.5">
-                    <span class="px-2 py-0.5 rounded bg-brand text-white font-mono font-black tracking-widest text-[9px] shadow-sm">v1.0</span>
+                    <span class="px-2 py-0.5 rounded bg-brand text-white font-mono font-black tracking-widest text-[9px] shadow-sm">v1.1</span>
                     <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-white/10 font-black uppercase tracking-widest text-[9px]">PROD</span>
                 </div>
             </div>
@@ -530,13 +546,30 @@
                 
                 <!-- Row 1: 2 Columns even on mobile -->
                 <div class="grid grid-cols-2 gap-3 sm:gap-4">
-                    <div>
-                        <label class="block text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 sm:mb-1.5 ml-1">Asset Tag</label>
-                        <input type="text" x-model="form.asset" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-lg sm:rounded-xl px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-bold outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition" placeholder="e.g. PBLNET040">
+                    
+                    <!-- Searchable Asset Dropdown -->
+                    <div class="relative" @click.away="showAssetDropdown = false">
+                        <label class="block text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 sm:mb-1.5 ml-1">Asset Tag *</label>
+                        <input type="text" x-model="assetSearchQuery" @focus="showAssetDropdown = true" @input="showAssetDropdown = true" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-lg sm:rounded-xl px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-bold outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition shadow-sm" placeholder="Search Hostname...">
+                        
+                        <!-- Dropdown Options -->
+                        <div x-show="showAssetDropdown" x-transition class="absolute z-[100] top-[100%] left-0 w-full mt-1 bg-white dark:bg-dark_surface border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl max-h-48 overflow-y-auto custom-scroll" x-cloak>
+                            <template x-for="asset in filteredAssets" :key="asset.AssetID">
+                                <div @click="selectAsset(asset)" class="px-4 py-2.5 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-brand hover:text-white cursor-pointer transition border-b border-slate-100 dark:border-white/5 last:border-0 flex justify-between items-center group">
+                                    <span x-text="asset.Hostname || asset.AssetID"></span>
+                                    <span class="text-[9px] font-mono opacity-50 group-hover:opacity-100" x-text="'SN: ' + (asset.SerialNo || 'N/A')"></span>
+                                </div>
+                            </template>
+                            <div x-show="filteredAssets.length === 0" class="px-4 py-3 text-xs font-bold text-rose-500 text-center bg-rose-50 dark:bg-rose-900/10">No Matches Found</div>
+                        </div>
                     </div>
+
+                    <!-- Auto-filled Serial Number -->
                     <div>
-                        <label class="block text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 sm:mb-1.5 ml-1">Serial Number</label>
-                        <input type="text" x-model="form.serial" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-lg sm:rounded-xl px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-mono outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition" placeholder="e.g. INA022ZWVC">
+                        <label class="block text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 sm:mb-1.5 ml-1 flex justify-between items-center">
+                            Serial Number <span class="text-[7px] bg-brand/10 text-brand px-1 py-0.5 rounded">Auto</span>
+                        </label>
+                        <input type="text" x-model="form.serial" readonly class="w-full bg-slate-100 dark:bg-black/60 border border-transparent rounded-lg sm:rounded-xl px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-mono outline-none cursor-not-allowed transition shadow-inner" placeholder="Fetched from Inventory">
                     </div>
                 </div>
                 
@@ -552,10 +585,40 @@
                     </div>
                 </div>
                 
-                <!-- Row 3: Full Width -->
+                <!-- Row 3: Full Width (Categorized High-Granularity Dropdown) -->
                 <div>
-                    <label class="block text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 sm:mb-1.5 ml-1">Issue Description</label>
-                    <input type="text" x-model="form.issue" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-lg sm:rounded-xl px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition" placeholder="e.g. HDD Noise / Screen Flickering">
+                    <label class="block text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 sm:mb-1.5 ml-1">Problem Reported *</label>
+                    <select x-model="form.issue" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-lg sm:rounded-xl px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition shadow-sm cursor-pointer appearance-none" style="background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2364748b\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'%3e%3c/polyline%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em;">
+                        <option value="" disabled selected>-- Select Hardware Fault --</option>
+                        
+                        <optgroup label="Desktop & Server Core (Power/Board)">
+                            <option value="⚡ No Display/Not Booting (SMPS)">⚡ No Display/Not Booting (SMPS)</option>
+                            <option value="🔌 LAN Port / NIC Failure">🔌 LAN Port / NIC Failure</option>
+                            <option value="🔊 Motherboard POST Failure / Beeps">🔊 Motherboard POST Failure / Beeps</option>
+                            <option value="🔋 Server: Redundant PSU Failure">🔋 Server: Redundant PSU Failure</option>
+                        </optgroup>
+
+                        <optgroup label="Storage & Memory">
+                            <option value="💽 HDD/SSD Failure (No Boot)">💽 HDD/SSD Failure (No Boot)</option>
+                            <option value="📟 RAM Fault / Blue Screen">📟 RAM Fault / Blue Screen</option>
+                            <option value="💾 Server: RAID Array Degraded">💾 Server: RAID Array Degraded</option>
+                        </optgroup>
+
+                        <optgroup label="Cooling & Physical">
+                            <option value="❄️ CPU Fan Failure / Overheating">❄️ CPU Fan Failure / Overheating</option>
+                            <option value="🔨 Physical Damage / Broken Case">🔨 Physical Damage / Broken Case</option>
+                        </optgroup>
+
+                        <optgroup label="Peripherals & Display">
+                            <option value="🖥️ Monitor / Screen Issue">🖥️ Monitor / Screen Issue</option>
+                            <option value="⌨️ Keyboard Fault">⌨️ Keyboard Fault</option>
+                            <option value="🖱️ Mouse Issue">🖱️ Mouse Issue</option>
+                        </optgroup>
+
+                        <optgroup label="Miscellaneous">
+                            <option value="⚙️ Other Hardware Fault">⚙️ Other Hardware Fault</option>
+                        </optgroup>
+                    </select>
                 </div>
                 
                 <!-- Row 4: Full Width -->
@@ -620,7 +683,7 @@
 
     <!-- SCRIPT LOGIC -->
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbxmA6oLB_zN40YUBVlYovH6Ss8XmTgg9_2nCL6GKMo3iefYXgakKh09uzwUSd8RfZJA-g/exec";
+		const API_URL = "https://script.google.com/macros/s/AKfycby4H5eCFAB8mifuuQwzmCTOfa3J7J6rSvhEwjHSvaSfBsgmLFLq7s6UhhgnWQSQrGBy8g/exec";
 
         document.addEventListener('alpine:init', () => {
             Alpine.data('rmaSystem', () => ({
@@ -631,24 +694,27 @@
                 
                 form: { id: null, asset: '', serial: '', caseId: '', issue: '', actionTaken: '', date: '', resolveDate: '', status: 'Pending', secret: '' },
                 
+                // 🧠 NAYA VARIABLES: Inventory Dropdown & Auto-fill ke liye
+                inventoryList: [],
+                assetSearchQuery: '',
+                showAssetDropdown: false,
+
                 deleteId: null, deleteSecret: '',
                 currentUser: JSON.parse(sessionStorage.getItem('userData')) || { name: 'User' },
 
-                // Haptic Feedback Controller
                 haptic(type = 'light') {
                     if (!window.navigator || !window.navigator.vibrate) return; 
-                    if (type === 'light') { navigator.vibrate(15); } 
-                    else if (type === 'success') { navigator.vibrate([30, 50, 30]); } 
-                    else if (type === 'error' || type === 'delete') { navigator.vibrate([50, 50, 50, 50]); }
+                    try {
+                        if (type === 'light') navigator.vibrate(15); 
+                        else if (type === 'success') navigator.vibrate([30, 50, 30]); 
+                        else if (type === 'error' || type === 'delete') navigator.vibrate([50, 50, 50, 50]);
+                    } catch(e){}
                 },
 
                 filterBy(statusKeyword) { 
                     this.haptic('light'); 
-                    if (this.activeFilter === statusKeyword) {
-                        this.activeFilter = null; // Toggle off if clicked again
-                    } else {
-                        this.activeFilter = statusKeyword;
-                    }
+                    if (this.activeFilter === statusKeyword) { this.activeFilter = null; } 
+                    else { this.activeFilter = statusKeyword; }
                 },
                 
                 getBadgeClass() { 
@@ -660,10 +726,7 @@
 
                 get filteredLogs() { 
                     let list = this.logs || []; 
-                    
-                    if (this.activeFilter) {
-                        list = list.filter(log => log.status === this.activeFilter);
-                    }
+                    if (this.activeFilter) list = list.filter(log => log.status === this.activeFilter);
                     if (this.searchQuery) {
                         const q = this.searchQuery.toLowerCase().trim();
                         list = list.filter(log => 
@@ -674,6 +737,26 @@
                         );
                     }
                     return list;
+                },
+
+                // 🧠 NAYA GETTER: Searchable Dropdown List (Optimized)
+                get filteredAssets() {
+                    if (!this.assetSearchQuery) return this.inventoryList.slice(0, 50); // Show max 50 to avoid lag
+                    const q = this.assetSearchQuery.toLowerCase();
+                    return this.inventoryList.filter(a => 
+                        (a.Hostname && a.Hostname.toLowerCase().includes(q)) || 
+                        (a.AssetID && a.AssetID.toLowerCase().includes(q))
+                    ).slice(0, 50);
+                },
+
+                // 🧠 NAYA FUNCTION: Asset Selection Logic
+                selectAsset(asset) {
+                    const displayName = asset.Hostname || asset.AssetID;
+                    this.form.asset = displayName;
+                    this.assetSearchQuery = displayName;
+                    this.form.serial = asset.SerialNo || 'N/A'; // Auto Fill Serial Number!
+                    this.showAssetDropdown = false;
+                    this.haptic('light');
                 },
 
                 async init() {
@@ -690,16 +773,27 @@
                     }, 1000);
 
                     this.loading = true;
-                    await Promise.all([ this.fetchLogs(false), new Promise(resolve => setTimeout(resolve, 800)) ]);
+                    await Promise.all([ 
+                        this.fetchLogs(false), 
+                        this.fetchInventoryMaster(), // 👈 Fetch Inventory for dropdown
+                        new Promise(resolve => setTimeout(resolve, 800)) 
+                    ]);
                     this.loading = false; 
                 },
 
-                async fetchLogs(force = false) {
-                    if (force) {
-                        this.haptic('light'); 
-                        this.loading = true;
-                    }
+                // 🧠 NAYA FUNCTION: Fetch IT Inventory Data
+                async fetchInventoryMaster() {
+                    try {
+                        const res = await fetch(API_URL + '?action=getInventory');
+                        const data = await res.json();
+                        if(data.hardware) {
+                            this.inventoryList = data.hardware;
+                        }
+                    } catch(e) { console.error("Inventory Fetch Error", e); }
+                },
 
+                async fetchLogs(force = false) {
+                    if (force) { this.haptic('light'); this.loading = true; }
                     try {
                         const cached = localStorage.getItem('pbl_rma_cache');
                         if (cached && !force) {
@@ -738,12 +832,23 @@
 
                 editLog(log) {
                     this.haptic('light'); 
+                    
+                    // 🧠 NAYA LOGIC: Legacy Data Translator (Purane records ko naye Dropdown se match karne ke liye)
+                    let matchedIssue = log.issue || '';
+                    if (matchedIssue === 'LAN Port Issue') matchedIssue = '🔌 LAN Port / NIC Failure';
+                    else if (matchedIssue === 'No Display/Not Booting') matchedIssue = '⚡ No Display/Not Booting (SMPS)';
+                    else if (matchedIssue === 'HDD PROBLEM') matchedIssue = '💽 HDD/SSD Failure (No Boot)';
+                    else if (matchedIssue === 'Monitor / Screen Issue') matchedIssue = '🖥️ Monitor / Screen Issue';
+                    else if (matchedIssue === 'Keyboard Fault') matchedIssue = '⌨️ Keyboard Fault';
+                    else if (matchedIssue === 'Mouse Issue') matchedIssue = '🖱️ Mouse Issue';
+
                     this.form = { 
                         id: log.id, asset: log.asset, serial: log.serial, caseId: log.caseId || '', 
-                        issue: log.issue, actionTaken: log.actionTaken || '', 
+                        issue: matchedIssue, actionTaken: log.actionTaken || '', 
                         date: this.parseDateForInput(log.date), resolveDate: this.parseDateForInput(log.resolveDate),
                         status: log.status || 'Pending', secret: '' 
                     };
+                    this.assetSearchQuery = log.asset; // Set query for UI
                     this.showModal = true;
                 },
 
@@ -755,6 +860,15 @@
                 },
 
                 async saveLog() {
+                    // Force the hidden input to match visual search query just in case
+                    this.form.asset = this.assetSearchQuery;
+                    
+                    if (!this.form.asset || this.form.asset.trim() === '') {
+                        this.haptic('error');
+                        alert("❌ Validation Error: Please select an Asset Tag!");
+                        return;
+                    }
+
                     if (!this.form.secret || this.form.secret.trim() !== 'PBL2026') { 
                         this.haptic('error'); 
                         alert("❌ Invalid Admin Key!"); 
@@ -762,9 +876,7 @@
                     }
                     this.loading = true;
                     try { 
-                        // Map actionTaken back to action for the API payload to match existing backend logic
                         const payload = { ...this.form, action: this.form.actionTaken };
-                        
                         await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'saveRMA', ...payload }) }); 
                         this.haptic('success'); 
                         this.showModal = false; 
@@ -779,9 +891,7 @@
 
                 async deleteLog() {
                     if (!this.deleteSecret || this.deleteSecret.trim() !== 'PBL2026') { 
-                        this.haptic('error'); 
-                        alert("❌ Invalid Admin Key!"); 
-                        return; 
+                        this.haptic('error'); alert("❌ Invalid Admin Key!"); return; 
                     }
                     try { 
                         await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'deleteRMA', id: this.deleteId, secret: this.deleteSecret }) }); 
@@ -789,10 +899,7 @@
                         this.showDeleteModal = false; 
                         this.fetchLogs(true); 
                     } 
-                    catch (e) { 
-                        this.haptic('error'); 
-                        alert("Delete Failed"); 
-                    }
+                    catch (e) { this.haptic('error'); alert("Delete Failed"); }
                 },
 
                 openModal(mode) { 
@@ -801,7 +908,10 @@
                     this.showModal = true; 
                 },
                 
-                resetForm() { this.form = { id: null, asset: '', serial: '', caseId: '', issue: '', actionTaken: '', date: new Date().toISOString().split('T')[0], resolveDate: '', status: 'Pending', secret: '' }; },
+                resetForm() { 
+                    this.assetSearchQuery = ''; 
+                    this.form = { id: null, asset: '', serial: '', caseId: '', issue: '', actionTaken: '', date: new Date().toISOString().split('T')[0], resolveDate: '', status: 'Pending', secret: '' }; 
+                },
                 
                 formatDisplayDate(dateStr) { if (!dateStr || dateStr === 'Pending' || dateStr === 'N/A') return '-'; if (dateStr.includes('1970') || dateStr.includes('1899')) return 'Pending'; return dateStr.substring(0, 11); },
                 parseDateForInput(dateStr) { if(!dateStr || dateStr === 'Pending' || dateStr === 'N/A' || dateStr.includes('1970')) return ''; const date = new Date(dateStr); if(isNaN(date.getTime())) return ''; return date.toISOString().split('T')[0]; },
@@ -810,11 +920,11 @@
                     this.haptic('light'); 
                     this.isDark = !this.isDark; 
                     document.documentElement.classList.toggle('dark', this.isDark); 
-                    localStorage.setItem('theme', this.isDark ? 'dark' : 'light'); 
+                    try{ localStorage.setItem('theme', this.isDark ? 'dark' : 'light'); }catch(e){} 
                     document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
                 }
-            }))
-        })
+            }));
+        });
     </script>
 </body>
 </html>
