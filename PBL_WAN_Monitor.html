@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PBL Network Monitor | WAN v1.0</title>
+    <title>PBL Network Monitor | WAN v1.1</title>
     <link rel="icon" type="image/x-icon" href="Assets/images/pbl-logo.ico">
     
     <!-- PWA Setup -->
@@ -125,7 +125,7 @@
                 <!-- Page Identity (Divider removed, properly aligned) -->
                 <div class="flex flex-col justify-center">
                     <div class="flex items-center gap-1.5 sm:gap-2 mb-0.5 sm:mb-1">
-                        <span class="bg-brand/10 text-brand px-1.5 py-0.5 rounded font-mono font-bold text-[8px] sm:text-[9px] leading-none border border-brand/20">v1.0</span>
+                        <span class="bg-brand/10 text-brand px-1.5 py-0.5 rounded font-mono font-bold text-[8px] sm:text-[9px] leading-none border border-brand/20">v1.1</span>
                         <span class="inline-block text-[8px] sm:text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-md">NETWORK OPS</span>
                     </div>
                     <!-- Two-color text exactly like ITDashboard -->
@@ -513,7 +513,8 @@
                 <span class="hidden sm:flex items-center text-[10px] font-bold text-slate-500 dark:text-slate-400 gap-1">&copy; <span x-text="new Date().getFullYear()"></span></span>
                 <span class="hidden sm:block h-3 w-px bg-slate-300 dark:bg-white/10"></span>
                 <div class="flex items-center gap-1.5">
-                    <span class="px-2 py-0.5 rounded bg-brand text-white font-mono font-black tracking-widest text-[9px] shadow-sm">v1.0</span>
+                    <span class="px-1.5 py-0.5 rounded-md bg-gradient-to-r from-brand to-indigo-600 text-white font-mono font-black tracking-widest shadow-[0_2px_10px_-2px_rgba(59,130,246,0.5)] cursor-default">v1.1</span>
+
                     <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-white/10 font-black uppercase tracking-widest text-[9px]">PROD</span>
                 </div>
             </div>
@@ -686,7 +687,7 @@
     <!-- SCRIPT LOGIC -->
     <!-- SCRIPT LOGIC -->
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbxmA6oLB_zN40YUBVlYovH6Ss8XmTgg9_2nCL6GKMo3iefYXgakKh09uzwUSd8RfZJA-g/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycby4H5eCFAB8mifuuQwzmCTOfa3J7J6rSvhEwjHSvaSfBsgmLFLq7s6UhhgnWQSQrGBy8g/exec";
 
         document.addEventListener('alpine:init', () => {
             Alpine.data('wanSystem', () => ({
