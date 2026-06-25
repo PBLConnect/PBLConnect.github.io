@@ -70,6 +70,48 @@
         #pull-indicator { height: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; transition: height 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
         .pull-ready i { transform: rotate(180deg); color: #3b82f6 !important; }
 		
+		/* ApexCharts Tooltip Override */
+		.apexcharts-tooltip { z-index: 9999 !important; overflow: visible !important; }
+		
+		/* 🎇 CUSTOM AUDIT RADIO BUTTONS WITH PARTICLES 🎇 */
+        .audit-radio-group { position: relative; display: flex; flex-wrap: wrap; border-radius: 0.6rem; background: #f1f5f9; padding: 0.25rem; gap: 0.25rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+        .dark .audit-radio-group { background: rgba(15, 23, 42, 0.4); box-shadow: inset 0 2px 5px rgba(0,0,0,0.4); }
+        .audit-radio-group .radio { flex: 1 1 auto; text-align: center; position: relative; }
+        .audit-radio-group .radio input { display: none; }
+        
+        .audit-radio-group .radio .name { display: flex; cursor: pointer; align-items: center; justify-content: center; border-radius: 0.4rem; border: none; padding: 0.4rem 0; color: #64748b; font-weight: 900; font-size: 10px; text-transform: uppercase; transition: all 0.2s ease; overflow: visible; z-index: 10; letter-spacing: 0.5px;}
+        .dark .audit-radio-group .radio .name { color: #94a3b8; }
+        
+        /* Dynamic Colors Variable Setup */
+        .audit-radio-group .radio.pass { --c-main: #10b981; --c-dark: #059669; --c-light: #34d399; }
+        .audit-radio-group .radio.fail { --c-main: #ef4444; --c-dark: #dc2626; --c-light: #f87171; }
+        .audit-radio-group .radio.na { --c-main: #f59e0b; --c-dark: #d97706; --c-light: #fbbf24; }
+
+        .audit-radio-group .radio:hover .name { background: rgba(255,255,255,0.7); }
+        .dark .audit-radio-group .radio:hover .name { background: rgba(255,255,255,0.05); }
+        
+        /* 🔥 FIX: Only un-checked disabled buttons should fade */
+        .audit-radio-group .radio input:disabled:not(:checked) + .name { cursor: not-allowed; opacity: 0.4; background: transparent; }
+
+        /* Checked Active State */
+        .audit-radio-group .radio input:checked + .name {
+            background: linear-gradient(145deg, var(--c-main), var(--c-dark));
+            color: white; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.2), inset -2px -2px 4px rgba(255, 255, 255, 0.1), 0 4px 8px rgba(0,0,0,0.15);
+            transform: translateY(1px); animation: btn-pop 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* 🔥 FIX: Checked disabled buttons should remain fully visible but unclickable */
+        .audit-radio-group .radio input:disabled:checked + .name { cursor: not-allowed; animation: none; opacity: 1; transform: translateY(0); box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.15); }
+
+        /* Particle System */
+        .audit-radio-group .radio .name::before, .audit-radio-group .radio .name::after { content: ""; position: absolute; width: 4px; height: 4px; border-radius: 50%; opacity: 0; pointer-events: none; }
+        .audit-radio-group .radio input:checked:not(:disabled) + .name::before { background: var(--c-light); box-shadow: 0 0 6px var(--c-light), 8px -8px 0 var(--c-light), -8px -8px 0 var(--c-light); top: -4px; left: 50%; transform: translateX(-50%); animation: part-top 0.6s ease-out forwards; }
+        .audit-radio-group .radio input:checked:not(:disabled) + .name::after { background: var(--c-light); box-shadow: 0 0 6px var(--c-light), 8px 8px 0 var(--c-light), -8px 8px 0 var(--c-light); bottom: -4px; left: 50%; transform: translateX(-50%); animation: part-bot 0.6s ease-out forwards; }
+
+        @keyframes btn-pop { 0% { transform: scale(0.92) translateY(2px); } 50% { transform: scale(1.05) translateY(-1px); } 100% { transform: scale(1) translateY(1px); } }
+        @keyframes part-top { 0% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); } 40% { opacity: 0.8; } 100% { opacity: 0; transform: translateX(-50%) translateY(-15px) scale(0); box-shadow: 0 0 4px transparent, 15px -15px 0 transparent, -15px -15px 0 transparent; } }
+        @keyframes part-bot { 0% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); } 40% { opacity: 0.8; } 100% { opacity: 0; transform: translateX(-50%) translateY(15px) scale(0); box-shadow: 0 0 4px transparent, 15px 15px 0 transparent, -15px 15px 0 transparent; } }
+		
 		
 		
 		
@@ -97,7 +139,7 @@
                             <div class="absolute -inset-0.5 bg-gradient-to-r from-rose-400 to-brand rounded-md blur opacity-50 group-hover:opacity-75 transition duration-500 animate-pulse"></div>
                             <!-- Actual Button -->
                             <button class="relative bg-white dark:bg-[#020617] text-brand px-2 py-0.5 rounded-md font-mono font-black text-[9px] leading-none border border-slate-200 dark:border-white/10 shadow-sm flex items-center gap-1.5" title="View Release Notes">
-                                <span>v1.1</span> 
+                                <span>v1.2</span> 
                                 <!-- Red Ping Dot -->
                                 <span class="relative flex h-1.5 w-1.5">
                                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
@@ -157,18 +199,19 @@
                             </div>
                             <div class="max-h-64 overflow-y-auto custom-scroll">
                                 <template x-for="notif in notifications" :key="notif.id">
-                                    <div class="p-4 border-b border-slate-50 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 cursor-pointer flex gap-3 transition">
+                                    <div @click="if(notif.type === 'audit') { showNotifs = false; openAuditModal(); } else { scrollToLog(); }" 
+                                         class="p-4 border-b border-slate-50 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 cursor-pointer flex gap-3 transition">
                                         <div class="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 shadow-sm border border-transparent dark:border-white/5"
-                                             :class="(notif.urgency && notif.urgency.includes('High')) ? 'bg-red-50 text-red-500 dark:bg-red-500/10' : 'bg-blue-50 text-blue-500 dark:bg-blue-500/10'">
-                                            <i class="fa-solid" :class="(notif.urgency && notif.urgency.includes('High')) ? 'fa-triangle-exclamation' : 'fa-ticket'"></i>
+                                             :class="(notif.urgency === 'Critical' || (notif.urgency && notif.urgency.includes('High'))) ? 'bg-red-50 text-red-500 dark:bg-red-500/10' : (notif.urgency === 'Warning' ? 'bg-amber-50 text-amber-500 dark:bg-amber-500/10' : 'bg-blue-50 text-blue-500 dark:bg-blue-500/10')">
+                                            <i class="fa-solid" :class="notif.type === 'audit' ? 'fa-shield-halved' : ((notif.urgency === 'Critical' || (notif.urgency && notif.urgency.includes('High'))) ? 'fa-triangle-exclamation' : 'fa-ticket')"></i>
                                         </div>
                                         <div class="flex-1 min-w-0">
                                             <div class="flex justify-between items-start">
                                                 <p class="text-xs font-bold text-slate-700 dark:text-slate-200 truncate pr-2 group-hover:text-brand transition" x-text="notif.issue">Issue</p>
-                                                <span class="text-[9px] font-mono text-slate-400 shrink-0" x-text="formatDisplayDate(notif.date)"></span>
+                                                <span class="text-[9px] font-mono text-slate-400 shrink-0" x-text="notif.dateStr ? notif.dateStr : formatDisplayDate(notif.date)"></span>
                                             </div>
                                             <p class="text-[10px] text-slate-500 truncate mt-1">
-                                                <span class="font-bold text-slate-600 dark:text-slate-400" x-text="notif.name"></span> • <span x-text="notif.desc"></span>
+                                                <span class="font-bold text-slate-600 dark:text-slate-400" :class="notif.type === 'audit' && notif.urgency === 'Critical' ? 'text-red-500' : ''" x-text="notif.name"></span> <span x-show="notif.desc">•</span> <span x-text="notif.desc"></span>
                                             </p>
                                         </div>
                                     </div>
@@ -224,19 +267,20 @@
 
         <div class="max-w-[1920px] mx-auto w-full flex flex-col gap-4 sm:gap-6 h-full pb-4 lg:pb-0">
 
-            <!-- APPS GRID -->
-             <!-- APPS GRID v1.2 (3D Kinetic) -->
+            <!-- APPS GRID v1.2 (3D Kinetic) -->
             <section class="shrink-0 relative z-20">
-                <div class="cards-container grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-5">
+                <div class="cards-container grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-5">
                     
-                    <a href="PBL_Inventory.html" @click="haptic('light')" class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-blue-50/80 to-white/80 border border-blue-200/60 shadow-md hover:shadow-2xl hover:border-brand/50 dark:from-blue-900/10 dark:to-dark_surface/80 dark:border-blue-800/30 dark:hover:border-brand/50">
+                    <!-- 1. IT INVENTORY (Blue Theme Hover) -->
+                    <a href="PBL_Inventory.html" @click="haptic('light')" class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-blue-50/80 to-white/80 border border-blue-200/60 shadow-md hover:shadow-2xl hover:border-blue-400/50 dark:from-blue-900/10 dark:to-dark_surface/80 dark:border-blue-800/30 dark:hover:border-blue-400/50">
                         <i class="fa-solid fa-laptop absolute -bottom-4 -right-3 text-7xl sm:text-9xl text-blue-500/20 dark:text-blue-500/10 group-hover:scale-110 transition-transform duration-500"></i>
                         <div class="flex items-center justify-between relative z-10 mb-2">
                             <div class="flex items-center gap-2">
                                 <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-blue-500 text-[12px] shrink-0 border border-blue-100 dark:border-white/5"><i class="fa-solid fa-database"></i></div>
                                 <span class="hidden sm:inline-block text-[11px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest leading-none">Database</span>
                             </div>
-                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-blue-100/50 dark:bg-blue-900/30 text-blue-500 flex items-center justify-center group-hover:bg-brand group-hover:text-white transition-all duration-300 shrink-0"><i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i></div>
+                            <!-- Color updated to blue-500 -->
+                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-blue-100/50 dark:bg-blue-900/30 text-blue-500 flex items-center justify-center group-hover:bg-blue-500 group-hover:text-white transition-all duration-300 shrink-0"><i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i></div>
                         </div>
                         <div class="relative z-10 mt-auto">
                             <h3 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">IT Inventory</h3>
@@ -244,14 +288,16 @@
                         </div>
                     </a>
 
-                    <a href="PBL_Switch_Map.html" @click="haptic('light')" class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-teal-50/80 to-white/80 border border-teal-200/60 shadow-md hover:shadow-2xl hover:border-brand/50 dark:from-teal-900/10 dark:to-dark_surface/80 dark:border-teal-800/30 dark:hover:border-brand/50">
+                    <!-- 2. SWITCH MAP (Teal Theme Hover) -->
+                    <a href="PBL_Switch_Map.html" @click="haptic('light')" class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-teal-50/80 to-white/80 border border-teal-200/60 shadow-md hover:shadow-2xl hover:border-teal-400/50 dark:from-teal-900/10 dark:to-dark_surface/80 dark:border-teal-800/30 dark:hover:border-teal-400/50">
                         <i class="fa-solid fa-network-wired absolute -bottom-4 -right-3 text-7xl sm:text-9xl text-teal-500/20 dark:text-teal-500/10 group-hover:scale-110 transition-transform duration-500"></i>
                         <div class="flex items-center justify-between relative z-10 mb-2">
                             <div class="flex items-center gap-2">
                                 <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-teal-500 text-[12px] shrink-0 border border-teal-100 dark:border-white/5"><i class="fa-solid fa-plug"></i></div>
                                 <span class="hidden sm:inline-block text-[11px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-widest leading-none">Network</span>
                             </div>
-                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-teal-100/50 dark:bg-teal-900/30 text-teal-500 flex items-center justify-center group-hover:bg-brand group-hover:text-white transition-all duration-300 shrink-0"><i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i></div>
+                            <!-- Color updated to teal-500 -->
+                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-teal-100/50 dark:bg-teal-900/30 text-teal-500 flex items-center justify-center group-hover:bg-teal-500 group-hover:text-white transition-all duration-300 shrink-0"><i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i></div>
                         </div>
                         <div class="relative z-10 mt-auto">
                             <h3 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">Switch Map</h3>
@@ -259,14 +305,16 @@
                         </div>
                     </a>
 
-                    <a href="PBL_WAN_Monitor.html" @click="haptic('light')" class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-amber-50/80 to-white/80 border border-amber-200/60 shadow-md hover:shadow-2xl hover:border-brand/50 dark:from-amber-900/10 dark:to-dark_surface/80 dark:border-amber-800/30 dark:hover:border-brand/50">
+                    <!-- 3. WAN MONITOR (Amber Theme Hover) -->
+                    <a href="PBL_WAN_Monitor.html" @click="haptic('light')" class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-amber-50/80 to-white/80 border border-amber-200/60 shadow-md hover:shadow-2xl hover:border-amber-400/50 dark:from-amber-900/10 dark:to-dark_surface/80 dark:border-amber-800/30 dark:hover:border-amber-400/50">
                         <i class="fa-solid fa-satellite-dish absolute -bottom-4 -right-3 text-7xl sm:text-9xl text-amber-500/20 dark:text-amber-500/10 group-hover:scale-110 transition-transform duration-500"></i>
                         <div class="flex items-center justify-between relative z-10 mb-2">
                             <div class="flex items-center gap-2">
                                 <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-amber-500 text-[12px] shrink-0 border border-amber-100 dark:border-white/5"><i class="fa-solid fa-tower-broadcast"></i></div>
                                 <span class="hidden sm:inline-block text-[11px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest leading-none">Links</span>
                             </div>
-                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-amber-100/50 dark:bg-amber-900/30 text-amber-500 flex items-center justify-center group-hover:bg-brand group-hover:text-white transition-all duration-300 shrink-0"><i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i></div>
+                            <!-- Color updated to amber-500 -->
+                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-amber-100/50 dark:bg-amber-900/30 text-amber-500 flex items-center justify-center group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shrink-0"><i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i></div>
                         </div>
                         <div class="relative z-10 mt-auto">
                             <h3 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">WAN Monitor</h3>
@@ -274,14 +322,16 @@
                         </div>
                     </a>
 
-                    <a href="PBL_Hardware_RMA.html" @click="haptic('light')" class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-purple-50/80 to-white/80 border border-purple-200/60 shadow-md hover:shadow-2xl hover:border-brand/50 dark:from-purple-900/10 dark:to-dark_surface/80 dark:border-purple-800/30 dark:hover:border-brand/50">
+                    <!-- 4. RMA TRACKER (Purple Theme Hover) -->
+                    <a href="PBL_Hardware_RMA.html" @click="haptic('light')" class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-purple-50/80 to-white/80 border border-purple-200/60 shadow-md hover:shadow-2xl hover:border-purple-400/50 dark:from-purple-900/10 dark:to-dark_surface/80 dark:border-purple-800/30 dark:hover:border-purple-400/50">
                         <i class="fa-solid fa-screwdriver-wrench absolute -bottom-4 -right-3 text-7xl sm:text-9xl text-purple-500/20 dark:text-purple-500/10 group-hover:scale-110 transition-transform duration-500"></i>
                         <div class="flex items-center justify-between relative z-10 mb-2">
                             <div class="flex items-center gap-2">
                                 <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-purple-500 text-[12px] shrink-0 border border-purple-100 dark:border-white/5"><i class="fa-solid fa-boxes-packing"></i></div>
                                 <span class="hidden sm:inline-block text-[11px] font-black text-purple-600 dark:text-purple-400 uppercase tracking-widest leading-none">Support</span>
                             </div>
-                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-purple-100/50 dark:bg-purple-900/30 text-purple-500 flex items-center justify-center group-hover:bg-brand group-hover:text-white transition-all duration-300 shrink-0"><i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i></div>
+                            <!-- Color updated to purple-500 -->
+                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-purple-100/50 dark:bg-purple-900/30 text-purple-500 flex items-center justify-center group-hover:bg-purple-500 group-hover:text-white transition-all duration-300 shrink-0"><i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i></div>
                         </div>
                         <div class="relative z-10 mt-auto">
                             <h3 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">RMA Tracker</h3>
@@ -289,20 +339,67 @@
                         </div>
                     </a>
 
-                    <a href="PBL_IP_Manager.html" @click="haptic('light')" class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] lg:col-span-1 md:col-span-3 col-span-2 bg-gradient-to-br from-rose-50/80 to-white/80 border border-rose-200/60 shadow-md hover:shadow-2xl hover:border-brand/50 dark:from-rose-900/10 dark:to-dark_surface/80 dark:border-rose-800/30 dark:hover:border-brand/50">
+                   <!-- 5. IP MANAGER (Fixed Col Span) -->
+                    <a href="PBL_IP_Manager.html" @click="haptic('light')" class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-rose-50/80 to-white/80 border border-rose-200/60 shadow-md hover:shadow-2xl hover:border-rose-400/50 dark:from-rose-900/10 dark:to-dark_surface/80 dark:border-rose-800/30 dark:hover:border-rose-400/50">
                         <i class="fa-solid fa-globe absolute -bottom-4 -right-3 text-7xl sm:text-9xl text-rose-500/20 dark:text-rose-500/10 group-hover:scale-110 transition-transform duration-500"></i>
                         <div class="flex items-center justify-between relative z-10 mb-2">
                             <div class="flex items-center gap-2">
                                 <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-rose-500 text-[12px] shrink-0 border border-rose-100 dark:border-white/5"><i class="fa-solid fa-route"></i></div>
                                 <span class="hidden sm:inline-block text-[11px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest leading-none">Routing</span>
                             </div>
-                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-rose-100/50 dark:bg-rose-900/30 text-rose-500 flex items-center justify-center group-hover:bg-brand group-hover:text-white transition-all duration-300 shrink-0"><i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i></div>
+                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-rose-100/50 dark:bg-rose-900/30 text-rose-500 flex items-center justify-center group-hover:bg-rose-500 group-hover:text-white transition-all duration-300 shrink-0"><i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i></div>
                         </div>
                         <div class="relative z-10 mt-auto">
                             <h3 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">IP Manager</h3>
                             <p class="text-[11px] sm:text-[13px] font-bold text-slate-500 dark:text-slate-400 mt-1 truncate">Network Routing 🌐</p>
                         </div>
                     </a>
+
+                    <!-- 6. SECURITY AUDIT (DYNAMIC SMART KPI) -->
+                    <a @click.prevent="haptic('light'); openAuditModal()" 
+                       class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-500 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] border"
+                       :class="
+                            auditMeta.status === 'Overdue' 
+                            ? 'bg-red-50/90 dark:bg-red-900/30 border-red-500 ring-4 ring-red-500/30 shadow-[0_0_30px_rgba(239,68,68,0.7)] hover:shadow-[0_0_40px_rgba(239,68,68,0.9)] transform scale-[1.03] z-20' 
+                            : (auditAlert && auditAlert.urgency === 'Warning' 
+                                ? 'bg-gradient-to-br from-amber-50 to-white dark:from-amber-900/20 dark:to-dark_surface/80 border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.5)] hover:shadow-[0_0_30px_rgba(245,158,11,0.7)]' 
+                                : 'bg-gradient-to-br from-indigo-50/80 to-white/80 dark:from-indigo-900/10 dark:to-dark_surface/80 border-indigo-200/60 shadow-md hover:shadow-2xl hover:border-indigo-400/50 dark:border-indigo-800/30 dark:hover:border-indigo-400/50')
+                       ">
+                        
+                        <!-- Background Big Icon -->
+                        <i class="fa-solid fa-shield-halved absolute -bottom-4 -right-3 text-7xl sm:text-9xl group-hover:scale-110 transition-transform duration-500"
+                           :class="auditMeta.status === 'Overdue' ? 'text-red-500/20 dark:text-red-500/10' : (auditAlert && auditAlert.urgency === 'Warning' ? 'text-amber-500/20 dark:text-amber-500/10' : 'text-indigo-500/20 dark:text-indigo-500/10')"></i>
+                        
+                        <div class="flex items-center justify-between relative z-10 mb-2">
+                            <div class="flex items-center gap-2">
+                                <!-- Top Left Small Icon -->
+                                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-[12px] shrink-0 border transition-colors duration-300"
+                                     :class="auditMeta.status === 'Overdue' ? 'text-red-500 border-red-200 dark:border-red-500/30' : (auditAlert && auditAlert.urgency === 'Warning' ? 'text-amber-500 border-amber-200 dark:border-amber-500/30' : 'text-indigo-500 border-indigo-100 dark:border-white/5')">
+                                    <i class="fa-solid" :class="auditMeta.status === 'Overdue' ? 'fa-triangle-exclamation animate-pulse' : 'fa-user-shield'"></i>
+                                </div>
+                                <span class="hidden sm:inline-block text-[11px] font-black uppercase tracking-widest leading-none transition-colors duration-300"
+                                      :class="auditMeta.status === 'Overdue' ? 'text-red-600 dark:text-red-400' : (auditAlert && auditAlert.urgency === 'Warning' ? 'text-amber-600 dark:text-amber-400' : 'text-indigo-600 dark:text-indigo-400')">Security</span>
+                            </div>
+                            
+                            <!-- Arrow Button -->
+                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center transition-all duration-300 shrink-0"
+                                 :class="auditMeta.status === 'Overdue' ? 'bg-red-100/50 dark:bg-red-900/30 text-red-500 group-hover:bg-red-500 group-hover:text-white' : (auditAlert && auditAlert.urgency === 'Warning' ? 'bg-amber-100/50 dark:bg-amber-900/30 text-amber-500 group-hover:bg-amber-500 group-hover:text-white' : 'bg-indigo-100/50 dark:bg-indigo-900/30 text-indigo-500 group-hover:bg-indigo-500 group-hover:text-white')">
+                                <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="relative z-10 mt-auto">
+                            <!-- ✅ NAYA NAAM YAHAN HAI -->
+                            <h3 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">IT Sec Audit</h3>
+                            
+                            <!-- Dynamic Tagline -->
+                            <p class="text-[11px] sm:text-[13px] font-bold mt-1 truncate transition-colors duration-300"
+                               :class="auditMeta.status === 'Overdue' ? 'text-red-500 dark:text-red-400' : (auditAlert && auditAlert.urgency === 'Warning' ? 'text-amber-500 dark:text-amber-400' : 'text-slate-500 dark:text-slate-400')">
+                               <span x-text="auditMeta.status === 'Overdue' ? 'Action Required 🚨' : (auditAlert && auditAlert.urgency === 'Warning' ? 'Due Soon ⏳' : (auditMeta.status === 'Pending' || auditMeta.status === 'Draft' ? 'Audit Open 📝' : 'Compliance 🛡️'))"></span>
+                            </p>
+                        </div>
+                    </a>
+
                 </div>
             </section>
 
@@ -419,8 +516,8 @@
                     </div>
                 </div>
 
-                <!-- RIGHT: ANALYTICS MODULE -->
-                <div class="relative rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(168,85,247,0.1)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-500 border border-white/80 dark:border-white/10 flex flex-col h-[500px] lg:h-full group bg-white/40 dark:bg-[#0f172a]/60 backdrop-blur-3xl z-10">
+               <!-- RIGHT: ANALYTICS MODULE -->
+                <div class="relative rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgba(168,85,247,0.1)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-500 border border-white/80 dark:border-white/10 flex flex-col min-h-[520px] h-auto lg:min-h-0 lg:h-full group bg-white/40 dark:bg-[#0f172a]/60 backdrop-blur-3xl z-10">
                     
                     <div class="bento-blob delay-3 bg-[#a855f7]" style="width: 200px; height: 200px; filter: blur(70px); opacity: 0.2; top: -10%; left: 50%;"></div>
 
@@ -541,8 +638,9 @@
                             </div>
 
                         </div>
-            </section>
-        </div>
+                    </div>
+                </div>
+                </div>
     </main>
 
     <!-- FOOTER -->
@@ -551,7 +649,7 @@
             <div class="flex items-center gap-2 sm:gap-3 z-10">
                 <span>&copy; <span x-text="new Date().getFullYear()"></span> <span class="hidden sm:inline font-bold text-slate-700 dark:text-white">PBL Connect</span></span>
                 <span class="h-3 w-px bg-slate-300 dark:bg-white/10"></span>
-                <span class="font-mono text-brand font-bold">v1.1</span>
+                <span class="font-mono text-brand font-bold">v1.2</span>
             </div>
             <div class="hidden lg:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 items-center gap-4 bg-slate-50 dark:bg-white/5 px-4 py-1.5 rounded-full border border-slate-200 dark:border-white/5 shadow-sm">
                 <div class="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
@@ -590,100 +688,72 @@
         </div>
     </div>
 	
-	<!-- 🚀 MEGA CHANGELOG MODAL (RELEASE NOTES v1.1) -->
+	<!-- 🚀 MEGA CHANGELOG MODAL (RELEASE NOTES v1.2) -->
     <div x-show="showChangelogModal" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/70 backdrop-blur-md p-4" x-transition.opacity @click.self="showChangelogModal = false">
         <div class="bg-white dark:bg-dark_surface w-full max-w-4xl rounded-[2rem] shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden flex flex-col max-h-[85vh] sm:max-h-[90vh] transform transition-all scale-100">
             
-            <!-- Modal Header (Premium Gradient) -->
-            <div class="p-6 sm:p-8 border-b border-slate-100 dark:border-white/10 bg-gradient-to-br from-brand to-indigo-700 text-white shrink-0 relative overflow-hidden">
+            <!-- Modal Header (Indigo/Purple Theme Matching Sec Audit) -->
+            <div class="p-6 sm:p-8 border-b border-slate-100 dark:border-white/10 bg-gradient-to-br from-indigo-600 to-purple-700 text-white shrink-0 relative overflow-hidden">
                 <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
                 <div class="relative z-10 flex justify-between items-start">
                     <div>
                         <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest bg-white/20 border border-white/20 shadow-sm px-2.5 py-1 rounded-md mb-3 inline-block flex items-center gap-1.5 w-max"><span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span> Official Release Notes</span>
-                        <h3 class="text-2xl sm:text-3xl font-heading font-black leading-tight drop-shadow-md">What's New in v1.1 🚀</h3>
-                        <p class="text-xs font-medium opacity-80 mt-1.5 font-mono">Major Update: June 22, 2026</p>
+                        <h3 class="text-2xl sm:text-3xl font-heading font-black leading-tight drop-shadow-md">What's New in v1.2 🚀</h3>
+                        <p class="text-xs font-medium opacity-80 mt-1.5 font-mono">Security & Auto-Alerts Update • Jun 25, 2026</p>
                     </div>
                     <button @click="showChangelogModal = false" class="w-8 h-8 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/40 text-white transition shadow-sm active:scale-95"><i class="fa-solid fa-xmark text-sm"></i></button>
                 </div>
             </div>
 
-            <!-- Modal Body (Bento Style Grid - All 6 Modules) -->
-            <div class="p-5 sm:p-6 overflow-y-auto custom-scroll flex-1 bg-slate-50/50 dark:bg-transparent space-y-4 sm:space-y-5">
+            <!-- Modal Body (Bento Style Grid) -->
+            <div class="p-5 sm:p-6 overflow-y-auto custom-scroll flex-1 bg-slate-50/50 dark:bg-transparent space-y-6">
                 
-                <!-- Core Update Card -->
-                <div class="bg-white dark:bg-black/20 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm relative overflow-hidden">
-                    <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-yellow-400"></div>
-                    <h4 class="text-xs sm:text-sm font-black text-yellow-500 uppercase tracking-widest mb-2 flex items-center gap-2"><i class="fa-solid fa-bolt"></i> Global Interoperability Engine</h4>
-                    <p class="text-[11px] sm:text-[13px] text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
-                        Poora IT Portal ab ekdum interconnected ban chuka hai! 🔄 Ek module mein data modify karo, baaki sab jagah automatically sync ho jayega. IPs aur Hostnames ki manual data entry block kar di gayi hai taaki <strong>Single Source of Truth (SSOT)</strong> strict tarike se enforce ho sake. 🛡️
-                    </p>
+                <!-- v1.2 HIGHLIGHTS -->
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="px-2 py-0.5 rounded bg-indigo-500 text-white font-black text-[10px] uppercase tracking-widest shadow-sm">v1.2</span>
+                        <h4 class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-widest">Latest Additions</h4>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                        <!-- 1. Audit Engine -->
+                        <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition">
+                            <h4 class="text-[11px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Bi-Monthly Security Audit</h4>
+                            <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
+                                <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>New Sec Audit Box:</strong> Introduced a dedicated 'Sec Audit' KPI box on the dashboard. Click it to easily open the new 12-point security checklist.</span></li>
+                                <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Strict Access:</strong> Only the assigned engineer can fill and submit their own audit report.</span></li>
+                                <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Tamper-Proof:</strong> Once submitted, the audit locks permanently with the exact Date and Time.</span></li>
+                                <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Better Controls:</strong> Added smooth Pass/Fail buttons and a new Risk Severity (Low/High) selector.</span></li>
+                            </ul>
+                        </div>
+
+                        <!-- 2. Proactive Ops -->
+                        <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition">
+                            <h4 class="text-[11px] font-black text-rose-500 dark:text-rose-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-bolt"></i> Smart Automation</h4>
+                            <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
+                                <li class="flex items-start gap-1.5"><span class="text-rose-500 shrink-0"><i class="fa-solid fa-fire text-[10px] mt-0.5"></i></span> <span><strong>Auto-Ticketing:</strong> If any audit point fails, the system automatically creates a High-Priority IT ticket.</span></li>
+                                <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Smart Alerts:</strong> The system now sends automatic reminders and Overdue warnings based on the date.</span></li>
+                                <li class="flex items-start gap-1.5"><span class="text-blue-500 shrink-0"><i class="fa-solid fa-wrench text-[10px] mt-0.5"></i></span> <span><strong>UI Fixes:</strong> Cleaned up the Analytics layout and fixed the issue where the chart tooltip was getting cut.</span></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
-                    
-                    <!-- 1. IT Dashboard -->
-                    <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm">
-                        <h4 class="text-[11px] font-black text-slate-800 dark:text-white uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-house text-brand"></i> IT Dashboard</h4>
-                        <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
-                            <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-plus text-[8px] mt-0.5"></i></span> <span><strong>Added:</strong> Tickets par ab live IP, Switch Port aur Location ke badges real-time mein dikhenge. 📍</span></li>
-                            <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-plus text-[8px] mt-0.5"></i></span> <span><strong>Added:</strong> Apps par premium kinetic hover aur frosted glass zoom effect lagaya gaya hai. ✨</span></li>
-                            <li class="flex items-start gap-1.5"><span class="text-blue-500 shrink-0"><i class="fa-solid fa-wrench text-[8px] mt-0.5"></i></span> <span><strong>Fixed:</strong> Ticket details ko ultra-compact 2-row layout mein fix kiya, no more unnecessary scroll. 📐</span></li>
-                        </ul>
+                <!-- PREVIOUS VERSION (v1.1) 1-2 LINER -->
+                <div class="pt-5 border-t border-slate-200 dark:border-white/10">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="px-2 py-0.5 rounded bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-slate-400 font-black text-[10px] uppercase tracking-widest shadow-sm">v1.1</span>
+                        <h4 class="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Previous Update</h4>
                     </div>
-
-                    <!-- 2. IP Manager -->
-                    <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm">
-                        <h4 class="text-[11px] font-black text-slate-800 dark:text-white uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-globe text-emerald-500"></i> IP Manager</h4>
-                        <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
-                            <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-plus text-[8px] mt-0.5"></i></span> <span><strong>Added:</strong> Hostnames ke liye smart auto-sync searchable dropdown laga diya hai. 🔍</span></li>
-                            <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-plus text-[8px] mt-0.5"></i></span> <span><strong>Added:</strong> Active connections ab visually pop-out (highlight) honge taaki clear focus rahe. 🔴</span></li>
-                            <li class="flex items-start gap-1.5"><span class="text-blue-500 shrink-0"><i class="fa-solid fa-wrench text-[8px] mt-0.5"></i></span> <span><strong>Fixed:</strong> Mobile View ko optimize karke 1-page compact layout banaya bina vertical scroll ke. 📱</span></li>
-                        </ul>
+                    <div class="bg-slate-50 dark:bg-black/20 p-3 rounded-xl border border-slate-200 dark:border-white/5 flex items-start gap-3">
+                        <i class="fa-solid fa-clock-rotate-left text-slate-400 mt-0.5"></i>
+                        <p class="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed m-0">
+                            <strong>Connected Systems:</strong> Linked all IT modules (Inventory, IP Manager, Switches) so data automatically syncs everywhere without manual typing. Upgraded the overall design.
+                        </p>
                     </div>
-                    
-                    <!-- 3. IT Inventory -->
-                    <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm">
-                        <h4 class="text-[11px] font-black text-slate-800 dark:text-white uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-laptop text-blue-500"></i> IT Inventory</h4>
-                        <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
-                            <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-plus text-[8px] mt-0.5"></i></span> <span><strong>Added:</strong> IP Manager se seedha Live IP fetch hoga as a Read-Replica. Manual typing locked! 🔒</span></li>
-                            <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-plus text-[8px] mt-0.5"></i></span> <span><strong>Added:</strong> Asset details dekhne ke liye premium iOS-style sliding drawer (Bento cards) add kiya hai. 🗂️</span></li>
-                            <li class="flex items-start gap-1.5"><span class="text-blue-500 shrink-0"><i class="fa-solid fa-wrench text-[8px] mt-0.5"></i></span> <span><strong>Fixed:</strong> Mobile par scroll karte hi KPI cards smooth animation ke sath hide ho jayenge. 📉</span></li>
-                        </ul>
-                    </div>
-
-                    <!-- 4. Switch Map -->
-                    <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm">
-                        <h4 class="text-[11px] font-black text-slate-800 dark:text-white uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-network-wired text-teal-500"></i> Switch Map</h4>
-                        <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
-                            <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-plus text-[8px] mt-0.5"></i></span> <span><strong>Added:</strong> Active ports par ab Asset IDs ka smart dropdown aayega, hardcoded text nahi. 🔌</span></li>
-                            <li class="flex items-start gap-1.5"><span class="text-blue-500 shrink-0"><i class="fa-solid fa-wrench text-[8px] mt-0.5"></i></span> <span><strong>Fixed:</strong> Screen ke edge par tooltip ka katna (clipping issue) permanently fix kar diya. ✂️</span></li>
-                            <li class="flex items-start gap-1.5"><span class="text-blue-500 shrink-0"><i class="fa-solid fa-wrench text-[8px] mt-0.5"></i></span> <span><strong>Fixed:</strong> Mobile floating card par tap karte hi gayab hone wala Event propagation bug solved. 🐞</span></li>
-                        </ul>
-                    </div>
-
-                    <!-- 5. Hardware RMA -->
-                    <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm">
-                        <h4 class="text-[11px] font-black text-slate-800 dark:text-white uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-screwdriver-wrench text-purple-500"></i> RMA Tracker</h4>
-                        <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
-                            <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-plus text-[8px] mt-0.5"></i></span> <span><strong>Added:</strong> Hardware faults ke liye highly granular aur categorized dropdown (Taxonomy) add kiya. 📊</span></li>
-                            <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-plus text-[8px] mt-0.5"></i></span> <span><strong>Added:</strong> Hostname select karte hi Serial Number (S/N) auto-fill hoga. No more typos! ✅</span></li>
-                            <li class="flex items-start gap-1.5"><span class="text-blue-500 shrink-0"><i class="fa-solid fa-wrench text-[8px] mt-0.5"></i></span> <span><strong>Fixed:</strong> Purane plain-text data ko naye emoji-based dropdown se automatically map kar diya gaya hai. 🧩</span></li>
-                        </ul>
-                    </div>
-
-                    <!-- 6. WAN Monitor -->
-                    <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm">
-                        <h4 class="text-[11px] font-black text-slate-800 dark:text-white uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-satellite-dish text-orange-500"></i> WAN Monitor</h4>
-                        <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
-                            <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-plus text-[8px] mt-0.5"></i></span> <span><strong>Added:</strong> Dynamic ISP color coding ke sath premium layout design kiya gaya. 🎨</span></li>
-                            <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-plus text-[8px] mt-0.5"></i></span> <span><strong>Added:</strong> Mobile par scroll event detect karke KPI cards ko collapsible banaya gaya. 📱</span></li>
-                            <li class="flex items-start gap-1.5"><span class="text-blue-500 shrink-0"><i class="fa-solid fa-wrench text-[8px] mt-0.5"></i></span> <span><strong>Fixed:</strong> Backend array mapping ko fix karke exact database values se align kar diya hai. ⚙️</span></li>
-                        </ul>
-                    </div>
-
                 </div>
+
             </div>
-            
         </div>
     </div>
 
@@ -718,7 +788,177 @@
         </div>
     </div>
 
-    <div x-show="showStaffModal" x-cloak class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/70 backdrop-blur-md p-4" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" @click.self="showStaffModal = false">
+    <!-- 🛡️ SECURITY AUDIT MODAL -->
+    <div x-show="showAuditModal" x-cloak class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/70 backdrop-blur-md p-4" x-transition.opacity @click.self="showAuditModal = false">
+        <div class="bg-white dark:bg-dark_surface w-full max-w-4xl rounded-[2rem] shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden flex flex-col max-h-[90vh]">
+            
+            <div class="p-5 sm:p-6 border-b border-slate-100 dark:border-white/5 flex justify-between items-center bg-slate-50/50 dark:bg-black/20 shrink-0">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-white dark:bg-black/20 flex items-center justify-center shadow-sm border border-slate-200 dark:border-white/10 p-1.5 shrink-0 relative">
+                        <img src="pbl-logo.png" alt="PBL Logo" class="h-full w-auto object-contain drop-shadow-sm" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                        <div style="display:none;" class="w-full h-full bg-gradient-to-tr from-brand to-indigo-600 text-white rounded-lg items-center justify-center font-black text-lg">P</div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-heading font-black text-slate-800 dark:text-white leading-tight">Data Security Audit</h3>
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <p class="text-[10px] text-indigo-500 uppercase font-black tracking-widest" x-text="auditMeta.cycle + ' • ' + auditMeta.auditor"></p>
+                            <!-- 🕒 Submitted Timestamp Badge -->
+                            <span x-show="auditMeta.status === 'Submitted' && auditMeta.date" 
+                                  class="px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30 shadow-sm flex items-center gap-1" 
+                                  x-text="'✅ ' + auditMeta.date"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button @click="viewAuditHistory = !viewAuditHistory" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[10px] font-black uppercase tracking-widest transition hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-500/20">
+                        <i class="fa-solid" :class="viewAuditHistory ? 'fa-arrow-left' : 'fa-clock-rotate-left'"></i>
+                        <span x-text="viewAuditHistory ? 'Back to Audit' : 'Past Audits'"></span>
+                    </button>
+                    <button @click="showAuditModal = false" class="w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-white/10 text-slate-400 hover:text-red-500 transition shadow-sm border border-slate-100 dark:border-white/5"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+           
+	<!-- 📊 LIVE PROGRESS BAR (GAMIFICATION) -->
+            <div x-show="!viewAuditHistory" class="bg-slate-50 dark:bg-black/40 px-5 sm:px-6 pt-3 pb-4 border-b border-slate-200 dark:border-white/5 shrink-0 z-10 relative shadow-inner">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">Audit Completion</span>
+                    <span class="text-[11px] font-black text-indigo-600 dark:text-indigo-400" x-text="Math.round((auditForm.points.filter(p => p.status !== '').length / auditForm.points.length) * 100) + '%'"></span>
+                </div>
+                <div class="w-full bg-slate-200 dark:bg-white/10 rounded-full h-2 overflow-hidden shadow-inner">
+                    <div class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-500 ease-out" 
+                         :style="'width: ' + Math.round((auditForm.points.filter(p => p.status !== '').length / auditForm.points.length) * 100) + '%'"></div>
+                </div>
+            </div>
+		   
+           <!-- CURRENT AUDIT FORM -->
+            <div x-show="!viewAuditHistory" class="p-4 sm:p-6 overflow-y-auto custom-scroll flex-1 space-y-4 bg-slate-50/30 dark:bg-transparent">
+                <!-- Warning for late -->
+                <div x-show="auditMeta.status === 'Overdue' && !isAuditLocked" class="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 p-3 rounded-xl flex items-start gap-3">
+                    <i class="fa-solid fa-triangle-exclamation text-red-500 mt-0.5"></i>
+                    <p class="text-xs font-bold text-red-700 dark:text-red-400">This audit is OVERDUE. Submit immediately with proper remarks.</p>
+                </div>
+
+                <template x-for="(pt, index) in auditForm.points" :key="index">
+                    <div class="bg-white dark:bg-black/20 border rounded-xl p-4 shadow-sm transition hover:shadow-md"
+                         :class="pt.status === '' ? 'border-slate-200 dark:border-white/5' : (pt.status === 'Pass' ? 'border-emerald-200 dark:border-emerald-500/30' : (pt.status === 'Fail' ? 'border-red-200 dark:border-red-500/30' : 'border-amber-200 dark:border-amber-500/30'))">
+                        
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                            <div class="flex-1 pr-4">
+                                <h4 class="text-sm font-black text-slate-800 dark:text-slate-200" x-text="pt.title"></h4>
+                                <p class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1" x-text="pt.desc"></p>
+                            </div>
+                            <!-- 🎇 ANIMATED RADIO BUTTONS (SMART TOGGLE) -->
+                                <div class="audit-radio-group w-full sm:w-56 shrink-0 mt-2 sm:mt-0">
+								
+                                <label class="radio pass" @click.prevent="if(!isAuditLocked) { pt.status = pt.status === 'Pass' ? '' : 'Pass'; haptic('light'); }">
+                                    <input type="radio" :checked="pt.status === 'Pass'" :disabled="isAuditLocked" />
+                                    <span class="name">Pass</span>
+                                </label>
+                                <label class="radio fail" @click.prevent="if(!isAuditLocked) { pt.status = pt.status === 'Fail' ? '' : 'Fail'; haptic('light'); }">
+                                    <input type="radio" :checked="pt.status === 'Fail'" :disabled="isAuditLocked" />
+                                    <span class="name">Fail</span>
+                                </label>
+                                <label class="radio na" @click.prevent="if(!isAuditLocked) { pt.status = pt.status === 'N/A' ? '' : 'N/A'; haptic('light'); }">
+                                    <input type="radio" :checked="pt.status === 'N/A'" :disabled="isAuditLocked" />
+                                    <span class="name">N/A</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- 🌡️ RISK SEVERITY SCALE (Auto-opens on Fail) -->
+                        <div x-show="pt.status === 'Fail'" x-collapse class="mt-2 mb-3 flex flex-wrap items-center gap-3 bg-red-50 dark:bg-red-900/10 p-2.5 rounded-lg border border-red-100 dark:border-red-900/30 transition-all">
+                            <span class="text-[9px] font-black uppercase tracking-widest text-red-500"><i class="fa-solid fa-fire-flame-curved mr-1"></i> Risk Severity:</span>
+                            <div class="flex gap-2">
+                                <button @click.prevent="if(!isAuditLocked) { auditForm.points[index].severity = 'Low'; haptic('light'); }" 
+                                        class="px-3 py-1 rounded text-[9px] font-black uppercase transition disabled:cursor-not-allowed"
+                                        :class="auditForm.points[index].severity === 'Low' ? 'bg-amber-500 text-white shadow-sm ring-2 ring-amber-500/30 opacity-100' : ('bg-white text-slate-500 dark:bg-white/5 dark:text-slate-400 ' + (isAuditLocked ? 'opacity-40' : 'hover:bg-slate-50'))" 
+                                        :disabled="isAuditLocked">Low</button>
+                                
+                                <button @click.prevent="if(!isAuditLocked) { auditForm.points[index].severity = 'Medium'; haptic('light'); }" 
+                                        class="px-3 py-1 rounded text-[9px] font-black uppercase transition disabled:cursor-not-allowed"
+                                        :class="auditForm.points[index].severity === 'Medium' ? 'bg-orange-500 text-white shadow-sm ring-2 ring-orange-500/30 opacity-100' : ('bg-white text-slate-500 dark:bg-white/5 dark:text-slate-400 ' + (isAuditLocked ? 'opacity-40' : 'hover:bg-slate-50'))" 
+                                        :disabled="isAuditLocked">Medium</button>
+                                
+                                <button @click.prevent="if(!isAuditLocked) { auditForm.points[index].severity = 'Critical'; haptic('light'); }" 
+                                        class="px-3 py-1 rounded text-[9px] font-black uppercase transition disabled:cursor-not-allowed"
+                                        :class="auditForm.points[index].severity === 'Critical' ? 'bg-red-600 text-white shadow-sm ring-2 ring-red-600/30 opacity-100' : ('bg-white text-slate-500 dark:bg-white/5 dark:text-slate-400 ' + (isAuditLocked ? 'opacity-40' : 'hover:bg-slate-50'))" 
+                                        :disabled="isAuditLocked">Critical</button>
+                            </div>
+                        </div>
+
+                        <!-- ALWAYS OPEN REMARKS (Mandatory Proof) -->
+                        <div class="relative">
+                            <i class="fa-solid fa-pen-clip absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                            <textarea x-model="pt.remarks" :readonly="isAuditLocked" 
+                                      :class="isAuditLocked ? 'bg-slate-100 text-slate-800 font-medium cursor-not-allowed dark:bg-black/60 dark:text-slate-300' : 'bg-slate-50 dark:bg-black/40 dark:text-slate-200 focus:border-indigo-500'" 
+                                      rows="2" placeholder="📝 Mandatory: Add remarks, PC names, or proof..." 
+                                      class="w-full pl-8 pr-3 py-2 border border-slate-200 dark:border-white/10 rounded-lg text-xs outline-none transition resize-none placeholder:text-[10px] sm:placeholder:text-xs"></textarea>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- HISTORY VIEW -->
+            <div x-show="viewAuditHistory" class="p-4 sm:p-6 overflow-y-auto custom-scroll flex-1 space-y-3 bg-slate-50/30 dark:bg-transparent">
+                <template x-for="hist in allAudits" :key="hist.cycle">
+                    <div class="bg-white dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-xl p-4 shadow-sm flex items-center justify-between">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-[9px] px-2 py-0.5 rounded font-black uppercase tracking-widest border"
+                                      :class="hist.status === 'Submitted' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-amber-50 text-amber-600 border-amber-200'" x-text="hist.status"></span>
+                                <span class="text-[10px] font-bold text-slate-400 font-mono" x-text="hist.date"></span>
+                            </div>
+                            <h4 class="text-sm font-black text-slate-800 dark:text-white" x-text="hist.cycle"></h4>
+                            <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-0.5">Auditor: <span x-text="hist.auditor"></span></p>
+                        </div>
+                        <div class="text-center">
+                            <span class="text-2xl font-black" :class="hist.score >= 80 ? 'text-emerald-500' : 'text-red-500'" x-text="hist.score + '%'"></span>
+                        </div>
+                    </div>
+                </template>
+                <div x-show="allAudits.length === 0" class="text-center p-10 text-slate-400">
+                    <i class="fa-solid fa-clock-rotate-left text-4xl mb-3 opacity-30"></i>
+                    <p class="text-xs font-bold uppercase tracking-widest">No past records found.</p>
+                </div>
+            </div>
+
+            <!-- MODAL FOOTER (Submit & Save or Locked Reason) -->
+            <div x-show="!viewAuditHistory" class="p-4 sm:p-5 border-t border-slate-100 dark:border-white/5 bg-white dark:bg-dark_surface flex flex-col sm:flex-row justify-between items-center gap-3 shrink-0">
+                
+                <!-- If Unlocked: Show standard inputs -->
+                <div x-show="!isAuditLocked" class="relative w-full sm:w-48">
+                    <i class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="password" x-model="auditSecret" placeholder="Admin Key" class="w-full pl-8 pr-3 py-2.5 bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl text-xs font-mono font-bold outline-none focus:border-indigo-500 transition">
+                </div>
+                <div class="flex gap-2 w-full sm:w-auto">
+                    <!-- Mobile only History button -->
+                    <button @click="viewAuditHistory = true" class="sm:hidden flex-1 px-2 py-3 bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300 font-bold rounded-xl transition text-[9px] uppercase tracking-widest flex items-center justify-center gap-1.5 border border-slate-200 dark:border-white/5 whitespace-nowrap">
+                        <i class="fa-solid fa-clock-rotate-left"></i> History
+                    </button>
+                    <button @click="submitAudit('Draft')" class="flex-1 sm:flex-none px-3 sm:px-5 py-3 sm:py-2.5 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 font-bold rounded-xl transition text-[9px] sm:text-xs uppercase tracking-widest flex items-center justify-center gap-1.5 border border-slate-200 dark:border-white/5 whitespace-nowrap">
+                        <i class="fa-solid fa-floppy-disk"></i> Draft
+                    </button>
+                    <button @click="submitAudit('Submitted')" class="flex-1 sm:flex-none px-4 sm:px-8 py-3 sm:py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-[9px] sm:text-xs uppercase tracking-widest rounded-xl transition shadow-[0_5px_15px_-3px_rgba(99,102,241,0.4)] flex items-center justify-center gap-2 active:scale-95 whitespace-nowrap" :disabled="auditLoading">
+                        <span x-show="!auditLoading">Submit <i class="fa-solid fa-paper-plane ml-1"></i></span>
+                        <span x-show="auditLoading"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
+                    </button>
+                </div>
+
+                <!-- If Locked: Show Banner instead of inputs -->
+                <div x-show="isAuditLocked" class="w-full text-center py-3 px-4 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl">
+                    <p class="text-xs font-bold text-slate-600 dark:text-slate-400" x-text="auditLockReason"></p>
+                </div>
+            </div>
+            
+            <div x-show="viewAuditHistory" class="p-4 sm:p-5 border-t border-slate-100 dark:border-white/5 bg-white dark:bg-dark_surface sm:hidden flex justify-center">
+                 <button @click="viewAuditHistory = false" class="w-full py-2.5 bg-indigo-600 text-white font-black text-[10px] uppercase tracking-wider rounded-xl transition shadow-md">
+                        Back to Audit Form
+                 </button>
+            </div>
+        </div>
+    </div>
+	
+	<div x-show="showStaffModal" x-cloak class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/70 backdrop-blur-md p-4" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" @click.self="showStaffModal = false">
         <div class="bg-white dark:bg-dark_surface w-full max-w-lg rounded-[2rem] shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden">
             <div class="relative p-6 pb-5 border-b border-slate-100 dark:border-white/5 bg-gradient-to-br from-slate-50 to-white dark:from-dark_surface dark:to-black/20 overflow-hidden">
                 <div class="absolute -right-6 -top-6 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
@@ -810,6 +1050,7 @@
     </div>
 
     <!-- SCRIPT -->
+    <!-- SCRIPT -->
     <script>
     const API_URL = "https://script.google.com/macros/s/AKfycby4H5eCFAB8mifuuQwzmCTOfa3J7J6rSvhEwjHSvaSfBsgmLFLq7s6UhhgnWQSQrGBy8g/exec";
 
@@ -829,9 +1070,47 @@
                 currentUser: safeUser,
                 
                 showNotifs: false, showProfile: false, highlightLog: false,
-            showLogoutModal: false, showProfileModal: false, showSettingsModal: false, 
-            showGuide: false, showStaffModal: false, showOpenTicketsModal: false, showChangelogModal: false,
-                loading: true, tickets: [],
+                showLogoutModal: false, showProfileModal: false, showSettingsModal: false, 
+                showGuide: false, showStaffModal: false, showOpenTicketsModal: false, showChangelogModal: false, showAuditModal: false,
+                
+                viewAuditHistory: false,
+                allAudits: [],
+                auditLoading: false, 
+                auditSecret: '',
+                auditMeta: { cycle: 'Loading...', auditor: '-', status: 'Pending', date: '' },
+                auditForm: { points: [] },
+
+                // 🔒 Security Governance Locks
+                get isAuditLocked() {
+                    if (this.auditMeta.status === 'Submitted') return true;
+                    // Agar login kiya hua banda Assigned Auditor nahi hai, toh Lock kar do
+                    if (this.currentUser && this.currentUser.name && this.currentUser.name !== this.auditMeta.auditor) return true;
+                    return false;
+                },
+                get auditLockReason() {
+                    if (this.auditMeta.status === 'Submitted') return "🔒 This audit is officially finalized and permanently locked.";
+                    if (this.currentUser && this.currentUser.name && this.currentUser.name !== this.auditMeta.auditor) return `🛑 Strict Ops: Only ${this.auditMeta.auditor} is authorized to modify this audit.`;
+                    return "";
+                },
+
+                // The 12 Checkpoints 🧠
+                masterAuditPoints: [
+                    { id: 'p1', title: '1. Hardware Inventory Check 🖥️', desc: 'Physical computers & storage vs actual count.' },
+                    { id: 'p2', title: '2. Software & License Check 👾', desc: 'Unauthorized software & license tracking verification.' },
+                    { id: 'p3', title: '3. USB Port Block Check 🔌', desc: 'Random PC testing with pendrive to ensure restriction policy.' },
+                    { id: 'p4', title: '4. Antivirus Health Check 🦠', desc: 'Sophos/Seqrite active & virus definitions updated.' },
+                    { id: 'p5', title: '5. Shared Drive Scan 📂', desc: 'Central server (192.168.0.223) checked for unwanted files.' },
+                    { id: 'p6', title: '6. AMC Replacement Logs 📞', desc: 'Hardware vendor calls tracked with ticket numbers.' },
+                    { id: 'p7', title: '7. Faulty Hardware Disposal 🔨', desc: 'Defective drives physically destroyed before disposal.' },
+                    { id: 'p8', title: '8. WAN & Network Review 🌐', desc: 'Last 15 days internet downtime reasons analyzed.' },
+                    { id: 'p9', title: '9. Active Directory (AD) Cleanup 🚪', desc: 'Resigned employee accounts disabled immediately.' },
+                    { id: 'p10', title: '10. Backup Restore Test 💾', desc: 'Random file actual restore test (not just success msg).' },
+                    { id: 'p11', title: '11. Major Security Concerns 🚨', desc: 'Any out-of-the-box or high-risk findings.' },
+                    { id: 'p12', title: '12. Server Room Access Review 🚪', desc: 'Last 2 weeks entry/exit log printed and verified.' }
+                ],
+			
+                loading: true, 
+                tickets: [],
                 stats: { total: 0, open: 0, resolved: 0 },
                 currentTime: '', germanTime: '', currentDate: '', 
                 
@@ -840,6 +1119,25 @@
                     { name: 'Anil Singh', role: 'Sr. Network Eng.', shift: 'Morning Shift', start: '08:00', end: '15:45', avatar: 'AS', color: 'bg-blue-500' },
                     { name: 'Ashok Singh', role: 'Desktop Support', shift: 'Evening Shift', start: '14:15', end: '21:30', avatar: 'AS', color: 'bg-emerald-500' }
                 ],
+                
+                chartConfig: { type: 'status', time: 'all' },
+                chartInstance: null,
+
+                init() {
+                    if (this.isDark) document.documentElement.classList.add('dark');
+                    document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
+                    
+                    this.fetchTickets();
+                    this.checkAuditStatus();
+                    
+                    setInterval(() => {
+                        const now = new Date();
+                        this.currentTime = now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                        this.germanTime = now.toLocaleTimeString('en-US', { timeZone: 'Europe/Berlin', hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                        this.currentDate = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+                    }, 1000);
+                    setInterval(() => this.fetchTickets(), 300000); 
+                },
 
                 haptic(type = 'light') {
                     if (!window.navigator || !window.navigator.vibrate) return; 
@@ -854,8 +1152,65 @@
                     if (!Array.isArray(this.tickets)) return [];
                     return this.tickets.filter(t => t.status === 'Open').sort((a, b) => new Date(a.date) - new Date(b.date)); 
                 },
-                get openTicketCount() { return this.openTickets.length; },
-                get notifications() { return this.openTickets; },
+                
+                // 🧠 SMART AUDIT ALERT ENGINE (WITH 3 PHASES)
+                get auditAlert() {
+                    if (!this.currentUser || !this.currentUser.name) return null;
+                    if (this.auditMeta.status === 'Submitted') return null; // No alert if done
+                    
+                    const today = new Date().getDate();
+                    let isWarning = false;
+                    let isActive = false;
+                    let isOverdue = this.auditMeta.status === 'Overdue';
+                    
+                    // Cycle 01 Logic
+                    if (this.auditMeta.cycle.includes('Cycle 01')) {
+                        if (today >= 1 && today <= 5) isActive = true;
+                        if (today === 6 || today === 7) isWarning = true;
+                    }
+                    // Cycle 02 Logic
+                    if (this.auditMeta.cycle.includes('Cycle 02')) {
+                        if (today >= 15 && today <= 19) isActive = true;
+                        if (today === 20 || today === 21) isWarning = true;
+                    }
+                    
+                    if (!isActive && !isWarning && !isOverdue) return null;
+                    
+                    const isAuditor = this.currentUser.name === this.auditMeta.auditor;
+                    const isITHead = this.currentUser.name.includes('Vikas'); // Escalation to IT Head
+                    
+                    if (isOverdue && (isAuditor || isITHead)) {
+                        return {
+                            id: 'audit-alert', type: 'audit', urgency: 'Critical',
+                            issue: '🚨 Audit Overdue Escalation',
+                            desc: `${this.auditMeta.cycle} assigned to ${this.auditMeta.auditor} is past deadline!`,
+                            dateStr: 'Action Req.', name: 'System Security'
+                        };
+                    } else if (isWarning && isAuditor) {
+                        return {
+                            id: 'audit-alert', type: 'audit', urgency: 'Warning',
+                            issue: '⏳ Audit Due Soon',
+                            desc: `Reminder: Submit the ${this.auditMeta.cycle} before the deadline.`,
+                            dateStr: 'Reminder', name: 'System Security'
+                        };
+                    } else if (isActive && isAuditor) {
+                        return {
+                            id: 'audit-alert', type: 'audit', urgency: 'Normal', // Blue info alert
+                            issue: '📝 Audit Window Open',
+                            desc: `The ${this.auditMeta.cycle} is now open. You can start drafting your report.`,
+                            dateStr: 'Info', name: 'System Security'
+                        };
+                    }
+                    return null;
+                },
+
+                get notifications() { 
+                    let notifs = [...this.openTickets];
+                    const aAlert = this.auditAlert;
+                    if (aAlert) notifs.unshift(aAlert); // Pin audit alert to TOP 📌
+                    return notifs; 
+                },
+                get openTicketCount() { return this.notifications.length; }, // Count updates automatically
                 get userInitials() { return this.currentUser.name ? this.currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase() : '??'; },
                 get onlineStaffCount() { return this.staffData.filter(s => this.isStaffOnline(s)).length; },
 
@@ -925,20 +1280,105 @@
                     if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); this.highlightLog = true; setTimeout(() => this.highlightLog = false, 2000); } 
                 },
 
-                chartConfig: { type: 'status', time: 'all' },
-                chartInstance: null,
+				// Smart Logic to calculate which cycle is active right now
+                calculateAuditCycle() {
+                    const d = new Date();
+                    const date = d.getDate();
+                    const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+                    const month = monthNames[d.getMonth()];
+                    const year = d.getFullYear();
 
-                init() {
-                    if (this.isDark) document.documentElement.classList.add('dark');
-                    document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
-                    this.fetchTickets();
-                    setInterval(() => {
-                        const now = new Date();
-                        this.currentTime = now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                        this.germanTime = now.toLocaleTimeString('en-US', { timeZone: 'Europe/Berlin', hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                        this.currentDate = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
-                    }, 1000);
-                    setInterval(() => this.fetchTickets(), 300000); 
+                    if (date <= 14) {
+                        this.auditMeta.cycle = `Cycle 01 (${month} ${year})`;
+                        this.auditMeta.auditor = "Anil Singh";
+                        this.auditMeta.status = date > 7 ? 'Overdue' : 'Active';
+                    } else {
+                        this.auditMeta.cycle = `Cycle 02 (${month} ${year})`;
+                        this.auditMeta.auditor = "Ashok Singh";
+                        this.auditMeta.status = date > 21 ? 'Overdue' : 'Active';
+                    }
+                },
+
+                async checkAuditStatus() {
+                    this.calculateAuditCycle();
+                    try {
+                        const res = await fetch(API_URL + '?action=getBiMonthlyAudit');
+                        const data = await res.json();
+                        
+                        this.allAudits = data.audits || []; 
+                        
+                        const current = this.allAudits.find(a => a.cycle === this.auditMeta.cycle);
+                        if (current) {
+                            this.auditMeta.status = current.status;
+                            this.auditMeta.date = current.date; // 👈 Timestamp capture kiya
+                            const parsedDetails = JSON.parse(current.details);
+                            // 🔥 FIX: Purane drafts mein severity inject karo taaki reactivity bani rahe
+                            this.auditForm.points = Object.values(parsedDetails).map(p => ({ 
+                                ...p, 
+                                severity: p.severity || '' 
+                            }));
+                        } else {
+                            this.auditForm.points = this.masterAuditPoints.map(p => ({ ...p, status: '', remarks: '', severity: '' }));
+                        }
+                    } catch(e) { console.error(e); }
+                },
+
+                openAuditModal() {
+                    this.auditSecret = '';
+                    this.viewAuditHistory = false;
+                    if (this.auditForm.points.length === 0) {
+                        this.auditForm.points = this.masterAuditPoints.map(p => ({ ...p, status: '', remarks: '' }));
+                    }
+                    this.showAuditModal = true;
+                },
+
+                async submitAudit(submitType) {
+                    let isValid = true;
+                    let isComplete = true;
+
+                    // Ab HAR point ke liye remarks MONDATORY hain!
+                    this.auditForm.points.forEach(pt => {
+                        if (pt.status === '') isComplete = false;
+                        if (pt.remarks.trim() === '') isValid = false; 
+                        // Ensure severity is selected if Fail
+                        if (pt.status === 'Fail' && !pt.severity) isValid = false;
+                    });
+                    
+                    if (submitType === 'Draft') { /*...*/ } 
+                    else {
+                        if (!isComplete) { this.haptic('error'); alert("⚠️ Action Required: Please mark 'Pass', 'Fail', or 'N/A' for ALL points."); return; }
+                        if (!isValid) { this.haptic('error'); alert("📝 Meticulous Audit Required: Ensure remarks are filled and 'Risk Severity' is selected for failed points."); return; }
+                    }
+
+                    if (this.auditSecret !== 'PBL2026') {
+                        this.haptic('error'); alert("❌ Invalid Admin Key!"); return;
+                    }
+
+                    const passCount = this.auditForm.points.filter(p => p.status === 'Pass').length;
+                    const score = Math.round((passCount / 12) * 100);
+
+                    const pointsObj = {};
+                    this.auditForm.points.forEach((p, i) => pointsObj['p'+(i+1)] = p);
+
+                    this.auditLoading = true;
+                    try {
+                        const payload = {
+                            action: 'saveBiMonthlyAudit', cycle: this.auditMeta.cycle,
+                            auditor: this.auditMeta.auditor, doneBy: this.currentUser.name, // 👈 Identify kon bhej raha hai
+                            status: submitType,
+                            score: score, points: pointsObj, secret: this.auditSecret
+                        };
+                        
+                        await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+                        this.haptic('success');
+                        this.auditMeta.status = submitType;
+                        this.showAuditModal = false;
+                        if(submitType === 'Submitted') alert("✅ Genuine Audit Report Submitted and Emailed Successfully!");
+                        else alert("💾 Draft Saved.");
+
+                    } catch(e) {
+                        this.haptic('error'); alert("Failed to save audit.");
+                    } finally { this.auditLoading = false; }
                 },
 
                 async fetchTickets(force = false) {
@@ -1060,9 +1500,9 @@
                     document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
                     if(this.chartInstance) { this.chartInstance.updateOptions({ theme: { mode: this.isDark ? 'dark' : 'light' } }); }
                 }
-            };
-        });
-    });
+            }; // End return
+        }); // End Alpine.data
+    }); // End eventListener
 
     // PULL TO REFRESH
     document.addEventListener('DOMContentLoaded', () => {
