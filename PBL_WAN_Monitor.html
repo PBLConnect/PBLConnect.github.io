@@ -827,25 +827,48 @@
                     }
                 },
 
-                async saveLog() {
-                    if (!this.form.secret || this.form.secret.trim() !== 'PBL2026') { 
-                        this.haptic('error'); 
-                        alert("❌ Invalid Admin Key!"); 
-                        return; 
-                    }
-                    this.loading = true;
-                    try { 
-                        await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'saveWAN', ...this.form }) }); 
-                        this.haptic('success'); 
-                        this.showModal = false; 
-                        this.fetchLogs(true); 
-                        this.resetForm(); 
-                    } 
-                    catch (e) { 
-                        this.haptic('error'); 
-                        alert("Save Failed"); 
-                    } finally { this.loading = false; }
-                },
+              // Updated saveLog with correct payload mapping
+async saveLog() {
+    if (!this.form.secret || this.form.secret.trim() !== 'PBL2026') { 
+        this.haptic('error'); 
+        alert("❌ Invalid Admin Key!"); 
+        return; 
+    }
+    
+    this.loading = true;
+    try { 
+        // 🛠️ X10Think Fix: Payload ko explicitly map kiya taaki Apps Script ko 'action' field mil sake
+        const payload = {
+            ...this.form,
+            action: 'saveWAN', // Main Command for Apps Script
+            actionTaken: this.form.actionTaken, // UI ke liye
+            desc: this.form.actionTaken // Backend 'action' column ke liye (if needed)
+        };
+
+        const response = await fetch(API_URL, { 
+            method: 'POST', 
+            body: JSON.stringify(payload) 
+        }); 
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            this.haptic('success'); 
+            this.showModal = false; 
+            await this.fetchLogs(true); 
+            this.resetForm(); 
+        } else {
+            throw new Error(result.message);
+        }
+    } 
+    catch (e) { 
+        console.error("Save Error:", e);
+        this.haptic('error'); 
+        alert("⚠️ Save Failed: Database connection error or invalid data."); 
+    } finally { 
+        this.loading = false; 
+    }
+},
 
                 async deleteLog() {
                     if (!this.deleteSecret || this.deleteSecret.trim() !== 'PBL2026') { 
