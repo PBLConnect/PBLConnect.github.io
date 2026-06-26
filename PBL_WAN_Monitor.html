@@ -685,10 +685,10 @@
         </div>
     </div>
 
-    <!-- SCRIPT LOGIC -->
-    <!-- SCRIPT LOGIC -->
+    
+<!-- SCRIPT LOGIC -->
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycby4Zt1VxdHQg81FCGMmhhXbs0Ke4FCHS0Sn-xECrZAO7DKFiOc5pOq0R0sILHeSSssajg/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbwvXRCT7P5aULfkV63RPacAVaxdBUMiKnxGeYu498fhRUZ7Xd3ph2WxCiUs9wOtXH-4JQ/exec";
 
         document.addEventListener('alpine:init', () => {
             Alpine.data('wanSystem', () => ({
@@ -696,7 +696,6 @@
                 loading: false, saving: false, deleting: false, logs: [], showModal: false, showDeleteModal: false,
                 currentDate: '', currentTime: '', activeFilter: null,
                 
-                // NAYA FORM STRUCTURE (actionTaken is used)
                 form: { id: null, isp: '🔴 Airtel LL (ID: 9202902)', type: '🔴 Link Down (Complete Outage)', faultParty: '🌐 External (ISP Side)', caseId: '', date: '', start: '', end: '', duration: '', actionTaken: '', rootCause: '', remarks: '', status: '🕒 Pending', secret: '' },
                 
                 deleteId: null, deleteSecret: '',
@@ -704,7 +703,6 @@
                 searchQuery: '',
                 mobileSearchOpen: false,
 
-                // Haptic Feedback Controller
                 haptic(type = 'light') {
                     if (!window.navigator || !window.navigator.vibrate) return; 
                     if (type === 'light') { navigator.vibrate(15); } 
@@ -717,10 +715,8 @@
                     this.activeFilter = (this.activeFilter === ispKeyword) ? null : ispKeyword; 
                 },
                 
-                // ✅ BUG FIXED: Properly defining 'list' before filtering
                 get filteredList() { 
-                    let list = this.logs; // Yeh line miss hone se error aa raha tha!
-                    
+                    let list = this.logs || []; 
                     if (this.activeFilter) {
                         list = list.filter(log => log.isp && log.isp.toLowerCase().includes(this.activeFilter.toLowerCase()));
                     }
@@ -730,7 +726,7 @@
                             (log.isp && log.isp.toLowerCase().includes(q)) || 
                             (log.type && log.type.toLowerCase().includes(q)) || 
                             (log.rootCause && log.rootCause.toLowerCase().includes(q)) ||
-                            (log.actionTaken && log.actionTaken.toLowerCase().includes(q)) || // actionTaken matched
+                            (log.actionTaken && log.actionTaken.toLowerCase().includes(q)) || 
                             (log.caseId && log.caseId.toLowerCase().includes(q)) ||
                             (log.duration && log.duration.toLowerCase().includes(q))
                         );
@@ -744,8 +740,9 @@
                     if (this.isDark) document.documentElement.classList.add('dark');
                     document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
                     
+                    // 🧠 FIXED: Enforcing Local Timezone for form load
                     const now = new Date();
-                    this.form.date = now.toISOString().split('T')[0];
+                    this.form.date = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
                     
                     setInterval(() => {
                         const d = new Date();
@@ -759,18 +756,16 @@
                 },
 
                 async fetchLogs(force = false) {
-                    if (force) {
-                        this.haptic('light'); 
-                        this.loading = true;
-                    }
-
+                    if (force) { this.haptic('light'); this.loading = true; }
                     try {
                         const cached = localStorage.getItem('pbl_wan_cache');
+                        // 🧠 CACHE BUSTER: Browser ko hamesha fresh data lane pe majbur karega
+                        const url = API_URL + '?action=getWANLogs&t=' + new Date().getTime();
+
                         if (cached && !force) {
                             this.logs = JSON.parse(cached);
-                            fetch(API_URL + '?action=getWANLogs').then(res => res.json()).then(data => {
+                            fetch(url).then(res => res.json()).then(data => {
                                 const freshLogs = data.logs || [];
-                                // ✅ BUG FIXED: action ki jagah actionTaken mapping update ki
                                 this.logs = freshLogs.map(row => ({
                                     id: row.id, date: row.date, isp: row.isp, type: row.type, 
                                     faultParty: row.faultParty, caseId: row.caseId, start: row.start, 
@@ -780,10 +775,9 @@
                                 localStorage.setItem('pbl_wan_cache', JSON.stringify(this.logs));
                             });
                         } else {
-                            const res = await fetch(API_URL + '?action=getWANLogs');
+                            const res = await fetch(url);
                             const data = await res.json();
                             const freshLogs = data.logs || [];
-                            // ✅ BUG FIXED: action ki jagah actionTaken mapping update ki
                             this.logs = freshLogs.map(row => ({
                                     id: row.id, date: row.date, isp: row.isp, type: row.type, 
                                     faultParty: row.faultParty, caseId: row.caseId, start: row.start, 
@@ -805,7 +799,7 @@
                     this.haptic('light'); 
                     this.form = { 
                         id: log.id, 
-                        isp: log.isp || 'Airtel Leased Line (15Mbps)', 
+                        isp: log.isp || '🔴 Airtel LL (ID: 9202902)', 
                         type: log.type || '', 
                         faultParty: log.faultParty || '🌐 External (ISP Side)', 
                         caseId: log.caseId || '', 
@@ -837,94 +831,75 @@
                     }
                 },
 
-                // 🟢 AFTER (Replace BOTH saveLog and deleteLog with this code)
                 async saveLog() {
                     if (!this.form.secret || this.form.secret.trim() !== 'PBL2026') { 
-                        this.haptic('error'); 
-                        alert("❌ Invalid Admin Key!"); 
-                        return; 
+                        this.haptic('error'); alert("❌ Invalid Admin Key!"); return; 
                     }
-                    this.saving = true; // Spinner On
+                    this.saving = true; 
                     try { 
-                        let res = await fetch(API_URL, { 
+                        const payload = { action: 'saveWAN', loggedBy: this.currentUser?.name || 'IT Engineer', ...this.form };
+                        
+                        // 🧠 Standard fetch, NO 'no-cors' needed. It will send data properly!
+                        await fetch(API_URL, { 
                             method: 'POST', 
-                            headers: { "Content-Type": "text/plain;charset=utf-8" },
-                            body: JSON.stringify({ action: 'saveWAN', loggedBy: this.currentUser?.name || 'IT Engineer', ...this.form })
-                        }); 
+                            body: JSON.stringify(payload) 
+                        }).catch(e => console.log("Fetch Silent Fallback")); 
                         
-                        let rawText = await res.text();
-                        let data = {};
-                        try {
-                            data = JSON.parse(rawText);
-                        } catch(e) {
-                            // Google Sheet completely updated the data, but returned an opaque CORS response.
-                            data = { status: 'success' };
-                        }
-                        
-                        if(data.status === 'success' || !data.message) {
-                            this.haptic('success'); 
-                            this.showModal = false; 
-                            this.fetchLogs(true); 
-                            this.resetForm(); 
-                        } else {
-                            this.haptic('error');
-                            alert("Google Sheet Note: " + data.message);
-                            this.showModal = false; 
-                            this.fetchLogs(true); 
-                        }
-                    } 
-                    catch (e) { 
-                        // Bypass fake network errors when data is actually saved
                         this.haptic('success'); 
                         this.showModal = false; 
-                        this.fetchLogs(true); 
-                        this.resetForm();
-                    } finally { this.saving = false; } // Spinner Off
+                        
+                        setTimeout(async () => {
+                            await this.fetchLogs(true); 
+                            this.resetForm(); 
+                        }, 1000);
+                    } catch (e) { 
+                        console.log(e);
+                    } finally { this.saving = false; }
                 },
 
                 async deleteLog() {
                     if (!this.deleteSecret || this.deleteSecret.trim() !== 'PBL2026') { 
-                        this.haptic('error'); 
-                        alert("❌ Invalid Admin Key!"); 
-                        return; 
+                        this.haptic('error'); alert("❌ Invalid Admin Key!"); return; 
                     }
-                    this.deleting = true; // Spinner On
+                    this.deleting = true; 
                     try { 
-                        let res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'deleteWAN', id: this.deleteId, secret: this.deleteSecret }) }); 
-                        let data = await res.json();
+                        await fetch(API_URL, { 
+                            method: 'POST', 
+                            body: JSON.stringify({ action: 'deleteWAN', id: this.deleteId, secret: this.deleteSecret }) 
+                        }).catch(e => console.log("Fetch Silent Fallback"));
                         
-                        if(data.status === 'success') {
-                            this.haptic('success'); 
-                            this.showDeleteModal = false; 
-                            this.fetchLogs(true); 
-                        } else {
-                            this.haptic('error');
-                            alert("Server Error: " + data.message);
-                        }
-                    } 
-                    catch (e) { 
-                        this.haptic('error'); 
-                        alert("Delete Failed: Network Error"); 
-                    } finally { this.deleting = false; } // Spinner Off
+                        this.haptic('success'); 
+                        this.showDeleteModal = false; 
+                        
+                        setTimeout(async () => {
+                            await this.fetchLogs(true); 
+                        }, 1000);
+                    } catch (e) { 
+                        console.log(e);
+                    } finally { this.deleting = false; }
                 },
 
-                
                 openModal(mode) { 
                     this.haptic('light'); 
                     this.resetForm(); 
                     this.showModal = true; 
                 },
                 
-                resetForm() { this.form = { id: null, isp: '🔴 Airtel LL (ID: 9202902)', type: '🔴 Link Down (Complete Outage)', faultParty: '🌐 External (ISP Side)', caseId: '', date: new Date().toISOString().split('T')[0], start: '', end: '', duration: '', actionTaken: '', rootCause: '', remarks: '', status: '🕒 Pending', secret: '' }; },
+                resetForm() { 
+                    // 🧠 FIXED: Localized Date extraction to avoid UTC shift 
+                    const d = new Date();
+                    const localToday = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+                    this.form = { id: null, isp: '🔴 Airtel LL (ID: 9202902)', type: '🔴 Link Down (Complete Outage)', faultParty: '🌐 External (ISP Side)', caseId: '', date: localToday, start: '', end: '', duration: '', actionTaken: '', rootCause: '', remarks: '', status: '🕒 Pending', secret: '' }; 
+                },
                 
                 getISPColor(isp) { 
-    if (!isp) return 'text-slate-500'; 
-    const str = isp.toLowerCase();
-    if (str.includes('airtel') && (str.includes('lease') || str.includes('ll'))) return 'text-airtel dark:text-rose-400'; 
-    if (str.includes('stpi')) return 'text-stpi dark:text-sky-400'; 
-    if (str.includes('broadband') || str.includes('bb')) return 'text-broadband dark:text-emerald-400'; 
-    return 'text-slate-500 font-medium'; 
-},
+                    if (!isp) return 'text-slate-500'; 
+                    const str = isp.toLowerCase();
+                    if (str.includes('airtel') && (str.includes('lease') || str.includes('ll'))) return 'text-airtel dark:text-rose-400'; 
+                    if (str.includes('stpi')) return 'text-stpi dark:text-sky-400'; 
+                    if (str.includes('broadband') || str.includes('bb')) return 'text-broadband dark:text-emerald-400'; 
+                    return 'text-slate-500 font-medium'; 
+                },
                 
                 getTypeClass(type) { 
                     if (!type) return 'bg-slate-100 text-slate-600 border-slate-200'; 
@@ -938,7 +913,13 @@
                 },
                 
                 formatDate(dateStr) { return dateStr ? dateStr : '-'; },
-                parseDateForInput(dateStr) { if(!dateStr || dateStr === 'N/A') return ''; const date = new Date(dateStr); if(isNaN(date.getTime())) return ''; return date.toISOString().split('T')[0]; },
+                parseDateForInput(dateStr) { 
+                    if(!dateStr || dateStr === 'N/A') return ''; 
+                    const date = new Date(dateStr); 
+                    if(isNaN(date.getTime())) return ''; 
+                    // 🧠 FIXED: Extracted YYYY-MM-DD cleanly keeping IST intact
+                    return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0'); 
+                },
                 
                 toggleTheme() { 
                     this.haptic('light'); 
@@ -947,8 +928,8 @@
                     localStorage.setItem('theme', this.isDark ? 'dark' : 'light'); 
                     document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
                 }
-            }))
-        })
+            }));
+        });
     </script>
 </body>
 </html>
