@@ -122,7 +122,7 @@
                 <!-- Page Identity (Divider removed, properly aligned) -->
                 <div class="flex flex-col justify-center">
                     <div class="flex items-center gap-1.5 sm:gap-2 mb-0.5 sm:mb-1">
-                        <span class="bg-brand/10 text-brand px-1.5 py-0.5 rounded font-mono font-bold text-[8px] sm:text-[9px] leading-none border border-brand/20">v1.1</span>
+                        <span class="bg-brand/10 text-brand px-1.5 py-0.5 rounded font-mono font-bold text-[8px] sm:text-[9px] leading-none border border-brand/20">v1.2</span>
 
                         <span class="inline-block text-[8px] sm:text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-md">HARDWARE OPS</span>
                     </div>
@@ -496,7 +496,7 @@
                 <span class="hidden sm:flex items-center text-[10px] font-bold text-slate-500 dark:text-slate-400 gap-1">&copy; <span x-text="new Date().getFullYear()"></span></span>
                 <span class="hidden sm:block h-3 w-px bg-slate-300 dark:bg-white/10"></span>
                 <div class="flex items-center gap-1.5">
-                    <span class="px-2 py-0.5 rounded bg-brand text-white font-mono font-black tracking-widest text-[9px] shadow-sm">v1.1</span>
+                    <span class="px-2 py-0.5 rounded bg-brand text-white font-mono font-black tracking-widest text-[9px] shadow-sm">v1.2</span>
                     <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-white/10 font-black uppercase tracking-widest text-[9px]">PROD</span>
                 </div>
             </div>
@@ -681,9 +681,8 @@
         </div>
     </div>
 
-    <!-- SCRIPT LOGIC -->
     <script>
-		const API_URL = "https://script.google.com/macros/s/AKfycby4H5eCFAB8mifuuQwzmCTOfa3J7J6rSvhEwjHSvaSfBsgmLFLq7s6UhhgnWQSQrGBy8g/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbwvXRCT7P5aULfkV63RPacAVaxdBUMiKnxGeYu498fhRUZ7Xd3ph2WxCiUs9wOtXH-4JQ/exec";
 
         document.addEventListener('alpine:init', () => {
             Alpine.data('rmaSystem', () => ({
@@ -692,9 +691,8 @@
                 currentDate: '', currentTime: '', 
                 activeFilter: null, searchQuery: '', mobileSearchOpen: false,
                 
-                form: { id: null, asset: '', serial: '', caseId: '', issue: '', actionTaken: '', date: '', resolveDate: '', status: 'Pending', secret: '' },
+                form: { id: null, asset: '', serial: '', caseId: '', issue: '', actionTaken: '', date: '', resolveDate: '', status: '🕒 Pending', secret: '' },
                 
-                // 🧠 NAYA VARIABLES: Inventory Dropdown & Auto-fill ke liye
                 inventoryList: [],
                 assetSearchQuery: '',
                 showAssetDropdown: false,
@@ -739,9 +737,8 @@
                     return list;
                 },
 
-                // 🧠 NAYA GETTER: Searchable Dropdown List (Optimized)
                 get filteredAssets() {
-                    if (!this.assetSearchQuery) return this.inventoryList.slice(0, 50); // Show max 50 to avoid lag
+                    if (!this.assetSearchQuery) return this.inventoryList.slice(0, 50); 
                     const q = this.assetSearchQuery.toLowerCase();
                     return this.inventoryList.filter(a => 
                         (a.Hostname && a.Hostname.toLowerCase().includes(q)) || 
@@ -749,12 +746,11 @@
                     ).slice(0, 50);
                 },
 
-                // 🧠 NAYA FUNCTION: Asset Selection Logic
                 selectAsset(asset) {
                     const displayName = asset.Hostname || asset.AssetID;
                     this.form.asset = displayName;
                     this.assetSearchQuery = displayName;
-                    this.form.serial = asset.SerialNo || 'N/A'; // Auto Fill Serial Number!
+                    this.form.serial = asset.SerialNo || 'N/A'; 
                     this.showAssetDropdown = false;
                     this.haptic('light');
                 },
@@ -763,8 +759,9 @@
                     if (this.isDark) document.documentElement.classList.add('dark');
                     document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
                     
+                    // 🧠 FIXED: Enforcing Local Timezone to prevent UTC backward shift
                     const now = new Date();
-                    this.form.date = now.toISOString().split('T')[0];
+                    this.form.date = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
                     
                     setInterval(() => {
                         const d = new Date();
@@ -775,13 +772,12 @@
                     this.loading = true;
                     await Promise.all([ 
                         this.fetchLogs(false), 
-                        this.fetchInventoryMaster(), // 👈 Fetch Inventory for dropdown
+                        this.fetchInventoryMaster(), 
                         new Promise(resolve => setTimeout(resolve, 800)) 
                     ]);
                     this.loading = false; 
                 },
 
-                // 🧠 NAYA FUNCTION: Fetch IT Inventory Data
                 async fetchInventoryMaster() {
                     try {
                         const res = await fetch(API_URL + '?action=getInventory');
@@ -796,13 +792,16 @@
                     if (force) { this.haptic('light'); this.loading = true; }
                     try {
                         const cached = localStorage.getItem('pbl_rma_cache');
+                        // 🧠 CACHE BUSTER
+                        const url = API_URL + '?action=getRMALogs&t=' + new Date().getTime();
+
                         if (cached && !force) {
                             this.logs = JSON.parse(cached);
-                            fetch(API_URL + '?action=getRMALogs').then(res => res.json()).then(data => {
+                            fetch(url).then(res => res.json()).then(data => {
                                 const mappedLogs = (data.logs || []).map(row => ({
                                     id: row.id, date: row.date, asset: row.asset, serial: row.serial, 
-                                    issue: row.issue, actionTaken: row.action, caseId: row.caseId, 
-                                    resolveDate: row.resolveDate, status: row.status
+                                    issue: row.issue, actionTaken: row.actionTaken || row.action, caseId: row.caseId, 
+                                    resolveDate: row.resolveDate, status: row.status, remarks: row.remarks
                                 })).sort((a, b) => new Date(b.date) - new Date(a.date));
 
                                 if (JSON.stringify(this.logs) !== JSON.stringify(mappedLogs)) {
@@ -811,12 +810,12 @@
                                 }
                             });
                         } else {
-                            const res = await fetch(API_URL + '?action=getRMALogs');
+                            const res = await fetch(url);
                             const data = await res.json();
                             this.logs = (data.logs || []).map(row => ({
                                 id: row.id, date: row.date, asset: row.asset, serial: row.serial, 
-                                issue: row.issue, actionTaken: row.action, caseId: row.caseId, 
-                                resolveDate: row.resolveDate, status: row.status
+                                issue: row.issue, actionTaken: row.actionTaken || row.action, caseId: row.caseId, 
+                                resolveDate: row.resolveDate, status: row.status, remarks: row.remarks
                             })).sort((a, b) => new Date(b.date) - new Date(a.date));
                             
                             localStorage.setItem('pbl_rma_cache', JSON.stringify(this.logs));
@@ -833,7 +832,6 @@
                 editLog(log) {
                     this.haptic('light'); 
                     
-                    // 🧠 NAYA LOGIC: Legacy Data Translator (Purane records ko naye Dropdown se match karne ke liye)
                     let matchedIssue = log.issue || '';
                     if (matchedIssue === 'LAN Port Issue') matchedIssue = '🔌 LAN Port / NIC Failure';
                     else if (matchedIssue === 'No Display/Not Booting') matchedIssue = '⚡ No Display/Not Booting (SMPS)';
@@ -846,9 +844,9 @@
                         id: log.id, asset: log.asset, serial: log.serial, caseId: log.caseId || '', 
                         issue: matchedIssue, actionTaken: log.actionTaken || '', 
                         date: this.parseDateForInput(log.date), resolveDate: this.parseDateForInput(log.resolveDate),
-                        status: log.status || 'Pending', secret: '' 
+                        status: log.status || '🕒 Pending', secret: '' 
                     };
-                    this.assetSearchQuery = log.asset; // Set query for UI
+                    this.assetSearchQuery = log.asset; 
                     this.showModal = true;
                 },
 
@@ -860,32 +858,32 @@
                 },
 
                 async saveLog() {
-                    // Force the hidden input to match visual search query just in case
                     this.form.asset = this.assetSearchQuery;
-                    
                     if (!this.form.asset || this.form.asset.trim() === '') {
-                        this.haptic('error');
-                        alert("❌ Validation Error: Please select an Asset Tag!");
-                        return;
+                        this.haptic('error'); alert("❌ Validation Error: Please select an Asset Tag!"); return;
                     }
 
                     if (!this.form.secret || this.form.secret.trim() !== 'PBL2026') { 
-                        this.haptic('error'); 
-                        alert("❌ Invalid Admin Key!"); 
-                        return; 
+                        this.haptic('error'); alert("❌ Invalid Admin Key!"); return; 
                     }
-                    this.loading = true;
+                    this.loading = true; 
                     try { 
-                        const payload = { ...this.form, action: this.form.actionTaken };
-                        await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'saveRMA', ...payload }) }); 
+                        const payload = { action: 'saveRMA', loggedBy: this.currentUser?.name || 'IT Engineer', ...this.form };
+                        
+                        await fetch(API_URL, { 
+                            method: 'POST', 
+                            body: JSON.stringify(payload) 
+                        }).catch(e => console.log("Fetch Silent Fallback")); 
+                        
                         this.haptic('success'); 
                         this.showModal = false; 
-                        this.fetchLogs(true); 
-                        this.resetForm(); 
-                    } 
-                    catch (e) { 
-                        this.haptic('error'); 
-                        alert("Save Failed"); 
+                        
+                        setTimeout(async () => {
+                            await this.fetchLogs(true); 
+                            this.resetForm(); 
+                        }, 1000);
+                    } catch (e) { 
+                        console.log(e);
                     } finally { this.loading = false; }
                 },
 
@@ -894,14 +892,22 @@
                         this.haptic('error'); alert("❌ Invalid Admin Key!"); return; 
                     }
                     try { 
-                        await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'deleteRMA', id: this.deleteId, secret: this.deleteSecret }) }); 
+                        await fetch(API_URL, { 
+                            method: 'POST', 
+                            body: JSON.stringify({ action: 'deleteRMA', id: this.deleteId, secret: this.deleteSecret }) 
+                        }).catch(e => console.log("Fetch Silent Fallback"));
+                        
                         this.haptic('success'); 
                         this.showDeleteModal = false; 
-                        this.fetchLogs(true); 
-                    } 
-                    catch (e) { this.haptic('error'); alert("Delete Failed"); }
+                        
+                        setTimeout(async () => {
+                            await this.fetchLogs(true); 
+                        }, 1000);
+                    } catch (e) { 
+                        console.log(e);
+                    }
                 },
-
+                
                 openModal(mode) { 
                     this.haptic('light'); 
                     this.resetForm(); 
@@ -910,11 +916,19 @@
                 
                 resetForm() { 
                     this.assetSearchQuery = ''; 
-                    this.form = { id: null, asset: '', serial: '', caseId: '', issue: '', actionTaken: '', date: new Date().toISOString().split('T')[0], resolveDate: '', status: 'Pending', secret: '' }; 
+                    const d = new Date();
+                    const localToday = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+                    this.form = { id: null, asset: '', serial: '', caseId: '', issue: '', actionTaken: '', date: localToday, resolveDate: '', status: '🕒 Pending', secret: '' }; 
                 },
                 
                 formatDisplayDate(dateStr) { if (!dateStr || dateStr === 'Pending' || dateStr === 'N/A') return '-'; if (dateStr.includes('1970') || dateStr.includes('1899')) return 'Pending'; return dateStr.substring(0, 11); },
-                parseDateForInput(dateStr) { if(!dateStr || dateStr === 'Pending' || dateStr === 'N/A' || dateStr.includes('1970')) return ''; const date = new Date(dateStr); if(isNaN(date.getTime())) return ''; return date.toISOString().split('T')[0]; },
+                parseDateForInput(dateStr) { 
+                    if(!dateStr || dateStr === 'Pending' || dateStr === 'N/A' || dateStr.includes('1970')) return ''; 
+                    const date = new Date(dateStr); 
+                    if(isNaN(date.getTime())) return ''; 
+                    // 🧠 FIXED: Safely extracting YYYY-MM-DD purely based on Local system time
+                    return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0'); 
+                },
                 
                 toggleTheme() { 
                     this.haptic('light'); 
