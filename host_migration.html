@@ -392,7 +392,13 @@
                     try {
                         const res = await fetch(API_URL + '?action=getMigrationData');
                         const data = await res.json();
-                        if (data.hosts) this.pcs = data.hosts;
+                        if (data.hosts) {
+                            // 🚀 FIX: डाटा आते ही Status को UPPERCASE और TRIM कर दिया ताकि फिल्टर एकदम सही काम करे
+                            this.pcs = data.hosts.map(p => ({
+                                ...p,
+                                status: String(p.status || 'PENDING').toUpperCase().trim()
+                            }));
+                        }
                         if (forceRefresh) showToast("Database Synced!");
                     } catch (e) { showToast("Network Error", true); }
                     finally { this.loading = false; this.isSyncing = false; }
@@ -404,10 +410,18 @@
 
                 get displayedList() {
                     let list = this.filteredHostnames;
-                    if (this.filterStatus !== 'ALL') list = list.filter(p => p.status === this.filterStatus);
+                    
+                    if (this.filterStatus !== 'ALL') {
+                        list = list.filter(p => p.status === this.filterStatus);
+                    }
+                    
+                    // 🚀 FIX: Search को भी सुरक्षित कर दिया ताकि अगर कोई नाम खाली हो तो ऐप क्रैश न हो
                     if (this.search) {
-                        const s = this.search.toLowerCase();
-                        list = list.filter(p => p.oldName.toLowerCase().includes(s) || p.newName.toLowerCase().includes(s));
+                        const s = this.search.toLowerCase().trim();
+                        list = list.filter(p => 
+                            String(p.oldName || '').toLowerCase().includes(s) || 
+                            String(p.newName || '').toLowerCase().includes(s)
+                        );
                     }
                     return list;
                 },
