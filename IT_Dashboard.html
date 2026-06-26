@@ -17,6 +17,7 @@
     </script>
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.13.3/dist/cdn.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
@@ -69,11 +70,9 @@
         @keyframes blob-bounce { 0% { transform: translate(-100%, -100%) translate3d(0, 0, 0) scale(1); } 25% { transform: translate(-50%, -100%) translate3d(50px, 0, 0) scale(1.2); } 50% { transform: translate(-100%, -50%) translate3d(50px, 50px, 0) scale(0.9); } 75% { transform: translate(-50%, -50%) translate3d(0, 50px, 0) scale(1.1); } 100% { transform: translate(-100%, -100%) translate3d(0, 0, 0) scale(1); } }
         #pull-indicator { height: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; transition: height 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
         .pull-ready i { transform: rotate(180deg); color: #3b82f6 !important; }
-		
-		/* ApexCharts Tooltip Override */
-		.apexcharts-tooltip { z-index: 9999 !important; overflow: visible !important; }
-		
-		/* 🎇 CUSTOM AUDIT RADIO BUTTONS WITH PARTICLES 🎇 */
+        
+        .apexcharts-tooltip { z-index: 9999 !important; overflow: visible !important; }
+        
         .audit-radio-group { position: relative; display: flex; flex-wrap: wrap; border-radius: 0.6rem; background: #f1f5f9; padding: 0.25rem; gap: 0.25rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
         .dark .audit-radio-group { background: rgba(15, 23, 42, 0.4); box-shadow: inset 0 2px 5px rgba(0,0,0,0.4); }
         .audit-radio-group .radio { flex: 1 1 auto; text-align: center; position: relative; }
@@ -82,7 +81,6 @@
         .audit-radio-group .radio .name { display: flex; cursor: pointer; align-items: center; justify-content: center; border-radius: 0.4rem; border: none; padding: 0.4rem 0; color: #64748b; font-weight: 900; font-size: 10px; text-transform: uppercase; transition: all 0.2s ease; overflow: visible; z-index: 10; letter-spacing: 0.5px;}
         .dark .audit-radio-group .radio .name { color: #94a3b8; }
         
-        /* Dynamic Colors Variable Setup */
         .audit-radio-group .radio.pass { --c-main: #10b981; --c-dark: #059669; --c-light: #34d399; }
         .audit-radio-group .radio.fail { --c-main: #ef4444; --c-dark: #dc2626; --c-light: #f87171; }
         .audit-radio-group .radio.na { --c-main: #f59e0b; --c-dark: #d97706; --c-light: #fbbf24; }
@@ -90,20 +88,16 @@
         .audit-radio-group .radio:hover .name { background: rgba(255,255,255,0.7); }
         .dark .audit-radio-group .radio:hover .name { background: rgba(255,255,255,0.05); }
         
-        /* 🔥 FIX: Only un-checked disabled buttons should fade */
         .audit-radio-group .radio input:disabled:not(:checked) + .name { cursor: not-allowed; opacity: 0.4; background: transparent; }
 
-        /* Checked Active State */
         .audit-radio-group .radio input:checked + .name {
             background: linear-gradient(145deg, var(--c-main), var(--c-dark));
             color: white; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
             box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.2), inset -2px -2px 4px rgba(255, 255, 255, 0.1), 0 4px 8px rgba(0,0,0,0.15);
             transform: translateY(1px); animation: btn-pop 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        /* 🔥 FIX: Checked disabled buttons should remain fully visible but unclickable */
         .audit-radio-group .radio input:disabled:checked + .name { cursor: not-allowed; animation: none; opacity: 1; transform: translateY(0); box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.15); }
 
-        /* Particle System */
         .audit-radio-group .radio .name::before, .audit-radio-group .radio .name::after { content: ""; position: absolute; width: 4px; height: 4px; border-radius: 50%; opacity: 0; pointer-events: none; }
         .audit-radio-group .radio input:checked:not(:disabled) + .name::before { background: var(--c-light); box-shadow: 0 0 6px var(--c-light), 8px -8px 0 var(--c-light), -8px -8px 0 var(--c-light); top: -4px; left: 50%; transform: translateX(-50%); animation: part-top 0.6s ease-out forwards; }
         .audit-radio-group .radio input:checked:not(:disabled) + .name::after { background: var(--c-light); box-shadow: 0 0 6px var(--c-light), 8px 8px 0 var(--c-light), -8px 8px 0 var(--c-light); bottom: -4px; left: 50%; transform: translateX(-50%); animation: part-bot 0.6s ease-out forwards; }
@@ -111,10 +105,6 @@
         @keyframes btn-pop { 0% { transform: scale(0.92) translateY(2px); } 50% { transform: scale(1.05) translateY(-1px); } 100% { transform: scale(1) translateY(1px); } }
         @keyframes part-top { 0% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); } 40% { opacity: 0.8; } 100% { opacity: 0; transform: translateX(-50%) translateY(-15px) scale(0); box-shadow: 0 0 4px transparent, 15px -15px 0 transparent, -15px -15px 0 transparent; } }
         @keyframes part-bot { 0% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); } 40% { opacity: 0.8; } 100% { opacity: 0; transform: translateX(-50%) translateY(15px) scale(0); box-shadow: 0 0 4px transparent, 15px 15px 0 transparent, -15px 15px 0 transparent; } }
-		
-		
-		
-		
     </style>
 </head>
 
@@ -133,14 +123,10 @@
                 </div>
                 <div class="flex flex-col justify-center">
                     <div class="flex items-center gap-2 sm:gap-3 mb-0.5 sm:mb-1">
-                        <!-- 🌟 GLOWING UPDATE BADGE -->
                         <div class="relative group cursor-pointer" @click="showChangelogModal = true; haptic('light')">
-                            <!-- Background Glow Effect -->
                             <div class="absolute -inset-0.5 bg-gradient-to-r from-rose-400 to-brand rounded-md blur opacity-50 group-hover:opacity-75 transition duration-500 animate-pulse"></div>
-                            <!-- Actual Button -->
                             <button class="relative bg-white dark:bg-[#020617] text-brand px-2 py-0.5 rounded-md font-mono font-black text-[9px] leading-none border border-slate-200 dark:border-white/10 shadow-sm flex items-center gap-1.5" title="View Release Notes">
                                 <span>v1.2</span> 
-                                <!-- Red Ping Dot -->
                                 <span class="relative flex h-1.5 w-1.5">
                                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
                                   <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-rose-500"></span>
@@ -197,38 +183,77 @@
                                 <h4 class="font-heading font-bold text-sm text-slate-800 dark:text-white">Pending Tickets</h4>
                                 <span class="text-[9px] bg-red-100 text-red-600 px-2.5 py-0.5 rounded-md font-black uppercase tracking-wider border border-red-200 dark:border-red-500/20 shadow-sm" x-text="openTicketCount + ' New'">0 New</span>
                             </div>
-                            <div class="max-h-64 overflow-y-auto custom-scroll">
-                                <template x-for="notif in notifications" :key="notif.id">
-                                    <div @click="if(notif.type === 'audit') { showNotifs = false; openAuditModal(); } else { scrollToLog(); }" 
-                                         class="p-4 border-b border-slate-50 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 cursor-pointer flex gap-3 transition">
-                                        <div class="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 shadow-sm border border-transparent dark:border-white/5"
-                                             :class="(notif.urgency === 'Critical' || (notif.urgency && notif.urgency.includes('High'))) ? 'bg-red-50 text-red-500 dark:bg-red-500/10' : (notif.urgency === 'Warning' ? 'bg-amber-50 text-amber-500 dark:bg-amber-500/10' : 'bg-blue-50 text-blue-500 dark:bg-blue-500/10')">
-                                            <i class="fa-solid" :class="notif.type === 'audit' ? 'fa-shield-halved' : ((notif.urgency === 'Critical' || (notif.urgency && notif.urgency.includes('High'))) ? 'fa-triangle-exclamation' : 'fa-ticket')"></i>
-                                        </div>
-                                        <div class="flex-1 min-w-0">
-                                            <div class="flex justify-between items-start">
-                                                <p class="text-xs font-bold text-slate-700 dark:text-slate-200 truncate pr-2 group-hover:text-brand transition" x-text="notif.issue">Issue</p>
-                                                <span class="text-[9px] font-mono text-slate-400 shrink-0" x-text="notif.dateStr ? notif.dateStr : formatDisplayDate(notif.date)"></span>
-                                            </div>
-                                            <p class="text-[10px] text-slate-500 truncate mt-1">
-                                                <span class="font-bold text-slate-600 dark:text-slate-400" :class="notif.type === 'audit' && notif.urgency === 'Critical' ? 'text-red-500' : ''" x-text="notif.name"></span> <span x-show="notif.desc">•</span> <span x-text="notif.desc"></span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </template>
-                                <div x-show="openTicketCount === 0" class="p-8 text-center text-slate-400">
-                                    <i class="fa-regular fa-circle-check text-3xl mb-3 text-emerald-500 opacity-50 drop-shadow-sm"></i>
-                                    <p class="text-xs font-bold uppercase tracking-widest mt-1">All clear!</p>
-                                </div>
-                            </div>
+                            <div class="max-h-[320px] overflow-y-auto custom-scroll p-1.5">
+    <template x-for="notif in notifications" :key="notif.id">
+        
+        <!-- 🧠 Data Processing applied on Dropdown -->
+        <div x-data="{ meta: processTicketMeta(notif) }"
+             @click="if(notif.type === 'audit' || meta.type === 'AUDIT') { showNotifs = false; openAuditModal(); } else { scrollToLog(); }" 
+             class="p-3 mb-1.5 rounded-xl border border-slate-100 dark:border-white/5 hover:border-slate-200 dark:hover:border-white/10 cursor-pointer flex gap-3 transition-all duration-300 group relative overflow-hidden bg-white dark:bg-dark_surface shadow-sm hover:shadow-md">
+            
+            <!-- Dynamic Left Color Bar -->
+            <div class="absolute left-0 top-0 bottom-0 w-1 transition-all opacity-0 group-hover:opacity-100" :class="meta.styles.openBar"></div>
+
+            <!-- Smart Themed Icon -->
+            <div class="w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 shadow-sm border border-slate-100 dark:border-white/10 transition-transform group-hover:scale-105"
+                 :class="meta.styles.openBg">
+                <i class="fa-solid text-[13px]" :class="meta.type === 'AUDIT' ? 'fa-shield-halved ' + meta.styles.iconColor : (meta.type === 'Helpdesk' ? getIssueConfig(notif.issue).icon + ' ' + meta.styles.iconColor : meta.icon + ' ' + meta.styles.iconColor)"></i>
+            </div>
+            
+            <div class="flex-1 min-w-0 flex flex-col justify-center">
+                <!-- Header Title & Date -->
+                <div class="flex justify-between items-start mb-1">
+                    <p class="text-[11px] font-black truncate pr-2 transition-colors leading-tight" 
+                       :class="meta.styles.textOpen" 
+                       x-text="notif.issue"></p>
+                    <span class="text-[8px] font-mono font-black text-slate-400 shrink-0 bg-slate-100 dark:bg-white/5 px-1.5 py-0.5 rounded border border-slate-200 dark:border-white/10 shadow-sm uppercase tracking-widest" 
+                          x-text="notif.dateStr ? notif.dateStr : formatDisplayDate(notif.date)"></span>
+                </div>
+                
+                <!-- Clean Formatted Description -->
+                <p class="text-[10px] text-slate-500 dark:text-slate-400 truncate leading-tight">
+                    <span class="font-bold text-slate-700 dark:text-slate-300" x-text="notif.name"></span>
+                    <span class="mx-1 opacity-40">|</span> 
+                    <span x-text="meta.cleanDesc.replace(/\n/g, ' • ')"></span>
+                </p>
+
+                <!-- Tags / Vendor & ISP Case ID Extracted -->
+                <div x-show="meta.refId || meta.caseId || meta.type === 'AUDIT'" class="mt-1.5 flex items-center gap-1.5 flex-wrap">
+                    <template x-if="meta.refId">
+                        <span class="inline-flex items-center text-[8px] font-mono font-black px-1.5 py-0.5 rounded shadow-sm border" :class="meta.styles.refBg">
+                            <i class="fa-solid fa-hashtag mr-1 opacity-60"></i><span x-text="meta.refId"></span>
+                        </span>
+                    </template>
+                    
+                    <!-- 👈 NEW: Dedicated Case ID Badge -->
+                    <template x-if="meta.caseId">
+                        <span class="inline-flex items-center text-[8px] font-mono font-black px-1.5 py-0.5 rounded shadow-sm border bg-slate-50 text-slate-500 border-slate-200 dark:bg-white/5 dark:border-white/10 dark:text-slate-400" title="Vendor/ISP Case ID">
+                            <i class="fa-solid fa-briefcase mr-1 opacity-60"></i><span x-text="'Case: ' + meta.caseId"></span>
+                        </span>
+                    </template>
+
+                    <template x-if="meta.type === 'AUDIT' && notif.urgency">
+                        <span class="inline-flex items-center text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded shadow-sm border"
+                              :class="notif.urgency.includes('Critical') ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-500/10 dark:text-red-400' : 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400'">
+                            <i class="fa-solid fa-triangle-exclamation mr-1 opacity-60"></i><span x-text="notif.urgency.split(' ')[0]"></span>
+                        </span>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </template>
+    
+    <div x-show="openTicketCount === 0" class="p-8 text-center text-slate-400">
+        <i class="fa-regular fa-circle-check text-4xl mb-3 text-emerald-500 opacity-50 drop-shadow-sm"></i>
+        <p class="text-xs font-bold uppercase tracking-widest mt-1">All clear!</p>
+    </div>
+</div>
                             <div class="p-3 text-center border-t border-slate-100 dark:border-dark_border bg-slate-50/50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 transition cursor-pointer" @click="scrollToLog()">
                                 <button class="text-[10px] font-black uppercase tracking-widest text-brand hover:text-brand_dark dark:hover:text-brand_glow transition">View all tickets &rarr;</button>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="h-6 w-px bg-slate-200 dark:bg-white/10 mx-0.5 sm:mx-1"></div>
 
                 <div class="h-6 w-px bg-slate-200 dark:bg-white/10 mx-0.5 sm:mx-1"></div>
 
@@ -267,11 +292,10 @@
 
         <div class="max-w-[1920px] mx-auto w-full flex flex-col gap-4 sm:gap-6 h-full pb-4 lg:pb-0">
 
-            <!-- APPS GRID v1.2 (3D Kinetic) -->
+            <!-- APPS GRID -->
             <section class="shrink-0 relative z-20">
                 <div class="cards-container grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-5">
                     
-                    <!-- 1. IT INVENTORY (Blue Theme Hover) -->
                     <a href="PBL_Inventory.html" @click="haptic('light')" class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-blue-50/80 to-white/80 border border-blue-200/60 shadow-md hover:shadow-2xl hover:border-blue-400/50 dark:from-blue-900/10 dark:to-dark_surface/80 dark:border-blue-800/30 dark:hover:border-blue-400/50">
                         <i class="fa-solid fa-laptop absolute -bottom-4 -right-3 text-7xl sm:text-9xl text-blue-500/20 dark:text-blue-500/10 group-hover:scale-110 transition-transform duration-500"></i>
                         <div class="flex items-center justify-between relative z-10 mb-2">
@@ -279,7 +303,6 @@
                                 <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-blue-500 text-[12px] shrink-0 border border-blue-100 dark:border-white/5"><i class="fa-solid fa-database"></i></div>
                                 <span class="hidden sm:inline-block text-[11px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest leading-none">Database</span>
                             </div>
-                            <!-- Color updated to blue-500 -->
                             <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-blue-100/50 dark:bg-blue-900/30 text-blue-500 flex items-center justify-center group-hover:bg-blue-500 group-hover:text-white transition-all duration-300 shrink-0"><i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i></div>
                         </div>
                         <div class="relative z-10 mt-auto">
@@ -288,7 +311,6 @@
                         </div>
                     </a>
 
-                    <!-- 2. SWITCH MAP (Teal Theme Hover) -->
                     <a href="PBL_Switch_Map.html" @click="haptic('light')" class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-teal-50/80 to-white/80 border border-teal-200/60 shadow-md hover:shadow-2xl hover:border-teal-400/50 dark:from-teal-900/10 dark:to-dark_surface/80 dark:border-teal-800/30 dark:hover:border-teal-400/50">
                         <i class="fa-solid fa-network-wired absolute -bottom-4 -right-3 text-7xl sm:text-9xl text-teal-500/20 dark:text-teal-500/10 group-hover:scale-110 transition-transform duration-500"></i>
                         <div class="flex items-center justify-between relative z-10 mb-2">
@@ -296,7 +318,6 @@
                                 <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-teal-500 text-[12px] shrink-0 border border-teal-100 dark:border-white/5"><i class="fa-solid fa-plug"></i></div>
                                 <span class="hidden sm:inline-block text-[11px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-widest leading-none">Network</span>
                             </div>
-                            <!-- Color updated to teal-500 -->
                             <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-teal-100/50 dark:bg-teal-900/30 text-teal-500 flex items-center justify-center group-hover:bg-teal-500 group-hover:text-white transition-all duration-300 shrink-0"><i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i></div>
                         </div>
                         <div class="relative z-10 mt-auto">
@@ -305,7 +326,6 @@
                         </div>
                     </a>
 
-                    <!-- 3. WAN MONITOR (Amber Theme Hover) -->
                     <a href="PBL_WAN_Monitor.html" @click="haptic('light')" class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-amber-50/80 to-white/80 border border-amber-200/60 shadow-md hover:shadow-2xl hover:border-amber-400/50 dark:from-amber-900/10 dark:to-dark_surface/80 dark:border-amber-800/30 dark:hover:border-amber-400/50">
                         <i class="fa-solid fa-satellite-dish absolute -bottom-4 -right-3 text-7xl sm:text-9xl text-amber-500/20 dark:text-amber-500/10 group-hover:scale-110 transition-transform duration-500"></i>
                         <div class="flex items-center justify-between relative z-10 mb-2">
@@ -313,7 +333,6 @@
                                 <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-amber-500 text-[12px] shrink-0 border border-amber-100 dark:border-white/5"><i class="fa-solid fa-tower-broadcast"></i></div>
                                 <span class="hidden sm:inline-block text-[11px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest leading-none">Links</span>
                             </div>
-                            <!-- Color updated to amber-500 -->
                             <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-amber-100/50 dark:bg-amber-900/30 text-amber-500 flex items-center justify-center group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shrink-0"><i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i></div>
                         </div>
                         <div class="relative z-10 mt-auto">
@@ -322,7 +341,6 @@
                         </div>
                     </a>
 
-                    <!-- 4. RMA TRACKER (Purple Theme Hover) -->
                     <a href="PBL_Hardware_RMA.html" @click="haptic('light')" class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-purple-50/80 to-white/80 border border-purple-200/60 shadow-md hover:shadow-2xl hover:border-purple-400/50 dark:from-purple-900/10 dark:to-dark_surface/80 dark:border-purple-800/30 dark:hover:border-purple-400/50">
                         <i class="fa-solid fa-screwdriver-wrench absolute -bottom-4 -right-3 text-7xl sm:text-9xl text-purple-500/20 dark:text-purple-500/10 group-hover:scale-110 transition-transform duration-500"></i>
                         <div class="flex items-center justify-between relative z-10 mb-2">
@@ -330,7 +348,6 @@
                                 <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-purple-500 text-[12px] shrink-0 border border-purple-100 dark:border-white/5"><i class="fa-solid fa-boxes-packing"></i></div>
                                 <span class="hidden sm:inline-block text-[11px] font-black text-purple-600 dark:text-purple-400 uppercase tracking-widest leading-none">Support</span>
                             </div>
-                            <!-- Color updated to purple-500 -->
                             <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-purple-100/50 dark:bg-purple-900/30 text-purple-500 flex items-center justify-center group-hover:bg-purple-500 group-hover:text-white transition-all duration-300 shrink-0"><i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i></div>
                         </div>
                         <div class="relative z-10 mt-auto">
@@ -339,7 +356,6 @@
                         </div>
                     </a>
 
-                   <!-- 5. IP MANAGER (Fixed Col Span) -->
                     <a href="PBL_IP_Manager.html" @click="haptic('light')" class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-rose-50/80 to-white/80 border border-rose-200/60 shadow-md hover:shadow-2xl hover:border-rose-400/50 dark:from-rose-900/10 dark:to-dark_surface/80 dark:border-rose-800/30 dark:hover:border-rose-400/50">
                         <i class="fa-solid fa-globe absolute -bottom-4 -right-3 text-7xl sm:text-9xl text-rose-500/20 dark:text-rose-500/10 group-hover:scale-110 transition-transform duration-500"></i>
                         <div class="flex items-center justify-between relative z-10 mb-2">
@@ -355,7 +371,6 @@
                         </div>
                     </a>
 
-                    <!-- 6. SECURITY AUDIT (DYNAMIC SMART KPI) -->
                     <a @click.prevent="haptic('light'); openAuditModal()" 
                        class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-500 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] border"
                        :class="
@@ -366,13 +381,11 @@
                                 : 'bg-gradient-to-br from-indigo-50/80 to-white/80 dark:from-indigo-900/10 dark:to-dark_surface/80 border-indigo-200/60 shadow-md hover:shadow-2xl hover:border-indigo-400/50 dark:border-indigo-800/30 dark:hover:border-indigo-400/50')
                        ">
                         
-                        <!-- Background Big Icon -->
                         <i class="fa-solid fa-shield-halved absolute -bottom-4 -right-3 text-7xl sm:text-9xl group-hover:scale-110 transition-transform duration-500"
                            :class="auditMeta.status === 'Overdue' ? 'text-red-500/20 dark:text-red-500/10' : (auditAlert && auditAlert.urgency === 'Warning' ? 'text-amber-500/20 dark:text-amber-500/10' : 'text-indigo-500/20 dark:text-indigo-500/10')"></i>
                         
                         <div class="flex items-center justify-between relative z-10 mb-2">
                             <div class="flex items-center gap-2">
-                                <!-- Top Left Small Icon -->
                                 <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-[12px] shrink-0 border transition-colors duration-300"
                                      :class="auditMeta.status === 'Overdue' ? 'text-red-500 border-red-200 dark:border-red-500/30' : (auditAlert && auditAlert.urgency === 'Warning' ? 'text-amber-500 border-amber-200 dark:border-amber-500/30' : 'text-indigo-500 border-indigo-100 dark:border-white/5')">
                                     <i class="fa-solid" :class="auditMeta.status === 'Overdue' ? 'fa-triangle-exclamation animate-pulse' : 'fa-user-shield'"></i>
@@ -381,7 +394,6 @@
                                       :class="auditMeta.status === 'Overdue' ? 'text-red-600 dark:text-red-400' : (auditAlert && auditAlert.urgency === 'Warning' ? 'text-amber-600 dark:text-amber-400' : 'text-indigo-600 dark:text-indigo-400')">Security</span>
                             </div>
                             
-                            <!-- Arrow Button -->
                             <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center transition-all duration-300 shrink-0"
                                  :class="auditMeta.status === 'Overdue' ? 'bg-red-100/50 dark:bg-red-900/30 text-red-500 group-hover:bg-red-500 group-hover:text-white' : (auditAlert && auditAlert.urgency === 'Warning' ? 'bg-amber-100/50 dark:bg-amber-900/30 text-amber-500 group-hover:bg-amber-500 group-hover:text-white' : 'bg-indigo-100/50 dark:bg-indigo-900/30 text-indigo-500 group-hover:bg-indigo-500 group-hover:text-white')">
                                 <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i>
@@ -389,10 +401,7 @@
                         </div>
                         
                         <div class="relative z-10 mt-auto">
-                            <!-- ✅ NAYA NAAM YAHAN HAI -->
                             <h3 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">IT Sec Audit</h3>
-                            
-                            <!-- Dynamic Tagline -->
                             <p class="text-[11px] sm:text-[13px] font-bold mt-1 truncate transition-colors duration-300"
                                :class="auditMeta.status === 'Overdue' ? 'text-red-500 dark:text-red-400' : (auditAlert && auditAlert.urgency === 'Warning' ? 'text-amber-500 dark:text-amber-400' : 'text-slate-500 dark:text-slate-400')">
                                <span x-text="auditMeta.status === 'Overdue' ? 'Action Required 🚨' : (auditAlert && auditAlert.urgency === 'Warning' ? 'Due Soon ⏳' : (auditMeta.status === 'Pending' || auditMeta.status === 'Draft' ? 'Audit Open 📝' : 'Compliance 🛡️'))"></span>
@@ -434,73 +443,79 @@
 
                         <div class="p-2 sm:p-3 bg-slate-50/50 dark:bg-transparent space-y-2.5">
                             <template x-for="ticket in tickets" :key="ticket.id">
-                                <div class="p-3 flex items-start gap-3 transition-all duration-300 rounded-[1.25rem] border hover:-translate-y-0.5 group relative overflow-hidden" 
-                                     :class="ticket.status === 'Open' ? 'bg-red-50/60 dark:bg-red-900/10 border-red-300 dark:border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.15)] hover:shadow-[0_0_25px_rgba(239,68,68,0.25)]' : 'bg-white dark:bg-dark_surface border-slate-100 dark:border-white/5 hover:border-emerald-300 hover:shadow-md'">
+                                <!-- SMART THEMED TICKET CARD -->
+                                <div x-data="{ meta: processTicketMeta(ticket) }" class="p-3 flex items-start gap-3 transition-all duration-300 rounded-[1.25rem] border hover:-translate-y-0.5 group relative overflow-hidden" 
+                                     :class="ticket.status === 'Open' ? meta.styles.openBg : meta.styles.closedBg">
                                     
-                                    <div class="absolute left-0 top-0 bottom-0 w-1.5 transition-all group-hover:w-2" 
-                                         :class="ticket.status === 'Open' ? 'bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.9)] animate-pulse' : 'bg-emerald-400 opacity-50'"></div>
+                                    <!-- 🖼️ Subtle Background Watermark -->
+                                    <i class="fa-solid absolute -bottom-3 -right-2 text-7xl opacity-[0.03] dark:opacity-[0.02] group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-500 pointer-events-none" :class="meta.watermarkClass"></i>
 
-                                    <div class="ml-1.5 w-9 h-9 rounded-xl flex items-center justify-center text-base shrink-0 shadow-sm border border-black/5 transition-transform group-hover:scale-105" 
+                                    <!-- Left Accent Bar -->
+                                    <div class="absolute left-0 top-0 bottom-0 w-1.5 transition-all group-hover:w-2" 
+                                         :class="ticket.status === 'Open' ? meta.styles.openBar : meta.styles.closedBar"></div>
+
+                                    <!-- Left Side Icon Container -->
+                                    <div class="ml-1.5 w-9 h-9 rounded-xl flex items-center justify-center text-base shrink-0 shadow-sm border border-black/5 transition-transform group-hover:scale-105 relative z-10" 
                                          :class="getIssueConfig(ticket.issue).color">
                                         <i class="fa-solid" :class="getIssueConfig(ticket.issue).icon"></i>
                                     </div>
                                     
-                                    <div class="flex-1 min-w-0">
-                                        <div class="flex justify-between items-center mb-0.5">
-                                            <p class="text-[13px] sm:text-sm font-bold truncate pr-2 transition-colors"
-                                               :class="ticket.status === 'Open' ? 'text-red-700 dark:text-red-400' : 'text-slate-800 dark:text-white group-hover:text-brand'" x-text="ticket.issue"></p>
+                                    <div class="flex-1 min-w-0 relative z-10">
+                                        <div class="flex justify-between items-start mb-0.5">
+                                            <div>
+                                                <!-- 🏷️ Source Badge (Only visible for System Tickets) -->
+                                                <span x-show="meta.isSystem" class="inline-block mb-1.5 px-2 py-0.5 rounded-[6px] text-[9px] font-black uppercase tracking-widest border shadow-sm" :class="meta.badgeClass" x-text="meta.badgeText"></span>
+                                                
+                                                <p class="text-[13px] sm:text-sm font-bold truncate pr-2 transition-colors leading-tight"
+                                                   :class="ticket.status === 'Open' ? meta.styles.textOpen : meta.styles.textClosed" x-text="ticket.issue"></p>
+                                            </div>
                                             
-                                            <span class="text-[8px] px-2 py-0.5 rounded-md font-black uppercase tracking-widest shrink-0 border transition-all" 
-                                                  :class="ticket.status === 'Open' ? 'bg-red-500 text-white border-red-400 dark:bg-red-600 dark:border-red-500 shadow-[0_0_12px_rgba(239,68,68,0.6)] animate-pulse' : 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'" 
+                                            <!-- Dynamic Status Pill -->
+                                            <span class="text-[8px] px-2 py-0.5 rounded-md font-black uppercase tracking-widest shrink-0 border transition-all mt-1" 
+                                                  :class="ticket.status === 'Open' ? meta.styles.openPill : meta.styles.closedPill" 
                                                   x-text="ticket.status === 'Open' ? 'OPEN' : 'CLOSED'"></span>
                                         </div>
                                         
-                                        <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 line-clamp-1 group-hover:text-slate-700 dark:group-hover:text-slate-300 transition-colors" x-text="ticket.desc"></p>
+                                        <!-- 🧹 Clean Description -->
+                                        <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 line-clamp-4 leading-relaxed whitespace-pre-wrap group-hover:text-slate-700 dark:group-hover:text-slate-300 transition-colors" x-text="meta.cleanDesc"></p>
                                         
-                                       <!-- 🗂️ STRUCTURED META TAGS (Ultra-Compact 2-Row Layout) -->
+                                        <!-- 🗂️ STRUCTURED META TAGS -->
                                         <div class="flex flex-col gap-2 mt-3">
-                                            
-                                            <!-- Row 1: Identity & Location -->
                                             <div class="flex items-center gap-2 flex-wrap">
-                                                <!-- User -->
+                                                <!-- Smart Icon User -->
                                                 <span class="flex items-center text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm"
-                                                      :class="ticket.status === 'Open' ? 'bg-white/80 dark:bg-black/20 text-red-600 dark:text-red-400' : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300'">
-                                                    <i class="fa-solid fa-user text-[8px] mr-1 opacity-50" :class="ticket.status === 'Open' ? 'text-red-500' : 'text-brand'"></i> <span x-text="ticket.name"></span>
+                                                      :class="ticket.status === 'Open' ? 'bg-white/80 dark:bg-black/20 ' + meta.styles.textOpen : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300'">
+                                                    <i class="fa-solid text-[8px] mr-1 opacity-50" :class="meta.icon + (ticket.status === 'Open' ? ' ' + meta.styles.iconColor : ' text-brand')"></i> <span x-text="ticket.name"></span>
                                                 </span>
-                                                <!-- Asset -->
+                                                <!-- Asset Tag (Trimmed if it's WAN) -->
                                                 <span class="flex items-center text-[9px] text-slate-500 font-mono bg-white dark:bg-dark_bg px-1.5 py-0.5 rounded border border-slate-200 dark:border-white/10 shadow-sm" title="Asset Tag">
-                                                    <span x-text="ticket.asset || 'N/A'"></span>
+                                                    <span x-text="meta.shortAsset"></span>
                                                 </span>
-                                                <!-- Location -->
-                                                <template x-if="ticket.hasExtra">
-                                                    <span class="flex items-center text-[9px] text-slate-500 font-bold bg-slate-100 dark:bg-white/5 px-1.5 py-0.5 rounded border border-slate-200 dark:border-white/10 shadow-sm" title="Location">
-                                                        <i class="fa-solid fa-location-dot mr-1 text-rose-400"></i> <span x-text="ticket.extraInfo.location || 'Unknown'"></span>
+                                                <!-- Dynamic Extracted Reference ID -->
+                                                <template x-if="meta.refId">
+                                                    <span class="flex items-center text-[9px] font-mono font-black px-2 py-0.5 rounded border shadow-sm" :class="meta.styles.refBg" title="Source Reference ID">
+                                                        <i class="fa-solid fa-hashtag mr-1 opacity-60"></i><span x-text="meta.refId"></span>
                                                     </span>
                                                 </template>
                                             </div>
 
-                                            <!-- Row 2: Network, Switch & Date -->
                                             <div class="flex items-center gap-2 flex-wrap">
                                                 <template x-if="ticket.hasExtra">
                                                     <div class="contents">
-                                                        <!-- Live IP -->
-                                                        <span class="flex items-center text-[9px] text-blue-600 font-mono bg-blue-50 dark:bg-blue-500/10 px-1.5 py-0.5 rounded border border-blue-100 dark:border-blue-500/20 shadow-sm" title="Live IP">
+                                                        <span class="flex items-center text-[9px] text-blue-600 font-mono bg-blue-50 dark:bg-blue-500/10 px-1.5 py-0.5 rounded border border-blue-100 dark:border-blue-500/20 shadow-sm">
                                                             <i class="fa-solid fa-network-wired mr-1"></i> <span x-text="ticket.extraInfo.lan || 'No IP'"></span>
                                                         </span>
-                                                        <!-- Switch & Port -->
-                                                        <span class="flex items-center text-[9px] text-purple-600 font-mono bg-purple-50 dark:bg-purple-500/10 px-1.5 py-0.5 rounded border border-purple-100 dark:border-purple-500/20 shadow-sm" title="Switch Route">
+                                                        <span class="flex items-center text-[9px] text-purple-600 font-mono bg-purple-50 dark:bg-purple-500/10 px-1.5 py-0.5 rounded border border-purple-100 dark:border-purple-500/20 shadow-sm">
                                                             <i class="fa-solid fa-server mr-1"></i> <span x-text="(ticket.extraInfo.switchPort || 'Not Patched').replace('Pt:', 'Port No: ')"></span>
                                                         </span>
                                                     </div>
                                                 </template>
-
-                                                <!-- Date (Always pushed to far right of Row 2) -->
+                                                <!-- Date -->
                                                 <span class="flex items-center text-[9px] ml-auto font-mono transition-colors"
                                                       :class="ticket.status === 'Open' ? 'text-red-500/80 font-bold' : 'text-slate-400 group-hover:text-brand'">
                                                     <i class="fa-regular fa-clock mr-1"></i> <span x-text="formatDisplayDate(ticket.date)"></span>
                                                 </span>
                                             </div>
-                                            
                                         </div>
                                     </div>
                                 </div>
@@ -640,7 +655,8 @@
                         </div>
                     </div>
                 </div>
-                </div>
+            </section>
+        </div>
     </main>
 
     <!-- FOOTER -->
@@ -688,11 +704,10 @@
         </div>
     </div>
 	
-	<!-- 🚀 MEGA CHANGELOG MODAL (RELEASE NOTES v1.2) -->
+	<!-- MEGA CHANGELOG MODAL (RELEASE NOTES v1.2) -->
     <div x-show="showChangelogModal" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/70 backdrop-blur-md p-4" x-transition.opacity @click.self="showChangelogModal = false">
         <div class="bg-white dark:bg-dark_surface w-full max-w-4xl rounded-[2rem] shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden flex flex-col max-h-[85vh] sm:max-h-[90vh] transform transition-all scale-100">
             
-            <!-- Modal Header (Indigo/Purple Theme Matching Sec Audit) -->
             <div class="p-6 sm:p-8 border-b border-slate-100 dark:border-white/10 bg-gradient-to-br from-indigo-600 to-purple-700 text-white shrink-0 relative overflow-hidden">
                 <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
                 <div class="relative z-10 flex justify-between items-start">
@@ -705,10 +720,7 @@
                 </div>
             </div>
 
-            <!-- Modal Body (Bento Style Grid) -->
             <div class="p-5 sm:p-6 overflow-y-auto custom-scroll flex-1 bg-slate-50/50 dark:bg-transparent space-y-6">
-                
-                <!-- v1.2 HIGHLIGHTS -->
                 <div>
                     <div class="flex items-center gap-2 mb-4">
                         <span class="px-2 py-0.5 rounded bg-indigo-500 text-white font-black text-[10px] uppercase tracking-widest shadow-sm">v1.2</span>
@@ -716,7 +728,6 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
-                        <!-- 1. Audit Engine -->
                         <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition">
                             <h4 class="text-[11px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Bi-Monthly Security Audit</h4>
                             <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
@@ -727,19 +738,17 @@
                             </ul>
                         </div>
 
-                        <!-- 2. Proactive Ops -->
                         <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition">
                             <h4 class="text-[11px] font-black text-rose-500 dark:text-rose-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-bolt"></i> Smart Automation</h4>
                             <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
                                 <li class="flex items-start gap-1.5"><span class="text-rose-500 shrink-0"><i class="fa-solid fa-fire text-[10px] mt-0.5"></i></span> <span><strong>Auto-Ticketing:</strong> If any audit point fails, the system automatically creates a High-Priority IT ticket.</span></li>
                                 <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Smart Alerts:</strong> The system now sends automatic reminders and Overdue warnings based on the date.</span></li>
-                                <li class="flex items-start gap-1.5"><span class="text-blue-500 shrink-0"><i class="fa-solid fa-wrench text-[10px] mt-0.5"></i></span> <span><strong>UI Fixes:</strong> Cleaned up the Analytics layout and fixed the issue where the chart tooltip was getting cut.</span></li>
+                                <li class="flex items-start gap-1.5"><span class="text-blue-500 shrink-0"><i class="fa-solid fa-wrench text-[10px] mt-0.5"></i></span> <span><strong>UI Fixes:</strong> Redesigned dynamic Dashboard Tickets. WAN, RMA, Audits, and Normal tickets now use distinct color themes matching their category!</span></li>
                             </ul>
                         </div>
                     </div>
                 </div>
 
-                <!-- PREVIOUS VERSION (v1.1) 1-2 LINER -->
                 <div class="pt-5 border-t border-slate-200 dark:border-white/10">
                     <div class="flex items-center gap-2 mb-3">
                         <span class="px-2 py-0.5 rounded bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-slate-400 font-black text-[10px] uppercase tracking-widest shadow-sm">v1.1</span>
@@ -752,7 +761,6 @@
                         </p>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -788,7 +796,7 @@
         </div>
     </div>
 
-    <!-- 🛡️ SECURITY AUDIT MODAL -->
+    <!-- SECURITY AUDIT MODAL -->
     <div x-show="showAuditModal" x-cloak class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/70 backdrop-blur-md p-4" x-transition.opacity @click.self="showAuditModal = false">
         <div class="bg-white dark:bg-dark_surface w-full max-w-4xl rounded-[2rem] shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden flex flex-col max-h-[90vh]">
             
@@ -802,7 +810,6 @@
                         <h3 class="text-xl font-heading font-black text-slate-800 dark:text-white leading-tight">Data Security Audit</h3>
                         <div class="flex items-center gap-2 mt-0.5">
                             <p class="text-[10px] text-indigo-500 uppercase font-black tracking-widest" x-text="auditMeta.cycle + ' • ' + auditMeta.auditor"></p>
-                            <!-- 🕒 Submitted Timestamp Badge -->
                             <span x-show="auditMeta.status === 'Submitted' && auditMeta.date" 
                                   class="px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30 shadow-sm flex items-center gap-1" 
                                   x-text="'✅ ' + auditMeta.date"></span>
@@ -818,7 +825,6 @@
                 </div>
             </div>
            
-	<!-- 📊 LIVE PROGRESS BAR (GAMIFICATION) -->
             <div x-show="!viewAuditHistory" class="bg-slate-50 dark:bg-black/40 px-5 sm:px-6 pt-3 pb-4 border-b border-slate-200 dark:border-white/5 shrink-0 z-10 relative shadow-inner">
                 <div class="flex justify-between items-center mb-2">
                     <span class="text-[9px] font-black uppercase tracking-widest text-slate-500">Audit Completion</span>
@@ -830,9 +836,7 @@
                 </div>
             </div>
 		   
-           <!-- CURRENT AUDIT FORM -->
             <div x-show="!viewAuditHistory" class="p-4 sm:p-6 overflow-y-auto custom-scroll flex-1 space-y-4 bg-slate-50/30 dark:bg-transparent">
-                <!-- Warning for late -->
                 <div x-show="auditMeta.status === 'Overdue' && !isAuditLocked" class="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 p-3 rounded-xl flex items-start gap-3">
                     <i class="fa-solid fa-triangle-exclamation text-red-500 mt-0.5"></i>
                     <p class="text-xs font-bold text-red-700 dark:text-red-400">This audit is OVERDUE. Submit immediately with proper remarks.</p>
@@ -847,9 +851,7 @@
                                 <h4 class="text-sm font-black text-slate-800 dark:text-slate-200" x-text="pt.title"></h4>
                                 <p class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mt-1" x-text="pt.desc"></p>
                             </div>
-                            <!-- 🎇 ANIMATED RADIO BUTTONS (SMART TOGGLE) -->
-                                <div class="audit-radio-group w-full sm:w-56 shrink-0 mt-2 sm:mt-0">
-								
+                            <div class="audit-radio-group w-full sm:w-56 shrink-0 mt-2 sm:mt-0">
                                 <label class="radio pass" @click.prevent="if(!isAuditLocked) { pt.status = pt.status === 'Pass' ? '' : 'Pass'; haptic('light'); }">
                                     <input type="radio" :checked="pt.status === 'Pass'" :disabled="isAuditLocked" />
                                     <span class="name">Pass</span>
@@ -865,7 +867,6 @@
                             </div>
                         </div>
                         
-                        <!-- 🌡️ RISK SEVERITY SCALE (Auto-opens on Fail) -->
                         <div x-show="pt.status === 'Fail'" x-collapse class="mt-2 mb-3 flex flex-wrap items-center gap-3 bg-red-50 dark:bg-red-900/10 p-2.5 rounded-lg border border-red-100 dark:border-red-900/30 transition-all">
                             <span class="text-[9px] font-black uppercase tracking-widest text-red-500"><i class="fa-solid fa-fire-flame-curved mr-1"></i> Risk Severity:</span>
                             <div class="flex gap-2">
@@ -886,7 +887,6 @@
                             </div>
                         </div>
 
-                        <!-- ALWAYS OPEN REMARKS (Mandatory Proof) -->
                         <div class="relative">
                             <i class="fa-solid fa-pen-clip absolute left-3 top-2.5 text-slate-400 text-xs"></i>
                             <textarea x-model="pt.remarks" :readonly="isAuditLocked" 
@@ -898,7 +898,6 @@
                 </template>
             </div>
 
-            <!-- HISTORY VIEW -->
             <div x-show="viewAuditHistory" class="p-4 sm:p-6 overflow-y-auto custom-scroll flex-1 space-y-3 bg-slate-50/30 dark:bg-transparent">
                 <template x-for="hist in allAudits" :key="hist.cycle">
                     <div class="bg-white dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-xl p-4 shadow-sm flex items-center justify-between">
@@ -922,16 +921,12 @@
                 </div>
             </div>
 
-            <!-- MODAL FOOTER (Submit & Save or Locked Reason) -->
             <div x-show="!viewAuditHistory" class="p-4 sm:p-5 border-t border-slate-100 dark:border-white/5 bg-white dark:bg-dark_surface flex flex-col sm:flex-row justify-between items-center gap-3 shrink-0">
-                
-                <!-- If Unlocked: Show standard inputs -->
                 <div x-show="!isAuditLocked" class="relative w-full sm:w-48">
                     <i class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
                     <input type="password" x-model="auditSecret" placeholder="Admin Key" class="w-full pl-8 pr-3 py-2.5 bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl text-xs font-mono font-bold outline-none focus:border-indigo-500 transition">
                 </div>
                 <div class="flex gap-2 w-full sm:w-auto">
-                    <!-- Mobile only History button -->
                     <button @click="viewAuditHistory = true" class="sm:hidden flex-1 px-2 py-3 bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300 font-bold rounded-xl transition text-[9px] uppercase tracking-widest flex items-center justify-center gap-1.5 border border-slate-200 dark:border-white/5 whitespace-nowrap">
                         <i class="fa-solid fa-clock-rotate-left"></i> History
                     </button>
@@ -944,7 +939,6 @@
                     </button>
                 </div>
 
-                <!-- If Locked: Show Banner instead of inputs -->
                 <div x-show="isAuditLocked" class="w-full text-center py-3 px-4 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl">
                     <p class="text-xs font-bold text-slate-600 dark:text-slate-400" x-text="auditLockReason"></p>
                 </div>
@@ -995,6 +989,7 @@
         </div>
     </div>
 
+    <!-- PENDING TICKETS MODAL (Now Themed Too!) -->
     <div x-show="showOpenTicketsModal" x-cloak class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" @click.self="showOpenTicketsModal = false">
         <div class="bg-white dark:bg-dark_surface w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden flex flex-col max-h-[80vh]">
             <div class="p-6 border-b border-slate-100 dark:border-white/10 flex justify-between items-center bg-red-50 dark:bg-red-900/10"><div class="flex items-center gap-4"><div class="w-10 h-10 rounded-xl bg-red-500 text-white flex items-center justify-center shadow-lg shadow-red-500/30 text-lg"><i class="fa-solid fa-clipboard-list"></i></div><div><h3 class="text-lg font-heading font-black text-slate-800 dark:text-white leading-tight">Pending Requests</h3><p class="text-[9px] text-red-600 dark:text-red-400 uppercase font-bold tracking-widest">Action Required</p></div></div><button @click="showOpenTicketsModal = false" class="w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-white/10 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition shadow-sm"><i class="fa-solid fa-xmark"></i></button></div>
@@ -1003,43 +998,63 @@
                     <div class="p-12 text-center flex flex-col items-center gap-3"><div class="w-16 h-16 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 rounded-full flex items-center justify-center text-3xl mb-1 shadow-inner"><i class="fa-solid fa-check"></i></div><h4 class="font-heading font-black text-xl text-slate-700 dark:text-white">All Clear!</h4><p class="text-xs text-slate-500 font-medium">No pending tickets at the moment.</p></div>
                 </template>
                 <template x-for="ticket in openTickets" :key="ticket.id">
-                    <div class="p-4 mb-3 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm hover:shadow-md hover:border-red-300 dark:hover:border-red-500/50 transition group">
-                        <div class="flex justify-between items-center mb-2"><span class="text-[9px] font-black tracking-widest bg-red-50 text-red-600 px-2 py-0.5 rounded-md border border-red-100 dark:bg-red-500/10 dark:border-red-500/20 dark:text-red-400">OPEN</span><span class="text-[10px] font-mono font-bold text-slate-400" x-text="formatDisplayDate(ticket.date)"></span></div>
-                        <h4 class="font-bold text-sm text-slate-800 dark:text-white mb-1.5 group-hover:text-brand transition pr-4" x-text="ticket.issue"></h4>
-                        <p class="text-xs text-slate-500 dark:text-slate-400 mb-4 line-clamp-2 leading-relaxed" x-text="ticket.desc"></p>
-                        <div class="border-t border-slate-50 dark:border-white/5 pt-3">
-                            <!-- 🗂️ STRUCTURED META TAGS (Ultra-Compact 2-Row Layout) -->
-                            <div class="flex flex-col gap-2">
+                    
+                    <!-- THEMED TICKET CARD INSIDE MODAL -->
+                    <div x-data="{ meta: processTicketMeta(ticket) }" class="p-4 mb-3 border rounded-2xl shadow-sm hover:-translate-y-0.5 transition-all duration-300 group relative overflow-hidden"
+                         :class="meta.styles.openBg">
+                        
+                        <!-- Watermark -->
+                        <i class="fa-solid absolute -bottom-3 -right-2 text-8xl opacity-[0.03] dark:opacity-[0.02] group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-500 pointer-events-none" :class="meta.watermarkClass"></i>
+
+                        <!-- Left Accent Bar -->
+                        <div class="absolute left-0 top-0 bottom-0 w-1.5 transition-all group-hover:w-2" 
+                             :class="meta.styles.openBar"></div>
+
+                        <!-- Top Info -->
+                        <div class="flex justify-between items-start mb-2 relative z-10">
+                            <div>
+                                <span x-show="meta.isSystem" class="inline-block mb-1.5 px-2 py-0.5 rounded-[6px] text-[9px] font-black uppercase tracking-widest border shadow-sm" :class="meta.badgeClass" x-text="meta.badgeText"></span>
                                 
-                                <!-- Row 1: Identity & Location -->
+                                <h4 class="font-bold text-sm mb-0.5 transition pr-4 leading-tight" 
+                                    :class="meta.styles.textOpen" x-text="ticket.issue"></h4>
+                            </div>
+                            <span class="text-[9px] font-black tracking-widest px-2 py-0.5 rounded-md border shrink-0 mt-1" 
+                                  :class="meta.styles.openPill">OPEN</span>
+                        </div>
+                        
+                        <!-- Clean Desc -->
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mb-4 line-clamp-4 leading-relaxed whitespace-pre-wrap relative z-10" x-text="meta.cleanDesc"></p>
+                        
+                        <!-- Tags Container -->
+                        <div class="border-t border-slate-50 dark:border-white/5 pt-3 relative z-10">
+                            <div class="flex flex-col gap-2">
                                 <div class="flex items-center gap-2 flex-wrap">
-                                    <span class="flex items-center text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300">
-                                        <i class="fa-solid fa-user text-[8px] mr-1 text-red-500"></i> <span x-text="ticket.name"></span>
+                                    <span class="flex items-center text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm bg-white/80 dark:bg-black/20" :class="meta.styles.textOpen">
+                                        <i class="fa-solid text-[8px] mr-1" :class="meta.icon + ' ' + meta.styles.iconColor"></i> <span x-text="ticket.name"></span>
                                     </span>
                                     <span class="flex items-center text-[9px] text-slate-500 font-mono bg-white dark:bg-dark_bg px-1.5 py-0.5 rounded border border-slate-200 dark:border-white/10 shadow-sm" title="Asset Tag">
-                                        <span x-text="ticket.asset || 'N/A'"></span>
+                                        <span x-text="meta.shortAsset"></span>
                                     </span>
-                                    <template x-if="ticket.hasExtra">
-                                        <span class="flex items-center text-[9px] text-slate-500 font-bold bg-slate-100 dark:bg-white/5 px-1.5 py-0.5 rounded border border-slate-200 dark:border-white/10 shadow-sm" title="Location">
-                                            <i class="fa-solid fa-location-dot mr-1 text-rose-400"></i> <span x-text="ticket.extraInfo.location || 'Unknown'"></span>
+                                    <template x-if="meta.refId">
+                                        <span class="flex items-center text-[9px] font-mono font-black px-2 py-0.5 rounded border shadow-sm" :class="meta.styles.refBg" title="Source Reference ID">
+                                            <i class="fa-solid fa-hashtag mr-1 opacity-60"></i><span x-text="meta.refId"></span>
                                         </span>
                                     </template>
                                 </div>
 
-                                <!-- Row 2: Network & Switch -->
                                 <div class="flex items-center gap-2 flex-wrap">
                                     <template x-if="ticket.hasExtra">
                                         <div class="contents">
-                                            <span class="flex items-center text-[9px] text-blue-600 font-mono bg-blue-50 dark:bg-blue-500/10 px-1.5 py-0.5 rounded border border-blue-100 dark:border-blue-500/20 shadow-sm" title="Live IP">
+                                            <span class="flex items-center text-[9px] text-blue-600 font-mono bg-blue-50 dark:bg-blue-500/10 px-1.5 py-0.5 rounded border border-blue-100 dark:border-blue-500/20 shadow-sm">
                                                 <i class="fa-solid fa-network-wired mr-1"></i> <span x-text="ticket.extraInfo.lan || 'No IP'"></span>
                                             </span>
-                                            <span class="flex items-center text-[9px] text-purple-600 font-mono bg-purple-50 dark:bg-purple-500/10 px-1.5 py-0.5 rounded border border-purple-100 dark:border-purple-500/20 shadow-sm" title="Switch Route">
+                                            <span class="flex items-center text-[9px] text-purple-600 font-mono bg-purple-50 dark:bg-purple-500/10 px-1.5 py-0.5 rounded border border-purple-100 dark:border-purple-500/20 shadow-sm">
                                                 <i class="fa-solid fa-server mr-1"></i> <span x-text="(ticket.extraInfo.switchPort || 'Not Patched').replace('Pt:', 'Port No: ')"></span>
                                             </span>
                                         </div>
                                     </template>
+                                    <span class="text-[9px] font-mono font-bold text-slate-400 ml-auto flex items-center gap-1"><i class="fa-regular fa-clock"></i> <span x-text="formatDisplayDate(ticket.date)"></span></span>
                                 </div>
-                                
                             </div>
                         </div>
                     </div>
@@ -1050,9 +1065,8 @@
     </div>
 
     <!-- SCRIPT -->
-    <!-- SCRIPT -->
     <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycby4H5eCFAB8mifuuQwzmCTOfa3J7J6rSvhEwjHSvaSfBsgmLFLq7s6UhhgnWQSQrGBy8g/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbwvXRCT7P5aULfkV63RPacAVaxdBUMiKnxGeYu498fhRUZ7Xd3ph2WxCiUs9wOtXH-4JQ/exec";
 
     document.addEventListener('alpine:init', () => {
         Alpine.data('dashboard', () => {
@@ -1080,10 +1094,8 @@
                 auditMeta: { cycle: 'Loading...', auditor: '-', status: 'Pending', date: '' },
                 auditForm: { points: [] },
 
-                // 🔒 Security Governance Locks
                 get isAuditLocked() {
                     if (this.auditMeta.status === 'Submitted') return true;
-                    // Agar login kiya hua banda Assigned Auditor nahi hai, toh Lock kar do
                     if (this.currentUser && this.currentUser.name && this.currentUser.name !== this.auditMeta.auditor) return true;
                     return false;
                 },
@@ -1093,7 +1105,6 @@
                     return "";
                 },
 
-                // The 12 Checkpoints 🧠
                 masterAuditPoints: [
                     { id: 'p1', title: '1. Hardware Inventory Check 🖥️', desc: 'Physical computers & storage vs actual count.' },
                     { id: 'p2', title: '2. Software & License Check 👾', desc: 'Unauthorized software & license tracking verification.' },
@@ -1153,22 +1164,18 @@
                     return this.tickets.filter(t => t.status === 'Open').sort((a, b) => new Date(a.date) - new Date(b.date)); 
                 },
                 
-                // 🧠 SMART AUDIT ALERT ENGINE (WITH 3 PHASES)
                 get auditAlert() {
                     if (!this.currentUser || !this.currentUser.name) return null;
-                    if (this.auditMeta.status === 'Submitted') return null; // No alert if done
+                    if (this.auditMeta.status === 'Submitted') return null;
                     
                     const today = new Date().getDate();
-                    let isWarning = false;
-                    let isActive = false;
+                    let isWarning = false; let isActive = false;
                     let isOverdue = this.auditMeta.status === 'Overdue';
                     
-                    // Cycle 01 Logic
                     if (this.auditMeta.cycle.includes('Cycle 01')) {
                         if (today >= 1 && today <= 5) isActive = true;
                         if (today === 6 || today === 7) isWarning = true;
                     }
-                    // Cycle 02 Logic
                     if (this.auditMeta.cycle.includes('Cycle 02')) {
                         if (today >= 15 && today <= 19) isActive = true;
                         if (today === 20 || today === 21) isWarning = true;
@@ -1177,7 +1184,7 @@
                     if (!isActive && !isWarning && !isOverdue) return null;
                     
                     const isAuditor = this.currentUser.name === this.auditMeta.auditor;
-                    const isITHead = this.currentUser.name.includes('Vikas'); // Escalation to IT Head
+                    const isITHead = this.currentUser.name.includes('Vikas'); 
                     
                     if (isOverdue && (isAuditor || isITHead)) {
                         return {
@@ -1195,7 +1202,7 @@
                         };
                     } else if (isActive && isAuditor) {
                         return {
-                            id: 'audit-alert', type: 'audit', urgency: 'Normal', // Blue info alert
+                            id: 'audit-alert', type: 'audit', urgency: 'Normal', 
                             issue: '📝 Audit Window Open',
                             desc: `The ${this.auditMeta.cycle} is now open. You can start drafting your report.`,
                             dateStr: 'Info', name: 'System Security'
@@ -1203,14 +1210,148 @@
                     }
                     return null;
                 },
+				
+                // 🧠 SMART TICKET THEMER & EXTRACTOR
+                processTicketMeta(ticket) {
+                    let rawDesc = ticket.desc ? String(ticket.desc) : '';
+                    let rawIssue = ticket.issue ? String(ticket.issue) : '';
+                    let rawName = ticket.name ? String(ticket.name) : '';
+                    
+                    let meta = {
+                        type: 'Helpdesk',
+                        badgeClass: '',
+                        watermarkClass: 'fa-headset text-slate-400',
+                        icon: 'fa-user',
+                        badgeText: 'USER REQUEST',
+                        refId: null,
+                        caseId: null, // 👈 NEW: Case ID slot
+                        cleanDesc: rawDesc,
+                        isSystem: false,
+                        color: 'amber', 
+                        shortAsset: ticket.asset || 'N/A'
+                    };
+
+                    // 🧠 NEW: Smart Extraction of Vendor or ISP Case ID
+                    let caseMatch = rawDesc.match(/(?:ISP|Vendor)?\s*Case ID:\s*([^\n]+)/i);
+                    if (caseMatch && !caseMatch[1].includes('N/A') && !caseMatch[1].includes('Pending')) {
+                        meta.caseId = caseMatch[1].trim();
+                    }
+
+                    // 1. WAN Detection
+                    if (/\[WAN_ID/i.test(rawDesc)) {
+                        meta.type = 'WAN';
+                        meta.isSystem = true;
+                        meta.color = 'sky';
+                        meta.badgeClass = 'bg-sky-50 text-sky-600 border-sky-200 dark:bg-sky-500/10 dark:text-sky-400 dark:border-sky-500/30';
+                        meta.watermarkClass = 'fa-satellite-dish text-sky-500';
+                        meta.badgeText = 'WAN ALERT';
+                        meta.icon = 'fa-server';
+                        
+                        let match = rawDesc.match(/\[WAN_ID:\s*(.*?)\]/i);
+                        if(match) { meta.cleanDesc = rawDesc.replace(match[0], '').trim(); }
+                        
+                        // Extract Circuit ID directly for the hashtag pill
+                        let circuitMatch = String(ticket.asset).match(/\(ID:\s*(.*?)\)/i);
+                        if(circuitMatch) {
+                            meta.refId = circuitMatch[1].trim(); 
+                            meta.shortAsset = String(ticket.asset).split(' (ID:')[0].trim();
+                        } else {
+                            if(match) meta.refId = match[1].trim(); 
+                        }
+                    } 
+                    // 2. RMA Detection
+                    else if (/\[RMA_ID/i.test(rawDesc)) {
+                        meta.type = 'RMA';
+                        meta.isSystem = true;
+                        meta.color = 'purple';
+                        meta.badgeClass = 'bg-purple-50 text-purple-600 border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/30';
+                        meta.watermarkClass = 'fa-box-open text-purple-500';
+                        meta.badgeText = 'HARDWARE RMA';
+                        meta.icon = 'fa-gear';
+                        
+                        let match = rawDesc.match(/\[RMA_ID:\s*(.*?)\]/i);
+                        if(match) { 
+                            meta.refId = 'RMA-' + match[1].trim(); 
+                            meta.cleanDesc = rawDesc.replace(match[0], '').trim(); 
+                        }
+                    } 
+                    // 3. Security Audit Detection
+                    else if (rawName.toLowerCase().includes('bot') || rawIssue.toLowerCase().includes('audit')) {
+                        meta.type = 'AUDIT';
+                        meta.isSystem = true;
+                        meta.color = 'rose';
+                        meta.badgeClass = 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/30';
+                        meta.watermarkClass = 'fa-shield-halved text-rose-500';
+                        meta.badgeText = 'SEC AUDIT';
+                        meta.icon = 'fa-robot';
+                    } 
+                    else {
+                        meta.badgeClass = 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/30';
+                    }
+
+                    // Static style mappings required for Tailwind compiler
+                    const styleMap = {
+                        'amber': {
+                            openBg: 'bg-amber-50/60 dark:bg-amber-900/10 border-amber-300 dark:border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.15)] hover:shadow-[0_0_25px_rgba(245,158,11,0.25)]',
+                            closedBg: 'bg-white dark:bg-dark_surface border-slate-100 dark:border-white/5 hover:border-amber-300 hover:shadow-md',
+                            openBar: 'bg-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.9)] animate-pulse',
+                            closedBar: 'bg-emerald-400 opacity-50',
+                            openPill: 'bg-amber-500 text-white border-amber-400 dark:bg-amber-600 dark:border-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.6)] animate-pulse',
+                            closedPill: 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20',
+                            textOpen: 'text-amber-700 dark:text-amber-400',
+                            textClosed: 'text-slate-800 dark:text-white group-hover:text-amber-500',
+                            iconColor: 'text-amber-500',
+                            refBg: 'bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/30 text-amber-600 dark:text-amber-400'
+                        },
+                        'sky': {
+                            openBg: 'bg-sky-50/60 dark:bg-sky-900/10 border-sky-300 dark:border-sky-500/30 shadow-[0_0_15px_rgba(14,165,233,0.15)] hover:shadow-[0_0_25px_rgba(14,165,233,0.25)]',
+                            closedBg: 'bg-white dark:bg-dark_surface border-slate-100 dark:border-white/5 hover:border-sky-300 hover:shadow-md',
+                            openBar: 'bg-sky-500 shadow-[0_0_12px_rgba(14,165,233,0.9)] animate-pulse',
+                            closedBar: 'bg-emerald-400 opacity-50',
+                            openPill: 'bg-sky-500 text-white border-sky-400 dark:bg-sky-600 dark:border-sky-500 shadow-[0_0_12px_rgba(14,165,233,0.6)] animate-pulse',
+                            closedPill: 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20',
+                            textOpen: 'text-sky-700 dark:text-sky-400',
+                            textClosed: 'text-slate-800 dark:text-white group-hover:text-sky-500',
+                            iconColor: 'text-sky-500',
+                            refBg: 'bg-sky-50 dark:bg-sky-500/10 border-sky-200 dark:border-sky-500/30 text-sky-600 dark:text-sky-400'
+                        },
+                        'purple': {
+                            openBg: 'bg-purple-50/60 dark:bg-purple-900/10 border-purple-300 dark:border-purple-500/30 shadow-[0_0_15px_rgba(168,85,247,0.15)] hover:shadow-[0_0_25px_rgba(168,85,247,0.25)]',
+                            closedBg: 'bg-white dark:bg-dark_surface border-slate-100 dark:border-white/5 hover:border-purple-300 hover:shadow-md',
+                            openBar: 'bg-purple-500 shadow-[0_0_12px_rgba(168,85,247,0.9)] animate-pulse',
+                            closedBar: 'bg-emerald-400 opacity-50',
+                            openPill: 'bg-purple-500 text-white border-purple-400 dark:bg-purple-600 dark:border-purple-500 shadow-[0_0_12px_rgba(168,85,247,0.6)] animate-pulse',
+                            closedPill: 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20',
+                            textOpen: 'text-purple-700 dark:text-purple-400',
+                            textClosed: 'text-slate-800 dark:text-white group-hover:text-purple-500',
+                            iconColor: 'text-purple-500',
+                            refBg: 'bg-purple-50 dark:bg-purple-500/10 border-purple-200 dark:border-purple-500/30 text-purple-600 dark:text-purple-400'
+                        },
+                        'rose': {
+                            openBg: 'bg-rose-50/60 dark:bg-rose-900/10 border-rose-300 dark:border-rose-500/30 shadow-[0_0_15px_rgba(244,63,94,0.15)] hover:shadow-[0_0_25px_rgba(244,63,94,0.25)]',
+                            closedBg: 'bg-white dark:bg-dark_surface border-slate-100 dark:border-white/5 hover:border-rose-300 hover:shadow-md',
+                            openBar: 'bg-rose-500 shadow-[0_0_12px_rgba(244,63,94,0.9)] animate-pulse',
+                            closedBar: 'bg-emerald-400 opacity-50',
+                            openPill: 'bg-rose-500 text-white border-rose-400 dark:bg-rose-600 dark:border-rose-500 shadow-[0_0_12px_rgba(244,63,94,0.6)] animate-pulse',
+                            closedPill: 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20',
+                            textOpen: 'text-rose-700 dark:text-rose-400',
+                            textClosed: 'text-slate-800 dark:text-white group-hover:text-rose-500',
+                            iconColor: 'text-rose-500',
+                            refBg: 'bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/30 text-rose-600 dark:text-rose-400'
+                        }
+                    };
+
+                    meta.styles = styleMap[meta.color];
+                    return meta;
+                },
 
                 get notifications() { 
                     let notifs = [...this.openTickets];
                     const aAlert = this.auditAlert;
-                    if (aAlert) notifs.unshift(aAlert); // Pin audit alert to TOP 📌
+                    if (aAlert) notifs.unshift(aAlert);
                     return notifs; 
                 },
-                get openTicketCount() { return this.notifications.length; }, // Count updates automatically
+                get openTicketCount() { return this.notifications.length; },
                 get userInitials() { return this.currentUser.name ? this.currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase() : '??'; },
                 get onlineStaffCount() { return this.staffData.filter(s => this.isStaffOnline(s)).length; },
 
@@ -1280,7 +1421,6 @@
                     if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); this.highlightLog = true; setTimeout(() => this.highlightLog = false, 2000); } 
                 },
 
-				// Smart Logic to calculate which cycle is active right now
                 calculateAuditCycle() {
                     const d = new Date();
                     const date = d.getDate();
@@ -1310,9 +1450,8 @@
                         const current = this.allAudits.find(a => a.cycle === this.auditMeta.cycle);
                         if (current) {
                             this.auditMeta.status = current.status;
-                            this.auditMeta.date = current.date; // 👈 Timestamp capture kiya
+                            this.auditMeta.date = current.date;
                             const parsedDetails = JSON.parse(current.details);
-                            // 🔥 FIX: Purane drafts mein severity inject karo taaki reactivity bani rahe
                             this.auditForm.points = Object.values(parsedDetails).map(p => ({ 
                                 ...p, 
                                 severity: p.severity || '' 
@@ -1336,15 +1475,13 @@
                     let isValid = true;
                     let isComplete = true;
 
-                    // Ab HAR point ke liye remarks MONDATORY hain!
                     this.auditForm.points.forEach(pt => {
                         if (pt.status === '') isComplete = false;
                         if (pt.remarks.trim() === '') isValid = false; 
-                        // Ensure severity is selected if Fail
                         if (pt.status === 'Fail' && !pt.severity) isValid = false;
                     });
                     
-                    if (submitType === 'Draft') { /*...*/ } 
+                    if (submitType === 'Draft') { } 
                     else {
                         if (!isComplete) { this.haptic('error'); alert("⚠️ Action Required: Please mark 'Pass', 'Fail', or 'N/A' for ALL points."); return; }
                         if (!isValid) { this.haptic('error'); alert("📝 Meticulous Audit Required: Ensure remarks are filled and 'Risk Severity' is selected for failed points."); return; }
@@ -1364,7 +1501,7 @@
                     try {
                         const payload = {
                             action: 'saveBiMonthlyAudit', cycle: this.auditMeta.cycle,
-                            auditor: this.auditMeta.auditor, doneBy: this.currentUser.name, // 👈 Identify kon bhej raha hai
+                            auditor: this.auditMeta.auditor, doneBy: this.currentUser.name, 
                             status: submitType,
                             score: score, points: pointsObj, secret: this.auditSecret
                         };
@@ -1387,6 +1524,8 @@
                         let cachedData = null;
                         try { cachedData = localStorage.getItem('pbl_tickets_cache'); } catch(e) {}
                         
+                        const url = API_URL + '?action=getTickets&t=' + new Date().getTime();
+                        
                         if (cachedData && !force) {
                             this.tickets = JSON.parse(cachedData);
                             if(!Array.isArray(this.tickets)) this.tickets = []; 
@@ -1395,7 +1534,7 @@
                             this.loading = false; 
                         }
                         
-                        const res = await fetch(API_URL + '?action=getTickets');
+                        const res = await fetch(url);
                         const data = await res.json();
                         
                         const freshTickets = (data.tickets || []).map(t => ({
@@ -1500,11 +1639,10 @@
                     document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
                     if(this.chartInstance) { this.chartInstance.updateOptions({ theme: { mode: this.isDark ? 'dark' : 'light' } }); }
                 }
-            }; // End return
-        }); // End Alpine.data
-    }); // End eventListener
-
-    // PULL TO REFRESH
+            }; 
+        }); 
+    }); 
+    
     document.addEventListener('DOMContentLoaded', () => {
         const mainScroll = document.getElementById('main-scroll');
         const pullIndicator = document.getElementById('pull-indicator');
