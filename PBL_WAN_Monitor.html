@@ -600,20 +600,35 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Log Date *</label>
-                        <input type="date" x-model="form.date" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-3 text-sm font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition text-slate-800 dark:text-white shadow-sm">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Start Time *</label>
-                        <input type="time" x-model="form.start" @change="calculateDuration" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-3 text-sm font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition text-slate-800 dark:text-white shadow-sm">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">End Time</label>
-                        <input type="time" x-model="form.end" @change="calculateDuration" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-3 text-sm font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition text-slate-800 dark:text-white shadow-sm">
-                    </div>
-                </div>
+                <!-- DOWNTIME STARTED BLOCK -->
+				<div class="bg-slate-50/80 dark:bg-black/20 p-3 rounded-xl border border-slate-100 dark:border-white/5 mb-4 shadow-sm">
+					<h4 class="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-2 flex items-center gap-1.5"><i class="fa-solid fa-arrow-trend-down"></i> Downtime Started</h4>
+					<div class="grid grid-cols-2 gap-4">
+						<div>
+							<label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Down Date *</label>
+							<input type="date" x-model="form.date" @change="calculateDuration" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2.5 text-sm font-medium outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 transition text-slate-800 dark:text-white shadow-sm">
+						</div>
+						<div>
+							<label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Down Time *</label>
+							<input type="time" x-model="form.start" @change="calculateDuration" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2.5 text-sm font-medium outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 transition text-slate-800 dark:text-white shadow-sm">
+						</div>
+					</div>
+				</div>
+
+				<!-- LINK RESTORED BLOCK -->
+				<div class="bg-slate-50/80 dark:bg-black/20 p-3 rounded-xl border border-slate-100 dark:border-white/5 transition-all duration-300 shadow-sm" :class="!form.status.includes('Resolved') ? 'opacity-50 grayscale pointer-events-none' : 'border-emerald-200 dark:border-emerald-500/30'">
+					<h4 class="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-2 flex items-center gap-1.5"><i class="fa-solid fa-arrow-trend-up"></i> Link Restored</h4>
+					<div class="grid grid-cols-2 gap-4">
+						<div>
+							<label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Resolved Date</label>
+							<input type="date" x-model="form.endDate" @change="calculateDuration" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2.5 text-sm font-medium outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition text-slate-800 dark:text-white shadow-sm">
+						</div>
+						<div>
+							<label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Resolved Time</label>
+							<input type="time" x-model="form.end" @change="calculateDuration" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2.5 text-sm font-medium outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition text-slate-800 dark:text-white shadow-sm">
+						</div>
+					</div>
+				</div>
 
                 <div>
                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Root Cause</label>
@@ -687,6 +702,7 @@
 
     
 <!-- SCRIPT LOGIC -->
+    <!-- SCRIPT LOGIC -->
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwvXRCT7P5aULfkV63RPacAVaxdBUMiKnxGeYu498fhRUZ7Xd3ph2WxCiUs9wOtXH-4JQ/exec";
 
@@ -696,7 +712,7 @@
                 loading: false, saving: false, deleting: false, logs: [], showModal: false, showDeleteModal: false,
                 currentDate: '', currentTime: '', activeFilter: null,
                 
-                form: { id: null, isp: '🔴 Airtel LL (ID: 9202902)', type: '🔴 Link Down (Complete Outage)', faultParty: '🌐 External (ISP Side)', caseId: '', date: '', start: '', end: '', duration: '', actionTaken: '', rootCause: '', remarks: '', status: '🕒 Pending', secret: '' },
+                form: { id: null, isp: '🔴 Airtel LL (ID: 9202902)', type: '🔴 Link Down (Complete Outage)', faultParty: '🌐 External (ISP Side)', caseId: '', date: '', start: '', endDate: '', end: '', duration: '', actionTaken: '', rootCause: '', remarks: '', status: '🕒 Pending', secret: '' },
                 
                 deleteId: null, deleteSecret: '',
                 currentUser: JSON.parse(sessionStorage.getItem('userData')) || { name: 'Vikas Rawat' },
@@ -740,9 +756,9 @@
                     if (this.isDark) document.documentElement.classList.add('dark');
                     document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
                     
-                    // 🧠 FIXED: Enforcing Local Timezone for form load
                     const now = new Date();
                     this.form.date = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+                    this.form.endDate = this.form.date;
                     
                     setInterval(() => {
                         const d = new Date();
@@ -759,7 +775,6 @@
                     if (force) { this.haptic('light'); this.loading = true; }
                     try {
                         const cached = localStorage.getItem('pbl_wan_cache');
-                        // 🧠 CACHE BUSTER: Browser ko hamesha fresh data lane pe majbur karega
                         const url = API_URL + '?action=getWANLogs&t=' + new Date().getTime();
 
                         if (cached && !force) {
@@ -769,6 +784,7 @@
                                 this.logs = freshLogs.map(row => ({
                                     id: row.id, date: row.date, isp: row.isp, type: row.type, 
                                     faultParty: row.faultParty, caseId: row.caseId, start: row.start, 
+                                    endDate: row.endDate,
                                     end: row.end, duration: row.duration, actionTaken: row.actionTaken, 
                                     rootCause: row.rootCause, remarks: row.remarks, status: row.status
                                 }));
@@ -779,11 +795,12 @@
                             const data = await res.json();
                             const freshLogs = data.logs || [];
                             this.logs = freshLogs.map(row => ({
-                                    id: row.id, date: row.date, isp: row.isp, type: row.type, 
-                                    faultParty: row.faultParty, caseId: row.caseId, start: row.start, 
-                                    end: row.end, duration: row.duration, actionTaken: row.actionTaken, 
-                                    rootCause: row.rootCause, remarks: row.remarks, status: row.status
-                                }));
+                                id: row.id, date: row.date, isp: row.isp, type: row.type, 
+                                faultParty: row.faultParty, caseId: row.caseId, start: row.start, 
+                                endDate: row.endDate,
+                                end: row.end, duration: row.duration, actionTaken: row.actionTaken, 
+                                rootCause: row.rootCause, remarks: row.remarks, status: row.status
+                            }));
                             localStorage.setItem('pbl_wan_cache', JSON.stringify(this.logs));
                             if (force) this.haptic('success'); 
                         }
@@ -805,6 +822,7 @@
                         caseId: log.caseId || '', 
                         date: this.parseDateForInput(log.date), 
                         start: log.start || '', 
+                        endDate: this.parseDateForInput(log.endDate || log.date), 
                         end: log.end || '', 
                         duration: log.duration || '', 
                         actionTaken: log.actionTaken || '', 
@@ -824,10 +842,18 @@
                 },
 
                 calculateDuration() {
-                    if (this.form.start && this.form.end) {
-                        const s = new Date(`2000-01-01T${this.form.start}`); const e = new Date(`2000-01-01T${this.form.end}`);
-                        let diff = (e - s) / 1000 / 60; if (diff < 0) diff += 24 * 60;
-                        this.form.duration = `${Math.floor(diff / 60)}h ${diff % 60}m`;
+                    if (this.form.date && this.form.start && this.form.endDate && this.form.end) {
+                        const s = new Date(`${this.form.date}T${this.form.start}`); 
+                        const e = new Date(`${this.form.endDate}T${this.form.end}`);
+                        let diffMs = e - s;
+                        if (diffMs >= 0) {
+                            let days = Math.floor(diffMs / 86400000);
+                            let hrs = Math.floor((diffMs % 86400000) / 3600000);
+                            let mins = Math.round((diffMs % 3600000) / 60000);
+                            this.form.duration = days > 0 ? `${days}d ${hrs}h ${mins}m` : `${hrs}h ${mins}m`;
+                        } else {
+                            this.form.duration = 'Invalid Time';
+                        }
                     }
                 },
 
@@ -839,7 +865,6 @@
                     try { 
                         const payload = { action: 'saveWAN', loggedBy: this.currentUser?.name || 'IT Engineer', ...this.form };
                         
-                        // 🧠 Standard fetch, NO 'no-cors' needed. It will send data properly!
                         await fetch(API_URL, { 
                             method: 'POST', 
                             body: JSON.stringify(payload) 
@@ -886,10 +911,9 @@
                 },
                 
                 resetForm() { 
-                    // 🧠 FIXED: Localized Date extraction to avoid UTC shift 
                     const d = new Date();
                     const localToday = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-                    this.form = { id: null, isp: '🔴 Airtel LL (ID: 9202902)', type: '🔴 Link Down (Complete Outage)', faultParty: '🌐 External (ISP Side)', caseId: '', date: localToday, start: '', end: '', duration: '', actionTaken: '', rootCause: '', remarks: '', status: '🕒 Pending', secret: '' }; 
+                    this.form = { id: null, isp: '🔴 Airtel LL (ID: 9202902)', type: '🔴 Link Down (Complete Outage)', faultParty: '🌐 External (ISP Side)', caseId: '', date: localToday, start: '', endDate: localToday, end: '', duration: '', actionTaken: '', rootCause: '', remarks: '', status: '🕒 Pending', secret: '' }; 
                 },
                 
                 getISPColor(isp) { 
@@ -912,12 +936,15 @@
                     return 'bg-slate-50 text-slate-600 border border-slate-200 dark:bg-white/5 dark:text-slate-400 dark:border-white/10'; 
                 },
                 
-                formatDate(dateStr) { return dateStr ? dateStr : '-'; },
+                formatDate(dateStr) { 
+                    if (!dateStr || dateStr === 'N/A' || dateStr.includes('1899') || dateStr.includes('1970')) return '-';
+                    return dateStr; 
+                },
+
                 parseDateForInput(dateStr) { 
-                    if(!dateStr || dateStr === 'N/A') return ''; 
+                    if(!dateStr || dateStr === 'Pending' || dateStr === 'N/A' || dateStr.includes('1970') || dateStr.includes('1899')) return ''; 
                     const date = new Date(dateStr); 
                     if(isNaN(date.getTime())) return ''; 
-                    // 🧠 FIXED: Extracted YYYY-MM-DD cleanly keeping IST intact
                     return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0'); 
                 },
                 
