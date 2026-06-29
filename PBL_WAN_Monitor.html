@@ -541,141 +541,159 @@
 
     <!-- MODAL: ADD/EDIT LOG -->
     <div x-show="showModal" x-cloak class="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
-        <div class="bg-white dark:bg-dark_surface w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden flex flex-col max-h-[90vh]" @click.away="showModal = false">
+        <!-- WIDENED MODAL TO FIT EVERYTHING ON ONE PAGE -->
+        <div class="bg-white dark:bg-dark_surface w-full max-w-3xl rounded-[2rem] shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden flex flex-col max-h-[95vh] sm:max-h-[90vh]" @click.away="showModal = false">
             
             <!-- Header -->
-            <div class="px-6 py-5 border-b border-slate-100 dark:border-white/5 flex justify-between items-center shrink-0">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-brand text-white flex items-center justify-center shadow-lg shadow-brand/30 text-xl">
+            <div class="px-5 py-4 border-b border-slate-100 dark:border-white/5 flex justify-between items-center shrink-0 bg-white dark:bg-dark_surface z-20 relative">
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-brand text-white flex items-center justify-center shadow-lg shadow-brand/30 text-lg sm:text-xl shrink-0">
                         <i class="fa-solid" :class="form.id ? 'fa-pen-to-square' : 'fa-triangle-exclamation'"></i>
                     </div>
                     <div>
-                        <h3 class="font-heading font-black text-xl text-slate-800 dark:text-white leading-tight" x-text="form.id ? 'Edit Log Entry' : 'Report ISP Event'"></h3>
-                        <p class="text-[10px] text-brand uppercase font-black tracking-widest mt-1">Network Ops</p>
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-heading font-black text-lg sm:text-xl text-slate-800 dark:text-white leading-tight" x-text="form.id ? 'Edit Log Entry' : 'Report ISP Event'"></h3>
+                            <span x-show="isLocked" class="bg-amber-100 text-amber-700 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest shadow-sm flex items-center gap-1 border border-amber-200" x-cloak><i class="fa-solid fa-lock"></i> Locked</span>
+                            <span x-show="!isLocked && form.id && form.status.includes('Resolved')" class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest shadow-sm flex items-center gap-1 border border-emerald-200" x-cloak><i class="fa-solid fa-lock-open"></i> Unlocked</span>
+                        </div>
+                        <p class="text-[9px] sm:text-[10px] text-brand uppercase font-black tracking-widest mt-0.5">Network Ops</p>
                     </div>
                 </div>
-                <button @click="showModal = false; haptic('light')" class="w-8 h-8 rounded-full bg-slate-50 dark:bg-white/10 flex items-center justify-center text-slate-500 hover:text-red-500 transition shadow-sm"><i class="fa-solid fa-xmark"></i></button>
+                <button @click="showModal = false; haptic('light')" class="w-8 h-8 rounded-full bg-slate-50 dark:bg-white/10 flex items-center justify-center text-slate-500 hover:text-red-500 transition shadow-sm shrink-0"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
-            <!-- Body -->
-            <div class="p-6 space-y-4 overflow-y-auto custom-scroll flex-1">
-                <input type="hidden" x-model="form.id">
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Select ISP Link *</label>
-                        <select x-model="form.isp" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition cursor-pointer text-slate-800 dark:text-white shadow-sm appearance-none">
-                            <option value="Airtel Leased Line (15Mbps)">🔴 Airtel LL (ID: 9202902)</option>
-                            <option value="STPI Leased Line (15Mbps)">📡 STPI LL (ID: PAN-STP-01)</option>
-                            <option value="Airtel Broadband (30Mbps)">🟢 Airtel BB (ID: 01204204260_dsl)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Event Category *</label>
-                        <select x-model="form.type" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition cursor-pointer text-slate-800 dark:text-white shadow-sm appearance-none">
-                            <option>🔴 Link Down (Complete Outage)</option>
-                            <option>✂️ Fiber Cut / Cable Fault</option>
-                            <option>⚠️ Link Flapping (Unstable)</option>
-                            <option>🐢 Slow Speed / High Latency</option>
-                            <option>🔌 Power Issue (ISP End)</option>
-                            <option>💥 Hardware / Equipment Fault</option>
-                            <option>🔧 ISP Maintenance</option>
-                            <option>📡 Switched to RF (Primary)</option>
-                            <option>⚡ Switched to Fiber (Backup)</option>
-                            <option>🚀 Bandwidth Upgrade</option>
-                        </select>
+            <!-- Body (DIV controls scrolling, FIELDSET controls locking) -->
+            <div class="p-4 sm:p-6 overflow-y-auto custom-scroll flex-1 bg-slate-50/30 dark:bg-transparent relative z-10">
+                <fieldset :disabled="isLocked" class="space-y-3 sm:space-y-4 transition-all duration-300" :class="isLocked ? 'opacity-60 grayscale-[0.2]' : ''">
+                    <input type="hidden" x-model="form.id">
+                    
+                    <!-- COMPACT 4-GRID FOR BASICS -->
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 sm:gap-4">
+                        <div class="sm:col-span-2">
+                            <label class="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1 sm:mb-1.5 ml-1">Select ISP Link *</label>
+                            <select x-model="form.isp" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-bold outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition cursor-pointer text-slate-800 dark:text-white shadow-sm appearance-none">
+                                <option value="Airtel Leased Line (15Mbps)">🔴 Airtel LL (ID: 9202902)</option>
+                                <option value="STPI Leased Line (15Mbps)">📡 STPI LL (ID: PAN-STP-01)</option>
+                                <option value="Airtel Broadband (30Mbps)">🟢 Airtel BB (ID: 01204204260_dsl)</option>
+                            </select>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1 sm:mb-1.5 ml-1">Event Category *</label>
+                            <select x-model="form.type" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-bold outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition cursor-pointer text-slate-800 dark:text-white shadow-sm appearance-none">
+                                <option>🔴 Link Down (Complete Outage)</option>
+                                <option>✂️ Fiber Cut / Cable Fault</option>
+                                <option>⚠️ Link Flapping (Unstable)</option>
+                                <option>🐢 Slow Speed / High Latency</option>
+                                <option>🔌 Power Issue (ISP End)</option>
+                                <option>💥 Hardware / Equipment Fault</option>
+                                <option>🔧 ISP Maintenance</option>
+                                <option>📡 Switched to RF (Primary)</option>
+                                <option>⚡ Switched to Fiber (Backup)</option>
+                                <option>🚀 Bandwidth Upgrade</option>
+                            </select>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1 sm:mb-1.5 ml-1">Fault Party</label>
+                            <select x-model="form.faultParty" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-bold outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition cursor-pointer text-slate-800 dark:text-white shadow-sm appearance-none">
+                                <option>🌐 External (ISP Side)</option>
+                                <option>🏢 Internal (PBL Office)</option>
+                                <option>ℹ️ N/A (Testing/Upgrade)</option>
+                            </select>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1 sm:mb-1.5 ml-1">ISP Case ID</label>
+                            <input type="text" x-model="form.caseId" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-mono font-bold text-blue-600 dark:text-blue-400 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition shadow-sm" placeholder="e.g. 1-89304928">
+                        </div>
                     </div>
 
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Fault Party</label>
-                        <select x-model="form.faultParty" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition cursor-pointer text-slate-800 dark:text-white shadow-sm appearance-none">
-                            <option>🌐 External (ISP Side)</option>
-                            <option>🏢 Internal (PBL Office)</option>
-                            <option>ℹ️ N/A (Testing/Upgrade)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">ISP Case ID</label>
-                        <input type="text" x-model="form.caseId" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-bold text-blue-600 dark:text-blue-400 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition shadow-sm" placeholder="e.g. 1-89304928">
-                    </div>
-                </div>
+                    <!-- TIMING BLOCK (SIDE-BY-SIDE ON DESKTOP) -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+                        <!-- DOWNTIME STARTED BLOCK -->
+                        <div class="bg-white dark:bg-black/20 p-3 sm:p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm">
+                            <h4 class="text-[9px] sm:text-[10px] font-black text-rose-500 uppercase tracking-widest mb-2.5 flex items-center gap-1.5"><i class="fa-solid fa-arrow-trend-down"></i> Downtime Started</h4>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-[8px] sm:text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1 ml-1">Date *</label>
+                                    <input type="date" x-model="form.date" @change="calculateDuration" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-lg sm:rounded-xl px-2.5 py-2 text-xs font-bold outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 transition text-slate-800 dark:text-white shadow-inner">
+                                </div>
+                                <div>
+                                    <label class="block text-[8px] sm:text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1 ml-1">Time *</label>
+                                    <input type="time" x-model="form.start" @change="calculateDuration" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-lg sm:rounded-xl px-2.5 py-2 text-xs font-bold outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 transition text-slate-800 dark:text-white shadow-inner">
+                                </div>
+                            </div>
+                        </div>
 
-                <!-- DOWNTIME STARTED BLOCK -->
-				<div class="bg-slate-50/80 dark:bg-black/20 p-3 rounded-xl border border-slate-100 dark:border-white/5 mb-4 shadow-sm">
-					<h4 class="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-2 flex items-center gap-1.5"><i class="fa-solid fa-arrow-trend-down"></i> Downtime Started</h4>
-					<div class="grid grid-cols-2 gap-4">
-						<div>
-							<label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Down Date *</label>
-							<input type="date" x-model="form.date" @change="calculateDuration" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2.5 text-sm font-medium outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 transition text-slate-800 dark:text-white shadow-sm">
-						</div>
-						<div>
-							<label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Down Time *</label>
-							<input type="time" x-model="form.start" @change="calculateDuration" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2.5 text-sm font-medium outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 transition text-slate-800 dark:text-white shadow-sm">
-						</div>
-					</div>
-				</div>
-
-				<!-- LINK RESTORED BLOCK -->
-				<div class="bg-slate-50/80 dark:bg-black/20 p-3 rounded-xl border border-slate-100 dark:border-white/5 transition-all duration-300 shadow-sm" :class="!form.status.includes('Resolved') ? 'opacity-50 grayscale pointer-events-none' : 'border-emerald-200 dark:border-emerald-500/30'">
-					<h4 class="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-2 flex items-center gap-1.5"><i class="fa-solid fa-arrow-trend-up"></i> Link Restored</h4>
-					<div class="grid grid-cols-2 gap-4">
-						<div>
-							<label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Resolved Date</label>
-							<input type="date" x-model="form.endDate" @change="calculateDuration" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2.5 text-sm font-medium outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition text-slate-800 dark:text-white shadow-sm">
-						</div>
-						<div>
-							<label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Resolved Time</label>
-							<input type="time" x-model="form.end" @change="calculateDuration" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2.5 text-sm font-medium outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition text-slate-800 dark:text-white shadow-sm">
-						</div>
-					</div>
-				</div>
-
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Root Cause</label>
-                    <input type="text" x-model="form.rootCause" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition text-slate-800 dark:text-white shadow-sm" placeholder="e.g. Fiber Cut due to road work">
-                </div>
-             
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Action Taken</label>
-                    <input type="text" x-model="form.actionTaken" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition text-slate-800 dark:text-white shadow-sm" placeholder="e.g. Switched to RF Backup">
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Remarks / Details</label>
-                        <input type="text" x-model="form.remarks" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition text-slate-800 dark:text-white shadow-sm" placeholder="Optional notes">
+                        <!-- LINK RESTORED BLOCK -->
+                        <div class="bg-white dark:bg-black/20 p-3 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm" :class="!form.status.includes('Resolved') ? 'border-slate-200 dark:border-white/5 opacity-60 grayscale pointer-events-none' : 'border-emerald-200 dark:border-emerald-500/30 bg-emerald-50/30 dark:bg-emerald-900/10'">
+                            <h4 class="text-[9px] sm:text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-2.5 flex items-center gap-1.5"><i class="fa-solid fa-arrow-trend-up"></i> Link Restored</h4>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-[8px] sm:text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1 ml-1">Date</label>
+                                    <input type="date" x-model="form.endDate" @change="calculateDuration" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-lg sm:rounded-xl px-2.5 py-2 text-xs font-bold outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition text-slate-800 dark:text-white shadow-inner">
+                                </div>
+                                <div>
+                                    <label class="block text-[8px] sm:text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1 ml-1">Time</label>
+                                    <input type="time" x-model="form.end" @change="calculateDuration" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-lg sm:rounded-xl px-2.5 py-2 text-xs font-bold outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition text-slate-800 dark:text-white shadow-inner">
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Current Status *</label>
-                        <select x-model="form.status" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition cursor-pointer text-slate-800 dark:text-white shadow-sm appearance-none">
-                            <option>🕒 Pending</option>
-                            <option>⏳ Escalated</option>
-                            <option>✅ Resolved</option>
-                        </select>
+
+                    <!-- RESOLUTION DETAILS -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                        <div>
+                            <label class="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1 sm:mb-1.5 ml-1">Root Cause</label>
+                            <input type="text" x-model="form.rootCause" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition text-slate-800 dark:text-white shadow-sm" placeholder="e.g. Fiber Cut due to road work">
+                        </div>
+                        <div>
+                            <label class="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1 sm:mb-1.5 ml-1">Action Taken</label>
+                            <input type="text" x-model="form.actionTaken" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition text-slate-800 dark:text-white shadow-sm" placeholder="e.g. Switched to RF Backup">
+                        </div>
                     </div>
-                </div>
-            </div>
+
+                    <!-- REMARKS & STATUS -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                        <div class="sm:col-span-2">
+                            <label class="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1 sm:mb-1.5 ml-1">Remarks / Details</label>
+                            <input type="text" x-model="form.remarks" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition text-slate-800 dark:text-white shadow-sm" placeholder="Optional notes">
+                        </div>
+                        <div class="sm:col-span-1">
+                            <label class="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1 sm:mb-1.5 ml-1">Current Status *</label>
+                            <select x-model="form.status" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-bold outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition cursor-pointer text-slate-800 dark:text-white shadow-sm appearance-none">
+                                <option>🕒 Pending</option>
+                                <option>⏳ Escalated</option>
+                                <option>✅ Resolved</option>
+                            </select>
+                        </div>
+                    </div>
+                </fieldset>
+            </div> 
             
             <!-- Footer -->
-            <div class="bg-white dark:bg-dark_surface px-6 py-5 border-t border-slate-100 dark:border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4 shrink-0">
-                <div class="relative w-full sm:w-48">
+            <div class="bg-slate-50/80 dark:bg-black/40 backdrop-blur-md px-4 sm:px-6 py-4 border-t border-slate-200 dark:border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4 shrink-0 relative z-20 rounded-b-3xl">
+                
+                <div class="relative w-full sm:w-56 shrink-0">
                     <i class="fa-solid fa-key absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                    <input type="password" x-model="form.secret" placeholder="Admin Key" class="w-full pl-10 pr-4 py-3 bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl text-xs font-mono font-bold outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition shadow-sm">
+                    <input type="password" x-model="form.secret" @input="if(isLocked && form.secret === 'PBL2026') { isLocked = false; haptic('success'); }" placeholder="Admin Key" class="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl text-xs font-mono font-bold outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition shadow-sm">
                 </div>
-                <div class="flex items-center gap-4 w-full sm:w-auto">
-                    <div class="flex flex-col text-right hidden sm:flex mr-2">
-                        <span class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Calculated Duration</span>
-                        <span class="text-xs font-mono font-black text-brand" x-text="form.duration || '--h --m'"></span>
+                
+                <div class="flex items-center justify-end gap-3 sm:gap-4 w-full sm:w-auto">
+                    <!-- Text won't break anymore due to whitespace-nowrap and flex-col -->
+                    <div class="hidden sm:flex flex-col text-right shrink-0">
+                        <span class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-0.5 whitespace-nowrap">Calculated Duration</span>
+                        <span class="text-xs font-mono font-black text-brand whitespace-nowrap" x-text="form.duration || '--h --m'"></span>
                     </div>
-                    <button @click="showModal = false; haptic('light')" class="text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition w-full sm:w-auto text-center px-2">Cancel</button>
-                    <!-- SAVE BUTTON -->
-                    <button @click="saveLog()" class="bg-brand hover:bg-blue-600 text-white px-8 py-3 rounded-xl text-sm font-black uppercase tracking-wider shadow-[0_5px_15px_-3px_rgba(59,130,246,0.4)] transition w-full sm:w-auto flex items-center justify-center gap-2 active:scale-95" :disabled="saving">
+                    
+                    <button @click="showModal = false; haptic('light')" class="text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition px-2 shrink-0">Cancel</button>
+                    
+                    <button @click="saveLog()" class="bg-brand hover:bg-blue-600 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider shadow-[0_5px_15px_-3px_rgba(59,130,246,0.4)] transition flex items-center justify-center gap-2 active:scale-95 shrink-0" :disabled="saving">
                         <span x-show="!saving" x-text="form.id ? 'UPDATE' : 'SAVE'"></span>
                         <span x-show="saving"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
                     </button>
                 </div>
             </div>
-        </div>
+
+        </div> 
     </div>
 
     <!-- DELETE CONFIRMATION MODAL -->
@@ -710,7 +728,7 @@
             Alpine.data('wanSystem', () => ({
                 isDark: localStorage.getItem('theme') === 'dark',
                 loading: false, saving: false, deleting: false, logs: [], showModal: false, showDeleteModal: false,
-                currentDate: '', currentTime: '', activeFilter: null,
+                currentDate: '', currentTime: '', activeFilter: null, isLocked: false, // 🔥 Naya Variable Add Kiya
                 
                 form: { id: null, isp: '🔴 Airtel LL (ID: 9202902)', type: '🔴 Link Down (Complete Outage)', faultParty: '🌐 External (ISP Side)', caseId: '', date: '', start: '', endDate: '', end: '', duration: '', actionTaken: '', rootCause: '', remarks: '', status: '🕒 Pending', secret: '' },
                 
@@ -813,8 +831,9 @@
                 },
 
                 editLog(log) {
-                    this.haptic('light'); 
-                    this.form = { 
+				this.haptic('light'); 
+				this.isLocked = (log.status && log.status.includes('Resolved')); // 🔥 Check karega ki lock karna hai ya nahi
+				this.form = { 
                         id: log.id, 
                         isp: log.isp || '🔴 Airtel LL (ID: 9202902)', 
                         type: log.type || '', 
@@ -911,7 +930,8 @@
                 },
                 
                 resetForm() { 
-                    const d = new Date();
+				this.isLocked = false; // 🔥 Naya form kholte waqt hamesha unlocked rahega
+				const d = new Date();
                     const localToday = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
                     this.form = { id: null, isp: '🔴 Airtel LL (ID: 9202902)', type: '🔴 Link Down (Complete Outage)', faultParty: '🌐 External (ISP Side)', caseId: '', date: localToday, start: '', endDate: localToday, end: '', duration: '', actionTaken: '', rootCause: '', remarks: '', status: '🕒 Pending', secret: '' }; 
                 },
