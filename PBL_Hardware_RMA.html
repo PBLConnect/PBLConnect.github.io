@@ -628,20 +628,24 @@
                 </div>
                 
                 <!-- Row 5: 2 Columns even on mobile -->
-                <div class="grid grid-cols-2 gap-3 sm:gap-4">
-                    <div>
-                        <label class="block text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 sm:mb-1.5 ml-1">Current Status</label>
-                        <select x-model="form.status" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-lg sm:rounded-xl px-2 sm:px-3 py-2 sm:py-2.5 text-[10px] sm:text-sm font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition cursor-pointer">
-                            <option value="Pending">🕒 Pending</option>
-                            <option value="Part Ordered">📦 Ordered</option>
-                            <option value="Resolved">✅ Resolved</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 sm:mb-1.5 ml-1">Resolved Date</label>
-                        <input type="date" x-model="form.resolveDate" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-lg sm:rounded-xl px-2 sm:px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition disabled:opacity-50 disabled:cursor-not-allowed" :disabled="form.status !== 'Resolved'">
-                    </div>
-                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 p-3 bg-slate-50/80 dark:bg-black/20 rounded-xl border border-slate-100 dark:border-white/5 shadow-sm">
+				<div>
+					<label class="block text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 sm:mb-1.5 ml-1">Current Status</label>
+					<select x-model="form.status" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-lg sm:rounded-xl px-2 sm:px-3 py-2 sm:py-2.5 text-[10px] sm:text-sm font-bold outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition cursor-pointer shadow-sm">
+						<option value="Pending">🕒 Pending</option>
+						<option value="Part Ordered">📦 Ordered</option>
+						<option value="Resolved">✅ Resolved</option>
+					</select>
+				</div>
+				<div :class="form.status !== 'Resolved' ? 'opacity-50 grayscale pointer-events-none' : ''">
+					<label class="block text-[9px] sm:text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1 sm:mb-1.5 ml-1">Resolved Date</label>
+					<input type="date" x-model="form.resolveDate" class="w-full bg-white dark:bg-black/40 border border-emerald-200 dark:border-emerald-700/50 rounded-lg sm:rounded-xl px-2 sm:px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-medium outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition shadow-sm text-slate-800 dark:text-white">
+				</div>
+				<div :class="form.status !== 'Resolved' ? 'opacity-50 grayscale pointer-events-none' : ''">
+					<label class="block text-[9px] sm:text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1 sm:mb-1.5 ml-1">Resolved Time</label>
+					<input type="time" x-model="form.resolveTime" class="w-full bg-white dark:bg-black/40 border border-emerald-200 dark:border-emerald-700/50 rounded-lg sm:rounded-xl px-2 sm:px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-medium outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition shadow-sm text-slate-800 dark:text-white">
+				</div>
+			</div>
             </div>
             
             <!-- Modal Footer (Fixed at bottom) -->
@@ -801,7 +805,7 @@
                                 const mappedLogs = (data.logs || []).map(row => ({
                                     id: row.id, date: row.date, asset: row.asset, serial: row.serial, 
                                     issue: row.issue, actionTaken: row.actionTaken || row.action, caseId: row.caseId, 
-                                    resolveDate: row.resolveDate, status: row.status, remarks: row.remarks
+                                    resolveDate: row.resolveDate, resolveTime: row.resolveTime || '', status: row.status, remarks: row.remarks
                                 })).sort((a, b) => new Date(b.date) - new Date(a.date));
 
                                 if (JSON.stringify(this.logs) !== JSON.stringify(mappedLogs)) {
@@ -844,7 +848,8 @@
                         id: log.id, asset: log.asset, serial: log.serial, caseId: log.caseId || '', 
                         issue: matchedIssue, actionTaken: log.actionTaken || '', 
                         date: this.parseDateForInput(log.date), resolveDate: this.parseDateForInput(log.resolveDate),
-                        status: log.status || '🕒 Pending', secret: '' 
+						resolveTime: log.resolveTime || '',  // 🔥 Backend se aaya hua time form field mein bind ho jayega
+						status: log.status || '🕒 Pending', secret: '' 
                     };
                     this.assetSearchQuery = log.asset; 
                     this.showModal = true;
@@ -918,7 +923,7 @@
                     this.assetSearchQuery = ''; 
                     const d = new Date();
                     const localToday = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-                    this.form = { id: null, asset: '', serial: '', caseId: '', issue: '', actionTaken: '', date: localToday, resolveDate: '', status: '🕒 Pending', secret: '' }; 
+                    this.form = { id: null, asset: '', serial: '', caseId: '', issue: '', actionTaken: '', date: localToday, resolveDate: '', resolveTime: '', status: '🕒 Pending', secret: '' }; 
                 },
                 
                 formatDisplayDate(dateStr) { if (!dateStr || dateStr === 'Pending' || dateStr === 'N/A') return '-'; if (dateStr.includes('1970') || dateStr.includes('1899')) return 'Pending'; return dateStr.substring(0, 11); },
