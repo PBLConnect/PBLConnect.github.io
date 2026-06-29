@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dashboard | IT Operations v1.2</title>
+    <title>Dashboard | IT Operations v1.2.5</title>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <link rel="icon" type="image/x-icon" href="Assets/images/pbl-logo.ico">
     <link rel="manifest" href="manifest.json">
@@ -126,7 +126,7 @@
                         <div class="relative group cursor-pointer" @click="showChangelogModal = true; haptic('light')">
                             <div class="absolute -inset-0.5 bg-gradient-to-r from-rose-400 to-brand rounded-md blur opacity-50 group-hover:opacity-75 transition duration-500 animate-pulse"></div>
                             <button class="relative bg-white dark:bg-[#020617] text-brand px-2 py-0.5 rounded-md font-mono font-black text-[9px] leading-none border border-slate-200 dark:border-white/10 shadow-sm flex items-center gap-1.5" title="View Release Notes">
-                                <span>v1.2</span> 
+                                <span>v1.2.5</span> 
                                 <span class="relative flex h-1.5 w-1.5">
                                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
                                   <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-rose-500"></span>
@@ -665,7 +665,7 @@
             <div class="flex items-center gap-2 sm:gap-3 z-10">
                 <span>&copy; <span x-text="new Date().getFullYear()"></span> <span class="hidden sm:inline font-bold text-slate-700 dark:text-white">PBL Connect</span></span>
                 <span class="h-3 w-px bg-slate-300 dark:bg-white/10"></span>
-                <span class="font-mono text-brand font-bold">v1.2</span>
+                <span class="font-mono text-brand font-bold">v1.2.5</span>
             </div>
             <div class="hidden lg:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 items-center gap-4 bg-slate-50 dark:bg-white/5 px-4 py-1.5 rounded-full border border-slate-200 dark:border-white/5 shadow-sm">
                 <div class="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
@@ -704,63 +704,81 @@
         </div>
     </div>
 	
-	<!-- MEGA CHANGELOG MODAL (RELEASE NOTES v1.2) -->
+	<!-- MEGA CHANGELOG MODAL (RELEASE NOTES v1.2.5) -->
     <div x-show="showChangelogModal" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/70 backdrop-blur-md p-4" x-transition.opacity @click.self="showChangelogModal = false">
         <div class="bg-white dark:bg-dark_surface w-full max-w-4xl rounded-[2rem] shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden flex flex-col max-h-[85vh] sm:max-h-[90vh] transform transition-all scale-100">
             
-            <div class="p-6 sm:p-8 border-b border-slate-100 dark:border-white/10 bg-gradient-to-br from-indigo-600 to-purple-700 text-white shrink-0 relative overflow-hidden">
+            <!-- Hero Header (Green Theme for v1.2.5) -->
+            <div class="p-6 sm:p-8 border-b border-slate-100 dark:border-white/10 bg-gradient-to-br from-emerald-500 to-teal-700 text-white shrink-0 relative overflow-hidden">
                 <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
                 <div class="relative z-10 flex justify-between items-start">
                     <div>
                         <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest bg-white/20 border border-white/20 shadow-sm px-2.5 py-1 rounded-md mb-3 inline-block flex items-center gap-1.5 w-max"><span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span> Official Release Notes</span>
-                        <h3 class="text-2xl sm:text-3xl font-heading font-black leading-tight drop-shadow-md">What's New in v1.2 🚀</h3>
-                        <p class="text-xs font-medium opacity-80 mt-1.5 font-mono">Security & Auto-Alerts Update • Jun 25, 2026</p>
+                        <h3 class="text-2xl sm:text-3xl font-heading font-black leading-tight drop-shadow-md">What's New in v1.2.5 🚀</h3>
+                        <p class="text-xs font-medium opacity-80 mt-1.5 font-mono">Routing History & Smart Locks • Jun 29, 2026</p>
                     </div>
                     <button @click="showChangelogModal = false" class="w-8 h-8 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/40 text-white transition shadow-sm active:scale-95"><i class="fa-solid fa-xmark text-sm"></i></button>
                 </div>
             </div>
 
+            <!-- Scrollable Content -->
             <div class="p-5 sm:p-6 overflow-y-auto custom-scroll flex-1 bg-slate-50/50 dark:bg-transparent space-y-6">
+                
+                <!-- === VERSION 1.2.5 (LATEST) === -->
                 <div>
                     <div class="flex items-center gap-2 mb-4">
-                        <span class="px-2 py-0.5 rounded bg-indigo-500 text-white font-black text-[10px] uppercase tracking-widest shadow-sm">v1.2</span>
+                        <span class="px-2 py-0.5 rounded bg-emerald-500 text-white font-black text-[10px] uppercase tracking-widest shadow-sm">v1.2.5</span>
                         <h4 class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-widest">Latest Additions</h4>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
                         <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition">
-                            <h4 class="text-[11px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Bi-Monthly Security Audit</h4>
+                            <h4 class="text-[11px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-route"></i> IP Manager Update</h4>
                             <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
-                                <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>New Sec Audit Box:</strong> Introduced a dedicated 'Sec Audit' KPI box on the dashboard. Click it to easily open the new 12-point security checklist.</span></li>
-                                <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Strict Access:</strong> Only the assigned engineer can fill and submit their own audit report.</span></li>
-                                <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Tamper-Proof:</strong> Once submitted, the audit locks permanently with the exact Date and Time.</span></li>
-                                <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Better Controls:</strong> Added smooth Pass/Fail buttons and a new Risk Severity (Low/High) selector.</span></li>
+                                <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Routing History:</strong> Added a cool timeline to see when a PC's IP or Internet line was changed.</span></li>
+                                <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Audit Trail:</strong> Clearly shows the Old IP vs New IP and the name of the IT Engineer who changed it.</span></li>
                             </ul>
                         </div>
 
                         <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition">
-                            <h4 class="text-[11px] font-black text-rose-500 dark:text-rose-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-bolt"></i> Smart Automation</h4>
+                            <h4 class="text-[11px] font-black text-amber-500 dark:text-amber-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-lock"></i> Security & UI Fixes</h4>
                             <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
-                                <li class="flex items-start gap-1.5"><span class="text-rose-500 shrink-0"><i class="fa-solid fa-fire text-[10px] mt-0.5"></i></span> <span><strong>Auto-Ticketing:</strong> If any audit point fails, the system automatically creates a High-Priority IT ticket.</span></li>
-                                <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Smart Alerts:</strong> The system now sends automatic reminders and Overdue warnings based on the date.</span></li>
-                                <li class="flex items-start gap-1.5"><span class="text-blue-500 shrink-0"><i class="fa-solid fa-wrench text-[10px] mt-0.5"></i></span> <span><strong>UI Fixes:</strong> Redesigned dynamic Dashboard Tickets. WAN, RMA, Audits, and Normal tickets now use distinct color themes matching their category!</span></li>
+                                <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Admin Lock:</strong> Resolved RMA & WAN tickets are now safely locked. You must enter the Admin Key to edit them.</span></li>
+                                <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Accurate Time:</strong> Added exact Date & Time options for multi-day downtimes.</span></li>
+                                <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Clean Design:</strong> Forms are redesigned to fit perfectly on your screen without scrolling.</span></li>
                             </ul>
                         </div>
                     </div>
                 </div>
 
+                <!-- === VERSION 1.2 (PREVIOUS) === -->
                 <div class="pt-5 border-t border-slate-200 dark:border-white/10">
                     <div class="flex items-center gap-2 mb-3">
-                        <span class="px-2 py-0.5 rounded bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-slate-400 font-black text-[10px] uppercase tracking-widest shadow-sm">v1.1</span>
-                        <h4 class="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Previous Update</h4>
+                        <span class="px-2 py-0.5 rounded bg-indigo-500 text-white font-black text-[10px] uppercase tracking-widest shadow-sm">v1.2</span>
+                        <h4 class="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Security Update</h4>
                     </div>
                     <div class="bg-slate-50 dark:bg-black/20 p-3 rounded-xl border border-slate-200 dark:border-white/5 flex items-start gap-3">
-                        <i class="fa-solid fa-clock-rotate-left text-slate-400 mt-0.5"></i>
+                        <i class="fa-solid fa-shield-halved text-indigo-500 mt-0.5"></i>
                         <p class="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed m-0">
-                            <strong>Connected Systems:</strong> Linked all IT modules (Inventory, IP Manager, Switches) so data automatically syncs everywhere without manual typing. Upgraded the overall design.
+                            <strong>Bi-Monthly Audits:</strong> Added a strict 12-point IT Security checklist. It automatically generates high-priority tickets if any security point fails, ensuring 100% compliance.
                         </p>
                     </div>
                 </div>
+
+                <!-- === VERSION 1.1 (OLDER) === -->
+                <div class="pt-5 border-t border-slate-200 dark:border-white/10">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="px-2 py-0.5 rounded bg-slate-400 text-white font-black text-[10px] uppercase tracking-widest shadow-sm">v1.1</span>
+                        <h4 class="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Base Integration</h4>
+                    </div>
+                    <div class="bg-slate-50 dark:bg-black/20 p-3 rounded-xl border border-slate-200 dark:border-white/5 flex items-start gap-3">
+                        <i class="fa-solid fa-link text-slate-400 mt-0.5"></i>
+                        <p class="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed m-0">
+                            <strong>Connected Systems:</strong> Successfully linked all IT modules (Inventory, IP Manager, Switches) so data automatically syncs across the platform without manual typing.
+                        </p>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
