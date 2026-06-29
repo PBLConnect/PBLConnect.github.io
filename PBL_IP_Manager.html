@@ -478,16 +478,84 @@
     <div x-show="showModal" x-cloak class="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4" x-transition.opacity>
         <div class="bg-white/95 dark:bg-dark_surface/95 backdrop-blur-xl w-full max-w-3xl rounded-3xl shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden flex flex-col max-h-[90vh]" @click.away="showModal = false">
             
-            <div class="px-6 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-black/20 flex justify-between items-center shrink-0">
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-black/20 flex justify-between items-center shrink-0 transition-colors">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-brand text-white flex items-center justify-center shadow-lg shadow-brand/30 text-lg"><i class="fa-solid" :class="isEdit ? 'fa-pen-to-square' : 'fa-plus'"></i></div>
-                    <div><h3 class="font-heading font-black text-lg text-slate-800 dark:text-white" x-text="isEdit ? 'Update IP Config' : 'Register New IP'"></h3><p class="text-[9px] text-brand uppercase font-bold tracking-widest mt-0.5">Network Operation</p></div>
+                    <div class="w-10 h-10 rounded-xl bg-brand text-white flex items-center justify-center shadow-lg shadow-brand/30 text-lg transition-all duration-300" :class="showHistory ? 'bg-indigo-600' : ''">
+                        <i class="fa-solid" :class="showHistory ? 'fa-clock-rotate-left' : (isEdit ? 'fa-pen-to-square' : 'fa-plus')"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-heading font-black text-lg text-slate-800 dark:text-white leading-tight" x-text="showHistory ? 'Routing History' : (isEdit ? 'Update IP Config' : 'Register New IP')"></h3>
+                        <p class="text-[9px] text-brand uppercase font-bold tracking-widest mt-0.5" :class="showHistory ? 'text-indigo-500' : ''" x-text="showHistory ? form.compName : 'Network Operation'"></p>
+                    </div>
                 </div>
-                <button @click="haptic('light'); showModal = false" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-400 hover:text-red-500 transition"><i class="fa-solid fa-xmark"></i></button>
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <!-- History Button (Only shows in Edit mode) -->
+                    <button x-show="isEdit" @click="showHistory ? showHistory = false : fetchHistory()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition hover:bg-indigo-100 border border-indigo-200 dark:border-indigo-500/20 shadow-sm active:scale-95">
+                        <i class="fa-solid" :class="showHistory ? 'fa-arrow-left' : 'fa-clock-rotate-left'"></i>
+                        <span x-text="showHistory ? 'Back to Edit' : 'History'"></span>
+                    </button>
+                    <!-- Close Button -->
+                    <button @click="haptic('light'); showModal = false" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-400 hover:text-red-500 transition shadow-sm border border-slate-200 dark:border-white/5"><i class="fa-solid fa-xmark"></i></button>
+                </div>
             </div>
             
-            <!-- Modal Body: Premium Bento Box Layout (Ultra-Compact) -->
-            <div class="p-3 sm:p-5 overflow-y-auto custom-scroll flex-1 bg-slate-50/50 dark:bg-transparent">
+            <!-- 🕒 HISTORY VIEW (New Feature) -->
+            <div x-show="showHistory" x-cloak class="p-4 sm:p-6 overflow-y-auto custom-scroll flex-1 bg-slate-50/50 dark:bg-transparent">
+                <!-- Loader -->
+                <div x-show="loadingHistory" class="flex flex-col justify-center items-center py-16 gap-3">
+                    <i class="fa-solid fa-circle-notch fa-spin text-indigo-500 text-3xl"></i>
+                    <span class="text-[10px] font-black text-indigo-500 uppercase tracking-widest animate-pulse">Loading Timeline...</span>
+                </div>
+                
+                <!-- Timeline List -->
+                <div x-show="!loadingHistory && historyList.length > 0" class="space-y-4">
+                    <template x-for="(hist, idx) in historyList" :key="idx">
+                        <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm relative transition hover:shadow-md hover:-translate-y-0.5">
+                            
+                            <!-- Date & User Row -->
+                            <div class="flex justify-between items-start mb-3 border-b border-slate-100 dark:border-white/5 pb-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-500/20 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest shadow-sm" x-text="hist.date"></span>
+                                    <span class="text-[10px] font-bold text-slate-400 font-mono" x-text="hist.time"></span>
+                                </div>
+                                <span class="text-[9px] font-bold text-slate-500 uppercase flex items-center gap-1.5 bg-slate-50 dark:bg-white/5 px-2 py-0.5 rounded border border-slate-100 dark:border-white/10"><i class="fa-solid fa-user text-brand opacity-70"></i> <span x-text="hist.user"></span></span>
+                            </div>
+                            
+                            <!-- Changes Row -->
+                            <div class="flex items-center justify-between gap-2 sm:gap-4">
+                                <!-- Old State -->
+                                <div class="flex-1 bg-slate-50 dark:bg-black/40 p-2.5 sm:p-3 rounded-xl border border-slate-200 dark:border-white/10 opacity-70">
+                                    <span class="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1.5"><i class="fa-solid fa-clock-rotate-left mr-1"></i> Previous</span>
+                                    <div class="text-[10px] sm:text-[11px] font-bold text-slate-600 dark:text-slate-300 truncate" x-text="hist.oldConn"></div>
+                                    <div class="text-[10px] sm:text-[12px] font-mono font-black text-slate-500 mt-1" x-text="hist.oldIP"></div>
+                                </div>
+                                
+                                <!-- Arrow -->
+                                <i class="fa-solid fa-arrow-right-long text-slate-300 dark:text-slate-600 text-lg"></i>
+                                
+                                <!-- New State -->
+                                <div class="flex-1 bg-emerald-50/50 dark:bg-emerald-900/10 p-2.5 sm:p-3 rounded-xl border border-emerald-200 dark:border-emerald-900/30 shadow-sm relative overflow-hidden">
+                                    <div class="absolute -right-4 -bottom-4 w-12 h-12 bg-emerald-500/10 rounded-full blur-xl"></div>
+                                    <span class="block text-[8px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-1.5 relative z-10"><i class="fa-solid fa-bolt mr-1"></i> Updated To</span>
+                                    <div class="text-[10px] sm:text-[11px] font-bold text-slate-800 dark:text-slate-200 truncate relative z-10" x-text="hist.newConn"></div>
+                                    <div class="text-[10px] sm:text-[12px] font-mono font-black text-brand dark:text-brand_glow mt-1 relative z-10" x-text="hist.newIP"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                
+                <!-- Empty State -->
+                <div x-show="!loadingHistory && historyList.length === 0" class="py-16 text-center text-slate-400 bg-white dark:bg-dark_surface rounded-2xl border border-slate-200 dark:border-white/5">
+                    <i class="fa-solid fa-timeline text-4xl mb-4 opacity-30 text-indigo-500"></i>
+                    <p class="text-[11px] font-black uppercase tracking-widest text-slate-500">No Routing History Found.</p>
+                    <p class="text-[10px] font-medium mt-1">Changes made from today will appear here.</p>
+                </div>
+            </div>
+
+            <!-- 📝 FORM VIEW (Original Content, Hidden when History is Open) -->
+            <div x-show="!showHistory" class="p-3 sm:p-5 overflow-y-auto custom-scroll flex-1 bg-slate-50/50 dark:bg-transparent">
                 <div class="space-y-2.5 sm:space-y-4">
                     
                     <!-- SECTION 1: IDENTITY -->
@@ -495,7 +563,6 @@
                         <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-brand"></div>
                         <h4 class="text-[9px] sm:text-[10px] font-black text-brand uppercase tracking-widest mb-2 flex items-center gap-1.5"><i class="fa-solid fa-desktop"></i> Asset Identity</h4>
                         
-                        <!-- 🧠 SMART FIX: 2 Columns on Mobile -->
                         <div class="grid grid-cols-2 gap-2 sm:gap-4">
                             <!-- Searchable Hostname Dropdown -->
                             <div class="relative" @click.away="showAssetDropdown = false">
@@ -529,7 +596,7 @@
                             <h4 class="text-[9px] sm:text-[10px] font-black text-emerald-500 uppercase tracking-widest flex items-center gap-1.5"><i class="fa-solid fa-network-wired"></i> IPv4</h4>
                             
                             <div class="w-32 sm:w-48">
-                                <select x-model="form.connType" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-md sm:rounded-lg px-1.5 py-1 text-[8px] sm:text-[9px] font-black outline-none focus:border-emerald-500 cursor-pointer text-slate-700 dark:text-slate-200 shadow-sm uppercase tracking-wide">
+                                <select x-model="form.connType" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-md sm:rounded-lg px-1.5 py-1 text-[8px] sm:text-[9px] font-black outline-none focus:border-emerald-500 cursor-pointer text-slate-700 dark:text-slate-200 shadow-sm uppercase tracking-wide appearance-none">
                                     <option value="Airtel Lease Line">🔴 Airtel LL</option>
                                     <option value="STPI Lease Line">📡 STPI LL</option>
                                     <option value="Airtel Broadband">🟢 Broadband</option>
@@ -538,7 +605,6 @@
                             </div>
                         </div>
                         
-                        <!-- 🧠 SMART FIX: 2 Columns on Mobile with tight gap -->
                         <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
                             <div>
                                 <label class="block text-[7px] sm:text-[8px] font-black text-slate-500 uppercase tracking-widest mb-0.5 sm:mb-1">Local LAN (DC)</label>
@@ -564,7 +630,6 @@
                         <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-purple-500"></div>
                         <h4 class="text-[9px] sm:text-[10px] font-black text-purple-500 uppercase tracking-widest mb-2 flex items-center gap-1.5"><i class="fa-solid fa-route"></i> Gateway & Switch</h4>
                         
-                        <!-- 🧠 SMART FIX: 3 Columns on Mobile (Full width Gateway, Switch/Port split) -->
                         <div class="grid grid-cols-3 gap-2 sm:gap-3">
                             <div class="col-span-3 sm:col-span-1">
                                 <label class="block text-[7px] sm:text-[8px] font-black text-slate-500 uppercase tracking-widest mb-0.5 sm:mb-1">Gateway</label>
@@ -584,8 +649,8 @@
                 </div>
             </div>
             
-            <!-- FIXED FOOTER: ALWAYS 1 LINE ON MOBILE -->
-            <div class="bg-slate-50/50 dark:bg-black/20 px-4 sm:px-6 py-3 sm:py-4 border-t border-slate-100 dark:border-white/5 flex flex-row justify-between items-center gap-2 shrink-0">
+            <!-- FIXED FOOTER: (Hides when History is open) -->
+            <div x-show="!showHistory" class="bg-slate-50/50 dark:bg-black/20 px-4 sm:px-6 py-3 sm:py-4 border-t border-slate-100 dark:border-white/5 flex flex-row justify-between items-center gap-2 shrink-0">
                 <div class="relative w-[40%] sm:w-48 shrink-0">
                     <i class="fa-solid fa-key absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[10px] sm:text-xs"></i>
                     <input type="password" x-model="form.secret" autocomplete="new-password" placeholder="Admin Key" class="w-full pl-7 sm:pl-8 pr-2 py-1.5 sm:py-2 bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-mono font-bold outline-none focus:border-brand transition shadow-sm">
@@ -612,7 +677,10 @@
                 currentTime: '',
                 loading: false, saving: false, ips: [], search: '',
                 filterConn: '', filterLoc: '', activeFilter: null,
-                showModal: false, isEdit: false,
+				showModal: false, isEdit: false,
+				historyList: [], showHistory: false, loadingHistory: false, // 🔥 History State
+				showModal: false, isEdit: false,
+				historyList: [], showHistory: false, loadingHistory: false, // 🔥 History State
                 form: { compName: '', lan: '', airtelLL: '', stpi: '', airtelBB: '', gateway: '', connType: 'Airtel Lease Line', location: '', switchName: '', switchPort: '', secret: '' },
                 
                 // 🧠 NAYA VARIABLES: Inventory Dropdown ke liye
@@ -730,10 +798,27 @@
                         else this.loading = false;
                     }
                 },
+				
+				async fetchHistory() {
+				this.haptic('light');
+				this.loadingHistory = true;
+				this.showHistory = true;
+				try {
+					const res = await fetch(API_URL + '?action=getIPHistory&compName=' + encodeURIComponent(this.form.compName));
+					const data = await res.json();
+					this.historyList = data.history || [];
+				} catch(e) {
+					console.error(e);
+				} finally {
+					this.loadingHistory = false;
+				}
+			},
 
                 openModal(mode) {
-                    this.haptic('light');
-                    this.isEdit = mode === 'edit';
+				this.haptic('light');
+				this.showHistory = false; // 🔥 Reset History tab
+				this.historyList = []; 
+				this.isEdit = mode === 'edit';
                     if (!this.isEdit) {
                         this.form = { compName: '', lan: '', airtelLL: '', stpi: '', airtelBB: '', gateway: '', connType: 'Airtel Lease Line', location: '', switchName: '', switchPort: '', secret: '' };
                         this.assetSearchQuery = ''; // Reset Search
@@ -759,7 +844,7 @@
                     
                     this.saving = true;
                     try {
-                        const payload = { action: 'saveIP', ...this.form };
+                        const payload = { action: 'saveIP', loggedBy: this.currentUser?.name || 'IT Engineer', ...this.form };
                         const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
                         const result = await res.json();
                         
