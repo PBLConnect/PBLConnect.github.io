@@ -1196,18 +1196,18 @@
                     
                     let meta = {
                         type: 'Helpdesk',
-                        badgeClass: '',
+                        badgeClass: 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/30', // ✅ Badge Color Add Kiya
                         watermarkClass: 'fa-headset text-slate-400',
                         icon: 'fa-user',
-                        badgeText: 'USER REQUEST',
+                        badgeText: 'IT HELPDESK', // ✅ Premium Name Set Kiya
                         refId: null,
                         caseId: null, 
                         cleanDesc: rawDesc,
-                        isSystem: false,
+                        isSystem: true,   // ✅ TRUE KAR DIYA (Ab Badge Hamesha Dikhega)
                         color: 'amber', 
                         shortAsset: ticket.asset || 'N/A',
                         statusTextOpen: 'OPEN',
-                        statusTextClosed: 'RESOLVED' // ✅ Ab standard 'RESOLVED' aayega
+                        statusTextClosed: 'RESOLVED'
                     };
 
                     let caseMatch = rawDesc.match(/(?:ISP|Vendor)?\s*Case ID:\s*([^\n]+)/i);
