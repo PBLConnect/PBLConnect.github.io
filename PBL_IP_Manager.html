@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PBL IP Allocation Master v1.1</title>
+    <title>PBL IP Allocation Master v1.2.5</title>
     <link rel="icon" type="image/x-icon" href="Assets/images/pbl-logo.ico">
     <meta name="theme-color" id="meta-theme-color" content="#f1f5f9">
     
@@ -122,7 +122,7 @@
 
                 <div class="flex flex-col justify-center">
                     <div class="flex items-center gap-1.5 sm:gap-2 mb-0.5 sm:mb-1">
-                        <span class="bg-brand/10 text-brand px-1.5 py-0.5 rounded font-mono font-bold text-[8px] sm:text-[9px] leading-none border border-brand/20">v1.2</span>
+                        <span class="bg-brand/10 text-brand px-1.5 py-0.5 rounded font-mono font-bold text-[8px] sm:text-[9px] leading-none border border-brand/20">v1.2.5</span>
 
                         <span class="inline-block text-[8px] sm:text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-md">NETWORK OPS</span>
                     </div>
@@ -353,10 +353,13 @@
 
                                 <!-- IP Matrix (Focus on Active) -->
                                 <div class="ml-2 grid grid-cols-2 gap-2 mb-3">
-                                    <!-- LAN -->
-                                    <div class="bg-slate-50 dark:bg-black/30 p-2 rounded-xl border border-slate-100 dark:border-white/5">
-                                        <span class="block text-[8px] font-black text-slate-400 uppercase mb-0.5">LAN (DC)</span>
-                                        <span class="text-[11px] font-mono font-bold text-slate-700 dark:text-slate-300" x-text="row.lan || '-'"></span>
+                                    <!-- LAN (DYNAMIC HIGHLIGHTING) -->
+                                    <div class="p-2 rounded-xl border transition-all" 
+                                         :class="row.connType === 'Local Lan' ? 'bg-indigo-50 border-indigo-200 dark:bg-indigo-900/20 shadow-sm' : 'bg-slate-50 dark:bg-black/30 border-slate-100 dark:border-white/5 opacity-50 group-hover:opacity-100'">
+                                        <span class="block text-[8px] font-black uppercase mb-0.5" 
+                                              :class="row.connType === 'Local Lan' ? 'text-indigo-500' : 'text-slate-400'">LAN (DC)</span>
+                                        <span class="text-[11px] font-mono font-bold" 
+                                              :class="row.connType === 'Local Lan' ? 'text-indigo-700 dark:text-indigo-400' : 'text-slate-500'" x-text="row.lan || '-'"></span>
                                     </div>
                                     <!-- Active WAN (Dynamic) -->
                                     <div class="p-2 rounded-xl border shadow-sm" :class="row.connType === 'Airtel Lease Line' ? 'bg-rose-50 border-rose-200 dark:bg-rose-900/20' : (row.connType === 'STPI Lease Line' ? 'bg-sky-50 border-sky-200 dark:bg-sky-900/20' : (row.connType === 'Airtel Broadband' ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/20' : 'bg-slate-50 border-slate-200 dark:bg-black/30'))">
@@ -415,8 +418,10 @@
                                         <span class="px-2.5 py-1.5 rounded-md text-[9px] font-black uppercase tracking-widest border shadow-sm inline-block" :class="getConnectionColor(row.connType, false)" x-text="row.connType || 'Unassigned'"></span>
                                     </td>
                                     
-                                    <!-- LAN -->
-                                    <td class="px-4 py-3 align-middle text-center font-mono font-bold text-slate-600 dark:text-slate-300" x-text="row.lan || '-'"></td>
+                                    <!-- LAN (DYNAMIC HIGHLIGHTING) -->
+                                    <td class="px-4 py-3 align-middle text-center font-mono font-bold transition-all border-x border-slate-100 dark:border-white/5" 
+                                        :class="row.connType === 'Local Lan' ? 'text-indigo-600 bg-indigo-50/80 dark:bg-indigo-900/20 dark:text-indigo-400 shadow-inner scale-105 rounded-lg' : 'text-slate-400 dark:text-slate-600 opacity-50 group-hover:opacity-100'" 
+                                        x-text="row.lan || '-'"></td>
                                     
                                     <!-- 🧠 SMART IP HIGHLIGHTING -->
                                     <td class="px-4 py-3 align-middle text-center font-mono font-bold transition-all border-l border-slate-100 dark:border-white/5" 
@@ -463,7 +468,7 @@
             <div class="flex items-center gap-1.5 sm:gap-3 z-10 shrink-0">
                 <span class="font-black text-slate-500 dark:text-slate-400 flex items-center gap-1">&copy; <span x-text="new Date().getFullYear()"></span></span>
                 <span class="h-3 w-px bg-slate-300 dark:bg-white/10"></span>
-                <span class="px-1.5 py-0.5 rounded-md bg-gradient-to-r from-brand to-indigo-600 text-white font-mono font-black tracking-widest shadow-[0_2px_10px_-2px_rgba(59,130,246,0.5)] cursor-default">v1.2</span>
+                <span class="px-1.5 py-0.5 rounded-md bg-gradient-to-r from-brand to-indigo-600 text-white font-mono font-black tracking-widest shadow-[0_2px_10px_-2px_rgba(59,130,246,0.5)] cursor-default">v1.2.5</span>
 
                 <span class="hidden sm:flex px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-white/5 text-slate-400 border border-slate-200 dark:border-white/5 font-black uppercase tracking-widest">PROD</span>
             </div>
