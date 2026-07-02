@@ -332,20 +332,27 @@
                     </div>
 
                     <!-- HARDWARE FILTERS (Only visible on Hardware Tab) -->
-                    <div class="flex items-center gap-2 w-full lg:w-auto" x-show="currentTab === 'hardware'" x-cloak>
-                        <div class="relative flex-1 sm:w-36">
+                    <div class="flex items-center flex-wrap gap-2 w-full lg:w-auto" x-show="currentTab === 'hardware'" x-cloak>
+                        <div class="relative flex-1 min-w-[110px] sm:w-32">
                             <select x-model="filterType" @change="haptic('light')" class="w-full pl-3 pr-8 py-2 bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl text-xs font-bold focus:ring-2 focus:ring-brand/30 outline-none cursor-pointer appearance-none dark:text-white truncate shadow-sm">
                                 <option value="">🖥️ All Types</option>
                                 <template x-for="type in uniqueTypes" :key="type"><option :value="type" x-text="getDeviceEmoji(type) + '  ' + type"></option></template>
                             </select>
                         </div>
-                        <div class="relative flex-1 sm:w-32">
+                        <div class="relative flex-1 min-w-[100px] sm:w-28">
                             <select x-model="filterStatus" @change="haptic('light')" class="w-full pl-3 pr-8 py-2 bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl text-xs font-bold focus:ring-2 focus:ring-brand/30 outline-none cursor-pointer appearance-none dark:text-white shadow-sm">
                                 <option value="">📊 Status</option>
                                 <option value="In Use">🟢 In Use</option>
                                 <option value="Spare">📦 Spare</option>
                                 <option value="Decommissioned">🔴 Decom</option>
                                 <option value="In Repair">🔧 Repair</option>
+                            </select>
+                        </div>
+                        <!-- NAYA LOCATION FILTER -->
+                        <div class="relative flex-1 min-w-[120px] sm:w-32">
+                            <select x-model="filterLoc" @change="haptic('light')" class="w-full pl-3 pr-8 py-2 bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl text-xs font-bold focus:ring-2 focus:ring-brand/30 outline-none cursor-pointer appearance-none dark:text-white truncate shadow-sm">
+                                <option value="">📍 Location</option>
+                                <template x-for="loc in uniqueLocations" :key="loc"><option :value="loc" x-text="loc"></option></template>
                             </select>
                         </div>
                         <button @click="filterHygiene = !filterHygiene" :class="filterHygiene ? 'bg-amber-100 text-amber-700 border-amber-300 dark:bg-amber-500/20 dark:text-amber-400 dark:border-amber-500/50' : 'bg-white text-slate-500 border-slate-200 dark:bg-white/5 dark:text-slate-400 dark:border-white/10'" class="w-9 h-9 sm:w-auto sm:px-3 sm:py-2 rounded-xl border transition flex items-center justify-center shadow-sm shrink-0" title="Show Incomplete Data">
@@ -906,7 +913,8 @@
 				hideMobileKPI: false,
                 hardwareList: cachedHW, 
                 softwareList: cachedSW, 
-                searchQuery: '', mobileSearchOpen: false, filterType: '', filterStatus: '', filterHygiene: false,
+                // 🛠️ filterLoc variable yahan add kiya
+                searchQuery: '', mobileSearchOpen: false, filterType: '', filterStatus: '', filterLoc: '', filterHygiene: false,
                 isDark: false, 
                 loading: true,
                 syncing: false, submitting: false,
@@ -927,6 +935,19 @@
                     if (type === 'light') navigator.vibrate(15); 
                     else if (type === 'success') navigator.vibrate([30, 50, 30]); 
                     else if (type === 'error' || type === 'delete') navigator.vibrate([50, 50, 50, 50]); 
+                },
+				
+				 // 🛠️ filterLoc ka logic filter function me daala
+                get filteredHardware() {
+                    const q = this.searchQuery.toLowerCase().trim();
+                    return this.hardwareList.filter(a => { 
+                        const rowStr = Object.values(a).join(' ').toLowerCase(); 
+                        return rowStr.includes(q) 
+                            && (this.filterType === '' || a.DeviceType === this.filterType) 
+                            && (this.filterStatus === '' || a.Status === this.filterStatus) 
+                            && (this.filterLoc === '' || a.Location === this.filterLoc) 
+                            && (!this.filterHygiene || (!a.SerialNo || !a.IP_Address || !a.AssignedTo)); 
+                    });
                 },
 
                 async init() {
@@ -1019,6 +1040,8 @@
                 isExpiring(d) { if(!d) return false; const days = (new Date(d) - new Date())/(1000*60*60*24); return days < 30 && days > -1; },
 
                 get uniqueTypes() { const counts = {}; this.hardwareList.forEach(a => { const t = a.DeviceType; if(t) counts[t]=(counts[t]||0)+1; }); return Object.keys(counts).sort((a,b) => counts[b] - counts[a]); },
+                // 🛠️ Location list dynamically extract karne ke liye function add kiya
+                get uniqueLocations() { const locs = new Set(this.hardwareList.map(a => a.Location).filter(Boolean)); return Array.from(locs).sort(); },
                 getDeviceEmoji(type) { const map = { 'Desktop':'🖥️', 'Laptop':'💻', 'Monitor':'📺', 'Server':'🗄️', 'Switch':'🖧', 'Printer':'🖨️', 'UPS':'🔋', 'Firewall':'🛡️', 'Router':'📡', 'KVM':'⌨️' }; return map[type] || '📦'; },
                 getOSEmoji(os) { const s = String(os||'').toLowerCase(); return s.includes('win') ? '🪟' : (s.includes('mac')?'🍎':'🐧'); },
                 getStatusClass(status) { if(status === 'In Use') return 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'; if(status === 'Spare') return 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20'; if(status === 'Decommissioned') return 'bg-red-50 text-red-600 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20'; return 'bg-slate-50 text-slate-500 border-slate-200 dark:bg-white/5 dark:text-slate-400 dark:border-white/10'; },
