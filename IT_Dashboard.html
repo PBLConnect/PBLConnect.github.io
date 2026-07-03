@@ -385,40 +385,51 @@
                         </div>
                     </a>
 
+                   <!-- 🚀 IT SEC AUDIT CARD (FIXED GRID SIZE + GLOW + 2-LINE TEXT) -->
                     <a @click.prevent="haptic('light'); openAuditModal()" 
-                       class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-500 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] border"
+                       class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-indigo-50/80 to-white/80 border border-indigo-200/60 dark:from-indigo-900/10 dark:to-dark_surface/80 dark:border-indigo-800/30 dark:hover:border-indigo-400/50"
                        :class="
                             auditMeta.status === 'Overdue' 
-                            ? 'bg-red-50/90 dark:bg-red-900/30 border-red-500 ring-4 ring-red-500/30 shadow-[0_0_30px_rgba(239,68,68,0.7)] hover:shadow-[0_0_40px_rgba(239,68,68,0.9)] transform scale-[1.03] z-20' 
-                            : (auditAlert && auditAlert.urgency === 'Warning' 
-                                ? 'bg-gradient-to-br from-amber-50 to-white dark:from-amber-900/20 dark:to-dark_surface/80 border-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.5)] hover:shadow-[0_0_30px_rgba(245,158,11,0.7)]' 
-                                : 'bg-gradient-to-br from-indigo-50/80 to-white/80 dark:from-indigo-900/10 dark:to-dark_surface/80 border-indigo-200/60 shadow-md hover:shadow-2xl hover:border-indigo-400/50 dark:border-indigo-800/30 dark:hover:border-indigo-400/50')
+                            ? '!border-red-400 shadow-[0_0_25px_rgba(239,68,68,0.5)]' 
+                            : (auditMeta.status !== 'Submitted'
+                                ? '!border-indigo-400 shadow-[0_0_25px_rgba(99,102,241,0.4)]'
+                                : 'shadow-md hover:shadow-2xl hover:border-indigo-400/50 opacity-60 grayscale-[0.5]')
                        ">
+                       
+                        <!-- 🌟 Pulsing Inner Glow (Visible only when open/overdue) -->
+                        <div x-show="auditMeta.status !== 'Submitted' && auditMeta.status !== 'Overdue'" class="absolute -inset-4 bg-indigo-400/20 blur-2xl animate-pulse pointer-events-none" x-cloak></div>
+                        <div x-show="auditMeta.status === 'Overdue'" class="absolute -inset-4 bg-red-400/20 blur-2xl animate-pulse pointer-events-none" x-cloak></div>
                         
-                        <i class="fa-solid fa-shield-halved absolute -bottom-4 -right-3 text-7xl sm:text-9xl group-hover:scale-110 transition-transform duration-500"
-                           :class="auditMeta.status === 'Overdue' ? 'text-red-500/20 dark:text-red-500/10' : (auditAlert && auditAlert.urgency === 'Warning' ? 'text-amber-500/20 dark:text-amber-500/10' : 'text-indigo-500/20 dark:text-indigo-500/10')"></i>
+                        <!-- Watermark Icon -->
+                        <i class="fa-solid fa-shield-halved absolute -bottom-4 -right-3 text-7xl sm:text-9xl group-hover:scale-110 transition-transform duration-500 text-indigo-500/20 dark:text-indigo-500/10"
+                           :class="auditMeta.status === 'Overdue' ? '!text-red-500/20' : ''"></i>
                         
+                        <!-- Top Row (Icon & Title) -->
                         <div class="flex items-center justify-between relative z-10 mb-2">
                             <div class="flex items-center gap-2">
-                                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-[12px] shrink-0 border transition-colors duration-300"
-                                     :class="auditMeta.status === 'Overdue' ? 'text-red-500 border-red-200 dark:border-red-500/30' : (auditAlert && auditAlert.urgency === 'Warning' ? 'text-amber-500 border-amber-200 dark:border-amber-500/30' : 'text-indigo-500 border-indigo-100 dark:border-white/5')">
+                                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-[12px] shrink-0 border border-indigo-100 dark:border-white/5 text-indigo-500 transition-colors duration-300"
+                                     :class="auditMeta.status === 'Overdue' ? '!border-red-200 !text-red-500' : ''">
                                     <i class="fa-solid" :class="auditMeta.status === 'Overdue' ? 'fa-triangle-exclamation animate-pulse' : 'fa-user-shield'"></i>
                                 </div>
-                                <span class="hidden sm:inline-block text-[11px] font-black uppercase tracking-widest leading-none transition-colors duration-300"
-                                      :class="auditMeta.status === 'Overdue' ? 'text-red-600 dark:text-red-400' : (auditAlert && auditAlert.urgency === 'Warning' ? 'text-amber-600 dark:text-amber-400' : 'text-indigo-600 dark:text-indigo-400')">Security</span>
+                                <span class="hidden sm:inline-block text-[11px] font-black uppercase tracking-widest leading-none text-indigo-600 dark:text-indigo-400"
+                                      :class="auditMeta.status === 'Overdue' ? '!text-red-600 dark:!text-red-400' : ''">Security</span>
                             </div>
                             
-                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl flex items-center justify-center transition-all duration-300 shrink-0"
-                                 :class="auditMeta.status === 'Overdue' ? 'bg-red-100/50 dark:bg-red-900/30 text-red-500 group-hover:bg-red-500 group-hover:text-white' : (auditAlert && auditAlert.urgency === 'Warning' ? 'bg-amber-100/50 dark:bg-amber-900/30 text-amber-500 group-hover:bg-amber-500 group-hover:text-white' : 'bg-indigo-100/50 dark:bg-indigo-900/30 text-indigo-500 group-hover:bg-indigo-500 group-hover:text-white')">
+                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-indigo-100/50 dark:bg-indigo-900/30 text-indigo-500 flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-all duration-300 shrink-0"
+                                 :class="auditMeta.status === 'Overdue' ? '!bg-red-100/50 !text-red-500 group-hover:!bg-red-500 group-hover:!text-white' : ''">
                                 <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i>
                             </div>
                         </div>
                         
+                        <!-- Bottom Row (Text) -->
                         <div class="relative z-10 mt-auto">
                             <h3 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">IT Sec Audit</h3>
-                            <p class="text-[11px] sm:text-[13px] font-bold mt-1 truncate transition-colors duration-300">
-								<span x-text="auditMeta.status === 'Overdue' ? 'Action Required 🚨' : (auditMeta.status === 'Draft' ? 'In Progress 📝' : (auditMeta.status === 'Submitted' ? 'Completed ✅' : 'Audit Open 🛡️'))"></span>
-							</p>
+                            
+                            <!-- Tightly stacked 2 lines to prevent layout shift -->
+                            <div class="mt-1 flex flex-col gap-0.5">
+                                <span class="text-[11px] sm:text-[13px] font-bold truncate transition-colors duration-300 text-slate-500 dark:text-slate-400 leading-tight" x-text="auditMeta.status === 'Overdue' ? 'Action Required 🚨' : (auditMeta.status === 'Draft' ? 'In Progress 📝' : (auditMeta.status === 'Submitted' ? 'Completed ✅' : 'Audit Open 🛡️'))"></span>
+                                <span x-show="auditMeta.status !== 'Submitted'" x-cloak class="font-mono text-[8.5px] sm:text-[9.5px] font-bold text-slate-400 dark:text-slate-500 truncate leading-none" x-text="auditMeta.cycle"></span>
+                            </div>
                         </div>
                     </a>
 
@@ -689,6 +700,116 @@
     </footer>
 
     <!-- MODALS -->
+
+    <!-- 🛡️ IT SEC AUDIT MODAL (Restored) -->
+    <div x-show="showAuditModal" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 sm:p-6" x-transition.opacity @click.self="if(!auditLoading) showAuditModal = false">
+        <div class="bg-slate-50 dark:bg-dark_surface w-full max-w-4xl rounded-[2rem] shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden flex flex-col max-h-[90vh]">
+            
+            <!-- Modal Header -->
+            <div class="p-5 sm:p-6 border-b border-slate-200 dark:border-white/10 flex justify-between items-center shrink-0 bg-white dark:bg-black/20">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-500/30 text-xl shrink-0">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-heading font-black text-lg sm:text-xl text-slate-800 dark:text-white leading-tight">Security & Compliance Audit</h3>
+                        <p class="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-indigo-500 mt-0.5" x-text="auditMeta.cycle"></p>
+                    </div>
+                </div>
+                <button @click="showAuditModal = false" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-400 hover:text-red-500 transition shrink-0"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <!-- Modal Body (Scrollable Checklist) -->
+            <div class="flex-1 overflow-y-auto custom-scroll p-4 sm:p-6 bg-slate-50/50 dark:bg-transparent">
+                
+                <!-- Lock Warning -->
+                <div x-show="isAuditLocked" class="mb-5 bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-xl text-xs font-bold flex items-start gap-2 shadow-sm dark:bg-amber-500/10 dark:border-amber-500/30 dark:text-amber-400">
+                    <i class="fa-solid fa-lock mt-0.5 shrink-0"></i>
+                    <span x-text="auditLockReason"></span>
+                </div>
+
+                <div class="space-y-4">
+                    <template x-for="(pt, index) in auditForm.points" :key="pt.id">
+                        <div class="bg-white dark:bg-black/20 p-4 sm:p-5 rounded-2xl border shadow-sm transition-all" :class="pt.status === 'Fail' ? 'border-red-200 dark:border-red-500/30 bg-red-50/30 dark:bg-red-900/10' : 'border-slate-200 dark:border-white/5'">
+                            <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                                <div class="flex-1">
+                                    <h4 class="text-sm font-black text-slate-800 dark:text-white" x-text="pt.title"></h4>
+                                    <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-1" x-text="pt.desc"></p>
+                                </div>
+                                
+                                <div class="w-full md:w-56 shrink-0">
+                                    <!-- 🚀 PASS / FAIL / NA BUTTONS -->
+                                    <div class="audit-radio-group">
+                                        <label class="radio pass">
+                                            <input type="radio" :name="'status_'+pt.id" value="Pass" x-model="pt.status" @click="pt.status === 'Pass' ? setTimeout(() => pt.status = '', 0) : null" :disabled="isAuditLocked">
+                                            <span class="name">PASS</span>
+                                        </label>
+                                        <label class="radio fail">
+                                            <input type="radio" :name="'status_'+pt.id" value="Fail" x-model="pt.status" @click="pt.status === 'Fail' ? setTimeout(() => { pt.status = ''; pt.severity = ''; pt.remarks = ''; }, 0) : null" :disabled="isAuditLocked">
+                                            <span class="name">FAIL</span>
+                                        </label>
+                                        <label class="radio na">
+                                            <input type="radio" :name="'status_'+pt.id" value="N/A" x-model="pt.status" @click="pt.status === 'N/A' ? setTimeout(() => pt.status = '', 0) : null" :disabled="isAuditLocked">
+                                            <span class="name">N/A</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Input Fields (Remarks & Severity) -->
+                            <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <div :class="pt.status === 'Fail' ? 'md:col-span-2' : 'md:col-span-3'">
+                                    <input type="text" x-model="pt.remarks" placeholder="Auditor Remarks / Evidence..." class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2 text-xs font-medium outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition dark:text-white shadow-inner" :disabled="isAuditLocked">
+                                </div>
+                                
+                                <!-- 🚀 MODERN RISK SEVERITY BUTTONS -->
+                                <div x-show="pt.status === 'Fail'" x-cloak class="w-full mt-2 md:mt-0 flex flex-col justify-center">
+                                    <div class="audit-radio-group !bg-red-50 dark:!bg-red-900/10 border border-red-200 dark:border-red-500/30">
+                                        <label class="radio" style="--c-main: #eab308; --c-dark: #ca8a04; --c-light: #fef08a;" title="Low Risk">
+                                            <input type="radio" :name="'sev_'+pt.id" value="Low" x-model="pt.severity" @click="pt.severity === 'Low' ? setTimeout(() => pt.severity = '', 0) : null" :disabled="isAuditLocked">
+                                            <span class="name !text-[10px]">LOW</span>
+                                        </label>
+                                        <label class="radio" style="--c-main: #f97316; --c-dark: #ea580c; --c-light: #fed7aa;" title="Medium Risk">
+                                            <input type="radio" :name="'sev_'+pt.id" value="Medium" x-model="pt.severity" @click="pt.severity === 'Medium' ? setTimeout(() => pt.severity = '', 0) : null" :disabled="isAuditLocked">
+                                            <span class="name !text-[10px]">MED</span>
+                                        </label>
+                                        <label class="radio" style="--c-main: #ef4444; --c-dark: #dc2626; --c-light: #fecaca;" title="High Risk">
+                                            <input type="radio" :name="'sev_'+pt.id" value="High" x-model="pt.severity" @click="pt.severity === 'High' ? setTimeout(() => pt.severity = '', 0) : null" :disabled="isAuditLocked">
+                                            <span class="name !text-[10px]">HIGH</span>
+                                        </label>
+                                        <label class="radio" style="--c-main: #9f1239; --c-dark: #881337; --c-light: #fda4af;" title="Critical Risk">
+                                            <input type="radio" :name="'sev_'+pt.id" value="Critical" x-model="pt.severity" @click="pt.severity === 'Critical' ? setTimeout(() => pt.severity = '', 0) : null" :disabled="isAuditLocked">
+                                            <span class="name !text-[10px]">CRIT</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-4 sm:p-5 border-t border-slate-200 dark:border-white/10 bg-white dark:bg-black/20 flex flex-col sm:flex-row justify-between items-center gap-4 shrink-0 rounded-b-[2rem]">
+                <div class="relative w-full sm:w-64 shrink-0">
+                    <i class="fa-solid fa-key absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="password" x-model="auditSecret" placeholder="Admin Key" class="w-full pl-8 pr-3 py-2.5 sm:py-3 bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl text-xs font-mono font-bold outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition shadow-sm" :disabled="isAuditLocked">
+                </div>
+                
+                <div class="flex items-center gap-2.5 w-full sm:w-auto">
+                    <button @click="submitAudit('Draft')" class="flex-1 sm:flex-none px-5 py-2.5 sm:py-3 rounded-xl text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition shadow-sm dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10" :disabled="auditLoading || isAuditLocked">
+                        <i class="fa-solid fa-save mr-1 opacity-70"></i> Save Draft
+                    </button>
+                    <button @click="submitAudit('Submitted')" class="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 sm:py-3 rounded-xl text-xs font-black uppercase tracking-wider shadow-[0_5px_15px_-3px_rgba(79,70,229,0.4)] transition active:scale-95 flex items-center justify-center gap-2" :disabled="auditLoading || isAuditLocked">
+                        <span x-show="!auditLoading">Final Submit</span>
+                        <span x-show="auditLoading"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ⬇️ Yahan se baaki modals continued hain... -->
     <div x-show="showLogoutModal" x-cloak class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4" x-transition.opacity>
         <div class="bg-white dark:bg-dark_surface w-full max-w-sm rounded-3xl shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden" @click.away="showLogoutModal = false">
             <div class="p-6 text-center">
@@ -1451,14 +1572,29 @@
                     const month = monthNames[d.getMonth()];
                     const year = d.getFullYear();
 
+                    let deadlineDate;
                     if (date <= 14) {
-                        this.auditMeta.cycle = `Cycle 01 (${month} ${year})`;
+                        this.auditMeta.cycle = `Cycle 01 (1st to 7th ${month})`;
                         this.auditMeta.auditor = "Anil Singh";
                         this.auditMeta.status = date > 7 ? 'Overdue' : 'Active';
+                        deadlineDate = new Date(year, d.getMonth(), 7, 23, 59, 59);
                     } else {
-                        this.auditMeta.cycle = `Cycle 02 (${month} ${year})`;
+                        this.auditMeta.cycle = `Cycle 02 (15th to 21st ${month})`;
                         this.auditMeta.auditor = "Ashok Singh";
                         this.auditMeta.status = date > 21 ? 'Overdue' : 'Active';
+                        deadlineDate = new Date(year, d.getMonth(), 21, 23, 59, 59);
+                    }
+
+                    // ⏳ Calculate Days Left
+                    const diffTime = deadlineDate - d;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    
+                    if (diffDays < 0) {
+                        this.auditMeta.deadlineText = `Overdue by ${Math.abs(diffDays)} days 🚨`;
+                    } else if (diffDays === 0) {
+                        this.auditMeta.deadlineText = `Last day to submit! ⏳`;
+                    } else {
+                        this.auditMeta.deadlineText = `${diffDays} days remaining ⏳`;
                     }
                 },
 
@@ -1474,6 +1610,9 @@
                         if (current) {
                             this.auditMeta.status = current.status;
                             this.auditMeta.date = current.date;
+                            if (current.status === 'Submitted') {
+                                this.auditMeta.deadlineText = "Audit Completed 🎉";
+                            }
                             const parsedDetails = JSON.parse(current.details);
                             this.auditForm.points = Object.values(parsedDetails).map(p => ({ 
                                 ...p, 
