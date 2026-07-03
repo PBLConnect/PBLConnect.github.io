@@ -385,20 +385,20 @@
                         </div>
                     </a>
 
-                   <!-- 🚀 IT SEC AUDIT CARD (FIXED GRID SIZE + GLOW + 2-LINE TEXT) -->
+                   <!-- 🚀 IT SEC AUDIT CARD (ENHANCED VISIBLE GLOW & NEON EDGE) -->
                     <a @click.prevent="haptic('light'); openAuditModal()" 
                        class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-indigo-50/80 to-white/80 border border-indigo-200/60 dark:from-indigo-900/10 dark:to-dark_surface/80 dark:border-indigo-800/30 dark:hover:border-indigo-400/50"
                        :class="
                             auditMeta.status === 'Overdue' 
-                            ? '!border-red-400 shadow-[0_0_25px_rgba(239,68,68,0.5)]' 
+                            ? '!border-red-500 shadow-[0_0_30px_rgba(239,68,68,0.65)] ring-1 ring-red-400/50' 
                             : (auditMeta.status !== 'Submitted'
-                                ? '!border-indigo-400 shadow-[0_0_25px_rgba(99,102,241,0.4)]'
+                                ? '!border-indigo-500 shadow-[0_0_30px_rgba(99,102,241,0.6)] ring-1 ring-indigo-400/50'
                                 : 'shadow-md hover:shadow-2xl hover:border-indigo-400/50 opacity-60 grayscale-[0.5]')
                        ">
                        
-                        <!-- 🌟 Pulsing Inner Glow (Visible only when open/overdue) -->
-                        <div x-show="auditMeta.status !== 'Submitted' && auditMeta.status !== 'Overdue'" class="absolute -inset-4 bg-indigo-400/20 blur-2xl animate-pulse pointer-events-none" x-cloak></div>
-                        <div x-show="auditMeta.status === 'Overdue'" class="absolute -inset-4 bg-red-400/20 blur-2xl animate-pulse pointer-events-none" x-cloak></div>
+                        <!-- 🌟 Enhanced Pulsing Inner Glow (Tighter blur, higher opacity) -->
+                        <div x-show="auditMeta.status !== 'Submitted' && auditMeta.status !== 'Overdue'" class="absolute -inset-2 bg-indigo-500/35 blur-xl animate-pulse pointer-events-none" x-cloak></div>
+                        <div x-show="auditMeta.status === 'Overdue'" class="absolute -inset-2 bg-red-500/35 blur-xl animate-pulse pointer-events-none" x-cloak></div>
                         
                         <!-- Watermark Icon -->
                         <i class="fa-solid fa-shield-halved absolute -bottom-4 -right-3 text-7xl sm:text-9xl group-hover:scale-110 transition-transform duration-500 text-indigo-500/20 dark:text-indigo-500/10"
@@ -428,7 +428,7 @@
                             <!-- Tightly stacked 2 lines to prevent layout shift -->
                             <div class="mt-1 flex flex-col gap-0.5">
                                 <span class="text-[11px] sm:text-[13px] font-bold truncate transition-colors duration-300 text-slate-500 dark:text-slate-400 leading-tight" x-text="auditMeta.status === 'Overdue' ? 'Action Required 🚨' : (auditMeta.status === 'Draft' ? 'In Progress 📝' : (auditMeta.status === 'Submitted' ? 'Completed ✅' : 'Audit Open 🛡️'))"></span>
-                                <span x-show="auditMeta.status !== 'Submitted'" x-cloak class="font-mono text-[8.5px] sm:text-[9.5px] font-bold text-slate-400 dark:text-slate-500 truncate leading-none" x-text="auditMeta.cycle"></span>
+                                <span x-show="auditMeta.status !== 'Submitted'" x-cloak class="font-mono text-[8.5px] sm:text-[9.5px] font-black text-slate-800 dark:text-white drop-shadow-md truncate leading-none" x-text="auditMeta.cycle"></span>
                             </div>
                         </div>
                     </a>
