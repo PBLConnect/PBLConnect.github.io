@@ -343,15 +343,15 @@
                                 <div class="bg-white dark:bg-dark_surface border border-slate-200 dark:border-white/10 rounded-xl p-3 shadow-sm flex flex-col relative overflow-hidden transition-all hover:shadow-md cursor-pointer" @click="editLog(log)">
                                     
                                     <!-- Left Color Bar -->
-                                    <div class="absolute left-0 top-0 bottom-0 w-1.5" :class="log.status === 'Resolved' ? 'bg-emerald-500' : (log.status === 'AMC Logged' ? 'bg-blue-500' : 'bg-red-500')"></div>
+                                    <div class="absolute left-0 top-0 bottom-0 w-1.5" :class="(log.status || '').includes('Resolved') ? 'bg-emerald-500' : ((log.status || '').includes('AMC') ? 'bg-blue-500' : 'bg-red-500')"></div>
                                     
                                     <!-- Top Row: Asset ID & Status Badge -->
                                     <div class="flex justify-between items-center pl-2.5 mb-2">
                                         <h4 class="font-black text-sm text-brand dark:text-brand_glow leading-none truncate" x-text="log.asset"></h4>
                                         <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest border shrink-0 shadow-sm" 
-                                              :class="log.status === 'Resolved' ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10' : (log.status === 'Part Ordered' ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/10' : 'bg-red-50 text-red-600 border-red-200 dark:bg-red-500/10')">
-                                            <span x-text="log.status"></span>
-                                        </span>
+										  :class="(log.status || '').includes('Resolved') ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10' : ((log.status || '').includes('AMC') ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/10' : 'bg-red-50 text-red-600 border-red-200 dark:bg-red-500/10')">
+										<span x-text="(log.status || '').replace(/✅|🕒|🧰/g, '').trim()"></span>
+									</span>
                                     </div>
 
                                     <!-- Meta Details Row -->
@@ -452,9 +452,9 @@
                                         <!-- 6. Status Badge -->
                                         <td class="px-4 py-3 text-center align-middle">
                                             <span class="px-2 py-1 rounded-md text-[9px] font-black uppercase inline-flex items-center gap-1 border shadow-sm truncate max-w-full" 
-                                                  :class="log.status === 'Resolved' ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30' : (log.status === 'Part Ordered' ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/30' : 'bg-red-50 text-red-600 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/30')">
-                                                <i class="fa-solid text-[8px]" :class="log.status === 'Resolved' ? 'fa-check' : (log.status === 'AMC Logged' ? 'fa-toolbox' : 'fa-clock')"></i>
-                                                <span x-text="log.status"></span>
+                                                  :class="(log.status || '').includes('Resolved') ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30' : ((log.status || '').includes('AMC') ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/30' : 'bg-red-50 text-red-600 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/30')">
+                                                <i class="fa-solid text-[8px]" :class="(log.status || '').includes('Resolved') ? 'fa-check' : ((log.status || '').includes('AMC') ? 'fa-toolbox' : 'fa-clock')"></i>
+                                                <span x-text="(log.status || '').replace(/✅|🕒|🧰/g, '').trim()"></span>
                                             </span>
                                         </td>
 
@@ -838,8 +838,8 @@
                 },
 
                 editLog(log) {
-				this.haptic('light'); 
-				this.isLocked = (log.status === 'Resolved'); // 🔥 Check karega ki lock karna hai ya nahi
+                    this.haptic('light'); 
+                    this.isLocked = !!(log.status && log.status.includes('Resolved')); // 🔥 Safely checks for Resolved
                     
                     let matchedIssue = log.issue || '';
                     if (matchedIssue === 'LAN Port Issue') matchedIssue = '🔌 LAN Port / NIC Failure';
@@ -849,12 +849,15 @@
                     else if (matchedIssue === 'Keyboard Fault') matchedIssue = '⌨️ Keyboard Fault';
                     else if (matchedIssue === 'Mouse Issue') matchedIssue = '🖱️ Mouse Issue';
 
+                    // 🔥 Strip emojis so the dropdown binds properly!
+                    let pureStatus = (log.status || 'Pending').replace(/✅|🕒|🧰/g, '').trim();
+
                     this.form = { 
                         id: log.id, asset: log.asset, serial: log.serial, caseId: log.caseId || '', 
                         issue: matchedIssue, actionTaken: log.actionTaken || '', 
                         date: this.parseDateForInput(log.date), resolveDate: this.parseDateForInput(log.resolveDate),
-						resolveTime: log.resolveTime || '',  // 🔥 Backend se aaya hua time form field mein bind ho jayega
-						status: log.status || '🕒 Pending', secret: '' 
+                        resolveTime: log.resolveTime || '',  
+                        status: pureStatus, secret: '' 
                     };
                     this.assetSearchQuery = log.asset; 
                     this.showModal = true;
@@ -925,11 +928,11 @@
                 },
                 
                 resetForm() { 
-				this.isLocked = false; // 🔥 Naya form kholte waqt hamesha unlocked rahega
+				this.isLocked = false; 
 				this.assetSearchQuery = '';
                     const d = new Date();
                     const localToday = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-                    this.form = { id: null, asset: '', serial: '', caseId: '', issue: '', actionTaken: '', date: localToday, resolveDate: '', resolveTime: '', status: '🕒 Pending', secret: '' }; 
+                    this.form = { id: null, asset: '', serial: '', caseId: '', issue: '', actionTaken: '', date: localToday, resolveDate: '', resolveTime: '', status: 'Pending', secret: '' }; 
                 },
                 
                 formatDisplayDate(dateStr) { if (!dateStr || dateStr === 'Pending' || dateStr === 'N/A') return '-'; if (dateStr.includes('1970') || dateStr.includes('1899')) return 'Pending'; return dateStr.substring(0, 11); },
