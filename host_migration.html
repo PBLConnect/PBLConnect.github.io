@@ -454,13 +454,14 @@
                     this.submitting = true;
                     
                     const payload = {
-                        action: 'handleMigration',
-                        oldName: this.form.oldName,
-                        status: this.form.status,
-                        remarks: this.form.remarks,
-                        updatedBy: this.currentOperator,
-                        secret: this.form.secret
-                    };
+						action: 'handleMigration',
+						location: this.activeLocation, // 🛑 FIX: Ab backend ko location bhi bhejenge!
+						oldName: this.form.oldName,
+						status: this.form.status,
+						remarks: this.form.remarks,
+						updatedBy: this.currentOperator,
+						secret: this.form.secret
+					};
 
                     try {
                         const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
