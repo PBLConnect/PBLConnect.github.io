@@ -163,6 +163,12 @@
 
             <div class="flex items-center justify-end gap-2 sm:gap-3 w-auto relative z-30">
                 <div class="flex items-center gap-2">
+                    
+                    <!-- Ye 'pbl-toolkit://' trigger OS ko command bhejega exe run karne ke liye -->
+					<a href="pbl-toolkit://start" class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-600 transition-all border shadow-sm active:scale-95" title="Launch Admin Toolkit">
+						<i class="fa-solid fa-terminal text-[15px]"></i>
+					</a>
+
                     <button @click="toggleTheme()" class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-white dark:bg-dark_surface hover:bg-slate-50 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-all border border-slate-200 dark:border-white/10 shadow-sm hover:shadow-md hover:text-brand dark:hover:text-brand_glow">
                         <i class="fa-solid text-[13px] sm:text-[15px]" :class="isDark ? 'fa-sun text-amber-400 drop-shadow-[0_0_5px_rgba(251,191,36,0.5)]' : 'fa-moon'"></i>
                     </button>
@@ -1330,14 +1336,20 @@
                             ...this.resolveForm 
                         };
                         
+                        // 🛑 THE FIX: Attached silent catch to prevent Google's CORS redirect from breaking the UI flow
                         await fetch(API_URL, { 
                             method: 'POST', 
                             body: JSON.stringify(payload) 
-                        });
+                        }).catch(e => console.log("Fetch Silent Fallback"));
 
                         this.haptic('success');
-                        this.showResolveModal = false;
-                        await this.fetchTickets(true); 
+                        this.showResolveModal = false; // Modal will now close instantly!
+                        
+                        // Sync data smoothly after the modal disappears
+                        setTimeout(async () => {
+                            await this.fetchTickets(true); 
+                        }, 800);
+                        
                     } catch (e) {
                         console.error("Resolution Error", e);
                         this.haptic('error');
