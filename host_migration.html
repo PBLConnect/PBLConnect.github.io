@@ -387,26 +387,36 @@
                 },
 
                 async fetchData(forceRefresh) {
-                    if(forceRefresh) this.isSyncing = true;
-                    if(this.pcs.length === 0) this.loading = true;
-                    try {
-                        const res = await fetch(API_URL + '?action=getMigrationData');
-                        const data = await res.json();
-                        if (data.hosts) {
-                            // 🚀 FIX: डाटा आते ही Status को UPPERCASE और TRIM कर दिया ताकि फिल्टर एकदम सही काम करे
-                            this.pcs = data.hosts.map(p => ({
-                                ...p,
-                                status: String(p.status || 'PENDING').toUpperCase().trim()
-                            }));
-                        }
-                        if (forceRefresh) showToast("Database Synced!");
-                    } catch (e) { showToast("Network Error", true); }
-                    finally { this.loading = false; this.isSyncing = false; }
-                },
+				if(forceRefresh) this.isSyncing = true;
+				if(this.pcs.length === 0) this.loading = true;
+				try {
+					const res = await fetch(API_URL + '?action=getMigrationData');
+					const data = await res.json();
+					
+					if (data.hosts) {
+						this.pcs = data.hosts.map(p => ({
+							...p,
+							location: String(p.location || 'Noida').trim(), // Hardened data formatting 🛠️
+							status: String(p.status || 'PENDING').toUpperCase().trim()
+						}));
+					} else if (data.error) {
+						// Agar backend se error aayi toh user ko dikhni chahiye, chhupana nahi hai 🤨
+						showToast("DB Error: " + data.error, true);
+						console.error("Backend Error:", data.error);
+					}
+					if (forceRefresh) showToast("Database Synced!");
+					
+				} catch (e) { 
+					// Agar JSON parse fail hua toh matlab tune backend ko New Version par deploy nahi kiya hai! 🎯
+					showToast("API Failed - Re-deploy GAS Script!", true); 
+					console.error("Fetch Exception (Check Deployment):", e);
+				}
+				finally { this.loading = false; this.isSyncing = false; }
+			}, // ✅ Yahan COMMA ( , ) laga diya hai! Ab parser properly next line pe jayega.
 
-                get filteredHostnames() {
-                    return this.pcs.filter(p => p.location.toUpperCase() === this.activeLocation.toUpperCase());
-                },
+            get filteredHostnames() {
+				return this.pcs.filter(p => String(p.location || '').trim().toUpperCase() === String(this.activeLocation).trim().toUpperCase());
+			},
 
                 get displayedList() {
                     let list = this.filteredHostnames;
