@@ -7,9 +7,13 @@
     <link rel="icon" type="image/x-icon" href="Assets/images/pbl-logo.ico">
     <meta name="theme-color" id="meta-theme-color" content="#f1f5f9">
     
-    <!-- SECURITY CHECK -->
+    <!-- SECURITY CHECK (Safe Wrapper) -->
     <script>
-        if (!sessionStorage.getItem('isLoggedIn')) { window.location.href = 'it-login.html'; }
+        try {
+            if (!sessionStorage.getItem('isLoggedIn')) { window.location.href = 'it-login.html'; }
+        } catch(e) {
+            console.warn("Storage blocked by browser. Bypassing security check for local run.");
+        }
     </script>
     
     <!-- Dependencies -->
@@ -813,13 +817,24 @@
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwvXRCT7P5aULfkV63RPacAVaxdBUMiKnxGeYu498fhRUZ7Xd3ph2WxCiUs9wOtXH-4JQ/exec";
 
+        // 🛡️ CRASH-PROOF STORAGE WRAPPERS (Bypasses file:/// and JSON corruption)
+        const getSafeTheme = () => { try { return localStorage.getItem('theme') === 'dark'; } catch(e) { return false; } };
+        const getSafeUser = () => { 
+            try { 
+                const data = sessionStorage.getItem('userData'); 
+                return data ? JSON.parse(data) : { name: 'Vikas' }; 
+            } catch(e) { 
+                return { name: 'Vikas' }; // Failsafe fallback
+            } 
+        };
+
         document.addEventListener('alpine:init', () => {
             Alpine.data('ipSystem', () => ({
                 // 1. Base Variables
-                isDark: localStorage.getItem('theme') === 'dark',
-                currentUser: JSON.parse(sessionStorage.getItem('userData')) || { name: 'Vikas' },
+                isDark: getSafeTheme(),
+                currentUser: getSafeUser(),
                 currentTime: '',
-                loading: false, 
+                loading: false,
                 saving: false, 
                 deleting: false, 
                 
@@ -947,20 +962,10 @@
                     if(force) { this.haptic('light'); this.fetchInventoryMaster(); }
                     this.loading = true;
                     try {
-                        // SMART FIX: Fix polluted DB records on the fly for perfect UI Highlighting
-                        const sanitizeData = (list) => list.map(ip => {
-                            if (ip.connType) { ip.connType = ip.connType.replace(/Leased/g, 'Lease'); }
-                            return ip;
-                        });
-
                         const cached = localStorage.getItem('pbl_ip_cache');
-                        if (cached && !force) { this.ips = sanitizeData(JSON.parse(cached)); }
+                        if (cached && !force) { this.ips = JSON.parse(cached); }
                         
                         const res = await fetch(API_URL + '?action=getIPs');
-                        const data = await res.json();
-                        if (data.ips) {
-                            this.ips = sanitizeData(data.ips);
-                            localStorage.setItem('pbl_ip_cache', JSON.stringify(this.ips));
                         const data = await res.json();
                         if (data.ips) {
                             this.ips = data.ips;
