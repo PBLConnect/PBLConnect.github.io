@@ -1134,6 +1134,21 @@
             </div>
         </div>
     </div>
+	
+	<!-- 🚀 MODERN SUCCESS POPUP (ALPINE.JS DRIVEN) -->
+    <div x-show="showSuccessPopup" x-cloak class="fixed inset-0 z-[10005] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm px-4" x-transition.opacity>
+        <div class="bg-white dark:bg-dark_surface p-8 rounded-[2.5rem] shadow-2xl text-center max-w-sm w-full border border-slate-100 dark:border-dark_border transform transition-all scale-100" @click.away="showSuccessPopup = false; window.location.reload();">
+            <div class="w-20 h-20 bg-emerald-100 dark:bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-5 text-emerald-600 dark:text-emerald-400 text-4xl shadow-inner border-[4px] border-emerald-50 dark:border-emerald-900/30">
+                <i class="fa-solid fa-check-double animate-bounce"></i>
+            </div>
+            <h3 class="text-2xl font-black font-heading text-slate-800 dark:text-white mb-2">Audit Submitted!</h3>
+            <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mb-8">Genuine Audit Report Submitted and Emailed Successfully.</p>
+            <button @click="showSuccessPopup = false; window.location.reload();" 
+                    class="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-xl font-black text-sm shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 active:scale-95 transition-all flex items-center justify-center gap-2">
+                ACKNOWLEDGE <i class="fa-solid fa-arrow-right-long ml-2"></i>
+            </button>
+        </div>
+    </div>
 
     <!-- SCRIPT -->
     <script>
@@ -1160,6 +1175,7 @@
                 
                 // 🔥 NAYA: RESOLVE MODAL VARIABLES (CONTEXT AWARE)
                 showResolveModal: false,
+                showSuccessPopup: false, // 🚀 NAYA VARIABLE POPUP KE LIYE
                 resolving: false,
                 resolveForm: { ticketId: '', issue: '', desc: '', remarks: '', secret: '', isAudit: false, viewOnly: false, assignedTo: '' },
                 
@@ -1558,6 +1574,7 @@
                     this.showLogoutModal = false; this.showProfileModal = false; this.showSettingsModal = false; 
                     this.showGuide = false; this.showStaffModal = false; this.showOpenTicketsModal = false;
                     this.showNotifs = false; this.showProfile = false; this.showResolveModal = false;
+                    this.showSuccessPopup = false; // 🚀 YAHAN BHI ADD KIYA
                 },
 
                 isStaffOnline(staff) {
@@ -1684,8 +1701,12 @@
                         this.haptic('success');
                         this.auditMeta.status = submitType;
                         this.showAuditModal = false;
-                        if(submitType === 'Submitted') alert("✅ Genuine Audit Report Submitted and Emailed Successfully!");
-                        else alert("💾 Draft Saved.");
+                        
+                        if(submitType === 'Submitted') {
+                            this.showSuccessPopup = true; // 🚀 MODERN POPUP TRIGGER
+                        } else {
+                            alert("💾 Draft Saved."); // Draft ke liye alert chalega
+                        }
 
                     } catch(e) {
                         this.haptic('error'); alert("Failed to save audit.");
