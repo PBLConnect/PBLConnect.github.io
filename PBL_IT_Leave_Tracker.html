@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- 📍 Centralized Versioning -->
+    <script src="pbl-config.js"></script>
+    <title>PBL HR | Leave Tracker</title>
+    <script>document.title += " " + PBL_APP_VERSION;</script>
+
+    <link rel="icon" type="image/x-icon" href="Assets/images/pbl-logo.ico">
+    <meta name="theme-color" id="meta-theme-color" content="#f1f5f9">
+    
+    <script>try { if (!sessionStorage.getItem('isLoggedIn')) { window.location.href = 'it-login.html'; } } catch(e) {}</script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'], heading: ['Outfit', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    colors: { brand: '#3b82f6', dark_bg: '#020617', dark_surface: '#0f172a' }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        [x-cloak] { display: none !important; }
+        body { background-color: #f1f5f9; transition: background-color 0.2s; }
+        .dark body { background-color: #020617; }
+        .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark .custom-scroll::-webkit-scrollbar-thumb { background: #334155; }
+        
+        /* 📅 MODERN CALENDAR GRID */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+        .cal-day { min-height: 48px; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; border-radius: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; position: relative; padding: 4px 6px; }
+        @media(min-width: 768px) { .cal-day { min-height: 58px; } }
+        
+        .cal-day:hover:not(.empty) { border-color: #3b82f6; transform: translateY(-2px); z-index: 50; box-shadow: 0 8px 20px -5px rgba(59,130,246,0.3); }
+        .empty { opacity: 0; pointer-events: none; }
+        .day-header { font-size: 10px; text-transform: uppercase; font-weight: 900; color: #94a3b8; text-align: center; margin-bottom: 8px; letter-spacing: 1px;}
+        
+        /* 🎨 DYNAMIC DATE COLORS */
+        .bg-leave-approved { background-color: #dcfce7 !important; color: #166534 !important; border-color: #bbf7d0 !important; }
+        .dark .bg-leave-approved { background-color: rgba(22, 163, 74, 0.15) !important; color: #4ade80 !important; border-color: rgba(74, 222, 128, 0.2) !important; }
+        
+        .bg-leave-pending { background-color: #ffedd5 !important; color: #9a3412 !important; border-color: #fed7aa !important; }
+        .dark .bg-leave-pending { background-color: rgba(234, 88, 12, 0.15) !important; color: #fb923c !important; border-color: rgba(251, 146, 60, 0.2) !important; }
+        
+        .bg-holiday-govt { background-color: #eef2ff !important; color: #4f46e5 !important; border-color: #c7d2fe !important; }
+        .dark .bg-holiday-govt { background-color: rgba(79, 70, 229, 0.15) !important; color: #a5b4fc !important; border-color: rgba(99, 102, 241, 0.2) !important; }
+        
+        .bg-holiday-rest { background-color: #fffbeb !important; color: #d97706 !important; border-color: #fde68a !important; }
+        .dark .bg-holiday-rest { background-color: rgba(245, 158, 11, 0.15) !important; color: #fcd34d !important; border-color: rgba(245, 158, 11, 0.2) !important; }
+
+        /* 🗨️ MODERN TOOLTIP */
+        .cal-day .modern-popup { visibility: hidden; opacity: 0; position: absolute; bottom: calc(100% + 12px); left: 50%; transform: translateX(-50%) translateY(10px); background: #1e293b; color: white; padding: 12px 16px; border-radius: 12px; width: max-content; min-width: 150px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.25); transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); pointer-events: none; z-index: 100; border: 1px solid rgba(255,255,255,0.1); }
+        
+        /* 📱 Fix: Tooltip sirf Desktop (mouse) pe dikhega, Mobile touch pe nahi phasega */
+        @media (hover: hover) {
+            .cal-day:hover .modern-popup { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        
+        .cal-day .modern-popup::after { content: ''; position: absolute; top: 100%; left: 50%; margin-left: -6px; border-width: 6px; border-style: solid; border-color: #1e293b transparent transparent transparent; }
+
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #3b82f6; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+
+<body class="text-slate-800 dark:text-slate-200 h-[100dvh] flex flex-col overflow-hidden selection:bg-brand selection:text-white" x-data="leaveSystem()">
+
+    <!-- HEADER (Ultra-Modern Redesign) -->
+    <header class="bg-white/80 dark:bg-[#020617]/80 backdrop-blur-2xl border-b border-slate-200/80 dark:border-white/5 flex-shrink-0 h-16 sm:h-20 z-40">
+        <div class="max-w-[1920px] mx-auto px-4 sm:px-6 h-full flex justify-between items-center">
+            
+            <div class="flex items-center gap-3 sm:gap-4 shrink-0">
+                <a href="IT_Dashboard.html" @click="haptic('light')" class="group flex items-center transition-transform active:scale-95" title="Return to IT Dashboard">
+                    <div class="relative h-9 sm:h-11 w-auto flex items-center">
+                        <img src="pbl-logo.png" alt="PBL Logo" class="h-full w-auto object-contain drop-shadow-md transition-transform group-hover:scale-105" @error="$el.style.display='none'; $refs.fbLogo.style.display='flex'">
+                        <div x-ref="fbLogo" style="display:none;" class="w-9 h-9 sm:w-11 sm:h-11 bg-gradient-to-tr from-brand to-indigo-600 text-white rounded-xl flex items-center justify-center font-black text-xl shadow-[0_0_15px_rgba(59,130,246,0.4)] group-hover:shadow-[0_0_25px_rgba(59,130,246,0.6)] transition-all">P</div>
+                    </div>
+                </a>
+                <div class="flex flex-col justify-center">
+                    <div class="flex items-center gap-2 mb-0.5">
+                        <span class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/30 dark:text-emerald-400 font-mono font-black text-[9px] leading-none shadow-sm" x-text="PBL_APP_VERSION"></span>
+                        <span class="hidden sm:inline-block text-[9px] font-black text-slate-400 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-md">HR OPERATIONS</span>
+                    </div>
+                    <h2 class="font-heading font-black text-lg sm:text-2xl text-slate-800 dark:text-white leading-tight tracking-tight mt-0.5">Leave<span class="text-emerald-500">Tracker</span></h2>
+                </div>
+            </div>
+
+            <!-- CENTER: Ultra-Minimal Clock & Shift Capsule -->
+            <div class="hidden lg:flex items-center justify-center flex-1 z-20 px-2 min-w-0 transition-all duration-300">
+                <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl p-1 rounded-full border border-slate-200 dark:border-white/10 flex items-center shadow-sm hover:shadow-md transition-all">
+                    <div class="flex items-center gap-2 px-3 py-1 whitespace-nowrap shrink-0">
+                        <i class="fa-regular fa-clock text-emerald-500 text-[13px] animate-pulse"></i>
+                        <span class="text-[14px] font-mono font-black text-slate-800 dark:text-white tracking-tight leading-none" x-text="currentTime"></span>
+                    </div>
+                    <div class="w-px h-4 bg-slate-300 dark:bg-slate-600 mx-1"></div>
+                    <div class="ml-1 px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest shadow-sm border transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0"
+                         :class="myShiftInfo.isOver ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30' : 'bg-slate-50 text-emerald-600 border-emerald-200 dark:bg-black/30 dark:text-emerald-400 dark:border-emerald-800/50'">
+                         <div class="w-1.5 h-1.5 rounded-full" :class="myShiftInfo.isOver ? 'bg-red-500' : 'bg-emerald-500'"></div>
+                        <span x-text="myShiftInfo.timeLeft"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-1.5 sm:gap-4 w-auto relative z-30 shrink-0">
+                <button @click="showApplyModal = true" class="hidden sm:flex items-center gap-1.5 h-9 px-4 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white transition-all shadow-[0_4px_10px_-2px_rgba(16,185,129,0.5)] font-bold text-[11px] active:scale-95 shrink-0">
+                    <i class="fa-solid fa-calendar-plus text-[13px]"></i> <span class="tracking-wide">Apply Leave</span>
+                </button>
+                <button @click="showApplyModal = true" class="sm:hidden w-8 h-8 flex items-center justify-center rounded-full bg-emerald-500 text-white shadow-md active:scale-95 shrink-0">
+                    <i class="fa-solid fa-plus text-sm"></i>
+                </button>
+
+                <div class="hidden sm:block w-px h-6 bg-slate-200 dark:bg-white/10"></div>
+
+                <div class="flex items-center gap-0.5 sm:gap-1 bg-white dark:bg-dark_surface p-0.5 sm:p-1 rounded-full border border-slate-200 dark:border-white/10 shadow-sm shrink-0">
+                    <template x-if="isGlobal">
+                        <button @click="toggleLocation()" class="h-7 px-2.5 sm:px-3 flex items-center justify-center rounded-full bg-slate-800 text-white dark:bg-white dark:text-slate-900 shadow-sm transition-transform active:scale-95 gap-1 font-bold text-[9px] sm:text-[10px]">
+                            <i class="fa-solid fa-location-dot"></i> <span x-text="currentLocation"></span>
+                        </button>
+                    </template>
+                    <template x-if="!isGlobal">
+                        <div class="h-7 px-2.5 sm:px-3 flex items-center justify-center rounded-full bg-slate-100 dark:bg-black/30 text-slate-500 dark:text-slate-400 gap-1 font-bold text-[9px] sm:text-[10px] cursor-default">
+                            <i class="fa-solid fa-location-dot opacity-70"></i> <span x-text="currentLocation"></span>
+                        </div>
+                    </template>
+                    <button @click="toggleTheme()" class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors">
+                        <i class="fa-solid text-[12px] sm:text-[13px]" :class="isDark ? 'fa-sun text-amber-400' : 'fa-moon'"></i>
+                    </button>
+                </div>
+
+                <div class="hidden sm:block w-px h-6 bg-slate-200 dark:bg-white/10 mx-0.5 sm:mx-1"></div>
+
+                <div class="relative shrink-0" @click.outside="showProfile = false">
+                    <div @click="showProfile = !showProfile" class="flex items-center gap-1.5 sm:gap-2 cursor-pointer group rounded-xl p-0 sm:p-1 sm:pr-2 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white text-[11px] sm:text-xs font-black shadow-md border border-white/20 relative shrink-0">
+                            <span x-text="userInitials"></span>
+                            <div class="absolute -bottom-1 -right-1 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-emerald-500 border-2 border-white dark:border-dark_surface rounded-full shadow-sm"></div>
+                        </div>
+                        
+                        <!-- ✅ FIX: Desktop pe space badha di hai aur truncation hata diya hai -->
+                        <div class="hidden sm:flex flex-col text-left max-w-[150px] lg:max-w-[350px] xl:max-w-[400px] min-w-0">
+                            <span class="text-[13px] font-bold text-slate-800 dark:text-white leading-none truncate" x-text="user.name"></span>
+                            <span class="text-[9px] text-slate-500 dark:text-slate-400 font-bold truncate lg:text-clip lg:overflow-visible lg:whitespace-nowrap uppercase tracking-widest mt-1" x-text="user.role || 'IT Operations'" :title="user.role"></span>
+                        </div>
+                        
+                        <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 group-hover:text-emerald-500 transition-transform shrink-0 ml-1 hidden sm:block" :class="showProfile ? 'rotate-180' : ''"></i>
+                    </div>
+                    
+                    <div x-show="showProfile" x-transition.origin.top.right class="absolute right-0 top-full mt-2 w-48 bg-white/95 dark:bg-dark_surface/95 backdrop-blur-xl rounded-2xl shadow-xl border border-slate-200 dark:border-dark_border z-[100] overflow-hidden" style="display: none;">
+                        <div class="p-2 space-y-1">
+                            <a href="IT_Dashboard.html" class="w-full text-left flex items-center gap-3 px-4 py-2.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-500/10 dark:hover:text-emerald-400 rounded-xl transition"><i class="fa-solid fa-gauge opacity-70"></i> IT Dashboard</a>
+                            <div class="h-px bg-slate-100 dark:bg-white/10 my-1"></div>
+                            <button onclick="sessionStorage.clear(); window.location.href='it-login.html';" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition text-left"><i class="fa-solid fa-arrow-right-from-bracket opacity-70"></i> Secure Logout</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto lg:overflow-hidden flex flex-col p-4 sm:p-6 bg-slate-50/50 dark:bg-[#020617] custom-scroll relative">
+        <div class="max-w-[1920px] w-full mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:flex-1 lg:min-h-0 pb-6 lg:pb-0">
+
+            <!-- 🟩 LEFT COLUMN -->
+            <div class="lg:col-span-2 flex flex-col gap-4 sm:gap-6 lg:min-h-0">
+                
+                <!-- WALLET CARDS -->
+                <div class="grid grid-cols-3 gap-3 sm:gap-4 shrink-0">
+                    <div @click="openPolicy('CL')" class="bg-white dark:bg-dark_surface p-3 sm:p-5 rounded-[1.5rem] shadow-sm border border-emerald-100 dark:border-emerald-900/30 flex flex-col relative overflow-hidden transition hover:-translate-y-1 hover:shadow-md cursor-pointer active:scale-95 group">
+                        <div class="absolute -right-4 -top-4 text-5xl sm:text-7xl text-emerald-500 opacity-5 group-hover:scale-110 transition-transform duration-500"><i class="fa-solid fa-mug-hot"></i></div>
+                        <span class="text-[8px] sm:text-[11px] font-black uppercase text-emerald-600 dark:text-emerald-400 tracking-tight sm:tracking-widest mb-1 leading-tight whitespace-normal break-words line-clamp-2 sm:truncate">Casual Leave (CL)</span>
+                        <h2 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading text-slate-800 dark:text-white mb-2 sm:mb-3 leading-none mt-1"><span x-text="balance.cl"></span> <span class="text-[10px] sm:text-sm text-slate-400 font-bold">/ 7</span></h2>
+                        <div class="w-full bg-slate-100 dark:bg-black/30 h-1.5 sm:h-2 rounded-full mt-auto"><div class="bg-emerald-500 h-full rounded-full transition-all" :style="`width: ${(balance.cl/7)*100}%`"></div></div>
+                    </div>
+                    
+                    <div @click="openPolicy('ML')" class="bg-white dark:bg-dark_surface p-3 sm:p-5 rounded-[1.5rem] shadow-sm border border-rose-100 dark:border-rose-900/30 flex flex-col relative overflow-hidden transition hover:-translate-y-1 hover:shadow-md cursor-pointer active:scale-95 group">
+                        <div class="absolute -right-4 -top-4 text-5xl sm:text-7xl text-rose-500 opacity-5 group-hover:scale-110 transition-transform duration-500"><i class="fa-solid fa-briefcase-medical"></i></div>
+                        <span class="text-[8px] sm:text-[11px] font-black uppercase text-rose-600 dark:text-rose-400 tracking-tight sm:tracking-widest mb-1 leading-tight whitespace-normal break-words line-clamp-2 sm:truncate">Sick Leave (ML)</span>
+                        <h2 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading text-slate-800 dark:text-white mb-2 sm:mb-3 leading-none mt-1"><span x-text="balance.ml"></span> <span class="text-[10px] sm:text-sm text-slate-400 font-bold">/ 7</span></h2>
+                        <div class="w-full bg-slate-100 dark:bg-black/30 h-1.5 sm:h-2 rounded-full mt-auto"><div class="bg-rose-500 h-full rounded-full transition-all" :style="`width: ${(balance.ml/7)*100}%`"></div></div>
+                    </div>
+
+                    <div @click="openPolicy('PL')" class="bg-white dark:bg-dark_surface p-3 sm:p-5 rounded-[1.5rem] shadow-sm border border-blue-100 dark:border-blue-900/30 flex flex-col relative overflow-hidden transition hover:-translate-y-1 hover:shadow-md cursor-pointer active:scale-95 group">
+                        <div class="absolute -right-4 -top-4 text-5xl sm:text-7xl text-blue-500 opacity-5 group-hover:scale-110 transition-transform duration-500"><i class="fa-solid fa-plane-departure"></i></div>
+                        <span class="text-[8px] sm:text-[11px] font-black uppercase text-blue-600 dark:text-blue-400 tracking-tight sm:tracking-widest mb-1 leading-tight whitespace-normal break-words line-clamp-2 sm:truncate">Privilege Leave (PL)</span>
+                        <h2 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading text-slate-800 dark:text-white mb-2 sm:mb-3 leading-none mt-1"><span x-text="balance.pl"></span> <span class="text-[10px] sm:text-sm text-slate-400 font-bold">/ 18</span></h2>
+                        <div class="w-full bg-slate-100 dark:bg-black/30 h-1.5 sm:h-2 rounded-full mt-auto"><div class="bg-blue-500 h-full rounded-full transition-all" :style="`width: ${(balance.pl/18)*100}%`"></div></div>
+                    </div>
+                </div>
+
+                <!-- HOLIDAY SCHEDULE -->
+                <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl p-5 sm:p-6 rounded-[2rem] shadow-sm border border-slate-200 dark:border-dark_border flex flex-col flex-1 min-h-[350px] lg:min-h-0 relative z-10">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 shrink-0">
+                        <h3 class="text-xl sm:text-2xl font-black font-heading text-slate-800 dark:text-white">Holiday Schedule</h3>
+                        <div class="flex bg-slate-100 dark:bg-black/30 p-1 rounded-xl border border-slate-200 dark:border-white/5 shadow-inner">
+                            <button @click="viewMode = 'list'" class="px-4 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-2" :class="viewMode === 'list' ? 'bg-white dark:bg-dark_surface text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'">
+                                <i class="fa-solid fa-list-ul"></i> List
+                            </button>
+                            <button @click="viewMode = 'calendar'" class="px-4 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-2" :class="viewMode === 'calendar' ? 'bg-white dark:bg-dark_surface text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'">
+                                <i class="fa-regular fa-calendar"></i> Calendar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 📜 LIST VIEW -->
+                    <div x-show="viewMode === 'list'" x-cloak class="flex-1 overflow-y-auto custom-scroll pr-2 pb-4">
+                        <template x-for="group in groupedHolidays" :key="group.monthYear">
+                            <div class="mb-6">
+                                <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-3 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-2">
+                                    <i class="fa-regular fa-calendar"></i> <span x-text="group.monthYear"></span>
+                                </h4>
+                                <div class="space-y-3">
+                                    <template x-for="hol in group.items" :key="hol.date">
+                                        <div class="bg-white dark:bg-black/20 p-3 sm:p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5 flex items-center gap-4 transition hover:shadow-md hover:-translate-y-0.5 relative overflow-hidden">
+                                            <div class="absolute left-0 top-0 bottom-0 w-1.5" :class="hol.type === 'Govt' ? 'bg-indigo-500' : 'bg-amber-500'"></div>
+                                            <div class="flex flex-col items-center justify-center min-w-[50px] shrink-0 border-r border-slate-100 dark:border-white/5 pr-4 pl-2">
+                                                <span class="text-2xl font-black leading-none text-slate-800 dark:text-white" x-text="hol.dateObj.getDate().toString().padStart(2,'0')"></span>
+                                                <span class="text-[9px] font-bold uppercase text-slate-500 mt-1" x-text="['SUN','MON','TUE','WED','THU','FRI','SAT'][hol.dateObj.getDay()]"></span>
+                                            </div>
+                                            <div class="flex-1 min-w-0">
+                                                <h4 class="text-sm sm:text-base font-bold text-slate-800 dark:text-white truncate flex items-center gap-2">
+                                                    <span x-text="hol.icon"></span> <span x-text="hol.name"></span>
+                                                </h4>
+                                            </div>
+                                            <div class="shrink-0">
+                                                <span class="px-2.5 py-1 rounded-md text-[8px] sm:text-[9px] font-black uppercase tracking-widest shadow-sm"
+                                                      :class="hol.type === 'Govt' ? 'bg-indigo-50 text-indigo-600 border border-indigo-200 dark:bg-indigo-500/10 dark:text-indigo-400 dark:border-indigo-500/30' : 'bg-amber-50 text-amber-600 border border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/30'"
+                                                      x-text="hol.type === 'Govt' ? 'Government' : 'Restricted'"></span>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- 📅 CALENDAR VIEW -->
+                    <div x-show="viewMode === 'calendar'" x-cloak class="flex flex-col h-full relative">
+                        <div class="flex justify-between items-center mb-6 px-2">
+                            <h3 class="text-lg font-black text-slate-700 dark:text-slate-300"><span x-text="monthNames[currentMonth]"></span> <span x-text="currentYear"></span></h3>
+                            <div class="flex gap-2">
+                                <button @click="changeMonth(-1)" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center hover:bg-indigo-50 dark:hover:bg-indigo-500/20 hover:text-indigo-600 dark:hover:text-indigo-400 transition active:scale-95"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                                <button @click="changeMonth(1)" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center hover:bg-indigo-50 dark:hover:bg-indigo-500/20 hover:text-indigo-600 dark:hover:text-indigo-400 transition active:scale-95"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="flex-1 pb-2 content-start w-full relative">
+                            <div class="calendar-grid mb-2 shrink-0">
+                                <template x-for="day in ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']"><div class="day-header" x-text="day"></div></template>
+                            </div>
+
+                            <div class="calendar-grid" @mouseup.window="endDrag()">
+                                <template x-for="blank in blankDays"><div class="cal-day empty"></div></template>
+                             <template x-for="d in daysInMonth" :key="d">
+    <div class="cal-day text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-black/20 group select-none transition-all duration-200"
+         :class="[
+            getDayClass(d), 
+            isDayInDragRange(d) ? 'ring-2 ring-brand !bg-brand/10 dark:!bg-brand/20 shadow-md scale-[1.03] z-40' : '',
+            (getDayData(d) && getDayData(d).type !== 'holiday') ? 'cursor-pointer hover:ring-2 hover:ring-black/20 dark:hover:ring-white/20' : ''
+         ]"
+         @mousedown="if(!getDayData(d) || getDayData(d).type === 'holiday') startDrag(d)"
+         @mouseenter="if(!getDayData(d) || getDayData(d).type === 'holiday') onDragOver(d)"
+         @mouseup="if(!getDayData(d) || getDayData(d).type === 'holiday') endDrag()"
+         @click="if(getDayData(d) && getDayData(d).type !== 'holiday') openLeaveDetails(d)">
+         
+        <span x-text="d" class="text-sm sm:text-base font-black z-10 relative pointer-events-none"></span>
+        
+        <!-- 📍 Clickable Colored Pill (Click handled by parent cell now) -->
+        <template x-if="getDayData(d) !== null">
+            <span class="text-[7px] sm:text-[8px] font-black uppercase mt-auto px-1 py-0.5 rounded shadow-sm w-full truncate text-center z-10 relative pointer-events-none transition-all" 
+                  :class="getDayData(d).type === 'holiday' ? 'bg-indigo-500/20 text-indigo-700 dark:bg-indigo-500/30 dark:text-indigo-300' : (getDayData(d).type === 'approved' ? 'bg-emerald-500/20 text-emerald-700 dark:bg-emerald-500/30 dark:text-emerald-300' : 'bg-orange-500/20 text-orange-700 dark:bg-orange-500/30 dark:text-orange-300')"
+                  x-text="getDayLabel(d)"></span>
+        </template>
+
+        <div x-show="getDayData(d) !== null" class="modern-popup">
+            <span class="block text-[9px] font-black uppercase text-slate-400 mb-1" x-text="String(d).padStart(2, '0') + ' ' + monthNames[currentMonth].substring(0,3) + ' ' + currentYear"></span>
+            <span class="block text-sm font-bold leading-tight text-white" x-text="getTooltipData(d).name"></span>
+            <span class="inline-block mt-2 px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest" :class="getDayData(d) && getDayData(d).full && getDayData(d).full.type === 'Govt' ? 'bg-indigo-500 text-white' : 'bg-amber-500 text-white'" x-text="getTooltipData(d).type"></span>
+        </div>
+    </div>
+</template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 🟨 RIGHT COLUMN -->
+            <div class="flex flex-col gap-5 sm:gap-6 lg:h-full lg:overflow-hidden">
+                
+                <!-- 💳 NEXT HOLIDAY -->
+                <div class="bg-gradient-to-br from-indigo-600 to-blue-600 rounded-[2rem] p-6 text-white relative overflow-hidden shadow-[0_15px_30px_-5px_rgba(79,70,229,0.4)] shrink-0 group hover:shadow-[0_20px_40px_-5px_rgba(79,70,229,0.5)] transition-all">
+                    <div class="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:scale-125 transition-transform duration-500"></div>
+                    <div class="absolute -bottom-10 -left-10 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
+                    
+                    <div class="flex justify-between items-start relative z-10">
+                        <div class="w-10 h-7 rounded-md bg-gradient-to-br from-amber-200 to-amber-500 border border-white/30 flex items-center justify-center relative overflow-hidden">
+                            <div class="w-full h-px bg-black/20 absolute top-1/2"></div>
+                            <div class="h-full w-px bg-black/20 absolute left-1/2"></div>
+                        </div>
+                        <span class="text-[9px] font-black uppercase tracking-widest opacity-80">Next Holiday</span>
+                    </div>
+                    
+                    <template x-if="nextHoliday">
+                        <div class="relative z-10 mt-5 flex flex-col h-[110px] justify-between">
+                            <div class="flex items-baseline gap-2">
+                                <h2 class="text-5xl font-black font-heading tracking-tighter drop-shadow-md" x-text="nextHoliday.daysLeft === 0 ? 'Now' : nextHoliday.daysLeft"></h2>
+                                <span class="text-xs font-bold uppercase tracking-widest opacity-80" x-text="nextHoliday.daysLeft === 0 ? 'Today' : (nextHoliday.daysLeft === 1 ? 'Tomorrow' : 'Days Left')"></span>
+                            </div>
+                            <div class="flex justify-between items-end mt-auto gap-4">
+                                <div class="flex-1 min-w-0">
+                                        <h4 class="font-bold text-lg leading-tight whitespace-normal break-words" x-text="(nextHoliday.icon || '🎌') + ' ' + nextHoliday.name"></h4>
+                                        <p class="text-[9px] font-bold uppercase tracking-widest opacity-70 mt-1" x-text="nextHoliday.type === 'Govt' ? 'Government' : 'Restricted'"></p>
+                                    </div>
+                                <div class="text-right shrink-0">
+                                    <p class="text-[8px] font-black uppercase tracking-widest opacity-70 mb-0.5">Date</p>
+                                    <h4 class="font-bold text-sm" x-text="formatDateShort(nextHoliday.date)"></h4>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- 🌴 LONG WEEKENDS (Ultra-Stable Context-Aware Carousel) -->
+                <div x-data="{ 
+                    lwManualIndex: null,
+                    get lwCurrentIndex() {
+                        if (this.lwManualIndex !== null) return this.lwManualIndex;
+                        if (!this.longWeekends || this.longWeekends.length === 0) return 0;
+                        let today = new Date(); today.setHours(0,0,0,0);
+                        let idx = this.longWeekends.findIndex(lw => new Date(lw.date) >= today);
+                        return idx !== -1 ? idx : 0;
+                    },
+                    lwGetTheme(name) {
+                        let n = (name || '').toLowerCase();
+                        if(n.includes('republic') || n.includes('independence') || n.includes('gandhi')) return 'from-orange-500 via-amber-500 to-emerald-600';
+                        if(n.includes('holi')) return 'from-fuchsia-500 via-rose-500 to-amber-500';
+                        if(n.includes('diwali') || n.includes('deepawali')) return 'from-amber-500 via-orange-500 to-rose-600';
+                        if(n.includes('x-mas') || n.includes('christmas')) return 'from-red-500 via-rose-600 to-emerald-700';
+                        if(n.includes('labour')) return 'from-slate-700 via-slate-800 to-slate-900';
+                        return 'from-sky-400 via-blue-500 to-indigo-600';
+                    }
+                }" class="bg-white dark:bg-dark_surface p-5 sm:p-6 rounded-[2rem] shadow-sm border border-slate-200 dark:border-dark_border flex flex-col shrink-0 relative z-10 h-[200px] transition-all hover:shadow-md">
+                    
+                    <div class="flex justify-between items-center mb-3 shrink-0">
+                        <h3 class="text-[11px] font-black uppercase tracking-widest text-sky-500 dark:text-sky-400 flex items-center gap-1.5"><i class="fa-solid fa-umbrella-beach text-sm"></i> Long Weekends</h3>
+                        <div class="flex gap-1.5" x-show="longWeekends.length > 1" x-cloak>
+                            <button @click="lwManualIndex = (lwCurrentIndex === 0) ? longWeekends.length - 1 : lwCurrentIndex - 1; haptic('light')" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 text-slate-500 dark:text-slate-400 transition flex items-center justify-center active:scale-95 border border-transparent shadow-sm"><i class="fa-solid fa-chevron-left text-[10px]"></i></button>
+                            <button @click="lwManualIndex = (lwCurrentIndex + 1) % longWeekends.length; haptic('light')" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 text-slate-500 dark:text-slate-400 transition flex items-center justify-center active:scale-95 border border-transparent shadow-sm"><i class="fa-solid fa-chevron-right text-[10px]"></i></button>
+                        </div>
+                    </div>
+                    
+                    <template x-if="longWeekends.length > 0">
+                        <div class="flex-1 bg-gradient-to-br rounded-[1.5rem] p-5 text-white shadow-inner relative overflow-hidden flex flex-col justify-center transition-all duration-500 group cursor-pointer" 
+                             :class="lwGetTheme(longWeekends[lwCurrentIndex]?.name)"
+                             @click="lwManualIndex = (lwCurrentIndex + 1) % longWeekends.length; haptic('light')">
+                            
+                            <div class="absolute -right-6 -top-6 w-32 h-32 bg-white/20 rounded-full blur-2xl group-hover:scale-150 group-hover:bg-white/30 transition-all duration-700"></div>
+                            <div class="absolute -left-6 -bottom-6 w-24 h-24 bg-white/10 rounded-full blur-xl transition-all duration-700"></div>
+                            
+                            <div class="absolute -right-2 top-1/2 -translate-y-1/2 text-[80px] opacity-20 group-hover:-translate-y-6 group-hover:scale-110 transition-all duration-500 pointer-events-none drop-shadow-xl" x-text="longWeekends[lwCurrentIndex]?.icon || '🌴'"></div>
+                            
+                            <div class="flex items-center gap-4 sm:gap-5 relative z-10 w-full mb-2">
+                                <div class="w-14 h-14 rounded-[1.1rem] bg-white/20 backdrop-blur-md border border-white/40 flex items-center justify-center text-3xl shadow-[0_8px_16px_rgba(0,0,0,0.1)] shrink-0 group-hover:-translate-y-1 transition-transform duration-300">
+                                    <span x-text="longWeekends[lwCurrentIndex]?.icon || '🌴'" class="drop-shadow-md"></span>
+                                </div>
+                                <div class="flex flex-col flex-1 min-w-0 justify-center">
+                                    <h4 class="text-lg sm:text-xl font-black font-heading truncate drop-shadow-md leading-none mb-2 tracking-tight" x-text="longWeekends[lwCurrentIndex]?.name || 'Holiday'"></h4>
+                                    <div class="flex items-center flex-wrap gap-2 opacity-95">
+                                        <span class="text-[9px] font-black uppercase tracking-widest bg-white/20 text-white px-2.5 py-1 rounded-md backdrop-blur-md border border-white/30 shadow-sm leading-none" x-text="longWeekends[lwCurrentIndex]?.range || 'Weekend'"></span>
+                                        <span class="text-[11px] font-bold tracking-wide drop-shadow-sm flex items-center gap-1"><i class="fa-regular fa-calendar-check opacity-70"></i> <span x-text="formatDateShort(longWeekends[lwCurrentIndex]?.date)"></span></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="absolute bottom-3 left-0 w-full flex justify-center gap-1.5 z-10 px-4" x-show="longWeekends.length > 1">
+                                <template x-for="(lw, idx) in longWeekends">
+                                    <div class="h-1.5 rounded-full transition-all duration-500 ease-out" 
+                                         :class="lwCurrentIndex === idx ? 'bg-white w-6 shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'bg-white/40 w-2 hover:bg-white/60'"></div>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+
+                    <template x-if="longWeekends.length === 0">
+                        <div class="flex-1 flex flex-col items-center justify-center bg-slate-50 dark:bg-black/20 rounded-[1.5rem] border border-dashed border-slate-200 dark:border-white/10 text-slate-400">
+                            <i class="fa-solid fa-face-frown-open text-3xl mb-2 opacity-50"></i>
+                            <p class="text-[10px] font-black uppercase tracking-widest">No Long Weekends Found</p>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- 🏢 LEAVE MANAGEMENT HUB -->
+                <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl p-4 sm:p-5 rounded-[2rem] shadow-sm border border-slate-200 dark:border-dark_border flex flex-col flex-1 min-h-[400px] lg:min-h-0 relative z-10">
+                    
+                    <div class="flex justify-between items-center mb-4 shrink-0">
+                        <div class="flex items-center gap-1.5 bg-slate-100 dark:bg-black/30 p-1.5 rounded-[14px] border border-slate-200 dark:border-white/5 shadow-inner">
+                            <button @click="activeTab = 'myLeaves'; haptic('light')" class="px-3 sm:px-4 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition flex items-center gap-1.5" :class="activeTab === 'myLeaves' ? 'bg-white dark:bg-dark_surface text-brand shadow-sm border border-slate-200 dark:border-white/10' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'">
+                                <i class="fa-solid fa-clock-rotate-left"></i> My Leaves
+                            </button>
+                            <button x-show="isAdmin" @click="activeTab = 'approvals'; haptic('light')" class="px-3 sm:px-4 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition flex items-center gap-1.5 relative" :class="activeTab === 'approvals' ? 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 shadow-sm border border-amber-200 dark:border-amber-500/30' : 'text-slate-500 hover:text-amber-600 dark:hover:text-amber-400'" x-cloak>
+                                <i class="fa-solid fa-clipboard-check"></i> Approvals
+                                <span x-show="pendingRequests.length > 0" class="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500 border border-white dark:border-dark_surface"></span>
+                                </span>
+                            </button>
+                        </div>
+                        <button @click="fetchData()" class="w-8 h-8 rounded-xl bg-slate-50 dark:bg-white/5 text-slate-400 hover:text-brand transition flex justify-center items-center shadow-sm border border-slate-200 dark:border-white/10 active:scale-95"><i class="fa-solid fa-rotate text-xs"></i></button>
+                    </div>
+
+                    <div x-show="loading" class="flex justify-center py-5"><div class="loader" style="width:20px;height:20px;border-width:2px;"></div></div>
+
+                    <!-- Scrollable Content Container -->
+                    <div class="flex-1 overflow-y-auto custom-scroll pr-1 pb-1" x-show="!loading">
+                        
+                        <!-- TAB 1: MY LEAVES -->
+                        <div x-show="activeTab === 'myLeaves'" class="space-y-3" x-transition.opacity>
+                            <template x-for="l in myLeaves" :key="l.id">
+                                <div @click="haptic('light'); selectedLeave = l; showLeaveDetailsModal = true" class="relative bg-gradient-to-br from-white to-slate-50 dark:from-dark_surface dark:to-black/10 p-3 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm flex items-center justify-between hover:shadow-md hover:-translate-y-0.5 cursor-pointer active:scale-[0.98] transition-all group overflow-hidden">
+                                    
+                                    <div class="absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-300" :class="l.status === 'Approved' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : (l.status === 'Rejected' ? 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]' : 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.5)]')"></div>
+                                    
+                                    <div class="flex items-center gap-3 min-w-0 pl-1.5 w-full">
+                                        <div class="w-10 h-10 rounded-[0.65rem] flex items-center justify-center text-[10px] font-black text-white shadow-inner shrink-0 group-hover:scale-105 transition-transform" 
+                                             :class="l.leaveType === 'ML' ? 'bg-gradient-to-br from-rose-400 to-rose-600' : (l.leaveType === 'PL' ? 'bg-gradient-to-br from-blue-400 to-blue-600' : (l.leaveType === 'LWP' ? 'bg-gradient-to-br from-slate-600 to-slate-800' : 'bg-gradient-to-br from-emerald-400 to-emerald-600'))">
+                                            <span x-text="l.leaveType" class="drop-shadow-sm"></span>
+                                        </div>
+                                        
+                                        <div class="flex flex-col min-w-0 flex-1">
+                                            <h4 class="text-[13px] font-bold text-slate-800 dark:text-slate-200 leading-none truncate mb-1" x-text="formatDateShort(l.startDate) + (l.startDate !== l.endDate ? ' - ' + formatDateShort(l.endDate) : '')"></h4>
+                                            <div class="flex items-center gap-1.5 opacity-80 text-[10px] font-bold text-slate-500 dark:text-slate-400 w-full">
+                                                <span class="text-brand dark:text-brand_glow whitespace-nowrap" x-text="l.calcDays + ' Day(s)'"></span>
+                                                <span class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600 shrink-0"></span>
+                                                <span class="truncate" x-text="l.reason" :title="l.reason"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="shrink-0 flex flex-col items-end gap-1 ml-2">
+                                        <span class="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border shadow-sm flex items-center gap-1" 
+                                              :class="l.status === 'Approved' ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30' : (l.status === 'Rejected' ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/30' : 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/30')">
+                                              <i class="fa-solid" :class="l.status === 'Approved' ? 'fa-check' : (l.status === 'Rejected' ? 'fa-xmark' : 'fa-clock')"></i> <span x-text="l.status" class="hidden sm:inline"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </template>
+                            <div x-show="myLeaves.length === 0" class="text-center text-slate-400 py-12 bg-slate-50/50 dark:bg-black/20 rounded-3xl border border-dashed border-slate-200 dark:border-white/10">
+                                <i class="fa-solid fa-mug-hot text-3xl mb-3 opacity-30"></i>
+                                <p class="text-[11px] font-bold uppercase tracking-widest">No leaves applied yet.</p>
+                            </div>
+                        </div>
+
+                        <!-- TAB 2: APPROVALS (Ultra-Compact Redesign) -->
+                        <div x-show="activeTab === 'approvals' && isAdmin" class="space-y-2.5" x-transition.opacity x-cloak>
+                            <template x-for="req in pendingRequests" :key="req.id">
+                                <div class="relative bg-gradient-to-br from-white to-amber-50/40 dark:from-dark_surface dark:to-amber-900/10 p-3 rounded-[1.25rem] border border-amber-100 dark:border-amber-900/30 shadow-sm hover:shadow-md transition-all group overflow-hidden">
+                                    
+                                    <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-amber-400 dark:bg-amber-500 shadow-[0_0_10px_rgba(251,191,36,0.6)]"></div>
+                                    
+                                    <div class="flex justify-between items-start pl-2 gap-2">
+                                        <div class="flex items-center gap-2.5 min-w-0">
+                                            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-300 to-orange-400 text-white flex items-center justify-center font-black text-xs shrink-0 shadow-inner group-hover:scale-105 transition-transform duration-300 border border-amber-200 dark:border-amber-600">
+                                                <span x-text="req.empName.substring(0,2).toUpperCase()" class="drop-shadow-sm"></span>
+                                            </div>
+                                            <div class="flex flex-col min-w-0">
+                                                <h4 class="text-[13px] font-black text-slate-800 dark:text-white leading-none truncate group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors" x-text="req.empName"></h4>
+                                                <div class="flex items-center gap-1.5 mt-1">
+                                                    <span class="px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border shadow-sm leading-none"
+                                                          :class="req.leaveType === 'ML' ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/30' : (req.leaveType === 'PL' ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/30' : (req.leaveType === 'LWP' ? 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-white/10 dark:text-slate-300 dark:border-white/20' : 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30'))"
+                                                          x-text="req.leaveType"></span>
+                                                    <span class="text-[9px] font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap" x-text="'• ' + req.calcDays + ' Day(s)'"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex flex-col items-end shrink-0">
+                                            <span class="text-[8px] font-mono font-bold text-slate-500 dark:text-slate-400 bg-white dark:bg-black/30 border border-slate-200 dark:border-white/10 px-1.5 py-0.5 rounded shadow-sm flex items-center gap-1">
+                                                <i class="fa-regular fa-calendar text-amber-500"></i>
+                                                <span x-text="formatDateShort(req.startDate) + (req.startDate !== req.endDate ? ' - ' + formatDateShort(req.endDate) : '')"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="ml-2 mt-2.5 bg-white/60 dark:bg-black/20 px-2.5 py-1.5 rounded-lg border border-slate-100 dark:border-white/5 flex gap-1.5 items-center shadow-inner">
+                                        <i class="fa-solid fa-quote-left text-amber-300 dark:text-amber-700 text-[9px] shrink-0"></i>
+                                        <p class="text-[10px] text-slate-600 dark:text-slate-300 font-medium leading-tight truncate" :title="req.reason" x-text="req.reason"></p>
+                                    </div>
+
+                                    <div class="ml-2 mt-2 flex gap-2 items-stretch">
+                                        <button @click="updateStatus(req.id, 'Approved')" class="flex-[3] bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest py-2 rounded-lg active:scale-95 transition-all shadow-sm hover:shadow-[0_4px_10px_-2px_rgba(16,185,129,0.5)] flex items-center justify-center gap-1.5">
+                                            <i class="fa-solid fa-check-double"></i> Approve
+                                        </button>
+                                        <button @click="updateStatus(req.id, 'Rejected')" class="flex-[2] bg-white dark:bg-dark_surface text-rose-500 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/10 border border-slate-200 dark:border-white/10 hover:border-rose-200 dark:hover:border-rose-500/30 text-[10px] font-black uppercase tracking-widest py-2 rounded-lg active:scale-95 transition-all shadow-sm flex items-center justify-center gap-1.5">
+                                            <i class="fa-solid fa-xmark"></i> Deny
+                                        </button>
+                                    </div>
+                                </div>
+                            </template>
+                            
+                            <div x-show="pendingRequests.length === 0" class="text-center text-amber-500/50 py-12 bg-white/50 dark:bg-black/20 rounded-3xl border border-dashed border-amber-200 dark:border-amber-900/30">
+                                <i class="fa-regular fa-face-smile-wink text-4xl mb-3 opacity-60"></i>
+                                <p class="text-[11px] font-black uppercase tracking-widest">Approval Queue is Clear!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- UNIFIED STATUS BAR (FOOTER) -->
+    <footer class="shrink-0 bg-white/90 dark:bg-[#09090b]/95 backdrop-blur-xl border-t border-slate-200/80 dark:border-white/5 z-50 h-10 sm:h-10 w-full flex items-center">
+        <div class="max-w-[1920px] w-full mx-auto px-3.5 sm:px-6 flex items-center justify-between text-[10px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400">
+            
+            <!-- LEFT: Copyright & Version -->
+            <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                <span class="font-bold flex items-center gap-1">
+                    &copy; <span x-text="new Date().getFullYear()"></span> 
+                    <span class="hidden sm:inline">PBL Connect</span>
+                    <span class="sm:hidden tracking-wider">PBL</span>
+                </span>
+                
+                <div class="w-px h-3.5 bg-slate-300 dark:bg-white/10"></div>
+                
+                <div class="flex items-center gap-1.5">
+                    <!-- 📍 MOBILE FIX: Make version a nice pill instead of loose text -->
+                    <span class="px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-600 border border-blue-200 dark:bg-brand/10 dark:border-brand/30 dark:text-brand_glow font-mono font-black text-[9px] leading-none shadow-sm" x-text="PBL_APP_VERSION"></span>
+                    <span class="hidden sm:inline-block px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[8px] font-black uppercase tracking-widest leading-none shadow-sm">PROD</span>
+                </div>
+            </div>
+
+            <!-- CENTER: System Status (Fluid & Centered safely) -->
+            <div class="hidden md:flex flex-1 justify-center items-center px-4 overflow-hidden">
+                <div class="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-100 dark:border-emerald-500/20 shadow-sm cursor-default">
+                    <span class="relative flex h-1.5 w-1.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                    </span>
+                    <span class="font-bold tracking-wide text-[10px] sm:text-[11px]">All Systems Operational</span>
+                </div>
+            </div>
+
+            <!-- RIGHT: Tech Vitals -->
+            <div class="flex items-center gap-2.5 sm:gap-3 shrink-0 font-mono font-bold cursor-default">
+                
+                <!-- 📍 MOBILE FIX: Replaces loose "OK" with a proper widget/pill -->
+                <div class="md:hidden flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-100 dark:border-emerald-500/20 shadow-sm">
+                    <span class="relative flex h-1.5 w-1.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                    </span>
+                    <span class="text-[8px] tracking-widest uppercase font-black">Online</span>
+                </div>
+                
+                <div class="md:hidden w-px h-3.5 bg-slate-300 dark:bg-white/10"></div>
+
+                <!-- Network Ping -->
+                <div class="flex items-center gap-1 sm:gap-1.5 hover:text-slate-700 dark:hover:text-slate-300 transition-colors" title="Network Latency">
+                    <i class="fa-solid fa-wifi text-[9px] sm:text-[10px] text-emerald-500"></i>
+                    <span>12ms</span>
+                </div>
+                
+                <div class="hidden sm:block w-px h-3.5 bg-slate-300 dark:bg-white/10"></div>
+                
+                <!-- Security Standard -->
+                <div class="hidden sm:flex items-center gap-1.5 hover:text-slate-700 dark:hover:text-slate-300 transition-colors" title="Encryption Level">
+                    <i class="fa-solid fa-shield-halved text-[10px] text-brand"></i>
+                    <span>AES-256</span>
+                </div>
+                
+                <div class="hidden lg:block w-px h-3.5 bg-slate-300 dark:bg-white/10"></div>
+                
+                <!-- System Clock -->
+                <div class="hidden lg:flex items-center gap-1.5 hover:text-slate-700 dark:hover:text-slate-300 transition-colors">
+                    <i class="fa-regular fa-clock text-[10px] opacity-70"></i>
+                    <span x-text="currentTime"></span>
+                </div>
+            </div>
+
+        </div>
+    </footer>
+	
+	<!-- ℹ️ LEAVE POLICY / INFO MODAL -->
+    <div x-show="showPolicyModal" x-cloak class="fixed inset-0 z-[65] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4" x-transition.opacity>
+        <div class="bg-white/95 dark:bg-dark_surface/95 backdrop-blur-xl w-full max-w-sm rounded-[2rem] shadow-2xl overflow-hidden border border-slate-200 dark:border-dark_border" @click.away="showPolicyModal = false">
+            <div class="p-6 pb-5 border-b border-slate-100 dark:border-white/5 flex justify-between items-center bg-slate-50/50 dark:bg-black/20">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl text-white flex items-center justify-center shadow-lg text-lg shrink-0"
+                         :class="selectedPolicy?.color === 'emerald' ? 'bg-emerald-500 shadow-emerald-500/30' : (selectedPolicy?.color === 'rose' ? 'bg-rose-500 shadow-rose-500/30' : 'bg-blue-500 shadow-blue-500/30')">
+                        <i class="fa-solid" :class="selectedPolicy?.icon"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-heading font-black text-lg text-slate-800 dark:text-white leading-tight" x-text="selectedPolicy?.title"></h3>
+                        <p class="text-[9px] uppercase font-black tracking-widest mt-0.5"
+                           :class="selectedPolicy?.color === 'emerald' ? 'text-emerald-500' : (selectedPolicy?.color === 'rose' ? 'text-rose-500' : 'text-blue-500')">Leave Policy Info</p>
+                    </div>
+                </div>
+                <button @click="showPolicyModal = false" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-400 hover:text-red-500 transition shadow-sm border border-slate-200 dark:border-transparent active:scale-95"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="p-6 space-y-4">
+                <div class="bg-white dark:bg-black/40 p-4 rounded-xl border border-slate-100 dark:border-white/5 flex items-center justify-between shadow-sm">
+                    <div class="text-center w-full">
+                        <span class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Quota</span>
+                        <span class="text-xl font-black text-slate-700 dark:text-slate-300" x-text="selectedPolicy?.total"></span>
+                    </div>
+                    <div class="w-px h-8 bg-slate-200 dark:bg-white/10 shrink-0"></div>
+                    <div class="text-center w-full">
+                        <span class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Consumed</span>
+                        <span class="text-xl font-black text-slate-700 dark:text-slate-300" x-text="selectedPolicy?.used"></span>
+                    </div>
+                    <div class="w-px h-8 bg-slate-200 dark:bg-white/10 shrink-0"></div>
+                    <div class="text-center w-full">
+                        <span class="block text-[9px] font-black uppercase tracking-widest mb-1" :class="selectedPolicy?.color === 'emerald' ? 'text-emerald-500' : (selectedPolicy?.color === 'rose' ? 'text-rose-500' : 'text-blue-500')">Available</span>
+                        <span class="text-xl font-black" :class="selectedPolicy?.color === 'emerald' ? 'text-emerald-600 dark:text-emerald-400' : (selectedPolicy?.color === 'rose' ? 'text-rose-600 dark:text-rose-400' : 'text-blue-600 dark:text-blue-400')" x-text="selectedPolicy?.total - selectedPolicy?.used"></span>
+                    </div>
+                </div>
+                
+                <div class="p-4 rounded-xl border flex gap-3 shadow-sm bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10">
+                    <i class="fa-solid fa-circle-info mt-0.5" :class="selectedPolicy?.color === 'emerald' ? 'text-emerald-500' : (selectedPolicy?.color === 'rose' ? 'text-rose-500' : 'text-blue-500')"></i>
+                    <p class="text-[11px] font-medium text-slate-600 dark:text-slate-400 leading-relaxed" x-text="selectedPolicy?.desc"></p>
+                </div>
+
+                <!-- 💰 PREMIUM ENCASHMENT BANNER (Clean UI + Bank Info) -->
+                <div class="bg-slate-50 dark:bg-black/20 rounded-xl p-3 border border-slate-200 dark:border-white/10 shadow-sm mt-3 relative overflow-hidden group">
+                    <div class="absolute -right-2 -bottom-2 text-5xl text-slate-200 dark:text-white/5 group-hover:scale-110 transition-transform"><i class="fa-solid fa-money-bill-trend-up"></i></div>
+                    
+                    <div class="flex items-start gap-2.5 relative z-10 mb-3">
+                        <div class="w-7 h-7 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-[10px] shrink-0 mt-0.5">
+                            <i class="fa-solid fa-building-columns"></i>
+                        </div>
+                        <div class="flex flex-col pr-2">
+                            <h4 class="text-[10px] font-black text-slate-700 dark:text-slate-200 uppercase tracking-widest">Year-End Encashment</h4>
+                            <p class="text-[9px] font-medium text-slate-500 dark:text-slate-400 leading-relaxed mt-1">All unused leaves are auto-encashed on <b>31st Mar</b> & credited to account by <b>15th April</b>. A fresh quota of <b>32 leaves</b> assigns on <b>1st April</b>.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-black/40 px-3 py-2.5 rounded-lg border border-slate-100 dark:border-white/5 flex justify-between items-center shadow-inner relative z-10">
+                        <span class="text-[9px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-1.5"><i class="fa-solid fa-calculator opacity-70"></i> Algorithm</span>
+                        <span class="text-[11px] font-mono font-black text-emerald-500 dark:text-emerald-400 tracking-tight">((Gross/26)+48%) * L</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="px-6 py-4 border-t border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-black/20 flex gap-3">
+                <button @click="showPolicyModal = false; showApplyModal = true; form.leaveType = selectedPolicy?.type" class="w-full text-white px-4 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-sm transition active:scale-95 flex items-center justify-center gap-2"
+                        :class="selectedPolicy?.color === 'emerald' ? 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/40' : (selectedPolicy?.color === 'rose' ? 'bg-rose-500 hover:bg-rose-600 shadow-rose-500/40' : 'bg-blue-500 hover:bg-blue-600 shadow-blue-500/40')">
+                    <i class="fa-solid fa-calendar-plus"></i> Apply This Leave
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- APPLY LEAVE MODAL -->
+    <div x-show="showApplyModal" x-cloak class="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4" x-transition.opacity>
+        <div class="bg-white/95 dark:bg-dark_surface/95 backdrop-blur-xl w-full max-w-md rounded-[2rem] shadow-2xl overflow-hidden border border-slate-200 dark:border-dark_border" @click.away="showApplyModal = false">
+            <div class="px-6 py-5 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-black/20 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/30 text-lg shrink-0"><i class="fa-solid fa-paper-plane"></i></div>
+                    <div>
+                        <h3 class="font-heading font-black text-lg text-slate-800 dark:text-white leading-tight">Apply Leave</h3>
+                        <p class="text-[9px] text-emerald-500 uppercase font-black tracking-widest mt-0.5">HR Operations</p>
+                    </div>
+                </div>
+                <button @click="showApplyModal = false" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-400 hover:text-red-500 transition shadow-sm border border-slate-200 dark:border-transparent"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 ml-1">Leave Type *</label>
+                    <select x-model="form.leaveType" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-bold outline-none cursor-pointer text-slate-800 dark:text-white shadow-sm appearance-none" style="background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2364748b\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'%3e%3c/polyline%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em;">
+                        <option value="CL">🟢 Casual Leave (CL)</option>
+                        <option value="ML">🔴 Sick/Medical Leave (ML)</option>
+                        <option value="PL">🔵 Privilege Leave (PL)</option>
+                        <option value="LWP">⚫ Leave Without Pay (LWP)</option>
+                    </select>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 ml-1">Start Date *</label>
+                        <input type="date" x-model="form.startDate" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-bold outline-none text-slate-800 dark:text-white shadow-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 ml-1">End Date *</label>
+                        <input type="date" x-model="form.endDate" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-bold outline-none text-slate-800 dark:text-white shadow-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition">
+                    </div>
+                </div>
+
+                <div x-show="form.startDate && form.startDate === form.endDate">
+                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 ml-1">Half Day?</label>
+                    <select x-model="form.halfDay" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-bold outline-none cursor-pointer text-slate-800 dark:text-white shadow-sm appearance-none" style="background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2364748b\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3e%3cpolyline points=\'6 9 12 15 18 9\'%3e%3c/polyline%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em;">
+                        <option value="None">⚪ No (Full Day)</option>
+                        <option value="H1">🌗 First Half</option>
+                        <option value="H2">🌓 Second Half</option>
+                    </select>
+                </div>
+
+                <div x-show="form.startDate && form.endDate && new Date(form.endDate) >= new Date(form.startDate)" class="bg-slate-50 dark:bg-black/30 p-3 rounded-xl border border-slate-200 dark:border-white/10 shadow-inner flex items-center justify-between transition-all">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm shadow-sm border shrink-0"
+                             :class="form.leaveType === 'ML' ? 'bg-rose-100 text-rose-500 border-rose-200 dark:bg-rose-500/10' : (form.leaveType === 'PL' ? 'bg-blue-100 text-blue-500 border-blue-200 dark:bg-blue-500/10' : (form.leaveType === 'LWP' ? 'bg-slate-200 text-slate-600 border-slate-300 dark:bg-white/10' : 'bg-emerald-100 text-emerald-500 border-emerald-200 dark:bg-emerald-500/10'))">
+                            <i class="fa-solid fa-calculator"></i>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Est. Duration</span>
+                            <span class="text-xs font-bold text-slate-700 dark:text-slate-300"><span x-text="getUIDays()"></span> Day(s)</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5 block">Selected</span>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest border shadow-sm inline-block"
+                              :class="form.leaveType === 'ML' ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400' : (form.leaveType === 'PL' ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400' : (form.leaveType === 'LWP' ? 'bg-slate-100 text-slate-600 border-slate-300 dark:bg-white/5 dark:text-slate-300' : 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400'))" 
+                              x-text="form.leaveType"></span>
+                    </div>
+                </div>
+
+                <template x-if="form.startDate && form.endDate && holidays.some(h => h.date >= form.startDate && h.date <= form.endDate)">
+                    <div class="bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 p-3 rounded-xl border border-amber-200 dark:border-amber-500/30 flex items-start gap-2.5 shadow-sm transition-all animate-pulse">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-500 mt-0.5 text-base shrink-0"></i>
+                        <div class="flex flex-col">
+                            <span class="uppercase tracking-widest text-[9px] font-black text-amber-600 dark:text-amber-500 mb-0.5">Holiday Overlap</span>
+                            <span class="text-[11px] font-medium leading-snug">
+                                Selected range includes <b><span x-text="holidays.filter(h => h.date >= form.startDate && h.date <= form.endDate).map(h => (h.icon || '🎌') + ' ' + h.name).join(', ')"></span></b>. Double check if you actually need to apply leave for this day!
+                            </span>
+                        </div>
+                    </div>
+                </template>
+
+                <div x-show="form.startDate && form.endDate && new Date(form.endDate) < new Date(form.startDate)" class="bg-red-50 text-red-600 p-2 rounded-xl text-[10px] font-bold text-center border border-red-200 shadow-sm">
+                    ⚠️ End Date cannot be before Start Date.
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 ml-1">Reason *</label>
+                    <input type="text" x-model="form.reason" placeholder="Brief reason for leave" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-medium outline-none text-slate-800 dark:text-white shadow-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition">
+                </div>
+            </div>
+            <div class="bg-slate-50/50 dark:bg-black/20 px-6 py-4 flex justify-end gap-3 border-t border-slate-100 dark:border-white/5">
+                <button @click="showApplyModal = false" class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 transition">Cancel</button>
+                <button @click="submitLeave()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2.5 rounded-xl text-sm font-black uppercase tracking-wider shadow-[0_5px_15px_-3px_rgba(16,185,129,0.4)] transition active:scale-95 flex items-center justify-center gap-2" :disabled="saving">
+                    <span x-show="!saving">Submit Request</span>
+                    <span x-show="saving"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 👁️‍🗨️ LEAVE DETAILS & AUDIT MODAL (IT HEAD CONSOLE) -->
+    <div x-show="showLeaveDetailsModal" x-cloak class="fixed inset-0 z-[70] flex items-end sm:items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4" x-transition.opacity>
+        <div class="bg-white dark:bg-dark_surface w-full max-w-sm sm:max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-200 dark:border-dark_border flex flex-col transition-transform transform translate-y-0" @click.away="showLeaveDetailsModal = false">
+            
+            <div class="p-6 text-white shrink-0 relative overflow-hidden" 
+                 :class="selectedLeave?.status === 'Approved' ? 'bg-gradient-to-br from-emerald-500 to-teal-600' : (selectedLeave?.status === 'Rejected' ? 'bg-gradient-to-br from-rose-500 to-red-600' : 'bg-gradient-to-br from-amber-400 to-orange-500')">
+                <div class="absolute -right-6 -top-6 w-32 h-32 bg-white/20 rounded-full blur-2xl pointer-events-none"></div>
+                <div class="flex justify-between items-start relative z-10">
+                    <div>
+                        <span class="text-[9px] font-black uppercase tracking-widest bg-white/20 px-2.5 py-1 rounded-md backdrop-blur-md shadow-sm border border-white/20 flex items-center gap-1.5 w-max">
+                            <i class="fa-solid fa-shoe-prints"></i> Audit Trail
+                        </span>
+                        <h3 class="text-2xl font-black font-heading mt-2 tracking-tight leading-none drop-shadow-md" x-text="selectedLeave?.empName"></h3>
+                        <p class="text-[10px] font-bold uppercase tracking-widest opacity-90 mt-1" x-text="selectedLeave?.location + ' Branch'"></p>
+                    </div>
+                    <button @click="showLeaveDetailsModal = false" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 border border-white/30 flex items-center justify-center transition active:scale-95 shadow-sm shrink-0"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+            
+            <div class="p-5 sm:p-6 space-y-5 overflow-y-auto custom-scroll max-h-[60vh]">
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border shadow-sm" x-text="selectedLeave?.leaveType" 
+                          :class="selectedLeave?.leaveType === 'ML' ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/30' : 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/30'"></span>
+                    <span class="px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border shadow-sm bg-slate-50 text-slate-500 dark:bg-white/5 dark:border-white/10 dark:text-slate-300" x-text="selectedLeave?.calcDays + ' Day(s)'"></span>
+                    <span class="px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border shadow-sm bg-slate-50 text-slate-500 dark:bg-white/5 dark:border-white/10 dark:text-slate-300 flex items-center gap-1.5"><i class="fa-regular fa-calendar opacity-70"></i> <span x-text="formatDateShort(selectedLeave?.startDate) + (selectedLeave?.startDate !== selectedLeave?.endDate ? ' to ' + formatDateShort(selectedLeave?.endDate) : '')"></span></span>
+                </div>
+
+                <div x-show="isAdmin || user.name === selectedLeave?.empName" class="bg-slate-50/80 dark:bg-black/20 p-3.5 rounded-xl border border-slate-200 dark:border-white/5 shadow-inner" x-cloak>
+                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5 mb-1"><i class="fa-solid fa-quote-left text-brand opacity-50"></i> Reason for Leave</span>
+                    <p class="text-xs font-medium text-slate-700 dark:text-slate-300 italic leading-snug" x-text="'&quot;' + selectedLeave?.reason + '&quot;'"></p>
+                </div>
+                <div x-show="!isAdmin && user.name !== selectedLeave?.empName" class="bg-slate-50/50 dark:bg-black/20 p-4 rounded-xl border border-slate-100 dark:border-white/5 text-center" x-cloak>
+                    <i class="fa-solid fa-lock text-slate-300 dark:text-slate-600 text-xl mb-1.5"></i>
+                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Reason Hidden (Privacy Policy)</p>
+                </div>
+
+                <div class="relative pl-4 border-l-2 border-slate-200 dark:border-white/10 space-y-5 ml-2">
+                    <div class="relative">
+                        <div class="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-slate-300 dark:bg-slate-600 border-2 border-white dark:border-dark_surface"></div>
+                        <p class="text-[9px] font-black uppercase tracking-widest text-slate-400" x-text="selectedLeave?.timestamp"></p>
+                        <p class="text-xs font-bold text-slate-700 dark:text-slate-300">Request Submitted</p>
+                    </div>
+                    <div class="relative" x-show="selectedLeave?.status !== 'Pending'" x-cloak>
+                        <div class="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-dark_surface shadow-sm" :class="selectedLeave?.status === 'Approved' ? 'bg-emerald-500' : 'bg-rose-500'"></div>
+                        <p class="text-[9px] font-black uppercase tracking-widest" :class="selectedLeave?.status === 'Approved' ? 'text-emerald-500' : 'text-rose-500'">IT Head Action</p>
+                        <p class="text-xs font-bold text-slate-700 dark:text-slate-300" x-text="'Marked as ' + selectedLeave?.status"></p>
+                        
+                        <div x-show="(isAdmin || user.name === selectedLeave?.empName) && selectedLeave?.remarks" class="mt-2.5 bg-white dark:bg-black/40 p-3 rounded-lg border shadow-sm" :class="selectedLeave?.status === 'Approved' ? 'border-emerald-100 dark:border-emerald-500/20' : 'border-rose-100 dark:border-rose-500/20'" x-cloak>
+                            <p class="text-[10px] font-medium text-slate-600 dark:text-slate-400 leading-snug"><strong class="text-slate-800 dark:text-slate-200">Remarks:</strong> <span x-text="selectedLeave?.remarks"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div x-show="isAdmin" class="bg-slate-50/80 dark:bg-black/40 p-4 border-t border-slate-100 dark:border-white/5 shrink-0" x-cloak>
+                 <template x-if="selectedLeave?.status === 'Pending'">
+                     <div class="flex gap-2">
+                         <button @click="showLeaveDetailsModal=false; updateStatus(selectedLeave?.id, 'Approved')" class="flex-1 bg-emerald-500 text-white text-[11px] font-black uppercase tracking-widest py-3 rounded-xl shadow-[0_4px_10px_-2px_rgba(16,185,129,0.5)] hover:shadow-lg transition active:scale-95 flex items-center justify-center gap-1.5"><i class="fa-solid fa-check"></i> Approve</button>
+                         <button @click="showLeaveDetailsModal=false; updateStatus(selectedLeave?.id, 'Rejected')" class="flex-1 bg-white dark:bg-dark_surface text-rose-500 border border-slate-200 dark:border-white/10 hover:bg-rose-50 dark:hover:bg-rose-500/10 text-[11px] font-black uppercase tracking-widest py-3 rounded-xl shadow-sm transition active:scale-95 flex items-center justify-center gap-1.5"><i class="fa-solid fa-xmark"></i> Reject</button>
+                     </div>
+                 </template>
+                 <template x-if="selectedLeave?.status === 'Approved'">
+                     <button @click="showLeaveDetailsModal=false; updateStatus(selectedLeave?.id, 'Rejected')" class="w-full bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/30 hover:bg-rose-100 text-[11px] font-black uppercase tracking-widest py-3 rounded-xl shadow-sm transition active:scale-95 flex items-center justify-center gap-1.5"><i class="fa-solid fa-ban"></i> Revoke Approval</button>
+                 </template>
+                 <template x-if="selectedLeave?.status === 'Rejected'">
+                     <div class="text-center text-[9px] font-black uppercase tracking-widest text-slate-400">Request is permanently closed.</div>
+                 </template>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN APPROVAL MODAL -->
+    <div x-show="showApproveModal" x-cloak class="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4" x-transition.opacity>
+        <div class="bg-white/95 dark:bg-dark_surface/95 backdrop-blur-xl w-full max-w-sm rounded-[2rem] shadow-2xl overflow-hidden p-6 sm:p-8 text-center border border-slate-200 dark:border-dark_border" @click.away="showApproveModal = false">
+            <div class="w-16 h-16 rounded-2xl bg-amber-50 dark:bg-amber-500/10 text-amber-500 flex items-center justify-center text-2xl mx-auto mb-5 shadow-sm border border-amber-100 dark:border-amber-500/20"><i class="fa-solid fa-shield-halved"></i></div>
+            <h3 class="text-xl font-heading font-black text-slate-800 dark:text-white mb-2">Manager Action</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mb-6 leading-relaxed">Please provide remarks and authorize this action using your Admin Key.</p>
+            
+            <div class="space-y-4 mb-6">
+                <input type="text" x-model="adminForm.remarks" placeholder="Optional Remarks (e.g. Approved, Enjoy)" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm outline-none dark:text-white focus:border-brand focus:ring-2 focus:ring-brand/20 transition text-center shadow-inner">
+                <div class="relative">
+                    <i class="fa-solid fa-key absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="password" x-model="adminForm.secret" placeholder="Admin Key" class="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl text-sm font-mono font-bold outline-none dark:text-white text-center tracking-widest focus:border-brand focus:ring-2 focus:ring-brand/20 transition shadow-inner">
+                </div>
+            </div>
+            
+            <div class="flex gap-3">
+                <button @click="showApproveModal = false" class="flex-1 py-3 text-xs font-bold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 rounded-xl transition">Cancel</button>
+                <button @click="confirmAction()" class="flex-1 bg-slate-800 dark:bg-white hover:bg-slate-900 dark:hover:bg-slate-100 text-white dark:text-slate-900 py-3 rounded-xl text-xs font-black uppercase tracking-wider shadow-sm transition active:scale-95 flex items-center justify-center gap-2" :disabled="saving">
+                    <span x-show="!saving">Confirm</span>
+                    <span x-show="saving"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbwvXRCT7P5aULfkV63RPacAVaxdBUMiKnxGeYu498fhRUZ7Xd3ph2WxCiUs9wOtXH-4JQ/exec";
+        const getSafeUser = () => { try { return JSON.parse(sessionStorage.getItem('userData')) || { name: 'Guest' }; } catch(e) { return { name: 'Guest' }; } };
+        const getSafeTheme = () => { try { return localStorage.getItem('theme') === 'dark'; } catch(e) { return false; } };
+
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('leaveSystem', () => ({
+                user: getSafeUser(),
+                isDark: getSafeTheme(),
+                isGlobal: getSafeUser().allowedLocation === 'Global',
+                currentLocation: getSafeUser().allowedLocation === 'Global' ? (localStorage.getItem('pbl_loc_pref') || 'Noida') : (getSafeUser().allowedLocation || 'Noida'),
+                currentTime: '',
+                
+                isAdmin: false,
+                showProfile: false, 
+                viewMode: 'list',
+                loading: false, saving: false,
+                activeTab: 'myLeaves',
+                allLeaves: [],
+                
+                holidays: [
+                    { date: '2026-01-01', name: "New Year's Day", type: 'Restricted', icon: '🎉' },
+                    { date: '2026-01-26', name: 'Republic Day', type: 'Govt', icon: '🎖️' },
+                    { date: '2026-03-04', name: 'Holi', type: 'Govt', icon: '🎨' },
+                    { date: '2026-04-03', name: 'Good Friday', type: 'Govt', icon: '🙏' },
+                    { date: '2026-05-01', name: 'Labour Day', type: 'Restricted', icon: '👷' },
+                    { date: '2026-08-15', name: 'Independence Day', type: 'Govt', icon: '🎆' },
+                    { date: '2026-08-28', name: 'Raksha Bandhan', type: 'Govt', icon: '👫' },
+                    { date: '2026-10-02', name: 'Gandhi Jayanti', type: 'Govt', icon: '🕊️' },
+                    { date: '2026-10-20', name: 'Dussehra', type: 'Govt', icon: '🏹' },
+                    { date: '2026-11-09', name: 'Deepawali', type: 'Govt', icon: '🪔' },
+                    { date: '2026-11-11', name: 'Bhai Duj', type: 'Restricted', icon: '🧑‍🤝‍🧑' },
+                    { date: '2026-12-25', name: 'X-Mas Day', type: 'Restricted', icon: '🎄' }
+                ],
+                
+                currentMonth: new Date().getMonth(),
+                currentYear: new Date().getFullYear(),
+                monthNames: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+                
+                showApplyModal: false,
+                form: { leaveType: 'CL', startDate: '', endDate: '', halfDay: 'None', reason: '' },
+                
+                showPolicyModal: false,
+                selectedPolicy: null,
+                openPolicy(type) {
+                    this.haptic('light');
+                    const policies = {
+                        'CL': { type: 'CL', title: 'Casual Leave (CL)', total: 7, desc: 'Used for urgent and unforeseen personal work. Cannot be clubbed with Privilege Leaves (PL).', icon: 'fa-mug-hot', color: 'emerald' },
+                        'ML': { type: 'ML', title: 'Sick Leave (ML)', total: 7, desc: 'Used for medical emergencies. A medical certificate is required if taken for more than 2 consecutive days.', icon: 'fa-briefcase-medical', color: 'rose' },
+                        'PL': { type: 'PL', title: 'Privilege Leave (PL)', total: 18, desc: 'Used for planned vacations. Must be applied in advance for proper approval routing.', icon: 'fa-plane-departure', color: 'blue' }
+                    };
+                    const usedLeaves = policies[type].total - this.balance[type.toLowerCase()];
+                    this.selectedPolicy = { ...policies[type], used: usedLeaves };
+                    this.showPolicyModal = true;
+                },
+                
+                showLeaveDetailsModal: false,
+                selectedLeave: null,
+
+                openLeaveDetails(d) {
+                    const data = this.getDayData(d);
+                    if(data && data.full && data.type !== 'holiday') {
+                        this.haptic('light');
+                        this.selectedLeave = data.full;
+                        this.showLeaveDetailsModal = true;
+                    }
+                },
+
+                showApproveModal: false,
+                adminForm: { id: '', status: '', remarks: '', secret: '' },
+
+                get userInitials() { return this.user.name ? this.user.name.split(' ').map(n => n[0]).join('').toUpperCase() : '??'; },
+
+                get myShiftInfo() {
+                    const now = new Date(); const end = new Date(now); end.setHours(17, 30, 0, 0);
+                    let diff = end - now;
+                    if(diff < 0) return { name: 'GENERAL SHIFT', time: '09:30 AM - 05:30 PM', timeLeft: 'OVER', isOver: true };
+                    const h = Math.floor(diff / 3600000); const m = Math.floor((diff % 3600000) / 60000);
+                    return { name: 'GENERAL SHIFT', time: '09:30 AM - 05:30 PM', timeLeft: `${h}H ${m}M LEFT`, isOver: false };
+                },
+
+                init() {
+                    this.isAdmin = this.user.name.includes('Vikas');
+                    if (this.isDark) document.documentElement.classList.add('dark');
+                    
+                    const today = new Date();
+                    this.form.startDate = today.toISOString().split('T')[0];
+                    this.form.endDate = this.form.startDate;
+                    
+                    setInterval(() => { this.currentTime = new Date().toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' }); }, 1000);
+                    this.fetchData();
+                    this.viewMode = 'calendar';
+                },
+
+                toggleTheme() {
+                    this.isDark = !this.isDark; document.documentElement.classList.toggle('dark', this.isDark);
+                    localStorage.setItem('theme', this.isDark ? 'dark' : 'light');
+                },
+                
+                toggleLocation() {
+                    if (!this.isGlobal) return;
+                    this.currentLocation = this.currentLocation === 'Noida' ? 'Dehradun' : 'Noida';
+                    localStorage.setItem('pbl_loc_pref', this.currentLocation);
+                },
+
+                haptic(type = 'light') {
+                    if (!window.navigator || !window.navigator.vibrate) return; 
+                    if (type === 'light') navigator.vibrate(15); 
+                    else if (type === 'success') navigator.vibrate([30, 50, 30]); 
+                    else navigator.vibrate([50, 50, 50, 50]); 
+                },
+
+                formatDisplayDate(dStr) {
+                    if(!dStr) return ''; const d = new Date(dStr);
+                    return String(d.getDate()).padStart(2,'0') + ' ' + this.monthNames[d.getMonth()].substring(0,3) + ' ' + d.getFullYear();
+                },
+                
+                formatDateShort(dStr) {
+                    if(!dStr) return ''; const d = new Date(dStr);
+                    return String(d.getDate()).padStart(2,'0') + ' ' + this.monthNames[d.getMonth()].substring(0,3);
+                },
+
+                async fetchData() {
+                    // ⚡ 1. SMART CACHE: Puraana data instantly load karo (0 Loading Time)
+                    try {
+                        const cachedLeaves = localStorage.getItem('pbl_leaves_cache');
+                        const cachedHolidays = localStorage.getItem('pbl_holidays_cache');
+                        
+                        if (cachedLeaves) this.allLeaves = JSON.parse(cachedLeaves);
+                        if (cachedHolidays) this.holidays = JSON.parse(cachedHolidays);
+                        
+                        const pendingCount = this.allLeaves.filter(l => String(l.status).trim() === 'Pending').length;
+                        this.activeTab = (this.isAdmin && pendingCount > 0) ? 'approvals' : 'myLeaves';
+                    } catch(e) {}
+
+                    // Agar cache bilkul khali hai (1st time login), sirf tabhi Loading Spinner dikhao
+                    if (this.allLeaves.length === 0) {
+                        this.loading = true;
+                    }
+
+                    // 🔄 2. BACKGROUND SYNC: Google Sheet se naya data laao silently
+                    try {
+                        const res = await fetch(API_URL + '?action=getLeaveData');
+                        const data = await res.json();
+                        
+                        if (data.leaves) {
+                            this.allLeaves = data.leaves;
+                            localStorage.setItem('pbl_leaves_cache', JSON.stringify(this.allLeaves)); // Cache update
+                        }
+                        
+                        if(data.holidays && data.holidays.length > 0) {
+                            this.holidays = data.holidays.map(h => {
+                                if (!h.icon) {
+                                    const localH = this.holidays.find(lh => lh.date === h.date || lh.name === h.name);
+                                    if (localH && localH.icon) h.icon = localH.icon;
+                                    else {
+                                        const n = (h.name || '').toLowerCase();
+                                        if(n.includes('republic') || n.includes('independence')) h.icon = '🇮🇳';
+                                        else if(n.includes('holi')) h.icon = '🎨';
+                                        else if(n.includes('diwali') || n.includes('deepawali')) h.icon = '🪔';
+                                        else if(n.includes('raksha') || n.includes('rakhi')) h.icon = '👫';
+                                        else if(n.includes('christmas') || n.includes('x-mas')) h.icon = '🎄';
+                                        else if(n.includes('gandhi')) h.icon = '🕊️';
+                                        else if(n.includes('new year')) h.icon = '🎉';
+                                        else if(n.includes('labour')) h.icon = '👷';
+                                        else if(n.includes('dussehra')) h.icon = '🏹';
+                                        else if(n.includes('eid')) h.icon = '🌙';
+                                        else h.icon = '🎌'; 
+                                    }
+                                }
+                                return h;
+                            });
+                            localStorage.setItem('pbl_holidays_cache', JSON.stringify(this.holidays)); // Cache update
+                        } 
+                        
+                        // Naye data ke hisaab se tab update karo
+                        const pendingCount = this.allLeaves.filter(l => String(l.status).trim() === 'Pending').length;
+                        if (this.isAdmin && pendingCount > 0) {
+                            this.activeTab = 'approvals';
+                        } else {
+                            this.activeTab = 'myLeaves';
+                        }
+                    } catch(e) {} finally { 
+                        this.loading = false; 
+                    }
+                },
+
+                get myLeaves() { 
+                    return this.allLeaves.filter(l => String(l.empName).trim() === String(this.user.name).trim()); 
+                },
+                get pendingRequests() { 
+                    return this.allLeaves.filter(l => String(l.status).trim() === 'Pending'); 
+                },
+
+                get fiscalStartDate() {
+                    const now = new Date();
+                    let fyYear = now.getFullYear();
+                    if (now.getMonth() < 3) fyYear -= 1;
+                    return new Date(fyYear, 3, 1); 
+                },
+                
+                get fiscalYearLabel() {
+                    const startYear = this.fiscalStartDate.getFullYear();
+                    return `FY ${startYear}-${(startYear + 1).toString().slice(-2)}`;
+                },
+
+                get balance() {
+                    let cl = 7, ml = 7, pl = 18;
+                    const fStart = this.fiscalStartDate;
+                    
+                    this.myLeaves.forEach(l => {
+                        const leaveDate = new Date(l.startDate);
+                        const statusCheck = String(l.status).trim(); 
+                        
+                        if (leaveDate >= fStart && (statusCheck === 'Approved' || statusCheck === 'Pending')) {
+                            const lType = String(l.leaveType).trim().toUpperCase();
+                            if (lType === 'CL') cl -= parseFloat(l.calcDays);
+                            if (lType === 'ML') ml -= parseFloat(l.calcDays);
+                            if (lType === 'PL') pl -= parseFloat(l.calcDays);
+                        }
+                    });
+                    return { cl: Math.max(0, cl), ml: Math.max(0, ml), pl: Math.max(0, pl) };
+                },
+
+                get groupedHolidays() {
+                    const groups = {};
+                    this.holidays.forEach(h => {
+                        const d = new Date(h.date);
+                        const mYear = this.monthNames[d.getMonth()] + ' ' + d.getFullYear();
+                        if(!groups[mYear]) groups[mYear] = [];
+                        groups[mYear].push({ ...h, dateObj: d });
+                    });
+                    
+                    return Object.keys(groups).map(key => {
+                        return { monthYear: key, items: groups[key].sort((a,b) => a.dateObj - b.dateObj) };
+                    });
+                },
+
+                get daysInMonth() { return new Date(this.currentYear, this.currentMonth + 1, 0).getDate(); },
+                
+                get blankDays() { 
+                    let firstDay = new Date(this.currentYear, this.currentMonth, 1).getDay();
+                    let blanks = (firstDay + 6) % 7; 
+                    return Array.from({ length: blanks }); 
+                },
+
+                changeMonth(dir) {
+                    this.haptic('light');
+                    this.currentMonth += dir;
+                    if (this.currentMonth < 0) { this.currentMonth = 11; this.currentYear--; }
+                    else if (this.currentMonth > 11) { this.currentMonth = 0; this.currentYear++; }
+                },
+
+                isDragging: false,
+                dragStart: null,
+                dragEnd: null,
+
+                startDrag(d) {
+                    this.isDragging = true;
+                    this.dragStart = d;
+                    this.dragEnd = d;
+                },
+                
+                onDragOver(d) {
+                    if (this.isDragging) {
+                        this.dragEnd = d;
+                    }
+                },
+                
+                endDrag() {
+                    if (!this.isDragging) return;
+                    this.isDragging = false;
+                    
+                    if (this.dragStart === null || this.dragEnd === null) return;
+
+                    this.haptic('light');
+                    let start = Math.min(this.dragStart, this.dragEnd);
+                    let end = Math.max(this.dragStart, this.dragEnd);
+
+                    const dtStart = new Date(this.currentYear, this.currentMonth, start);
+                    const dtEnd = new Date(this.currentYear, this.currentMonth, end);
+                    
+                    const fmtStart = dtStart.getFullYear() + '-' + String(dtStart.getMonth()+1).padStart(2,'0') + '-' + String(dtStart.getDate()).padStart(2,'0');
+                    const fmtEnd = dtEnd.getFullYear() + '-' + String(dtEnd.getMonth()+1).padStart(2,'0') + '-' + String(dtEnd.getDate()).padStart(2,'0');
+
+                    this.form.startDate = fmtStart;
+                    this.form.endDate = fmtEnd;
+                    this.form.halfDay = 'None';
+                    this.showApplyModal = true;
+                    
+                    this.dragStart = null;
+                    this.dragEnd = null;
+                },
+                
+                isDayInDragRange(d) {
+                    if (!this.isDragging || this.dragStart === null || this.dragEnd === null) return false;
+                    let min = Math.min(this.dragStart, this.dragEnd);
+                    let max = Math.max(this.dragStart, this.dragEnd);
+                    return d >= min && d <= max;
+                },
+
+                getUIDays() {
+                    if (!this.form.startDate || !this.form.endDate) return 0;
+                    const start = new Date(this.form.startDate);
+                    const end = new Date(this.form.endDate);
+                    if (end < start) return 0;
+                    
+                    if (this.form.startDate === this.form.endDate && this.form.halfDay !== 'None') {
+                        return 0.5;
+                    }
+                    
+                    const diffTime = Math.abs(end - start);
+                    return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                },
+
+                getDayData(d) {
+                    const dt = new Date(this.currentYear, this.currentMonth, d);
+                    const fStr = dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0');
+                    
+                    const hol = this.holidays.find(h => h.date === fStr);
+                    if (hol) return { type: 'holiday', label: (hol.icon || '🎌') + ' ' + hol.name.split(' ')[0], full: hol };
+
+                    const relevantLeaves = this.allLeaves.filter(l => l.status === 'Approved' || l.empName === this.user.name);
+                    
+                    const lv = relevantLeaves.find(l => {
+                        const ls = new Date(l.startDate); const le = new Date(l.endDate);
+                        ls.setHours(0,0,0,0); le.setHours(23,59,59,999);
+                        return dt >= ls && dt <= le;
+                    });
+
+                    if (lv) return { type: lv.status === 'Approved' ? 'approved' : 'pending', label: lv.empName.split(' ')[0], full: lv };
+                    return null;
+                },
+
+                getDayClass(d) {
+                    const data = this.getDayData(d);
+                    if (!data) return 'hover:bg-brand/10 hover:text-brand';
+                    if (data.type === 'holiday') return data.full.type === 'Govt' ? 'bg-holiday-govt' : 'bg-holiday-rest';
+                    if (data.type === 'approved') return 'bg-leave-approved';
+                    if (data.type === 'pending') return 'bg-leave-pending';
+                    return '';
+                },
+
+                getDayLabel(d) {
+                    const data = this.getDayData(d);
+                    return data ? data.label : '';
+                },
+
+                getTooltipData(d) {
+                    const data = this.getDayData(d);
+                    if(!data) return {};
+                    if(data.type === 'holiday') return { name: data.full.name, type: data.full.type + ' Holiday' };
+                    if(data.type === 'approved' || data.type === 'pending') return { name: data.full.empName, type: data.full.leaveType + ' (' + data.full.status + ')' };
+                    return {};
+                },
+
+                get nextHoliday() {
+                    const today = new Date();
+                    today.setHours(0,0,0,0);
+                    const upcoming = this.holidays.filter(h => new Date(h.date) >= today).sort((a, b) => new Date(a.date) - new Date(b.date));
+                    if (upcoming.length > 0) {
+                        const h = upcoming[0];
+                        const dDate = new Date(h.date);
+                        const diffTime = Math.abs(dDate - today);
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                        return { ...h, daysLeft: diffDays };
+                    }
+                    return null;
+                },
+
+                // 🌴 NEW: AUTOMATIC LONG WEEKEND CALCULATOR
+                get longWeekends() {
+                    const lw = [];
+                    
+                    this.holidays.forEach(h => {
+                        const d = new Date(h.date);
+                        const day = d.getDay(); // 0=Sun, 1=Mon, ..., 5=Fri, 6=Sat
+                        let range = '';
+                        
+                        // Check if it creates a long weekend
+                        if (day === 1) range = 'Sat - Mon (3 Days)';
+                        else if (day === 5) range = 'Fri - Sun (3 Days)';
+                        else if (day === 4) range = 'Thu - Sun (Take Fri Off)';
+                        else if (day === 2) range = 'Sat - Tue (Take Mon Off)';
+                        
+                        if (range) {
+                            lw.push({ ...h, range: range });
+                        }
+                    });
+                    
+                    // Sort chronologically
+                    return lw.sort((a, b) => new Date(a.date) - new Date(b.date));
+                },
+
+                async submitLeave() {
+                    if(!this.form.reason) { this.haptic('error'); alert("Please provide a reason."); return; }
+                    this.saving = true;
+                    try {
+                        const payload = { action: 'applyLeave', empName: this.user.name, locationContext: this.currentLocation, ...this.form };
+                        const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+                        const result = await res.json();
+                        if (result.status === 'success') { this.haptic('success'); this.showApplyModal = false; this.fetchData(); }
+                        else { this.haptic('error'); alert(result.message); }
+                    } catch(e) { this.haptic('error'); alert("Failed to apply leave."); } finally { this.saving = false; }
+                },
+
+                updateStatus(id, action) {
+                    this.haptic('light');
+                    this.adminForm = { id: id, status: action, remarks: '', secret: '' };
+                    this.showApproveModal = true;
+                },
+
+                async confirmAction() {
+                    if (this.adminForm.secret !== 'PBL2026') { this.haptic('error'); alert("❌ Invalid Admin Key"); return; }
+                    this.saving = true;
+                    try {
+                        const payload = { action: 'updateLeaveStatus', ...this.adminForm };
+                        await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+                        this.haptic('success');
+                        this.showApproveModal = false;
+                        this.fetchData();
+                    } catch(e) {} finally { this.saving = false; }
+                }
+            }));
+        });
+    </script>
+</body>
+</html>
