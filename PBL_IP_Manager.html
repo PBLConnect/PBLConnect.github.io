@@ -797,9 +797,10 @@
                     get isps() {
                         if (this.currentLocation === 'Dehradun') {
                             return {
-                                primary: { id: 'GSTech 10Mbps Fiber', short: 'GSTech 10M', icon: 'fa-tower-broadcast' },
-                                secondary: { id: 'STPI Leased 4Mbps', short: 'STPI 4M', icon: 'fa-satellite-dish' },
-                                broadband: { id: 'BSNL 15Mbps Fiber', short: 'BSNL 15M', icon: 'fa-wifi' }
+                                // 📍 FIX: 'id' exactly Google Sheet ke 'Connection Type' column jaisa match kiya gaya hai
+                                primary: { id: 'GSTCH', short: 'GSTech 10M', icon: 'fa-tower-broadcast' },
+                                secondary: { id: 'STPI', short: 'STPI 4M', icon: 'fa-satellite-dish' },
+                                broadband: { id: 'BSNL', short: 'BSNL 15M', icon: 'fa-wifi' }
                             };
                         } else {
                             return {
