@@ -1,9 +1,11 @@
-<!DOCTYPE html> <!-- HTML5 Document -->
+<!DOCTYPE html>
 <html lang="en" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PBL Network Monitor | WAN v1.3</title>
+    <script src="pbl-config.js"></script>
+    <title>PBL Network Monitor | WAN</title>
+    <script>document.title += " " + PBL_APP_VERSION;</script>
     <link rel="icon" type="image/x-icon" href="Assets/images/pbl-logo.ico">
     
     <!-- PWA Setup -->
@@ -13,13 +15,14 @@
 	
     <!-- SECURITY CHECK SCRIPT -->
     <script>
-        if (!sessionStorage.getItem('isLoggedIn')) {
-            window.location.href = 'it-login.html';
-        }
+        try {
+            if (!sessionStorage.getItem('isLoggedIn')) { window.location.href = 'it-login.html'; }
+        } catch(e) {}
     </script>
     
     <!-- Dependencies -->
     <script src="https://cdn.tailwindcss.com"></script>
+	
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
@@ -56,7 +59,6 @@
         body { background-color: #f1f5f9; transition: background-color 0.2s; }
         .dark body { background-color: #020617; }
         
-        /* Scrollbar Styling */
         .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
         .custom-scroll::-webkit-scrollbar-track { background: transparent; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
@@ -65,13 +67,9 @@
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* ISP Cards */
         .isp-card {
             transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            position: relative;
-            overflow: hidden;
-            border: 1px solid rgba(0,0,0,0.05);
-            backdrop-filter: blur(10px);
+            position: relative; overflow: hidden; border: 1px solid rgba(0,0,0,0.05); backdrop-filter: blur(10px);
         }
         @media (hover: hover) {
             .isp-card:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1); z-index: 20; }
@@ -82,79 +80,57 @@
         .dark .status-dot { box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.8); }
         .animate-pulse-fast { animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
 		
-		/* Premium Centered Loader */
         .spinnerContainer { display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .spinner { width: 50px; height: 50px; display: grid; border: 4px solid #0000; border-radius: 50%; border-right-color: #3b82f6; animation: tri-spinner 1s infinite linear; }
         .spinner::before, .spinner::after { content: ""; grid-area: 1/1; margin: 2px; border: inherit; border-radius: 50%; animation: tri-spinner 2s infinite; }
         .spinner::after { margin: 8px; animation-duration: 3s; }
         @keyframes tri-spinner { 100% { transform: rotate(1turn); } }
 
-        /* Fixed Word Carousel Loader */
         .loader { color: #334155; font-family: 'Outfit', sans-serif; font-weight: 900; font-size: 20px; box-sizing: content-box; height: 30px; padding: 0; display: flex; align-items: center; margin-top: 20px; overflow: hidden; }
         .dark .loader { color: #cbd5e1; }
         .words { overflow: hidden; height: 30px; line-height: 30px; }
         .word { display: block; height: 100%; padding-left: 6px; color: #3b82f6; animation: cycle-words 6s infinite; }
         .dark .word { color: #60a5fa; }
         
-        @keyframes cycle-words {
-            0%, 25% { transform: translateY(0%); }
-            33%, 58% { transform: translateY(-100%); }
-            66%, 91% { transform: translateY(-200%); }
-            100% { transform: translateY(-300%); }
-        }
+        @keyframes cycle-words { 0%, 25% { transform: translateY(0%); } 33%, 58% { transform: translateY(-100%); } 66%, 91% { transform: translateY(-200%); } 100% { transform: translateY(-300%); } }
     </style>
 </head>
 
 <body class="text-slate-800 dark:text-slate-200 h-[100dvh] flex flex-col overflow-hidden selection:bg-brand selection:text-white" x-data="wanSystem()">
 
-    <!-- NAVBAR (Redesigned Header IP Manager style) -->
-    <header class="sticky top-0 bg-white/70 dark:bg-[#020617]/70 backdrop-blur-2xl border-b border-slate-200/80 dark:border-white/5 flex-shrink-0 h-16 sm:h-20 z-40">
-        <div class="max-w-[1920px] mx-auto px-4 sm:px-6 h-full flex justify-between items-center relative">
+    <!-- NAVBAR (Unified Design matching Leave Tracker, AssetDB & Switch Map) -->
+    <header class="sticky top-0 bg-white/80 dark:bg-[#020617]/80 backdrop-blur-2xl border-b border-slate-200/80 dark:border-white/5 flex-shrink-0 h-16 sm:h-20 z-40">
+        <div class="max-w-[1920px] mx-auto px-4 sm:px-6 h-full flex justify-between items-center gap-4">
             
-            <!-- Left: Logo & Identity -->
-            <div class="flex items-center gap-3 sm:gap-4">
-                
-                <!-- App Logo -->
-                <a href="IT_Dashboard.html" @click="haptic('light')" class="group flex items-center transition-transform active:scale-95" title="Return to Dashboard">
-                    <div class="relative h-8 sm:h-10 w-auto flex items-center">
+            <!-- Left: Logo & Title -->
+            <div class="flex items-center gap-3 sm:gap-4 shrink-0">
+                <a href="IT_Dashboard.html" @click="haptic('light')" class="group flex items-center transition-transform active:scale-95" title="Return to IT Dashboard">
+                    <div class="relative h-9 sm:h-11 w-auto flex items-center">
                         <img src="pbl-logo.png" alt="PBL Logo" class="h-full w-auto object-contain drop-shadow-md transition-transform group-hover:scale-105" @error="$el.style.display='none'; $refs.fbLogo.style.display='flex'">
-                        <div x-ref="fbLogo" style="display:none;" class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-tr from-brand to-indigo-600 text-white rounded-xl flex items-center justify-center font-black text-xl shadow-[0_0_15px_rgba(59,130,246,0.4)] group-hover:shadow-[0_0_25px_rgba(59,130,246,0.6)] transition-all">P</div>
+                        <div x-ref="fbLogo" style="display:none;" class="w-9 h-9 sm:w-11 sm:h-11 bg-gradient-to-tr from-brand to-indigo-600 text-white rounded-xl flex items-center justify-center font-black text-xl shadow-[0_0_15px_rgba(59,130,246,0.4)] group-hover:shadow-[0_0_25px_rgba(59,130,246,0.6)] transition-all">P</div>
                     </div>
                 </a>
-
-                <!-- Page Identity (Divider removed, properly aligned) -->
                 <div class="flex flex-col justify-center">
-                    <div class="flex items-center gap-1.5 sm:gap-2 mb-0.5 sm:mb-1">
-                        <span class="bg-brand/10 text-brand px-1.5 py-0.5 rounded font-mono font-bold text-[8px] sm:text-[9px] leading-none border border-brand/20">v1.3</span>
-                        <span class="inline-block text-[8px] sm:text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-md">NETWORK OPS</span>
+                    <div class="flex items-center gap-2 mb-0.5">
+                        <span class="px-2 py-0.5 rounded-md bg-blue-50 text-blue-600 border border-blue-200 dark:bg-brand/10 dark:border-brand/30 dark:text-brand_glow font-mono font-black text-[9px] leading-none shadow-sm" x-text="PBL_APP_VERSION"></span>
+                        <span class="hidden sm:inline-block text-[9px] font-black text-slate-400 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-md">NETWORK OPS</span>
                     </div>
-                    <!-- Two-color text exactly like ITDashboard -->
-                    <h2 class="font-heading font-black text-lg sm:text-2xl text-slate-800 dark:text-white leading-tight tracking-tight">WAN<span class="text-brand dark:text-brand_glow">Logs</span></h2>
+                    <h2 class="font-heading font-black text-lg sm:text-2xl text-slate-800 dark:text-white leading-tight tracking-tight mt-0.5">WAN<span class="text-brand dark:text-brand_glow">Logs</span></h2>
                 </div>
             </div>
 
-            <!-- Center: Global Command Center (Spotlight Search) -->
-            <div class="hidden xl:flex items-center absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 transition-all duration-500 ease-out"
+            <!-- Global Search (Fluid Center Alignment) -->
+            <div class="hidden lg:flex items-center justify-center flex-1 z-20 px-2 min-w-0 transition-all duration-300"
                  x-data="{ isFocused: false }"
-                 @keydown.window="if ($event.ctrlKey && $event.key === '/') { $event.preventDefault(); $refs.globalSearch.focus(); }"
-                 :class="isFocused ? 'w-[450px]' : 'w-[320px]'">
-                
-                <div class="relative w-full h-10 rounded-full p-[1.5px] overflow-hidden flex items-center justify-center group shadow-sm transition-all"
-                     :class="isFocused ? 'shadow-[0_0_20px_rgba(168,85,247,0.25)]' : ''">
+                 @keydown.window="if ($event.ctrlKey && $event.key === '/') { $event.preventDefault(); $refs.globalSearch.focus(); }">
+                <div class="relative h-10 rounded-full p-[1.5px] overflow-hidden flex items-center justify-center group shadow-sm transition-all duration-500 ease-out origin-center" 
+                     :class="isFocused ? 'w-[450px] shadow-[0_0_20px_rgba(59,130,246,0.25)]' : 'w-[320px] max-w-full'">
                     <div class="absolute inset-0 bg-slate-200 dark:bg-white/10 transition-opacity duration-300" :class="isFocused ? 'opacity-0' : 'opacity-100'"></div>
-                    <div class="absolute w-[300%] h-[300%] animate-[spin_2.5s_linear_infinite] opacity-0 transition-opacity duration-500"
-                         :class="isFocused ? 'opacity-100' : 'opacity-0'" style="background: conic-gradient(transparent 40%, #3b82f6, #a855f7, #ec4899, transparent 70%);"></div>
+                    <div class="absolute w-[300%] h-[300%] animate-[spin_2.5s_linear_infinite] opacity-0 transition-opacity duration-500" :class="isFocused ? 'opacity-100' : 'opacity-0'" style="background: conic-gradient(transparent 40%, #3b82f6, #a855f7, #ec4899, transparent 70%);"></div>
 
                     <div class="relative z-10 w-full h-full bg-white dark:bg-dark_surface rounded-full flex items-center px-4 gap-3 transition-colors duration-300">
                         <i class="fa-solid fa-magnifying-glass transition-colors duration-300" :class="isFocused ? 'text-brand' : 'text-slate-400 dark:text-slate-500'"></i>
-                        
-                        <input type="search" x-ref="globalSearch" x-model="searchQuery" 
-					   autocomplete="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-form-type="other"
-					   readonly onfocus="this.removeAttribute('readonly');"
-					   @focus="isFocused = true; haptic('light')" @blur="isFocused = false"
-					   placeholder="Search Events, Logs, ISPs..."
-					   class="w-full bg-transparent border-none outline-none text-xs font-medium text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500">
-                        
+                        <input type="search" x-ref="globalSearch" x-model="searchQuery" autocomplete="off" autocorrect="off" spellcheck="false" readonly onfocus="this.removeAttribute('readonly');" @focus="isFocused = true; haptic('light')" @blur="isFocused = false" placeholder="Search Events, Logs, ISPs..." class="w-full bg-transparent border-none outline-none text-xs font-medium text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500">
                         <div class="shrink-0 flex items-center gap-1 transition-all duration-300 pointer-events-none" :class="isFocused ? 'opacity-0 translate-x-2' : 'opacity-100 translate-x-0'">
                             <kbd class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/5 text-[9px] font-mono font-bold text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-white/10 shadow-sm">CTRL</kbd>
                             <kbd class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/5 text-[9px] font-mono font-bold text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-white/10 shadow-sm">/</kbd>
@@ -163,153 +139,160 @@
                 </div>
             </div>
 
-            <!-- Right Actions -->
-            <div class="flex items-center justify-end gap-2 sm:gap-3 w-auto relative z-30">
-                <div class="flex items-center gap-1.5 sm:gap-2 bg-slate-100/80 dark:bg-black/40 p-1 sm:p-1.5 rounded-full border border-slate-200/50 dark:border-white/5 shadow-inner backdrop-blur-sm shrink-0">
+            <!-- Right Actions (Unified Profile UI) -->
+            <div class="flex items-center justify-end gap-1.5 sm:gap-4 shrink-0 relative z-30">
+                
+                <!-- Mobile Search Toggle -->
+                <button type="button" @click="mobileSearchOpen = !mobileSearchOpen; if(mobileSearchOpen) setTimeout(()=> $refs.mobSearchInput.focus(), 100); haptic('light')" class="lg:hidden w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 shadow-sm active:scale-95 shrink-0 hover:text-brand">
+                    <i class="fa-solid fa-magnifying-glass text-[13px]"></i>
+                </button>
+
+                <!-- Report Event Button -->
+                <button @click="openModal('add')" class="hidden sm:flex items-center gap-1.5 h-9 px-3.5 rounded-full bg-rose-50 hover:bg-rose-100 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/30 transition-all shadow-sm font-bold text-[11px] active:scale-95 shrink-0">
+                    <i class="fa-solid fa-triangle-exclamation text-[13px]"></i> <span class="tracking-wide">Report Event</span>
+                </button>
+                <button @click="openModal('add')" class="sm:hidden w-8 h-8 flex items-center justify-center rounded-full bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/30 shadow-sm active:scale-95 shrink-0">
+                    <i class="fa-solid fa-triangle-exclamation text-sm"></i>
+                </button>
+
+                <div class="hidden sm:block w-px h-6 bg-slate-200 dark:bg-white/10"></div>
+
+                <!-- Location & Theme Pill -->
+                <div class="flex items-center gap-0.5 sm:gap-1 bg-white dark:bg-dark_surface p-0.5 sm:p-1 rounded-full border border-slate-200 dark:border-white/10 shadow-sm shrink-0">
+                    <template x-if="isGlobal">
+                        <button @click="toggleLocation()" class="h-7 px-2.5 sm:px-3 flex items-center justify-center rounded-full bg-slate-800 text-white dark:bg-white dark:text-slate-900 shadow-sm transition-transform active:scale-95 gap-1 font-bold text-[9px] sm:text-[10px]">
+                            <i class="fa-solid fa-location-dot"></i> <span x-text="currentLocation"></span>
+                        </button>
+                    </template>
+                    <template x-if="!isGlobal">
+                        <div class="h-7 px-2.5 sm:px-3 flex items-center justify-center rounded-full bg-slate-100 dark:bg-black/30 text-slate-500 dark:text-slate-400 gap-1 font-bold text-[9px] sm:text-[10px] cursor-default">
+                            <i class="fa-solid fa-location-dot opacity-70"></i> <span x-text="currentLocation"></span>
+                        </div>
+                    </template>
+                    <button @click="toggleTheme()" class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors">
+                        <i class="fa-solid text-[12px] sm:text-[13px]" :class="isDark ? 'fa-sun text-amber-400' : 'fa-moon'"></i>
+                    </button>
+                </div>
+
+                <div class="hidden sm:block w-px h-6 bg-slate-200 dark:bg-white/10 mx-0.5 sm:mx-1"></div>
+
+                <!-- Unified Profile Dropdown -->
+                <div class="relative shrink-0" x-data="{ showProfile: false }" @click.outside="showProfile = false">
+                    <div @click="showProfile = !showProfile" class="flex items-center gap-1.5 sm:gap-2 cursor-pointer group rounded-xl p-0 sm:p-1 sm:pr-2 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-brand to-indigo-600 flex items-center justify-center text-white text-[11px] sm:text-xs font-black shadow-md border border-white/20 relative shrink-0">
+                            <span x-text="currentUser?.name ? currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0,2) : '??'"></span>
+                            <div class="absolute -bottom-1 -right-1 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-brand border-2 border-white dark:border-dark_surface rounded-full shadow-sm"></div>
+                        </div>
+                        <div class="hidden sm:flex flex-col text-left max-w-[150px] lg:max-w-[350px] xl:max-w-[400px] min-w-0">
+                            <span class="text-[13px] font-bold text-slate-800 dark:text-white leading-none truncate" x-text="currentUser?.name || 'User'"></span>
+                            <span class="text-[9px] text-slate-500 dark:text-slate-400 font-bold truncate lg:text-clip lg:overflow-visible lg:whitespace-nowrap uppercase tracking-widest mt-1" x-text="currentUser?.role || 'Network Ops'" :title="currentUser?.role"></span>
+                        </div>
+                        <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 group-hover:text-brand transition-transform shrink-0 ml-1 hidden sm:block" :class="showProfile ? 'rotate-180' : ''"></i>
+                    </div>
                     
-                    <!-- Report New Event Button -->
-                    <button @click="openModal('add')" class="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-rose-50 hover:bg-rose-100 dark:bg-rose-500/10 dark:hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 transition-all border border-rose-200 dark:border-rose-500/30 shadow-sm hover:shadow-md active:scale-95" title="Report Event">
-                        <i class="fa-solid fa-triangle-exclamation text-[12px] sm:text-[14px]"></i>
-                    </button>
-
-                    <!-- Mobile Search Toggle -->
-                    <button type="button" @click="mobileSearchOpen = !mobileSearchOpen; if(mobileSearchOpen) setTimeout(()=> $refs.mobSearchInput.focus(), 100); haptic('light')" class="xl:hidden w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-white dark:bg-dark_surface hover:bg-slate-50 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-all border border-slate-200 dark:border-white/10 shadow-sm hover:shadow-md">
-                        <i class="fa-solid fa-magnifying-glass text-[12px] sm:text-[14px]"></i>
-                    </button>
-
-                    <!-- Theme Toggle -->
-                    <button type="button" @click.prevent="toggleTheme()" class="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-white dark:bg-dark_surface hover:bg-slate-50 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-all border border-slate-200 dark:border-white/10 shadow-sm hover:shadow-md hover:text-brand dark:hover:text-brand_glow">
-                        <i class="fa-solid text-[13px] sm:text-[15px]" :class="isDark ? 'fa-sun text-amber-400 drop-shadow-[0_0_5px_rgba(251,191,36,0.5)]' : 'fa-moon'"></i>
-                    </button>
-
-                    <!-- Back to Hub Button -->
-                    <a href="IT_Dashboard.html" @click="haptic('light')" class="flex items-center justify-center gap-1.5 h-8 sm:h-10 px-3 sm:px-4 rounded-full bg-slate-800 dark:bg-white hover:bg-slate-900 dark:hover:bg-slate-100 text-white dark:text-slate-900 transition-all border border-transparent shadow-sm hover:shadow-md active:scale-95" title="Back to Dashboard">
-                        <i class="fa-solid fa-arrow-left text-[11px] sm:text-[13px]"></i> <span class="text-[10px] sm:text-xs font-bold">Hub</span>
-                    </a>
+                    <div x-show="showProfile" x-transition.origin.top.right class="absolute right-0 top-full mt-2 w-48 bg-white/95 dark:bg-dark_surface/95 backdrop-blur-xl rounded-2xl shadow-xl border border-slate-200 dark:border-dark_border z-[100] overflow-hidden" style="display: none;">
+                        <div class="p-2 space-y-1">
+                            <a href="IT_Dashboard.html" class="w-full text-left flex items-center gap-3 px-4 py-2.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-500/10 dark:hover:text-blue-400 rounded-xl transition"><i class="fa-solid fa-gauge opacity-70"></i> IT Dashboard</a>
+                            <div class="h-px bg-slate-100 dark:bg-white/10 my-1"></div>
+                            <button onclick="sessionStorage.clear(); window.location.href='it-login.html';" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition text-left"><i class="fa-solid fa-arrow-right-from-bracket opacity-70"></i> Secure Logout</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- 🚀 MOBILE SEARCH SLIDE-DOWN BAR -->
-        <div x-show="mobileSearchOpen" 
-             x-transition:enter="transition ease-out duration-200 transform"
-             x-transition:enter-start="-translate-y-full opacity-0"
-             x-transition:enter-end="translate-y-0 opacity-100"
-             x-transition:leave="transition ease-in duration-150 transform"
-             x-transition:leave-start="translate-y-0 opacity-100"
-             x-transition:leave-end="-translate-y-full opacity-0"
-             x-cloak
-             class="absolute top-full left-0 w-full p-3 bg-white/95 dark:bg-dark_surface/95 backdrop-blur-xl border-b border-slate-200 dark:border-dark_border shadow-xl xl:hidden -mt-px" style="z-index: 35;">
+        <!-- Mobile search panel -->
+        <div x-show="mobileSearchOpen" x-cloak class="absolute top-full left-0 w-full p-3 bg-white/95 dark:bg-dark_surface/95 backdrop-blur-xl border-b border-slate-200 dark:border-dark_border shadow-xl lg:hidden -mt-px" style="z-index: 35;">
             <div class="relative w-full max-w-md mx-auto">
                 <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-brand text-sm"></i>
-                <input type="search" x-ref="mobSearchInput" x-model="searchQuery" 
-			   autocomplete="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-form-type="other"
-			   readonly onfocus="this.removeAttribute('readonly');"
-			   placeholder="Search Events, Logs, ISPs..." 
-			   class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl pl-10 pr-10 py-3 text-xs sm:text-sm font-bold text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-brand/30 transition shadow-inner placeholder-slate-400">
-                <button @click="searchQuery = ''; mobileSearchOpen = false; haptic('light')" class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-slate-200 dark:hover:bg-white/10 transition">
-                    <i class="fa-solid fa-xmark text-sm"></i>
-                </button>
+                <input type="search" x-ref="mobSearchInput" x-model="searchQuery" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');" placeholder="Search Events, Logs, ISPs..." class="w-full bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl pl-10 pr-10 py-3 text-xs sm:text-sm font-bold text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-brand/30 transition shadow-inner placeholder-slate-400">
+                <button @click="searchQuery = ''; mobileSearchOpen = false; haptic('light')" class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-slate-200 dark:hover:bg-white/10 transition"><i class="fa-solid fa-xmark text-sm"></i></button>
             </div>
         </div>
     </header>
 
-    <!-- MAIN CONTENT -->
     <main class="flex-1 flex flex-col overflow-y-auto p-4 sm:p-6 bg-slate-50/50 dark:bg-[#020617]">
         <div class="max-w-[1920px] mx-auto w-full flex flex-col gap-4 sm:gap-6 h-full">
             
-            <!-- ISP CARDS (Bento Box Mobile 3-Cols | Bold Desktop) -->
+            <!-- 📍 ISP CARDS (DYNAMIC BASED ON LOCATION) -->
             <div class="cards-container grid grid-cols-3 gap-2 md:gap-4 shrink-0">
                 
-                <!-- CARD 1: Airtel LL -->
-                <div @click="filterBy('Airtel Leased Line')" class="isp-card bg-gradient-to-br from-rose-50 to-white dark:from-rose-900/10 dark:to-transparent rounded-2xl md:rounded-[1.25rem] p-2.5 sm:p-4 shadow-sm hover:shadow-md border cursor-pointer select-none group flex flex-col justify-between min-h-[85px] sm:min-h-[125px] relative" :class="activeFilter === 'Airtel Leased Line' ? 'border-rose-500 ring-2 ring-rose-500/30 transform scale-[1.02]' : (activeFilter ? 'opacity-40 border-rose-100 dark:border-rose-900/50' : 'border-rose-100 dark:border-rose-900/50')">
-                    
-                    <i class="fa-solid fa-tower-broadcast absolute -bottom-2 -right-2 text-5xl sm:text-8xl text-rose-500 opacity-20 dark:opacity-10 group-hover:scale-110 transition-transform duration-500"></i>
+                <!-- CARD 1: PRIMARY ISP -->
+                <div @click="filterBy(isps.primary.id)" class="isp-card bg-gradient-to-br from-rose-50 to-white dark:from-rose-900/10 dark:to-transparent rounded-2xl md:rounded-[1.25rem] p-2.5 sm:p-4 shadow-sm hover:shadow-md border cursor-pointer select-none group flex flex-col justify-between min-h-[85px] sm:min-h-[125px] relative" :class="activeFilter === isps.primary.id ? 'border-rose-500 ring-2 ring-rose-500/30 transform scale-[1.02]' : (activeFilter ? 'opacity-40 border-rose-100 dark:border-rose-900/50' : 'border-rose-100 dark:border-rose-900/50')">
+                    <i class="fa-solid absolute -bottom-2 -right-2 text-5xl sm:text-8xl opacity-20 dark:opacity-10 group-hover:scale-110 transition-transform duration-500 text-rose-500" :class="isps.primary.icon"></i>
                     <div class="absolute top-2.5 right-2.5 z-20"><span class="status-dot w-2 h-2 sm:w-2.5 sm:h-2.5 bg-emerald-500 animate-pulse-fast shadow-[0_0_5px_rgba(16,185,129,0.5)] border-2 border-white dark:border-dark_surface rounded-full block"></span></div>
-
                     <div class="flex items-center justify-between relative z-10 mb-1 sm:mb-2">
                         <div class="flex items-center gap-1.5 sm:gap-2">
-                            <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white dark:bg-dark_surface shadow-sm flex items-center justify-center text-rose-500 text-[10px] sm:text-xs shrink-0"><i class="fa-solid fa-tower-broadcast"></i></div>
-                            <span class="hidden sm:inline-block text-[11px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest leading-none truncate">Production</span>
+                            <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white dark:bg-dark_surface shadow-sm flex items-center justify-center text-[10px] sm:text-xs shrink-0 text-rose-500"><i class="fa-solid" :class="isps.primary.icon"></i></div>
+                            <span class="hidden sm:inline-block text-[11px] font-black uppercase tracking-widest leading-none truncate text-rose-600 dark:text-rose-400" x-text="isps.primary.short"></span>
                         </div>
                     </div>
-                    
                     <div class="relative z-10 mt-auto">
                         <div class="flex items-baseline gap-0.5 sm:gap-1">
-                            <h3 class="text-2xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none">15</h3>
+                            <h3 class="text-2xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none" x-text="isps.primary.speed"></h3>
                             <span class="text-[8px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest">Mbps</span>
                         </div>
                         <p class="text-[8px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1.5 truncate">
-                            <span class="sm:hidden">Airtel LL</span>
-                            <span class="hidden sm:inline">Airtel Leased Line</span> 🔴
+                            <span class="sm:hidden" x-text="isps.primary.short"></span>
+                            <span class="hidden sm:inline" x-text="isps.primary.id.split('(')[0]"></span> 🔴
                         </p>
                     </div>
                 </div>
 
-                <!-- CARD 2: STPI LL -->
-                <div @click="filterBy('STPI Leased Line')" class="isp-card bg-gradient-to-br from-sky-50 to-white dark:from-sky-900/10 dark:to-transparent rounded-2xl md:rounded-[1.25rem] p-2.5 sm:p-4 shadow-sm hover:shadow-md border cursor-pointer select-none group flex flex-col justify-between min-h-[85px] sm:min-h-[125px] relative" :class="activeFilter === 'STPI Leased Line' ? 'border-sky-500 ring-2 ring-sky-500/30 transform scale-[1.02]' : (activeFilter ? 'opacity-40 border-sky-100 dark:border-sky-900/50' : 'border-sky-100 dark:border-sky-900/50')">
-                    
-                    <i class="fa-solid fa-satellite-dish absolute -bottom-2 -right-2 text-5xl sm:text-8xl text-sky-500 opacity-20 dark:opacity-10 group-hover:scale-110 transition-transform duration-500"></i>
+                <!-- CARD 2: SECONDARY ISP -->
+                <div @click="filterBy(isps.secondary.id)" class="isp-card bg-gradient-to-br from-sky-50 to-white dark:from-sky-900/10 dark:to-transparent rounded-2xl md:rounded-[1.25rem] p-2.5 sm:p-4 shadow-sm hover:shadow-md border cursor-pointer select-none group flex flex-col justify-between min-h-[85px] sm:min-h-[125px] relative" :class="activeFilter === isps.secondary.id ? 'border-sky-500 ring-2 ring-sky-500/30 transform scale-[1.02]' : (activeFilter ? 'opacity-40 border-sky-100 dark:border-sky-900/50' : 'border-sky-100 dark:border-sky-900/50')">
+                    <i class="fa-solid absolute -bottom-2 -right-2 text-5xl sm:text-8xl opacity-20 dark:opacity-10 group-hover:scale-110 transition-transform duration-500 text-sky-500" :class="isps.secondary.icon"></i>
                     <div class="absolute top-2.5 right-2.5 z-20"><span class="status-dot w-2 h-2 sm:w-2.5 sm:h-2.5 bg-emerald-500 animate-pulse-fast shadow-[0_0_5px_rgba(16,185,129,0.5)] border-2 border-white dark:border-dark_surface rounded-full block"></span></div>
-
                     <div class="flex items-center justify-between relative z-10 mb-1 sm:mb-2">
                         <div class="flex items-center gap-1.5 sm:gap-2">
-                            <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white dark:bg-dark_surface shadow-sm flex items-center justify-center text-sky-500 text-[10px] sm:text-xs shrink-0"><i class="fa-solid fa-satellite-dish"></i></div>
-                            <span class="hidden sm:inline-block text-[11px] font-black text-sky-600 dark:text-sky-400 uppercase tracking-widest leading-none truncate">Production</span>
+                            <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white dark:bg-dark_surface shadow-sm flex items-center justify-center text-[10px] sm:text-xs shrink-0 text-sky-500"><i class="fa-solid" :class="isps.secondary.icon"></i></div>
+                            <span class="hidden sm:inline-block text-[11px] font-black uppercase tracking-widest leading-none truncate text-sky-600 dark:text-sky-400" x-text="isps.secondary.short"></span>
                         </div>
                     </div>
-                    
                     <div class="relative z-10 mt-auto">
                         <div class="flex items-baseline gap-0.5 sm:gap-1">
-                            <h3 class="text-2xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none">15</h3>
+                            <h3 class="text-2xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none" x-text="isps.secondary.speed"></h3>
                             <span class="text-[8px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest">Mbps</span>
                         </div>
                         <p class="text-[8px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1.5 truncate">
-                            <span class="sm:hidden">STPI Fiber</span>
-                            <span class="hidden sm:inline">STPI Fiber/RF</span> 📡
+                            <span class="sm:hidden" x-text="isps.secondary.short"></span>
+                            <span class="hidden sm:inline" x-text="isps.secondary.id.split('(')[0]"></span> 📡
                         </p>
                     </div>
                 </div>
 
-                <!-- CARD 3: Airtel BB -->
-                <div @click="filterBy('Airtel Broadband')" class="isp-card bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-900/10 dark:to-transparent rounded-2xl md:rounded-[1.25rem] p-2.5 sm:p-4 shadow-sm hover:shadow-md border cursor-pointer select-none group flex flex-col justify-between min-h-[85px] sm:min-h-[125px] relative" :class="activeFilter === 'Airtel Broadband' ? 'border-emerald-500 ring-2 ring-emerald-500/30 transform scale-[1.02]' : (activeFilter ? 'opacity-40 border-emerald-100 dark:border-emerald-900/50' : 'border-emerald-100 dark:border-emerald-900/50')">
-                    
-                    <i class="fa-solid fa-wifi absolute -bottom-2 -right-2 text-5xl sm:text-8xl text-emerald-500 opacity-20 dark:opacity-10 group-hover:scale-110 transition-transform duration-500"></i>
+                <!-- CARD 3: BROADBAND ISP -->
+                <div @click="filterBy(isps.broadband.id)" class="isp-card bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-900/10 dark:to-transparent rounded-2xl md:rounded-[1.25rem] p-2.5 sm:p-4 shadow-sm hover:shadow-md border cursor-pointer select-none group flex flex-col justify-between min-h-[85px] sm:min-h-[125px] relative" :class="activeFilter === isps.broadband.id ? 'border-emerald-500 ring-2 ring-emerald-500/30 transform scale-[1.02]' : (activeFilter ? 'opacity-40 border-emerald-100 dark:border-emerald-900/50' : 'border-emerald-100 dark:border-emerald-900/50')">
+                    <i class="fa-solid absolute -bottom-2 -right-2 text-5xl sm:text-8xl opacity-20 dark:opacity-10 group-hover:scale-110 transition-transform duration-500 text-emerald-500" :class="isps.broadband.icon"></i>
                     <div class="absolute top-2.5 right-2.5 z-20"><span class="status-dot w-2 h-2 sm:w-2.5 sm:h-2.5 bg-emerald-500 animate-pulse-fast shadow-[0_0_5px_rgba(16,185,129,0.5)] border-2 border-white dark:border-dark_surface rounded-full block"></span></div>
-
                     <div class="flex items-center justify-between relative z-10 mb-1 sm:mb-2">
                         <div class="flex items-center gap-1.5 sm:gap-2">
-                            <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white dark:bg-dark_surface shadow-sm flex items-center justify-center text-emerald-500 text-[10px] sm:text-xs shrink-0"><i class="fa-solid fa-wifi"></i></div>
-                            <span class="hidden sm:inline-block text-[11px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest leading-none truncate">Admin Dept</span>
+                            <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white dark:bg-dark_surface shadow-sm flex items-center justify-center text-[10px] sm:text-xs shrink-0 text-emerald-500"><i class="fa-solid" :class="isps.broadband.icon"></i></div>
+                            <span class="hidden sm:inline-block text-[11px] font-black uppercase tracking-widest leading-none truncate text-emerald-600 dark:text-emerald-400" x-text="isps.broadband.short"></span>
                         </div>
                     </div>
-                    
                     <div class="relative z-10 mt-auto">
                         <div class="flex items-baseline gap-0.5 sm:gap-1">
-                            <h3 class="text-2xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none">30</h3>
+                            <h3 class="text-2xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none" x-text="isps.broadband.speed"></h3>
                             <span class="text-[8px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest">Mbps</span>
                         </div>
                         <p class="text-[8px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1.5 truncate">
-                            <span class="sm:hidden">Airtel BB</span>
-                            <span class="hidden sm:inline">Airtel Broadband</span> 🟢
+                            <span class="sm:hidden" x-text="isps.broadband.short"></span>
+                            <span class="hidden sm:inline" x-text="isps.broadband.id.split('(')[0]"></span> 🟢
                         </p>
                     </div>
                 </div>
 
             </div>
 
-         <!-- LOGS TABLE WRAPPER -->
             <div class="flex-1 flex flex-col relative z-10">
-
-                <!-- TABLE CONTAINER -->
                 <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl rounded-3xl border border-slate-200 dark:border-dark_border shadow-sm flex flex-col flex-1 h-[450px] md:h-[500px] overflow-hidden relative mb-6 lg:mb-0">
                     
-                    <!-- HEADER -->
                     <div class="px-3 py-2.5 sm:px-5 sm:py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-black/20 flex justify-between items-center shrink-0">
                         <div class="flex items-center gap-3">
                             <h3 class="font-heading font-black text-xs sm:text-base text-slate-800 dark:text-white flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-brand opacity-80"></i> Event Logs</h3>
                             <div x-show="activeFilter" class="hidden sm:flex items-center gap-2 px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-widest cursor-pointer transition border shadow-sm" :class="getBadgeClass()" @click="filterBy(activeFilter)">
-                                <span x-text="activeFilter"></span> <i class="fa-solid fa-xmark hover:scale-125 transition"></i>
+                                <span x-text="activeFilter.split('(')[0]"></span> <i class="fa-solid fa-xmark hover:scale-125 transition"></i>
                             </div>
                         </div>
                         
@@ -321,15 +304,9 @@
                         </div> 
                     </div>
                     
-                    <!-- SCROLLABLE AREA -->
                     <div class="w-full flex-1 overflow-y-auto overflow-x-hidden custom-scroll relative bg-white/50 dark:bg-transparent">
                         
-                        <!-- 🌟 BLUR OVERLAY LOADER (Shows during background sync) -->
-                        <div x-show="loading" 
-                             class="absolute inset-0 z-50 flex flex-col items-center justify-start bg-slate-50/70 dark:bg-[#020617]/80 backdrop-blur-[3px] transition-opacity duration-300" 
-                             x-cloak>
-                            
-                            <!-- Box styling removed, kept sticky at top so it's always visible -->
+                        <div x-show="loading" class="absolute inset-0 z-50 flex flex-col items-center justify-start bg-slate-50/70 dark:bg-[#020617]/80 backdrop-blur-[3px] transition-opacity duration-300" x-cloak>
                             <div class="sticky top-16 sm:top-28 flex flex-col items-center justify-center w-full mt-10">
                                 <div class="spinnerContainer scale-90 sm:scale-100">
                                     <div class="spinner mx-auto"></div>
@@ -345,91 +322,58 @@
                                 </div>
                                 <div class="mt-5 text-[10px] font-black text-brand dark:text-brand_glow uppercase tracking-widest animate-pulse">Syncing Network Data...</div>
                             </div>
-
                         </div>
 
-                        <!-- 📱 MOBILE VIEW: SMART CARD LAYOUT (Always rendered under blur) -->
+                        <!-- 📱 MOBILE VIEW -->
                         <div class="md:hidden flex flex-col gap-2.5 p-2.5 pb-6">
                             <template x-for="(log, index) in filteredList" :key="'mob-'+index">
                                 <div class="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-3 shadow-sm flex flex-col gap-2.5 relative overflow-hidden transition-all hover:shadow-md cursor-pointer" @click="editLog(log)">
-                                    
-                                    <!-- Dynamic Color Bar based on ISP -->
-                                    <div class="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-xl" 
-                                         :class="log.isp && log.isp.toLowerCase().includes('stpi') ? 'bg-sky-500' : (log.isp && log.isp.toLowerCase().includes('broadband') ? 'bg-emerald-500' : 'bg-rose-500')"></div>
-                                    
-                                    <!-- Top Row: ISP & Status -->
+                                    <div class="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-xl" :class="log.isp && log.isp.toLowerCase().includes('stpi') ? 'bg-sky-500' : (log.isp && log.isp.toLowerCase().includes('broadband') ? 'bg-emerald-500' : 'bg-rose-500')"></div>
                                     <div class="flex justify-between items-start pl-2">
                                         <div class="flex flex-col pr-2">
-                                            <h4 class="font-black text-[13px] leading-none mb-1" :class="getISPColor(log.isp)" x-text="log.isp"></h4>
+                                            <h4 class="font-black text-[13px] leading-none mb-1" :class="getISPColor(log.isp)" x-text="log.isp.split('(')[0]"></h4>
                                             <span class="inline-block px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border shadow-sm w-max" :class="getTypeClass(log.type)">
                                                 <span x-text="log.type"></span>
                                             </span>
                                         </div>
-                                        <!-- Tiny Status Pill -->
                                         <span class="px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border shadow-sm shrink-0" 
                                               :class="(log.status || '').includes('Resolved') ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10' : ((log.status || '').includes('Escalated') ? 'bg-orange-50 text-orange-600 border-orange-200 dark:bg-orange-500/10' : 'bg-red-50 text-red-600 border-red-200 dark:bg-red-500/10')" x-text="log.status"></span>
                                     </div>
-
-                                    <!-- Meta Details -->
                                     <div class="flex items-center flex-wrap gap-x-2 gap-y-1.5 pl-2 text-[9px] font-bold text-slate-500">
                                         <span class="flex items-center gap-1 font-mono text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-white/5 px-1.5 py-0.5 rounded border border-slate-100 dark:border-white/10 shadow-sm"><i class="fa-regular fa-calendar text-brand opacity-80"></i> <span x-text="formatDate(log.date)"></span></span>
                                         <span class="flex items-center gap-1 font-mono text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-white/5 px-1.5 py-0.5 rounded border border-slate-100 dark:border-white/10 shadow-sm"><i class="fa-regular fa-clock text-brand opacity-80"></i> <span x-text="log.start + '-' + log.end"></span></span>
                                         <span class="flex items-center gap-1 text-brand dark:text-blue-400 bg-blue-50 dark:bg-brand/10 px-1.5 py-0.5 rounded border border-blue-100 dark:border-brand/20 shadow-sm"><i class="fa-solid fa-hourglass-half"></i> <span x-text="log.duration"></span></span>
                                     </div>
-
-                                    <!-- Darker Info Box for Mobile (Redesigned & Space Optimized) -->
                                     <div class="ml-2 bg-slate-50 dark:bg-black/30 rounded-lg p-2.5 border border-slate-100 dark:border-white/5 flex flex-col gap-1.5 mt-0.5">
-                                        
-                                        <!-- Row 1: Case & Fault Party -->
                                         <div class="flex justify-between items-center text-[10px]">
-                                            <div>
-                                                <span class="text-slate-500 uppercase tracking-widest font-black text-[8px] mr-1">Case:</span>
-                                                <span class="font-mono font-bold text-slate-700 dark:text-slate-300" x-text="log.caseId || 'N/A'"></span>
-                                            </div>
-                                            <div>
-                                                <span class="text-slate-500 uppercase tracking-widest font-black text-[8px] mr-1">Fault:</span>
-                                                <span class="font-bold text-slate-700 dark:text-slate-300" x-text="log.faultParty || '-'"></span>
-                                            </div>
+                                            <div><span class="text-slate-500 uppercase tracking-widest font-black text-[8px] mr-1">Case:</span><span class="font-mono font-bold text-slate-700 dark:text-slate-300" x-text="log.caseId || 'N/A'"></span></div>
+                                            <div><span class="text-slate-500 uppercase tracking-widest font-black text-[8px] mr-1">Fault:</span><span class="font-bold text-slate-700 dark:text-slate-300" x-text="log.faultParty || '-'"></span></div>
                                         </div>
-                                        
-                                        <!-- Row 2: Root Cause/Action (Left) & Remarks/Edit (Right) -->
                                         <div class="flex justify-between items-start border-t border-slate-200 dark:border-white/10 pt-1.5 gap-2">
-                                            
-                                            <!-- Left: Root Cause & Action -->
                                             <div class="flex flex-col text-[10px] gap-0.5 flex-1 pr-1">
                                                 <span class="text-slate-500 uppercase tracking-widest font-black text-[8px] mb-0.5">Root Cause & Action</span>
                                                 <span class="font-medium text-slate-700 dark:text-slate-300 leading-tight"><span class="font-bold text-rose-500">Cause:</span> <span x-text="log.rootCause || '-'"></span></span>
                                                 <span class="font-medium text-slate-700 dark:text-slate-300 leading-tight"><span class="font-bold text-emerald-600">Action:</span> <span x-text="log.actionTaken || '-'"></span></span>
                                             </div>
-
-                                            <!-- Right: Remarks (Name) & Buttons -->
-                                    <div class="flex flex-col justify-between items-end gap-1.5 shrink-0 border-l border-slate-200 dark:border-white/10 pl-2 w-24">
-                                        <p class="text-[9px] font-bold text-slate-500 flex items-center justify-end gap-1 max-w-full truncate" :title="log.remarks">
-                                            <i class="fa-solid fa-comment-dots opacity-40 shrink-0"></i> <span class="truncate" x-text="log.remarks || 'No remarks'"></span>
-                                        </p>
-                                        <div class="flex gap-1.5 mt-auto">
-                                            <button @click.stop="editLog(log)" class="w-6 h-6 rounded-md bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 text-slate-400 hover:text-brand transition flex items-center justify-center shadow-sm"><i class="fa-solid fa-pen text-[9px]"></i></button>
-                                            <button @click.stop="confirmDelete(log.id)" class="w-6 h-6 rounded-md bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 text-slate-400 hover:text-red-500 transition flex items-center justify-center shadow-sm"><i class="fa-solid fa-trash text-[9px]"></i></button>
-                                        </div>
-                                    </div>
-
+                                            <div class="flex flex-col justify-between items-end gap-1.5 shrink-0 border-l border-slate-200 dark:border-white/10 pl-2 w-24">
+                                                <p class="text-[9px] font-bold text-slate-500 flex items-center justify-end gap-1 max-w-full truncate" :title="log.remarks"><i class="fa-solid fa-comment-dots opacity-40 shrink-0"></i> <span class="truncate" x-text="log.remarks || 'No remarks'"></span></p>
+                                                <div class="flex gap-1.5 mt-auto">
+                                                    <button @click.stop="editLog(log)" class="w-6 h-6 rounded-md bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 text-slate-400 hover:text-brand transition flex items-center justify-center shadow-sm"><i class="fa-solid fa-pen text-[9px]"></i></button>
+                                                    <button @click.stop="confirmDelete(log.id)" class="w-6 h-6 rounded-md bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 text-slate-400 hover:text-red-500 transition flex items-center justify-center shadow-sm"><i class="fa-solid fa-trash text-[9px]"></i></button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </template>
-                            
-                            <div x-show="filteredList.length === 0" class="p-8 text-center text-slate-400">
-                                <i class="fa-solid fa-server text-3xl mb-3 opacity-30"></i>
-                                <p class="text-xs font-medium">No logs found. Connectivity is stable! 🚀</p>
-                            </div>
+                            <div x-show="filteredList.length === 0" class="p-8 text-center text-slate-400"><i class="fa-solid fa-server text-3xl mb-3 opacity-30"></i><p class="text-xs font-medium">No logs found. Connectivity is stable! 🚀</p></div>
                         </div>
 
-                        <!-- 💻 DESKTOP VIEW: TRADITIONAL TABLE (Always rendered under blur) -->
+                        <!-- 💻 DESKTOP VIEW -->
                         <table class="hidden md:table w-full text-left border-collapse table-fixed text-xs sm:text-sm">
                             <thead class="bg-white/50 dark:bg-white/5 text-[9px] text-slate-400 uppercase font-black tracking-widest sticky top-0 z-10 shadow-sm backdrop-blur-md">
                                 <tr>
                                     <th class="px-3 py-3 w-[10%] text-center">Date</th>
-                                    <!-- WIDENED COLUMNS TO PREVENT TRUNCATION -->
                                     <th class="px-3 py-3 w-[17%]">ISP / Case ID</th>
                                     <th class="px-3 py-3 w-[17%]">Event / Fault Party</th>
                                     <th class="px-3 py-3 w-[12%]">Timing & Duration</th>
@@ -440,47 +384,29 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100 dark:divide-white/5 text-xs">
-                                
                                 <template x-for="(log, index) in filteredList" :key="'desk-'+index">
                                     <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition cursor-pointer group" @click="editLog(log)">
-                                        <!-- Date -->
                                         <td class="px-3 py-3.5 font-mono font-bold text-slate-600 dark:text-slate-300 align-middle text-center truncate" x-text="formatDate(log.date)"></td>
-                                        
-                                        <!-- ISP & Case ID -->
                                         <td class="px-3 py-3.5 align-middle whitespace-normal break-words pr-2">
-                                            <div class="font-black leading-tight text-[13px]" :class="getISPColor(log.isp)" x-text="log.isp"></div>
+                                            <div class="font-black leading-tight text-[13px]" :class="getISPColor(log.isp)" x-text="log.isp.split('(')[0]"></div>
                                             <div class="text-[9px] text-slate-500 font-bold mt-1.5">Case: <span class="font-mono text-slate-700 dark:text-slate-300 break-all" x-text="log.caseId || 'N/A'"></span></div>
                                         </td>
-                                        
-                                        <!-- Event Type & Fault Party -->
                                         <td class="px-3 py-3.5 align-middle whitespace-normal break-words pr-2">
-                                            <span class="px-2 py-1.5 rounded-md font-black uppercase text-[8px] sm:text-[9px] tracking-wider border shadow-sm inline-block mb-1.5 leading-none" :class="getTypeClass(log.type)">
-                                                <span x-text="log.type"></span>
-                                            </span>
+                                            <span class="px-2 py-1.5 rounded-md font-black uppercase text-[8px] sm:text-[9px] tracking-wider border shadow-sm inline-block mb-1.5 leading-none" :class="getTypeClass(log.type)"><span x-text="log.type"></span></span>
                                             <div class="text-[9px] text-slate-500 font-bold leading-tight">Fault: <span class="text-slate-700 dark:text-slate-300" x-text="log.faultParty || '-'"></span></div>
                                         </td>
-
-                                        <!-- Timing & Duration -->
                                         <td class="px-3 py-3.5 align-middle truncate">
                                             <div class="font-mono text-slate-500 dark:text-slate-400 font-bold text-[10px]"><span x-text="log.start"></span> - <span x-text="log.end"></span></div>
                                             <div class="text-[10px] font-black text-brand mt-1" x-text="log.duration"></div>
                                         </td>
-                                        
-                                        <!-- Root Cause & Action -->
                                         <td class="px-3 py-3.5 align-middle whitespace-normal break-words pr-2" :title="'Cause: ' + (log.rootCause||'-') + '\nAction: ' + (log.action||'-')">
                                             <div class="text-[11px] font-bold text-slate-800 dark:text-slate-200 mb-1.5 leading-tight"><span class="text-[8px] text-slate-400 uppercase tracking-widest block mb-0.5">Cause:</span> <span x-text="log.rootCause || '-'"></span></div>
                                             <div class="text-[10px] font-medium text-slate-500 dark:text-slate-400 leading-tight"><span class="text-[8px] text-slate-400 uppercase tracking-widest block mb-0.5">Action:</span> <span x-text="log.actionTaken || '-'"></span></div>
                                         </td>
-                                        
-                                        <!-- Remarks -->
                                         <td class="px-3 py-3.5 text-slate-500 font-medium align-middle whitespace-normal break-words pr-2" :title="log.remarks" x-text="log.remarks || '-'"></td>
-
-                                        <!-- Status -->
                                         <td class="px-3 py-3.5 text-center align-middle">
                                             <span class="w-3 h-3 rounded-full inline-block shadow-sm" :class="(log.status || '').includes('Resolved') ? 'bg-emerald-500' : ((log.status || '').includes('Escalated') ? 'bg-orange-500' : 'bg-red-500 animate-pulse')" :title="log.status"></span>
                                         </td>
-
-                                        <!-- Action -->
                                         <td class="px-3 py-3.5 text-center align-middle sticky-col bg-transparent">
                                             <div class="flex items-center justify-center gap-1.5 opacity-50 group-hover:opacity-100 transition">
                                                 <button @click.stop="editLog(log)" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-black/30 hover:bg-brand hover:text-white text-slate-500 dark:text-slate-400 transition flex items-center justify-center border border-slate-200 dark:border-white/5 hover:border-brand/50 shadow-sm"><i class="fa-solid fa-pen text-[10px]"></i></button>
@@ -489,13 +415,7 @@
                                         </td>
                                     </tr>
                                 </template>
-                                
-                                <tr x-show="filteredList.length === 0">
-                                    <td colspan="8" class="p-12 text-center text-slate-400">
-                                        <i class="fa-solid fa-server text-4xl mb-3 opacity-30"></i>
-                                        <p class="text-xs font-medium">No matching logs found.</p>
-                                    </td>
-                                </tr>
+                                <tr x-show="filteredList.length === 0"><td colspan="8" class="p-12 text-center text-slate-400"><i class="fa-solid fa-server text-4xl mb-3 opacity-30"></i><p class="text-xs font-medium">No matching logs found.</p></td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -504,35 +424,72 @@
         </div>
     </main>
 
-    <!-- FOOTER (Ultra-Slim Symmetrical Layout) -->
-    <footer class="shrink-0 bg-white/90 dark:bg-[#09090b]/95 backdrop-blur-xl border-t border-slate-200 dark:border-white/5 z-50 py-2 sm:py-2.5 w-full relative overflow-hidden">
-        <!-- Glow Line on Top -->
-        <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-brand to-transparent opacity-60"></div>
-        
-        <div class="max-w-[1920px] mx-auto px-3 sm:px-6 relative flex items-center justify-between text-[9px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400">
+    <!-- UNIFIED STATUS BAR (FOOTER) -->
+    <footer class="shrink-0 bg-white/90 dark:bg-[#09090b]/95 backdrop-blur-xl border-t border-slate-200/80 dark:border-white/5 z-50 h-10 sm:h-10 w-full flex items-center">
+        <div class="max-w-[1920px] w-full mx-auto px-3.5 sm:px-6 flex items-center justify-between text-[10px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400">
             
-            <!-- LEFT: Copyright & App Version -->
-            <div class="flex items-center gap-1.5 sm:gap-3 z-10 shrink-0">
-                <span class="font-black text-slate-500 dark:text-slate-400 flex items-center gap-1">&copy; <span x-text="new Date().getFullYear()"></span></span>
-                <span class="h-3 w-px bg-slate-300 dark:bg-white/10"></span>
-                <span class="px-1.5 py-0.5 rounded-md bg-gradient-to-r from-brand to-indigo-600 text-white font-mono font-black tracking-widest shadow-[0_2px_10px_-2px_rgba(59,130,246,0.5)] cursor-default">v1.3</span>
-                <span class="hidden sm:flex px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-white/5 text-slate-400 border border-slate-200 dark:border-white/5 font-black uppercase tracking-widest">PROD</span>
+            <!-- LEFT: Copyright & Version -->
+            <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                <span class="font-bold flex items-center gap-1">
+                    &copy; <span x-text="new Date().getFullYear()"></span> 
+                    <span class="hidden sm:inline">PBL Connect</span>
+                    <span class="sm:hidden tracking-wider">PBL</span>
+                </span>
+                
+                <div class="w-px h-3.5 bg-slate-300 dark:bg-white/10"></div>
+                
+                <div class="flex items-center gap-1.5">
+                    <!-- 📍 MOBILE FIX: Make version a nice pill instead of loose text -->
+                    <span class="px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-600 border border-blue-200 dark:bg-brand/10 dark:border-brand/30 dark:text-brand_glow font-mono font-black text-[9px] leading-none shadow-sm" x-text="PBL_APP_VERSION"></span>
+                    <span class="hidden sm:inline-block px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[8px] font-black uppercase tracking-widest leading-none shadow-sm">PROD</span>
+                </div>
             </div>
 
-            <!-- CENTER: Telemetry Data (Truncates on small screens) -->
-            <div class="flex items-center justify-center gap-2 sm:gap-5 z-10 flex-1 px-1 sm:px-2 overflow-hidden truncate">
-                <div class="flex items-center gap-1 text-[9px] sm:text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 cursor-default"><i class="fa-solid fa-wifi text-[8px] sm:text-[10px]"></i><span class="hidden sm:inline">PING:</span> 12ms</div>
-                <span class="h-3 w-px bg-slate-300 dark:bg-white/10"></span>
-                <div class="flex items-center gap-1 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 cursor-default"><i class="fa-solid fa-shield-halved text-brand"></i><span class="hidden sm:inline">AES</span> Secured</div>
-                <span class="hidden sm:block h-3 w-px bg-slate-300 dark:bg-white/10"></span>
-                <div class="hidden sm:flex items-center gap-1 text-[10px] font-mono font-bold text-slate-500 cursor-default"><i class="fa-regular fa-clock opacity-60"></i><span x-text="currentTime"></span></div>
+            <!-- CENTER: System Status (Fluid & Centered safely) -->
+            <div class="hidden md:flex flex-1 justify-center items-center px-4 overflow-hidden">
+                <div class="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-100 dark:border-emerald-500/20 shadow-sm cursor-default">
+                    <span class="relative flex h-1.5 w-1.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                    </span>
+                    <span class="font-bold tracking-wide text-[10px] sm:text-[11px]">All Systems Operational</span>
+                </div>
             </div>
 
-            <!-- RIGHT: User Session Pill -->
-            <div class="flex items-center gap-2 z-10 shrink-0">
-                <div class="px-2.5 sm:px-3 py-1 rounded-full bg-slate-800 dark:bg-white text-white dark:text-slate-900 shadow-md flex items-center gap-1.5 transition hover:scale-105 cursor-default border border-slate-700 dark:border-white/20 whitespace-nowrap">
-                    <div class="w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-brand flex items-center justify-center text-white text-[7px] sm:text-[8px] shadow-sm shrink-0"><i class="fa-solid fa-user"></i></div>
-                    <span class="font-black tracking-wide text-[9px] sm:text-[11px] pr-0.5" x-text="currentUser?.name ? currentUser.name.split(' ')[0] : 'User'">User</span>
+            <!-- RIGHT: Tech Vitals -->
+            <div class="flex items-center gap-2.5 sm:gap-3 shrink-0 font-mono font-bold cursor-default">
+                
+                <!-- 📍 MOBILE FIX: Replaces loose "OK" with a proper widget/pill -->
+                <div class="md:hidden flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-100 dark:border-emerald-500/20 shadow-sm">
+                    <span class="relative flex h-1.5 w-1.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                    </span>
+                    <span class="text-[8px] tracking-widest uppercase font-black">Online</span>
+                </div>
+                
+                <div class="md:hidden w-px h-3.5 bg-slate-300 dark:bg-white/10"></div>
+
+                <!-- Network Ping -->
+                <div class="flex items-center gap-1 sm:gap-1.5 hover:text-slate-700 dark:hover:text-slate-300 transition-colors" title="Network Latency">
+                    <i class="fa-solid fa-wifi text-[9px] sm:text-[10px] text-emerald-500"></i>
+                    <span>12ms</span>
+                </div>
+                
+                <div class="hidden sm:block w-px h-3.5 bg-slate-300 dark:bg-white/10"></div>
+                
+                <!-- Security Standard -->
+                <div class="hidden sm:flex items-center gap-1.5 hover:text-slate-700 dark:hover:text-slate-300 transition-colors" title="Encryption Level">
+                    <i class="fa-solid fa-shield-halved text-[10px] text-brand"></i>
+                    <span>AES-256</span>
+                </div>
+                
+                <div class="hidden lg:block w-px h-3.5 bg-slate-300 dark:bg-white/10"></div>
+                
+                <!-- System Clock -->
+                <div class="hidden lg:flex items-center gap-1.5 hover:text-slate-700 dark:hover:text-slate-300 transition-colors">
+                    <i class="fa-regular fa-clock text-[10px] opacity-70"></i>
+                    <span x-text="currentTime"></span>
                 </div>
             </div>
 
@@ -541,10 +498,7 @@
 
     <!-- MODAL: ADD/EDIT LOG -->
     <div x-show="showModal" x-cloak class="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
-        <!-- WIDENED MODAL TO FIT EVERYTHING ON ONE PAGE -->
         <div class="bg-white dark:bg-dark_surface w-full max-w-3xl rounded-[2rem] shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden flex flex-col max-h-[95vh] sm:max-h-[90vh]" @click.away="showModal = false">
-            
-            <!-- Header -->
             <div class="px-5 py-4 border-b border-slate-100 dark:border-white/5 flex justify-between items-center shrink-0 bg-white dark:bg-dark_surface z-20 relative">
                 <div class="flex items-center gap-3 sm:gap-4">
                     <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-brand text-white flex items-center justify-center shadow-lg shadow-brand/30 text-lg sm:text-xl shrink-0">
@@ -562,19 +516,19 @@
                 <button @click="showModal = false; haptic('light')" class="w-8 h-8 rounded-full bg-slate-50 dark:bg-white/10 flex items-center justify-center text-slate-500 hover:text-red-500 transition shadow-sm shrink-0"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
-            <!-- Body (DIV controls scrolling, FIELDSET controls locking) -->
             <div class="p-4 sm:p-6 overflow-y-auto custom-scroll flex-1 bg-slate-50/30 dark:bg-transparent relative z-10">
                 <fieldset :disabled="isLocked" class="space-y-3 sm:space-y-4 transition-all duration-300" :class="isLocked ? 'opacity-60 grayscale-[0.2]' : ''">
                     <input type="hidden" x-model="form.id">
                     
-                    <!-- COMPACT 4-GRID FOR BASICS -->
                     <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 sm:gap-4">
                         <div class="sm:col-span-2">
                             <label class="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1 sm:mb-1.5 ml-1">Select ISP Link *</label>
-                            <select x-model="form.isp" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-bold outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition cursor-pointer text-slate-800 dark:text-white shadow-sm appearance-none">
-                                <option value="Airtel Leased Line (15Mbps)">🔴 Airtel LL (ID: 9202902)</option>
-                                <option value="STPI Leased Line (15Mbps)">📡 STPI LL (ID: PAN-STP-01)</option>
-                                <option value="Airtel Broadband (30Mbps)">🟢 Airtel BB (ID: 01204204260_dsl)</option>
+                            
+                            <!-- 📍 DYNAMIC ISP DROPDOWN IN MODAL -->
+                            <select x-model="form.isp" autocomplete="off" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-bold outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition cursor-pointer text-slate-800 dark:text-white shadow-sm appearance-none">
+                                <option value="primary_temp" :value="isps.primary.id" x-text="'🔴 ' + isps.primary.id"></option>
+                                <option value="secondary_temp" :value="isps.secondary.id" x-text="'📡 ' + isps.secondary.id"></option>
+                                <option value="broadband_temp" :value="isps.broadband.id" x-text="'🟢 ' + isps.broadband.id"></option>
                             </select>
                         </div>
                         <div class="sm:col-span-2">
@@ -606,9 +560,7 @@
                         </div>
                     </div>
 
-                    <!-- TIMING BLOCK (SIDE-BY-SIDE ON DESKTOP) -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
-                        <!-- DOWNTIME STARTED BLOCK -->
                         <div class="bg-white dark:bg-black/20 p-3 sm:p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm">
                             <h4 class="text-[9px] sm:text-[10px] font-black text-rose-500 uppercase tracking-widest mb-2.5 flex items-center gap-1.5"><i class="fa-solid fa-arrow-trend-down"></i> Downtime Started</h4>
                             <div class="grid grid-cols-2 gap-3">
@@ -623,7 +575,6 @@
                             </div>
                         </div>
 
-                        <!-- LINK RESTORED BLOCK -->
                         <div class="bg-white dark:bg-black/20 p-3 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm" :class="!form.status.includes('Resolved') ? 'border-slate-200 dark:border-white/5 opacity-60 grayscale pointer-events-none' : 'border-emerald-200 dark:border-emerald-500/30 bg-emerald-50/30 dark:bg-emerald-900/10'">
                             <h4 class="text-[9px] sm:text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-2.5 flex items-center gap-1.5"><i class="fa-solid fa-arrow-trend-up"></i> Link Restored</h4>
                             <div class="grid grid-cols-2 gap-3">
@@ -639,7 +590,6 @@
                         </div>
                     </div>
 
-                    <!-- RESOLUTION DETAILS -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         <div>
                             <label class="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1 sm:mb-1.5 ml-1">Root Cause</label>
@@ -651,7 +601,6 @@
                         </div>
                     </div>
 
-                    <!-- REMARKS & STATUS -->
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                         <div class="sm:col-span-2">
                             <label class="block text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1 sm:mb-1.5 ml-1">Remarks / Details</label>
@@ -669,30 +618,25 @@
                 </fieldset>
             </div> 
             
-            <!-- Footer -->
-            <div class="bg-slate-50/80 dark:bg-black/40 backdrop-blur-md px-4 sm:px-6 py-4 border-t border-slate-200 dark:border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4 shrink-0 relative z-20 rounded-b-3xl">
-                
+            <div class="bg-slate-50/80 dark:bg-black/40 backdrop-blur-md px-4 sm:px-6 py-4 border-t border-slate-100 dark:border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4 shrink-0 relative z-20 rounded-b-3xl">
                 <div class="relative w-full sm:w-56 shrink-0">
                     <i class="fa-solid fa-key absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
                     <input type="password" x-model="form.secret" @input="if(isLocked && form.secret === 'PBL2026') { isLocked = false; haptic('success'); }" placeholder="Admin Key" class="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl text-xs font-mono font-bold outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition shadow-sm">
                 </div>
                 
                 <div class="flex items-center justify-end gap-3 sm:gap-4 w-full sm:w-auto">
-                    <!-- Text won't break anymore due to whitespace-nowrap and flex-col -->
                     <div class="hidden sm:flex flex-col text-right shrink-0">
                         <span class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-0.5 whitespace-nowrap">Calculated Duration</span>
                         <span class="text-xs font-mono font-black text-brand whitespace-nowrap" x-text="form.duration || '--h --m'"></span>
                     </div>
                     
                     <button @click="showModal = false; haptic('light')" class="text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition px-2 shrink-0">Cancel</button>
-                    
                     <button @click="saveLog()" class="bg-brand hover:bg-blue-600 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider shadow-[0_5px_15px_-3px_rgba(59,130,246,0.4)] transition flex items-center justify-center gap-2 active:scale-95 shrink-0" :disabled="saving">
                         <span x-show="!saving" x-text="form.id ? 'UPDATE' : 'SAVE'"></span>
                         <span x-show="saving"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
                     </button>
                 </div>
             </div>
-
         </div> 
     </div>
 
@@ -718,264 +662,294 @@
         </div>
     </div>
 
-    
-<!-- SCRIPT LOGIC -->
     <!-- SCRIPT LOGIC -->
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbwvXRCT7P5aULfkV63RPacAVaxdBUMiKnxGeYu498fhRUZ7Xd3ph2WxCiUs9wOtXH-4JQ/exec";
 
+        const getSafeTheme = () => { try { return localStorage.getItem('theme') === 'dark'; } catch(e) { return false; } };
+        const getSafeUser = () => { try { const data = sessionStorage.getItem('userData'); return data ? JSON.parse(data) : { name: 'Vikas', allowedLocation: 'Global' }; } catch(e) { return { name: 'Vikas', allowedLocation: 'Global' }; } };
+
         document.addEventListener('alpine:init', () => {
-            Alpine.data('wanSystem', () => ({
-                isDark: localStorage.getItem('theme') === 'dark',
-                loading: false, saving: false, deleting: false, logs: [], showModal: false, showDeleteModal: false,
-                currentDate: '', currentTime: '', activeFilter: null, isLocked: false, // 🔥 Naya Variable Add Kiya
+            Alpine.data('wanSystem', () => {
+                let safeUser = getSafeUser();
                 
-                form: { id: null, isp: '🔴 Airtel LL (ID: 9202902)', type: '🔴 Link Down (Complete Outage)', faultParty: '🌐 External (ISP Side)', caseId: '', date: '', start: '', endDate: '', end: '', duration: '', actionTaken: '', rootCause: '', remarks: '', status: '🕒 Pending', secret: '' },
-                
-                deleteId: null, deleteSecret: '',
-                currentUser: JSON.parse(sessionStorage.getItem('userData')) || { name: 'Vikas Rawat' },
-                searchQuery: '',
-                mobileSearchOpen: false,
-
-                haptic(type = 'light') {
-                    if (!window.navigator || !window.navigator.vibrate) return; 
-                    if (type === 'light') { navigator.vibrate(15); } 
-                    else if (type === 'success') { navigator.vibrate([30, 50, 30]); } 
-                    else if (type === 'error' || type === 'delete') { navigator.vibrate([50, 50, 50, 50]); }
-                },
-
-                filterBy(ispKeyword) { 
-                    this.haptic('light'); 
-                    this.activeFilter = (this.activeFilter === ispKeyword) ? null : ispKeyword; 
-                },
-                
-                get filteredList() { 
-                    let list = this.logs || []; 
-                    if (this.activeFilter) {
-                        list = list.filter(log => log.isp && log.isp.toLowerCase().includes(this.activeFilter.toLowerCase()));
-                    }
-                    if (this.searchQuery) {
-                        const q = this.searchQuery.toLowerCase().trim();
-                        list = list.filter(log => 
-                            (log.isp && log.isp.toLowerCase().includes(q)) || 
-                            (log.type && log.type.toLowerCase().includes(q)) || 
-                            (log.rootCause && log.rootCause.toLowerCase().includes(q)) ||
-                            (log.actionTaken && log.actionTaken.toLowerCase().includes(q)) || 
-                            (log.caseId && log.caseId.toLowerCase().includes(q)) ||
-                            (log.duration && log.duration.toLowerCase().includes(q))
-                        );
-                    }
-                    return list;
-                },
-                
-                getBadgeClass() { return this.activeFilter === 'Airtel Leased Line' ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:border-rose-500/30 dark:text-rose-400' : (this.activeFilter === 'STPI Leased Line' ? 'bg-sky-50 text-sky-600 border-sky-200 dark:bg-sky-500/10 dark:border-sky-500/30 dark:text-sky-400' : (this.activeFilter === 'Airtel Broadband' ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/30 dark:text-emerald-400' : 'bg-slate-100 text-slate-600')); },
-
-                async init() {
-                    if (this.isDark) document.documentElement.classList.add('dark');
-                    document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
+                return {
+                    isDark: getSafeTheme(),
+                    currentUser: safeUser,
                     
-                    const now = new Date();
-                    this.form.date = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
-                    this.form.endDate = this.form.date;
+                    // 📍 SMART LOCATION TOGGLE SETUP
+                    isGlobal: safeUser.allowedLocation === 'Global',
+                    currentLocation: safeUser.allowedLocation === 'Global' ? (localStorage.getItem('pbl_loc_pref') || 'Noida') : (safeUser.allowedLocation || 'Noida'),
                     
-                    setInterval(() => {
-                        const d = new Date();
-                        this.currentTime = d.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
-                        this.currentDate = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-                    }, 1000);
+                    loading: false, saving: false, deleting: false, logs: [], showModal: false, showDeleteModal: false,
+                    currentDate: '', currentTime: '', activeFilter: null, isLocked: false, 
+                    searchQuery: '', mobileSearchOpen: false, deleteId: null, deleteSecret: '',
+                    
+                    form: { id: null, isp: '', type: '🔴 Link Down (Complete Outage)', faultParty: '🌐 External (ISP Side)', caseId: '', date: '', start: '', endDate: '', end: '', duration: '', actionTaken: '', rootCause: '', remarks: '', status: '🕒 Pending', secret: '' },
+                    
+                    // 📍 DYNAMIC ISPS PROPERTY
+                    get isps() {
+                        if (this.currentLocation === 'Dehradun') {
+                            return {
+                                primary: { id: 'GSTech 10Mbps Fiber', short: 'GSTech 10M', icon: 'fa-tower-broadcast', speed: '10' },
+                                secondary: { id: 'STPI Leased 4Mbps', short: 'STPI 4M', icon: 'fa-satellite-dish', speed: '4' },
+                                broadband: { id: 'BSNL 15Mbps Fiber', short: 'BSNL 15M', icon: 'fa-wifi', speed: '15' }
+                            };
+                        } else {
+                            return {
+                                primary: { id: 'Airtel Leased Line (15Mbps)', short: 'Airtel LL', icon: 'fa-tower-broadcast', speed: '15' },
+                                secondary: { id: 'STPI Leased Line (15Mbps)', short: 'STPI LL', icon: 'fa-satellite-dish', speed: '15' },
+                                broadband: { id: 'Airtel Broadband (30Mbps)', short: 'Airtel BB', icon: 'fa-wifi', speed: '30' }
+                            };
+                        }
+                    },
 
-                    this.loading = true;
-                    await Promise.all([ this.fetchLogs(false), new Promise(resolve => setTimeout(resolve, 800)) ]);
-                    this.loading = false; 
-                },
+                    toggleLocation() {
+                        if (!this.isGlobal) return;
+                        this.haptic('light');
+                        this.currentLocation = this.currentLocation === 'Noida' ? 'Dehradun' : 'Noida';
+                        localStorage.setItem('pbl_loc_pref', this.currentLocation);
+                        this.activeFilter = null;
+                        this.searchQuery = '';
+                    },
 
-                async fetchLogs(force = false) {
-                    if (force) { this.haptic('light'); this.loading = true; }
-                    try {
-                        const cached = localStorage.getItem('pbl_wan_cache');
-                        const url = API_URL + '?action=getWANLogs&t=' + new Date().getTime();
+                    haptic(type = 'light') {
+                        if (!window.navigator || !window.navigator.vibrate) return; 
+                        if (type === 'light') { navigator.vibrate(15); } 
+                        else if (type === 'success') { navigator.vibrate([30, 50, 30]); } 
+                        else if (type === 'error' || type === 'delete') { navigator.vibrate([50, 50, 50, 50]); }
+                    },
 
-                        if (cached && !force) {
-                            this.logs = JSON.parse(cached);
-                            fetch(url).then(res => res.json()).then(data => {
+                    filterBy(ispKeyword) { 
+                        this.haptic('light'); 
+                        this.activeFilter = (this.activeFilter === ispKeyword) ? null : ispKeyword; 
+                    },
+                    
+                    get baseFilteredList() {
+                        // 📍 STEP 1: Filter by Location Context FIRST
+                        return this.logs.filter(log => (log.location || 'Noida') === this.currentLocation);
+                    },
+
+                    get filteredList() { 
+                        let list = this.baseFilteredList; 
+                        if (this.activeFilter) {
+                            list = list.filter(log => log.isp && log.isp.toLowerCase().includes(this.activeFilter.split('(')[0].toLowerCase().trim()));
+                        }
+                        if (this.searchQuery) {
+                            const q = this.searchQuery.toLowerCase().trim();
+                            list = list.filter(log => 
+                                (log.isp && log.isp.toLowerCase().includes(q)) || 
+                                (log.type && log.type.toLowerCase().includes(q)) || 
+                                (log.rootCause && log.rootCause.toLowerCase().includes(q)) ||
+                                (log.actionTaken && log.actionTaken.toLowerCase().includes(q)) || 
+                                (log.caseId && log.caseId.toLowerCase().includes(q)) ||
+                                (log.duration && log.duration.toLowerCase().includes(q))
+                            );
+                        }
+                        return list;
+                    },
+                    
+                    getBadgeClass() { 
+                        if (this.activeFilter && this.activeFilter.toLowerCase().includes(this.isps.primary.id.split('(')[0].toLowerCase().trim())) return 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:border-rose-500/30 dark:text-rose-400';
+                        if (this.activeFilter && this.activeFilter.toLowerCase().includes('stpi')) return 'bg-sky-50 text-sky-600 border-sky-200 dark:bg-sky-500/10 dark:border-sky-500/30 dark:text-sky-400';
+                        if (this.activeFilter && (this.activeFilter.toLowerCase().includes('broadband') || this.activeFilter.toLowerCase().includes('bsnl'))) return 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/30 dark:text-emerald-400';
+                        return 'bg-slate-100 text-slate-600'; 
+                    },
+
+                    async init() {
+                        if (this.isDark) document.documentElement.classList.add('dark');
+                        document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
+                        
+                        const now = new Date();
+                        this.form.date = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+                        this.form.endDate = this.form.date;
+                        
+                        setInterval(() => {
+                            const d = new Date();
+                            this.currentTime = d.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
+                            this.currentDate = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+                        }, 1000);
+
+                        this.loading = true;
+                        await Promise.all([ this.fetchLogs(false), new Promise(resolve => setTimeout(resolve, 800)) ]);
+                        this.loading = false; 
+                    },
+
+                    async fetchLogs(force = false) {
+                        if (force) { this.haptic('light'); this.loading = true; }
+                        try {
+                            const cached = localStorage.getItem('pbl_wan_cache');
+                            const url = API_URL + '?action=getWANLogs&t=' + new Date().getTime();
+
+                            if (cached && !force) {
+                                this.logs = JSON.parse(cached);
+                                fetch(url).then(res => res.json()).then(data => {
+                                    const freshLogs = data.logs || [];
+                                    this.logs = freshLogs.map(row => ({
+                                        id: row.id, date: row.date, isp: row.isp, type: row.type, faultParty: row.faultParty, caseId: row.caseId, start: row.start, endDate: row.endDate, end: row.end, duration: row.duration, actionTaken: row.actionTaken, rootCause: row.rootCause, remarks: row.remarks, status: row.status, location: row.location || 'Noida'
+                                    }));
+                                    localStorage.setItem('pbl_wan_cache', JSON.stringify(this.logs));
+                                });
+                            } else {
+                                const res = await fetch(url);
+                                const data = await res.json();
                                 const freshLogs = data.logs || [];
                                 this.logs = freshLogs.map(row => ({
-                                    id: row.id, date: row.date, isp: row.isp, type: row.type, 
-                                    faultParty: row.faultParty, caseId: row.caseId, start: row.start, 
-                                    endDate: row.endDate,
-                                    end: row.end, duration: row.duration, actionTaken: row.actionTaken, 
-                                    rootCause: row.rootCause, remarks: row.remarks, status: row.status
+                                    id: row.id, date: row.date, isp: row.isp, type: row.type, faultParty: row.faultParty, caseId: row.caseId, start: row.start, endDate: row.endDate, end: row.end, duration: row.duration, actionTaken: row.actionTaken, rootCause: row.rootCause, remarks: row.remarks, status: row.status, location: row.location || 'Noida'
                                 }));
                                 localStorage.setItem('pbl_wan_cache', JSON.stringify(this.logs));
-                            });
-                        } else {
-                            const res = await fetch(url);
-                            const data = await res.json();
-                            const freshLogs = data.logs || [];
-                            this.logs = freshLogs.map(row => ({
-                                id: row.id, date: row.date, isp: row.isp, type: row.type, 
-                                faultParty: row.faultParty, caseId: row.caseId, start: row.start, 
-                                endDate: row.endDate,
-                                end: row.end, duration: row.duration, actionTaken: row.actionTaken, 
-                                rootCause: row.rootCause, remarks: row.remarks, status: row.status
-                            }));
-                            localStorage.setItem('pbl_wan_cache', JSON.stringify(this.logs));
-                            if (force) this.haptic('success'); 
+                                if (force) this.haptic('success'); 
+                            }
+                        } catch (e) { 
+                            console.error("Network Error", e); 
+                            if (force) this.haptic('error'); 
+                        } finally { 
+                            if (force) setTimeout(() => { this.loading = false; }, 400); 
                         }
-                    } catch (e) { 
-                        console.error("Network Error", e); 
-                        if (force) this.haptic('error'); 
-                    } finally { 
-                        if (force) setTimeout(() => { this.loading = false; }, 400); 
-                    }
-                },
+                    },
 
-                editLog(log) {
-				this.haptic('light'); 
-				this.isLocked = (log.status && log.status.includes('Resolved')); // 🔥 Check karega ki lock karna hai ya nahi
-				this.form = { 
-                        id: log.id, 
-                        isp: log.isp || '🔴 Airtel LL (ID: 9202902)', 
-                        type: log.type || '', 
-                        faultParty: log.faultParty || '🌐 External (ISP Side)', 
-                        caseId: log.caseId || '', 
-                        date: this.parseDateForInput(log.date), 
-                        start: log.start || '', 
-                        endDate: this.parseDateForInput(log.endDate || log.date), 
-                        end: log.end || '', 
-                        duration: log.duration || '', 
-                        actionTaken: log.actionTaken || '', 
-                        rootCause: log.rootCause || '', 
-                        remarks: log.remarks || '', 
-                        status: log.status || '🕒 Pending', 
-                        secret: '' 
-                    };
-                    this.showModal = true;
-                },
+                    editLog(log) {
+                        this.haptic('light'); 
+                        this.isLocked = !!(log.status && log.status.includes('Resolved')); 
+                        this.form = { 
+                            id: log.id, 
+                            isp: log.isp || this.isps.primary.id, 
+                            type: log.type || '', 
+                            faultParty: log.faultParty || '🌐 External (ISP Side)', 
+                            caseId: log.caseId || '', 
+                            date: this.parseDateForInput(log.date), 
+                            start: log.start || '', 
+                            endDate: this.parseDateForInput(log.endDate || log.date), 
+                            end: log.end || '', 
+                            duration: log.duration || '', 
+                            actionTaken: log.actionTaken || '', 
+                            rootCause: log.rootCause || '', 
+                            remarks: log.remarks || '', 
+                            status: log.status || '🕒 Pending', 
+                            secret: '' 
+                        };
+                        this.showModal = true;
+                    },
 
-                confirmDelete(id) { 
-                    this.haptic('delete'); 
-                    this.deleteId = id; 
-                    this.deleteSecret = ''; 
-                    this.showDeleteModal = true; 
-                },
+                    confirmDelete(id) { 
+                        this.haptic('delete'); 
+                        this.deleteId = id; 
+                        this.deleteSecret = ''; 
+                        this.showDeleteModal = true; 
+                    },
 
-                calculateDuration() {
-                    if (this.form.date && this.form.start && this.form.endDate && this.form.end) {
-                        const s = new Date(`${this.form.date}T${this.form.start}`); 
-                        const e = new Date(`${this.form.endDate}T${this.form.end}`);
-                        let diffMs = e - s;
-                        if (diffMs >= 0) {
-                            let days = Math.floor(diffMs / 86400000);
-                            let hrs = Math.floor((diffMs % 86400000) / 3600000);
-                            let mins = Math.round((diffMs % 3600000) / 60000);
-                            this.form.duration = days > 0 ? `${days}d ${hrs}h ${mins}m` : `${hrs}h ${mins}m`;
-                        } else {
-                            this.form.duration = 'Invalid Time';
+                    calculateDuration() {
+                        if (this.form.date && this.form.start && this.form.endDate && this.form.end) {
+                            const s = new Date(`${this.form.date}T${this.form.start}`); 
+                            const e = new Date(`${this.form.endDate}T${this.form.end}`);
+                            let diffMs = e - s;
+                            if (diffMs >= 0) {
+                                let days = Math.floor(diffMs / 86400000);
+                                let hrs = Math.floor((diffMs % 86400000) / 3600000);
+                                let mins = Math.round((diffMs % 3600000) / 60000);
+                                this.form.duration = days > 0 ? `${days}d ${hrs}h ${mins}m` : `${hrs}h ${mins}m`;
+                            } else {
+                                this.form.duration = 'Invalid Time';
+                            }
                         }
+                    },
+
+                    async saveLog() {
+                        if (!this.form.secret || this.form.secret.trim() !== 'PBL2026') { 
+                            this.haptic('error'); alert("❌ Invalid Admin Key!"); return; 
+                        }
+                        this.saving = true; 
+                        try { 
+                            // 📍 Passing locationContext to Backend
+                            const payload = { action: 'saveWAN', loggedBy: this.currentUser?.name || 'IT Engineer', locationContext: this.currentLocation, ...this.form };
+                            
+                            await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) }).catch(e => console.log("Fetch Silent Fallback")); 
+                            
+                            this.haptic('success'); 
+                            this.showModal = false; 
+                            
+                            setTimeout(async () => {
+                                await this.fetchLogs(true); 
+                                this.resetForm(); 
+                            }, 1000);
+                        } catch (e) { 
+                            console.log(e);
+                        } finally { this.saving = false; }
+                    },
+
+                    async deleteLog() {
+                        if (!this.deleteSecret || this.deleteSecret.trim() !== 'PBL2026') { 
+                            this.haptic('error'); alert("❌ Invalid Admin Key!"); return; 
+                        }
+                        this.deleting = true; 
+                        try { 
+                            await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'deleteWAN', id: this.deleteId, secret: this.deleteSecret }) }).catch(e => console.log("Fetch Silent Fallback"));
+                            
+                            this.haptic('success'); 
+                            this.showDeleteModal = false; 
+                            
+                            setTimeout(async () => {
+                                await this.fetchLogs(true); 
+                            }, 1000);
+                        } catch (e) { 
+                            console.log(e);
+                        } finally { this.deleting = false; }
+                    },
+
+                    openModal(mode) { 
+                        this.haptic('light'); 
+                        this.resetForm(); 
+                        this.showModal = true; 
+                    },
+                    
+                    resetForm() { 
+                        this.isLocked = false; 
+                        const d = new Date();
+                        const localToday = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+                        this.form = { id: null, isp: this.isps.primary.id, type: '🔴 Link Down (Complete Outage)', faultParty: '🌐 External (ISP Side)', caseId: '', date: localToday, start: '', endDate: localToday, end: '', duration: '', actionTaken: '', rootCause: '', remarks: '', status: '🕒 Pending', secret: '' }; 
+                    },
+                    
+                    getISPColor(isp) { 
+                        if (!isp) return 'text-slate-500'; 
+                        const str = isp.toLowerCase();
+                        if (str.includes(this.isps.primary.id.split('(')[0].toLowerCase().trim())) return 'text-airtel dark:text-rose-400'; 
+                        if (str.includes('stpi')) return 'text-stpi dark:text-sky-400'; 
+                        if (str.includes('broadband') || str.includes('bsnl')) return 'text-broadband dark:text-emerald-400'; 
+                        return 'text-slate-500 font-medium'; 
+                    },
+                    
+                    getTypeClass(type) { 
+                        if (!type) return 'bg-slate-100 text-slate-600 border-slate-200'; 
+                        const t = type.toLowerCase(); 
+                        if (t.includes('down') || t.includes('cut') || t.includes('fault') || t.includes('power')) return 'bg-red-50 text-red-600 border border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/30'; 
+                        if (t.includes('speed') || t.includes('slow')) return 'bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/30'; 
+                        if (t.includes('flap') || t.includes('maintenance')) return 'bg-orange-50 text-orange-600 border border-orange-200 dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/30'; 
+                        if (t.includes('switch') || t.includes('rf') || t.includes('fiber') || t.includes('testing')) return 'bg-indigo-50 text-indigo-600 border border-indigo-200 dark:bg-indigo-500/10 dark:text-indigo-400 dark:border-indigo-500/30'; 
+                        if (t.includes('upgrade') || t.includes('bandwidth')) return 'bg-fuchsia-50 text-fuchsia-600 border border-fuchsia-200 dark:bg-fuchsia-500/10 dark:text-fuchsia-400 dark:border-fuchsia-500/30'; 
+                        return 'bg-slate-50 text-slate-600 border border-slate-200 dark:bg-white/5 dark:text-slate-400 dark:border-white/10'; 
+                    },
+                    
+                    formatDate(dateStr) { 
+                        if (!dateStr || dateStr === 'N/A' || dateStr.includes('1899') || dateStr.includes('1970')) return '-';
+                        return dateStr; 
+                    },
+
+                    parseDateForInput(dateStr) { 
+                        if(!dateStr || dateStr === 'Pending' || dateStr === 'N/A' || dateStr.includes('1970') || dateStr.includes('1899')) return ''; 
+                        const date = new Date(dateStr); 
+                        if(isNaN(date.getTime())) return ''; 
+                        return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0'); 
+                    },
+                    
+                    toggleTheme() { 
+                        this.haptic('light'); 
+                        this.isDark = !this.isDark; 
+                        document.documentElement.classList.toggle('dark', this.isDark); 
+                        localStorage.setItem('theme', this.isDark ? 'dark' : 'light'); 
+                        document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
                     }
-                },
-
-                async saveLog() {
-                    if (!this.form.secret || this.form.secret.trim() !== 'PBL2026') { 
-                        this.haptic('error'); alert("❌ Invalid Admin Key!"); return; 
-                    }
-                    this.saving = true; 
-                    try { 
-                        const payload = { action: 'saveWAN', loggedBy: this.currentUser?.name || 'IT Engineer', ...this.form };
-                        
-                        await fetch(API_URL, { 
-                            method: 'POST', 
-                            body: JSON.stringify(payload) 
-                        }).catch(e => console.log("Fetch Silent Fallback")); 
-                        
-                        this.haptic('success'); 
-                        this.showModal = false; 
-                        
-                        setTimeout(async () => {
-                            await this.fetchLogs(true); 
-                            this.resetForm(); 
-                        }, 1000);
-                    } catch (e) { 
-                        console.log(e);
-                    } finally { this.saving = false; }
-                },
-
-                async deleteLog() {
-                    if (!this.deleteSecret || this.deleteSecret.trim() !== 'PBL2026') { 
-                        this.haptic('error'); alert("❌ Invalid Admin Key!"); return; 
-                    }
-                    this.deleting = true; 
-                    try { 
-                        await fetch(API_URL, { 
-                            method: 'POST', 
-                            body: JSON.stringify({ action: 'deleteWAN', id: this.deleteId, secret: this.deleteSecret }) 
-                        }).catch(e => console.log("Fetch Silent Fallback"));
-                        
-                        this.haptic('success'); 
-                        this.showDeleteModal = false; 
-                        
-                        setTimeout(async () => {
-                            await this.fetchLogs(true); 
-                        }, 1000);
-                    } catch (e) { 
-                        console.log(e);
-                    } finally { this.deleting = false; }
-                },
-
-                openModal(mode) { 
-                    this.haptic('light'); 
-                    this.resetForm(); 
-                    this.showModal = true; 
-                },
-                
-                resetForm() { 
-				this.isLocked = false; // 🔥 Naya form kholte waqt hamesha unlocked rahega
-				const d = new Date();
-                    const localToday = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-                    this.form = { id: null, isp: '🔴 Airtel LL (ID: 9202902)', type: '🔴 Link Down (Complete Outage)', faultParty: '🌐 External (ISP Side)', caseId: '', date: localToday, start: '', endDate: localToday, end: '', duration: '', actionTaken: '', rootCause: '', remarks: '', status: '🕒 Pending', secret: '' }; 
-                },
-                
-                getISPColor(isp) { 
-                    if (!isp) return 'text-slate-500'; 
-                    const str = isp.toLowerCase();
-                    if (str.includes('airtel') && (str.includes('lease') || str.includes('ll'))) return 'text-airtel dark:text-rose-400'; 
-                    if (str.includes('stpi')) return 'text-stpi dark:text-sky-400'; 
-                    if (str.includes('broadband') || str.includes('bb')) return 'text-broadband dark:text-emerald-400'; 
-                    return 'text-slate-500 font-medium'; 
-                },
-                
-                getTypeClass(type) { 
-                    if (!type) return 'bg-slate-100 text-slate-600 border-slate-200'; 
-                    const t = type.toLowerCase(); 
-                    if (t.includes('down') || t.includes('cut') || t.includes('fault') || t.includes('power')) return 'bg-red-50 text-red-600 border border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/30'; 
-                    if (t.includes('speed') || t.includes('slow')) return 'bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/30'; 
-                    if (t.includes('flap') || t.includes('maintenance')) return 'bg-orange-50 text-orange-600 border border-orange-200 dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/30'; 
-                    if (t.includes('switch') || t.includes('rf') || t.includes('fiber') || t.includes('testing')) return 'bg-indigo-50 text-indigo-600 border border-indigo-200 dark:bg-indigo-500/10 dark:text-indigo-400 dark:border-indigo-500/30'; 
-                    if (t.includes('upgrade') || t.includes('bandwidth')) return 'bg-fuchsia-50 text-fuchsia-600 border border-fuchsia-200 dark:bg-fuchsia-500/10 dark:text-fuchsia-400 dark:border-fuchsia-500/30'; 
-                    return 'bg-slate-50 text-slate-600 border border-slate-200 dark:bg-white/5 dark:text-slate-400 dark:border-white/10'; 
-                },
-                
-                formatDate(dateStr) { 
-                    if (!dateStr || dateStr === 'N/A' || dateStr.includes('1899') || dateStr.includes('1970')) return '-';
-                    return dateStr; 
-                },
-
-                parseDateForInput(dateStr) { 
-                    if(!dateStr || dateStr === 'Pending' || dateStr === 'N/A' || dateStr.includes('1970') || dateStr.includes('1899')) return ''; 
-                    const date = new Date(dateStr); 
-                    if(isNaN(date.getTime())) return ''; 
-                    return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0'); 
-                },
-                
-                toggleTheme() { 
-                    this.haptic('light'); 
-                    this.isDark = !this.isDark; 
-                    document.documentElement.classList.toggle('dark', this.isDark); 
-                    localStorage.setItem('theme', this.isDark ? 'dark' : 'light'); 
-                    document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
-                }
-            }));
+                };
+            });
         });
     </script>
 </body>
