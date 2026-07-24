@@ -1351,7 +1351,8 @@
                             this.tickets = JSON.parse(cachedData);
                             if(!Array.isArray(this.tickets)) this.tickets = []; 
                             this.updateKPIs();
-                            setTimeout(() => this.renderChart(), 50); 
+                            // 📍 FIX: 300ms ka delay diya taaki CSS flexbox apni jagah aur height le sake
+                            setTimeout(() => this.renderChart(), 300); 
                         }
                     } catch(e) {}
 
@@ -1979,10 +1980,11 @@
                     }
                     if (this.chartInstance) this.chartInstance.destroy();
                     const options = {
-                        chart: { type: chartType, height: '100%', fontFamily: 'Inter, sans-serif', background: 'transparent', toolbar: { show: false } },
+                        // 📍 FIX: Added width 100%, parentHeightOffset 0, aur redrawOnParentResize to forcefully lock it inside its box
+                        chart: { type: chartType, height: '100%', width: '100%', parentHeightOffset: 0, redrawOnParentResize: true, fontFamily: 'Inter, sans-serif', background: 'transparent', toolbar: { show: false } },
                         series: series, labels: labels, colors: colors,
                         theme: { mode: this.isDark ? 'dark' : 'light' },
-                        plotOptions: { bar: { borderRadius: 4, columnWidth: '40%' }, pie: { donut: { size: '70%', labels: { show: true, total: { show: true, label: 'Total', fontSize: '11px', color: this.isDark ? '#fff' : '#333' } } } } },
+                        plotOptions: { bar: { borderRadius: 4, columnWidth: '40%' }, pie: { donut: { size: '75%', labels: { show: true, total: { show: true, label: 'Total', fontSize: '11px', color: this.isDark ? '#fff' : '#333' } } } } },
                         dataLabels: { enabled: false }, legend: { show: false },
                         grid: { show: chartType === 'bar', borderColor: this.isDark ? '#334155' : '#e2e8f0', strokeDashArray: 4 },
                         xaxis: { categories: labels, labels: { style: { fontSize: '9px', colors: '#64748b' } }, axisBorder: { show: false }, axisTicks: { show: false } }
