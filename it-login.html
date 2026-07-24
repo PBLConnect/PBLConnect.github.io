@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="pbl-config.js"></script>
     <title>IT Dashboard | Secure Zero-Trust Access</title>
+    <script>document.title += " " + PBL_APP_VERSION;</script>
     <link rel="icon" type="image/x-icon" href="Assets/images/pbl-logo.ico">
     <!-- PWA Setup -->
     <link rel="manifest" href="manifest.json">
@@ -12,6 +14,7 @@
     
     <!-- Dependencies -->
     <script src="https://cdn.tailwindcss.com"></script>
+		
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 
@@ -150,7 +153,7 @@
             <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center justify-center gap-1.5">
                 <i class="fa-solid fa-lock text-[8px]"></i> Encrypted Session
             </p>
-            <p class="text-[9px] font-mono text-slate-400 dark:text-slate-500">v1.3 (Secure Mode)</p>
+            <p class="text-[9px] font-mono text-slate-400 dark:text-slate-500"><span id="login-version"></span> (Role-Based Mode)</p>
         </div>
     </div>
 
@@ -194,6 +197,7 @@
         const HASH_VIKAS = "UEJMX05vb3JpMTQzXzIwMjY=";
         const HASH_ANIL = "UEJMXzI2MTJfMjAyNg==";
         const HASH_ASHOK = "UEJMXzE5MDlfMjAyNg==";
+        const HASH_DEEPENDRA = "UEJMX2RlZXBlbmRyYV8yMDI2"; // Hash for "deependra"
 
         // --- THEME LOGIC ---
         function applyThemeIcons() {
@@ -344,11 +348,14 @@
             const error = document.getElementById('errorMsg');
             const card = document.querySelector('.glass-panel');
 
-            // 📂 USER DATABASE
+
+            // 📂 ROLE-BASED USER DATABASE (WITH SECURE SALTED HASHES)
+            // Hashes: btoa('PBL_password_2026')
             const users = {
-                'vikas': { name: 'Vikas Rawat', role: 'Head of IT & Super Admin', empId: 'DL/25629/143', email: 'itsupport@panbusiness.net', location: 'Noida', expectedHash: HASH_VIKAS },
-                'anil':  { name: 'Anil Singh', role: 'Senior Network Engineer', empId: 'DL/25629/485', email: 'kaintura.singh22@gmail.com', location: 'Noida', expectedHash: HASH_ANIL },
-                'ashok': { name: 'Ashok Singh', role: 'Desktop Support Engineer', empId: 'DL/25629/501', email: 'ashok22@gmail.com', location: 'Noida', expectedHash: HASH_ASHOK }
+                'vikas': { name: 'Vikas Rawat', role: 'Head of IT & Super Admin', empId: 'DL/25629/143', email: 'vik24x7@gmail.com', location: 'Noida', allowedLocation: 'Global', expectedHash: "UEJMX05vb3JpMTQzXzIwMjY=" },
+                'anil':  { name: 'Anil Singh', role: 'Senior Network Engineer', empId: 'DL/25629/485', email: 'kaintura.singh22@gmail.com', location: 'Noida', allowedLocation: 'Noida', expectedHash: "UEJMXzI2MTJfMjAyNg==" },
+                'ashok': { name: 'Ashok Singh', role: 'IT Engineer', empId: 'DL/25629/501', email: 'as1704510@gmail.com', location: 'Noida', allowedLocation: 'Noida', expectedHash: "UEJMXzE5MDlfMjAyNg==" },
+                'deependra': { name: 'Deependra Singh', role: 'IT Engineer', empId: 'DDN/001', email: 'singhdeepu320@gmail.com', location: 'Dehradun', allowedLocation: 'Dehradun', expectedHash: "UEJMXzA3MDZfMjAyNg==" }
             };
 
             error.classList.add('hidden');
@@ -366,7 +373,12 @@
                     haptic('success'); 
                     
                     const userDataString = JSON.stringify({
-                        name: validUser.name, role: validUser.role, empId: validUser.empId, email: validUser.email, location: validUser.location
+                        name: validUser.name, 
+                        role: validUser.role, 
+                        empId: validUser.empId, 
+                        email: validUser.email, 
+                        location: validUser.location,
+                        allowedLocation: validUser.allowedLocation // 🚀 YAHAN NAYA ROLE ENGINE ADD KIYA
                     });
 
                     sessionStorage.setItem('isLoggedIn', 'true');
@@ -379,7 +391,7 @@
                     btn.className = "flex-1 py-4 bg-emerald-500 text-white font-black rounded-xl shadow-[0_10px_25px_-5px_rgba(16,185,129,0.4)] transition flex items-center justify-center gap-2 tracking-wide";
                     btn.innerHTML = '<i class="fa-solid fa-shield-check text-lg"></i> ACCESS GRANTED';
                     
-                    // 🧬 Prompt for Biometric Setup (Pehli baar password dalne par set hoga)
+                    // 🧬 Prompt for Biometric Setup
                     await setupBiometric(userDataString);
                     
                     setTimeout(() => {
@@ -478,6 +490,9 @@
                     .catch(error => console.log('ServiceWorker registration failed:', error));
             });
         }
+		
+		// Add this right after <script> tag starts
+		document.getElementById('login-version').innerText = PBL_APP_VERSION;
     </script>
 </body>
 </html>
