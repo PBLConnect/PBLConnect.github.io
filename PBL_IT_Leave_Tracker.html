@@ -535,9 +535,8 @@
                 <div class="w-px h-3.5 bg-slate-300 dark:bg-white/10"></div>
                 
                 <div class="flex items-center gap-1.5">
-                    <!-- 📍 MOBILE FIX: Make version a nice pill instead of loose text -->
-                    <span class="px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-600 border border-blue-200 dark:bg-brand/10 dark:border-brand/30 dark:text-brand_glow font-mono font-black text-[9px] leading-none shadow-sm" x-text="PBL_APP_VERSION"></span>
-                    <span class="hidden sm:inline-block px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[8px] font-black uppercase tracking-widest leading-none shadow-sm">PROD</span>
+                    <span class="px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/30 dark:text-emerald-400 font-mono font-black text-[9px] leading-none shadow-sm" x-text="PBL_APP_VERSION"></span>
+                    <span class="hidden sm:inline-block px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[8px] font-black uppercase tracking-widest leading-none shadow-sm">HR-OPS</span>
                 </div>
             </div>
 
@@ -555,7 +554,7 @@
             <!-- RIGHT: Tech Vitals -->
             <div class="flex items-center gap-2.5 sm:gap-3 shrink-0 font-mono font-bold cursor-default">
                 
-                <!-- 📍 MOBILE FIX: Replaces loose "OK" with a proper widget/pill -->
+                <!-- Mobile Status Indicator -->
                 <div class="md:hidden flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-100 dark:border-emerald-500/20 shadow-sm">
                     <span class="relative flex h-1.5 w-1.5">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -576,7 +575,7 @@
                 
                 <!-- Security Standard -->
                 <div class="hidden sm:flex items-center gap-1.5 hover:text-slate-700 dark:hover:text-slate-300 transition-colors" title="Encryption Level">
-                    <i class="fa-solid fa-shield-halved text-[10px] text-brand"></i>
+                    <i class="fa-solid fa-shield-halved text-[10px] text-emerald-500"></i>
                     <span>AES-256</span>
                 </div>
                 
@@ -936,15 +935,34 @@
                 },
 
                 init() {
-                    this.isAdmin = this.user.name.includes('Vikas');
+                    this.isAdmin = !!(this.user && this.user.name && this.user.name.includes('Vikas'));
                     if (this.isDark) document.documentElement.classList.add('dark');
+                    document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
                     
                     const today = new Date();
                     this.form.startDate = today.toISOString().split('T')[0];
                     this.form.endDate = this.form.startDate;
                     
                     setInterval(() => { this.currentTime = new Date().toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' }); }, 1000);
-                    this.fetchData();
+                    
+                    // ⚡ 1. SMART CACHE: Load instantly from LocalStorage
+                    try {
+                        const cachedLeaves = localStorage.getItem('pbl_leave_cache');
+                        const cachedHolidays = localStorage.getItem('pbl_holidays_cache');
+                        
+                        if (cachedLeaves) this.allLeaves = JSON.parse(cachedLeaves);
+                        if (cachedHolidays) this.holidays = JSON.parse(cachedHolidays);
+                        
+                        const pendingCount = this.allLeaves.filter(l => String(l.status).trim() === 'Pending').length;
+                        this.activeTab = (this.isAdmin && pendingCount > 0) ? 'approvals' : 'myLeaves';
+                    } catch(e) {}
+
+                    // ⏱️ Exactly 1 second loader for professional visual effect
+                    this.loading = true;
+                    setTimeout(() => { this.loading = false; }, 1000);
+
+                    // 🔄 2. BACKGROUND SYNC: Fetch silently without blocking UI
+                    this.fetchData(false);
                     this.viewMode = 'calendar';
                 },
 
@@ -976,36 +994,21 @@
                     return String(d.getDate()).padStart(2,'0') + ' ' + this.monthNames[d.getMonth()].substring(0,3);
                 },
 
-                async fetchData() {
-                    // ⚡ 1. SMART CACHE: Puraana data instantly load karo (0 Loading Time)
-                    try {
-                        const cachedLeaves = localStorage.getItem('pbl_leaves_cache');
-                        const cachedHolidays = localStorage.getItem('pbl_holidays_cache');
-                        
-                        if (cachedLeaves) this.allLeaves = JSON.parse(cachedLeaves);
-                        if (cachedHolidays) this.holidays = JSON.parse(cachedHolidays);
-                        
-                        const pendingCount = this.allLeaves.filter(l => String(l.status).trim() === 'Pending').length;
-                        this.activeTab = (this.isAdmin && pendingCount > 0) ? 'approvals' : 'myLeaves';
-                    } catch(e) {}
-
-                    // Agar cache bilkul khali hai (1st time login), sirf tabhi Loading Spinner dikhao
-                    if (this.allLeaves.length === 0) {
-                        this.loading = true;
-                    }
-
-                    // 🔄 2. BACKGROUND SYNC: Google Sheet se naya data laao silently
+                async fetchData(force = false) {
+                    if (force) { this.haptic('light'); this.loading = true; }
                     try {
                         const res = await fetch(API_URL + '?action=getLeaveData');
                         const data = await res.json();
                         
-                        if (data.leaves) {
-                            this.allLeaves = data.leaves;
-                            localStorage.setItem('pbl_leaves_cache', JSON.stringify(this.allLeaves)); // Cache update
+                        if(data.leaves) {
+                            if (JSON.stringify(this.allLeaves) !== JSON.stringify(data.leaves)) {
+                                this.allLeaves = data.leaves;
+                                try { localStorage.setItem('pbl_leave_cache', JSON.stringify(this.allLeaves)); } catch(e) {}
+                            }
                         }
-                        
+
                         if(data.holidays && data.holidays.length > 0) {
-                            this.holidays = data.holidays.map(h => {
+                            const newHolidays = data.holidays.map(h => {
                                 if (!h.icon) {
                                     const localH = this.holidays.find(lh => lh.date === h.date || lh.name === h.name);
                                     if (localH && localH.icon) h.icon = localH.icon;
@@ -1026,18 +1029,26 @@
                                 }
                                 return h;
                             });
-                            localStorage.setItem('pbl_holidays_cache', JSON.stringify(this.holidays)); // Cache update
+                            
+                            if (JSON.stringify(this.holidays) !== JSON.stringify(newHolidays)) {
+                                this.holidays = newHolidays;
+                                try { localStorage.setItem('pbl_holidays_cache', JSON.stringify(this.holidays)); } catch(e) {}
+                            }
                         } 
                         
-                        // Naye data ke hisaab se tab update karo
                         const pendingCount = this.allLeaves.filter(l => String(l.status).trim() === 'Pending').length;
                         if (this.isAdmin && pendingCount > 0) {
                             this.activeTab = 'approvals';
                         } else {
                             this.activeTab = 'myLeaves';
                         }
-                    } catch(e) {} finally { 
-                        this.loading = false; 
+
+                        if (force) this.haptic('success');
+
+                    } catch(e) {
+                        if (force) this.haptic('error');
+                    } finally { 
+                        if (force) { setTimeout(() => { this.loading = false; }, 500); } 
                     }
                 },
 
