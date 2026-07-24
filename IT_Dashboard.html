@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dashboard | IT Operations v1.3</title>
+    <script src="pbl-config.js"></script>
+    <title>Dashboard | IT Operations</title>
+    <script>document.title += " " + PBL_APP_VERSION;</script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <link rel="icon" type="image/x-icon" href="Assets/images/pbl-logo.ico">
     <link rel="manifest" href="manifest.json">
@@ -17,7 +19,7 @@
     </script>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.13.3/dist/cdn.min.js"></script>
+	<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.13.3/dist/cdn.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
@@ -113,192 +115,191 @@
       @keydown.escape.window="closeAllModals()"
       @refresh-dashboard.window="fetchTickets(true)">
 
-    <!-- NAVBAR -->
-    <header class="bg-white/70 dark:bg-[#020617]/70 backdrop-blur-2xl border-b border-slate-200/80 dark:border-white/5 flex-shrink-0 h-16 sm:h-20 z-40">
+    <!-- NAVBAR (ULTRA-MODERN COHESIVE REDESIGN) -->
+    <header class="bg-white/80 dark:bg-[#020617]/80 backdrop-blur-2xl border-b border-slate-200/80 dark:border-white/5 flex-shrink-0 h-16 sm:h-20 z-40">
         <div class="max-w-[1920px] mx-auto px-4 sm:px-6 h-full flex justify-between items-center">
-            <div class="flex items-center gap-4 sm:gap-6">
-                <div class="relative h-9 sm:h-12 w-auto flex items-center">
-                    <img src="pbl-logo.png" alt="PBL Logo" class="h-8 sm:h-10 w-auto object-contain drop-shadow-md" @error="$el.style.display='none'; $refs.fbLogo.style.display='flex'">
+            
+            <!-- 1. LEFT: Brand Identity -->
+            <div class="flex items-center gap-3 sm:gap-4">
+                <div class="relative h-9 sm:h-11 w-auto flex items-center">
+                    <img src="pbl-logo.png" alt="PBL Logo" class="h-full w-auto object-contain drop-shadow-md" @error="$el.style.display='none'; $refs.fbLogo.style.display='flex'">
                     <div x-ref="fbLogo" style="display:none;" class="w-9 h-9 sm:w-11 sm:h-11 bg-gradient-to-tr from-brand to-indigo-600 text-white rounded-xl flex items-center justify-center font-black text-xl shadow-[0_0_15px_rgba(59,130,246,0.4)]">P</div>
                 </div>
                 <div class="flex flex-col justify-center">
-                    <div class="flex items-center gap-2 sm:gap-3 mb-0.5 sm:mb-1">
+                    <div class="flex items-center gap-2 mb-0.5">
                         <div class="relative group cursor-pointer" @click="showChangelogModal = true; haptic('light')">
-                            <div class="absolute -inset-0.5 bg-gradient-to-r from-emerald-400 to-teal-500 rounded-md blur opacity-50 group-hover:opacity-75 transition duration-500 animate-pulse"></div>
-                            <button class="relative bg-white dark:bg-[#020617] text-brand px-2 py-0.5 rounded-md font-mono font-black text-[9px] leading-none border border-slate-200 dark:border-white/10 shadow-sm flex items-center gap-1.5" title="View Release Notes">
-                                <span class="text-emerald-600 dark:text-emerald-400">v1.3</span> 
-                                <span class="relative flex h-1.5 w-1.5">
-                                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                  <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
-                                </span>
+                            <button class="relative bg-white dark:bg-[#020617] px-2 py-0.5 rounded-md font-mono font-black text-[9px] leading-none border border-slate-200 dark:border-white/10 shadow-sm flex items-center gap-1.5">
+                                <span class="text-emerald-600 dark:text-emerald-400" x-text="PBL_APP_VERSION"></span> 
+                                <span class="relative flex h-1.5 w-1.5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span></span>
                             </button>
                         </div>
-                        <span class="hidden sm:inline-block text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-md">IT Operations</span>
+                        <span class="hidden sm:inline-block text-[9px] font-black text-slate-400 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-md">IT Operations</span>
                     </div>
-                    <h2 class="font-heading font-black text-lg sm:text-xl text-slate-800 dark:text-white leading-tight mt-0.5 sm:mt-1">IT<span class="text-brand dark:text-brand_glow">Dashboard</span></h2>
+                    <h2 class="font-heading font-black text-lg sm:text-2xl text-slate-800 dark:text-white leading-tight tracking-tight mt-0.5">IT<span class="text-brand dark:text-brand_glow">Dashboard</span></h2>
                 </div>
             </div>
 
-            <div class="hidden lg:flex items-center absolute left-[45%] xl:left-[46%] transform -translate-x-1/2 z-20 w-max transition-all duration-300">
-                <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl p-1 rounded-full border border-slate-200 dark:border-white/10 flex items-center shadow-sm hover:shadow-md transition-all">
-                    <div class="flex items-center gap-2.5 px-3 xl:px-4 py-1.5 whitespace-nowrap">
-                        <i class="fa-regular fa-clock text-brand text-[13px] xl:text-[15px] animate-pulse"></i>
-                        <span class="text-[14px] xl:text-[16px] font-mono font-black text-slate-800 dark:text-white tracking-tight leading-none" x-text="currentTime"></span>
-                        <div class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600 mx-0.5"></div>
-                        <span class="text-[9px] xl:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest" x-text="currentDate"></span>
+            <!-- 2. CENTER: Sleek Clock Capsule (Fixed Overlap using Flex-1) -->
+            <div class="hidden xl:flex items-center justify-center flex-1 z-20 px-2 min-w-0 transition-all duration-300">
+                <div class="bg-slate-50/80 dark:bg-black/30 backdrop-blur-xl px-3 py-1.5 rounded-2xl border border-slate-200/80 dark:border-white/5 flex items-center shadow-sm gap-2 shrink-0">
+                    <div class="flex items-center gap-1.5 whitespace-nowrap shrink-0 text-slate-700 dark:text-slate-200">
+                        <i class="fa-regular fa-clock text-brand text-[12px] animate-pulse"></i>
+                        <span class="text-[12px] font-mono font-black tracking-tight" x-text="currentTime"></span>
                     </div>
-                    <div class="flex items-center gap-3 bg-slate-50 dark:bg-black/30 rounded-full pl-3 pr-1 py-1 border border-slate-100 dark:border-white/5 whitespace-nowrap">
-                        <div class="flex flex-col justify-center">
-                            <span class="text-[8px] font-black text-brand uppercase tracking-widest leading-none mb-0.5" x-text="myShiftInfo.name"></span>
-                            <span class="text-[9px] font-mono font-bold text-slate-500 dark:text-slate-400 leading-none" x-text="myShiftInfo.time"></span>
-                        </div>
-                        <div class="px-3 py-1.5 rounded-full text-[9px] xl:text-[10px] font-black uppercase tracking-widest shadow-sm border transition-colors flex items-center gap-1.5"
-                             :class="myShiftInfo.isOver ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800/50' : 'bg-white text-emerald-600 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800/50'">
-                             <div class="w-1.5 h-1.5 rounded-full" :class="myShiftInfo.isOver ? 'bg-red-500' : 'bg-emerald-500'"></div>
+                    <div class="w-px h-3 bg-slate-300 dark:bg-slate-600 shrink-0"></div>
+                    <div class="flex items-center gap-1.5 whitespace-nowrap shrink-0">
+                        <span class="text-[8px] font-black text-slate-500 uppercase tracking-widest" x-text="myShiftInfo.name"></span>
+                        <span class="px-1.5 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest border shadow-sm flex items-center gap-1.5"
+                             :class="myShiftInfo.isOver ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30' : 'bg-white dark:bg-black/40 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-white/10'">
+                             <div class="w-1 h-1 rounded-full" :class="myShiftInfo.isOver ? 'bg-red-500' : 'bg-emerald-500'"></div>
                             <span x-text="myShiftInfo.timeLeft"></span>
-                        </div>
+                        </span>
                     </div>
                 </div>
             </div>
 
-            <div class="flex items-center justify-end gap-2 sm:gap-3 w-auto relative z-30">
-                <div class="flex items-center gap-2">
+         <!-- 3. RIGHT: Grouped Controls -->
+            <div class="flex items-center justify-end gap-1.5 sm:gap-4 w-auto relative z-30 shrink-0">
+                
+                <!-- GROUP A: Quick Tools -->
+                <div class="hidden sm:flex items-center gap-2">
+                    <a href="PBL_IT_Leave_Tracker.html" @click="haptic('light')" class="flex items-center gap-1.5 h-9 px-3 rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-all border border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/30 dark:text-emerald-400 shadow-sm font-bold text-[11px] active:scale-95">
+                        <i class="fa-regular fa-calendar-check text-[13px]"></i> <span>Leave Hub</span>
+                    </a>
                     
-                    <!-- Ye 'pbl-toolkit://' trigger OS ko command bhejega exe run karne ke liye -->
-					<a href="pbl-toolkit://start" class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-600 transition-all border shadow-sm active:scale-95" title="Launch Admin Toolkit">
-						<i class="fa-solid fa-terminal text-[15px]"></i>
-					</a>
+                    <!-- 🔒 ADMIN TOOL: Restricted to Vikas, Anil & Ashok -->
+                    <a x-show="['vikas', 'anil', 'ashok'].some(n => (currentUser?.name || '').toLowerCase().includes(n))" x-cloak href="pbl-toolkit://start" class="flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-500 hover:text-white transition-all border border-indigo-200 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400 shadow-sm active:scale-95" title="Launch Admin Toolkit">
+                        <i class="fa-solid fa-terminal text-[13px]"></i>
+                    </a>
+                </div>
 
-                    <button @click="toggleTheme()" class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-white dark:bg-dark_surface hover:bg-slate-50 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-all border border-slate-200 dark:border-white/10 shadow-sm hover:shadow-md hover:text-brand dark:hover:text-brand_glow">
-                        <i class="fa-solid text-[13px] sm:text-[15px]" :class="isDark ? 'fa-sun text-amber-400 drop-shadow-[0_0_5px_rgba(251,191,36,0.5)]' : 'fa-moon'"></i>
+                <div class="hidden sm:block w-px h-6 bg-slate-200 dark:bg-white/10"></div>
+
+                <!-- GROUP B: System Controls Pill -->
+                <div class="flex items-center gap-0.5 sm:gap-1 bg-white dark:bg-dark_surface p-0.5 sm:p-1 rounded-full border border-slate-200 dark:border-white/10 shadow-sm">
+                    
+                    <!-- Location Toggle -->
+                    <template x-if="isGlobal">
+                        <button @click="toggleLocation()" class="h-7 px-2.5 sm:px-3 flex items-center justify-center rounded-full bg-slate-800 text-white dark:bg-white dark:text-slate-900 shadow-sm transition-transform active:scale-95 gap-1 font-bold text-[9px] sm:text-[10px]">
+                            <i class="fa-solid fa-location-dot"></i> <span x-text="currentLocation"></span>
+                        </button>
+                    </template>
+                    <template x-if="!isGlobal">
+                        <div class="h-7 px-2.5 sm:px-3 flex items-center justify-center rounded-full bg-slate-100 dark:bg-black/30 text-slate-500 dark:text-slate-400 gap-1 font-bold text-[9px] sm:text-[10px] cursor-default">
+                            <i class="fa-solid fa-location-dot opacity-70"></i> <span x-text="currentLocation"></span>
+                        </div>
+                    </template>
+
+                    <!-- Theme Toggle -->
+                    <button @click="toggleTheme()" class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors">
+                        <i class="fa-solid text-[12px] sm:text-[13px]" :class="isDark ? 'fa-sun text-amber-400' : 'fa-moon'"></i>
                     </button>
 
+                    <!-- Notifications -->
                     <div class="relative" @click.outside="showNotifs = false">
-                        <button @click="showNotifs = !showNotifs" class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-white dark:bg-dark_surface hover:bg-slate-50 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-all border border-slate-200 dark:border-white/10 shadow-sm hover:shadow-md hover:text-brand dark:hover:text-brand_glow">
-                            <i class="fa-regular fa-bell text-[13px] sm:text-[15px]"></i>
-                            <span x-show="openTicketCount > 0" class="absolute top-0.5 sm:top-1 right-0.5 sm:right-1 flex h-2.5 w-2.5">
+                        <button @click="showNotifs = !showNotifs" class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors">
+                            <i class="fa-regular fa-bell text-[12px] sm:text-[13px]"></i>
+                            <span x-show="openTicketCount > 0" class="absolute top-0 right-0 flex h-2.5 w-2.5">
                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500 border-2 border-white dark:border-dark_surface shadow-sm"></span>
+                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500 border-2 border-white dark:border-dark_surface"></span>
                             </span>
                         </button>
 
-                        <div x-show="showNotifs" x-transition.origin.top.right 
-                             class="absolute right-0 top-full mt-3 w-[280px] sm:w-80 bg-white/95 dark:bg-dark_surface/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-200 dark:border-dark_border z-[100] overflow-hidden"
-                             style="display: none;">
+                        <!-- Notification Dropdown -->
+                        <!-- 📍 FIX: Width increased to sm:w-96 (384px) for better breathing room -->
+                        <div x-show="showNotifs" x-transition.origin.top.right class="absolute right-0 top-full mt-3 w-[320px] sm:w-96 bg-white/95 dark:bg-dark_surface/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-200 dark:border-dark_border z-[100] overflow-hidden" style="display: none;">
                             <div class="p-4 border-b border-slate-100 dark:border-dark_border flex justify-between items-center bg-slate-50/50 dark:bg-white/5">
-                                <h4 class="font-heading font-bold text-sm text-slate-800 dark:text-white">Pending Tickets</h4>
+                                <h4 class="font-heading font-black text-sm text-slate-800 dark:text-white">Pending Requests</h4>
                                 <span class="text-[9px] bg-red-100 text-red-600 px-2.5 py-0.5 rounded-md font-black uppercase tracking-wider border border-red-200 dark:border-red-500/20 shadow-sm" x-text="openTicketCount + ' New'">0 New</span>
                             </div>
-                            <div class="max-h-[320px] overflow-y-auto custom-scroll p-1.5">
-    <template x-for="notif in notifications" :key="notif.id">
-        
-        <div x-data="{ meta: processTicketMeta(notif) }" class="p-3 sm:p-4 mb-3 border rounded-2xl shadow-sm hover:-translate-y-0.5 transition-all duration-300 group relative overflow-hidden flex flex-col sm:flex-row items-start gap-3"
-             :class="meta.styles.openBg" @click="if(notif.type === 'audit' || meta.type === 'AUDIT') { showNotifs = false; openAuditModal(); } else { scrollToLog(); }">
-            
-            <i class="fa-solid absolute -bottom-3 -right-2 text-7xl opacity-[0.03] dark:opacity-[0.02] group-hover:scale-110 transition-transform duration-500 pointer-events-none" :class="meta.watermarkClass"></i>
-            <div class="absolute left-0 top-0 bottom-0 w-1.5 transition-all group-hover:w-2" :class="meta.styles.openBar"></div>
-
-            <div class="ml-1.5 w-9 h-9 rounded-xl flex items-center justify-center text-base shrink-0 shadow-sm border border-black/5 transition-transform group-hover:scale-105 relative z-10 hidden sm:flex" :class="getIssueConfig(notif.issue).color">
-                <i class="fa-solid" :class="meta.type === 'AUDIT' ? 'fa-shield-halved ' + meta.styles.iconColor : (meta.type === 'Helpdesk' ? getIssueConfig(notif.issue).icon + ' ' + meta.styles.iconColor : meta.icon + ' ' + meta.styles.iconColor)"></i>
-            </div>
-            
-            <div class="flex-1 min-w-0 relative z-10 flex flex-col h-full w-full pl-2 sm:pl-0">
-                <div class="flex justify-between items-start mb-1">
-                    <div>
-                        <span x-show="meta.isSystem" class="inline-block mb-1.5 px-2 py-0.5 rounded-[6px] text-[9px] font-black uppercase tracking-widest border shadow-sm" :class="meta.badgeClass" x-text="meta.badgeText"></span>
-                        <h4 class="font-bold text-[13px] sm:text-sm mb-0.5 transition pr-4 leading-tight" :class="meta.styles.textOpen" x-text="notif.issue"></h4>
-                    </div>
-                    <span class="text-[8px] font-black tracking-widest px-2 py-0.5 rounded-md border shrink-0 mt-1" :class="meta.styles.openPill" x-text="meta.statusTextOpen"></span>
-                </div>
-                
-                <p class="text-[11px] sm:text-xs text-slate-600 dark:text-slate-400 leading-snug whitespace-pre-wrap group-hover:text-slate-800 dark:group-hover:text-slate-300 transition-colors mt-0.5" 
-                   :class="meta.type === 'AUDIT' ? 'line-clamp-none' : 'line-clamp-3'" 
-                   x-text="meta.cleanDesc.replace(/\n/g, ' • ')"></p>
-                
-                <div class="flex flex-col gap-2 mt-2.5">
-                    <div class="flex items-center gap-2 flex-wrap">
-                        <span class="flex items-center text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm bg-white/80 dark:bg-black/20" :class="meta.styles.textOpen">
-                            <i class="fa-solid text-[8px] mr-1" :class="meta.icon + ' ' + meta.styles.iconColor"></i> <span x-text="notif.name"></span>
-                        </span>
-                        <span class="flex items-center text-[9px] text-slate-500 font-mono bg-white dark:bg-dark_bg px-1.5 py-0.5 rounded border border-slate-200 dark:border-white/10 shadow-sm" title="Workstation ID">
-                            <span x-text="meta.shortAsset"></span>
-                        </span>
-                        <template x-if="meta.refId || meta.caseId">
-                            <span class="flex items-center text-[9px] font-mono font-black px-2 py-0.5 rounded border shadow-sm" :class="meta.styles.refBg">
-                                <i class="fa-solid fa-hashtag mr-1 opacity-60"></i><span x-text="meta.refId || meta.caseId"></span>
-                            </span>
-                        </template>
-                    </div>
-
-                    <div class="flex items-center gap-2 flex-wrap">
-                        <template x-if="notif.hasExtra">
-                            <div class="contents">
-                                <span class="flex items-center text-[9px] text-blue-600 font-mono bg-blue-50 dark:bg-blue-500/10 px-1.5 py-0.5 rounded border border-blue-100 dark:border-blue-500/20 shadow-sm">
-                                    <i class="fa-solid fa-network-wired mr-1"></i> <span x-text="notif.extraInfo.lan || 'No IP'"></span>
-                                </span>
-                                <span class="flex items-center text-[9px] text-purple-600 font-mono bg-purple-50 dark:bg-purple-500/10 px-1.5 py-0.5 rounded border border-purple-100 dark:border-purple-500/20 shadow-sm">
-                                    <i class="fa-solid fa-server mr-1"></i> <span x-text="(notif.extraInfo.switchPort || 'Not Patched').replace('Pt:', 'Port No: ')"></span>
-                                </span>
+                            
+                            <!-- 📍 FIX: Increased padding and added space-y-3 for proper gaps between cards -->
+                            <div class="max-h-[380px] overflow-y-auto custom-scroll p-3 space-y-3">
+                                <template x-for="notif in notifications" :key="notif.id">
+                                    <div x-data="{ meta: processTicketMeta(notif) }" class="p-3 sm:p-4 border rounded-2xl shadow-sm hover:-translate-y-0.5 transition-all duration-300 group relative overflow-hidden flex items-start gap-3 cursor-pointer" :class="meta.styles.openBg" @click="if(meta.type === 'AUDIT') { showNotifs = false; openAuditModal(); } else if (meta.type === 'LEAVE') { window.location.href='PBL_IT_Leave_Tracker.html'; } else { scrollToLog(); }">
+                                        <i class="fa-solid absolute -bottom-3 -right-2 text-6xl opacity-[0.03] dark:opacity-[0.02] group-hover:scale-110 transition-transform duration-500 pointer-events-none" :class="meta.watermarkClass"></i>
+                                        <div class="absolute left-0 top-0 bottom-0 w-1.5 transition-all group-hover:w-2" :class="meta.styles.openBar"></div>
+                                        
+                                        <div class="w-8 h-8 rounded-xl flex items-center justify-center text-sm shrink-0 shadow-sm border border-black/5 transition-transform group-hover:scale-105 relative z-10 hidden sm:flex" :class="getIssueConfig(notif.issue).color">
+                                            <i class="fa-solid" :class="meta.type === 'AUDIT' ? 'fa-shield-halved ' + meta.styles.iconColor : (meta.type === 'Helpdesk' ? getIssueConfig(notif.issue).icon + ' ' + meta.styles.iconColor : meta.icon + ' ' + meta.styles.iconColor)"></i>
+                                        </div>
+                                        
+                                        <div class="flex-1 min-w-0 relative z-10 flex flex-col h-full w-full pl-1.5 sm:pl-0">
+                                            <div class="flex justify-between items-start mb-1 gap-2">
+                                                <div class="min-w-0 flex-1">
+                                                    <span x-show="meta.isSystem" class="inline-block mb-1.5 px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border shadow-sm" :class="meta.badgeClass" x-text="meta.badgeText"></span>
+                                                    <!-- 📍 FIX: Truncated title if too long -->
+                                                    <h4 class="font-bold text-[13px] sm:text-[14px] mb-0.5 transition leading-tight truncate" :class="meta.styles.textOpen" x-text="notif.issue" :title="notif.issue"></h4>
+                                                </div>
+                                                <span class="text-[7px] sm:text-[8px] font-black tracking-widest px-1.5 py-0.5 rounded border shrink-0 mt-0.5 shadow-sm" :class="meta.styles.openPill" x-text="meta.statusTextOpen"></span>
+                                            </div>
+                                            
+                                            <!-- 📍 FIX: line-clamp-2 prevents description from taking infinite height -->
+                                            <p class="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 leading-snug whitespace-normal group-hover:text-slate-700 dark:group-hover:text-slate-300 transition-colors mt-0.5 line-clamp-2" x-text="meta.cleanDesc.replace(/\n/g, ' ')"></p>
+                                            
+                                            <div class="mt-3 pt-2.5 border-t border-slate-100/60 dark:border-white/5 flex items-center justify-between relative z-20 mt-auto w-full gap-2">
+                                                <span class="flex items-center text-[9px] font-mono font-bold transition-colors text-red-400 shrink-0">
+                                                    <i class="fa-regular fa-clock mr-1"></i> <span x-text="notif.dateStr ? notif.dateStr : formatDisplayDate(notif.date)"></span>
+                                                </span>
+                                                
+                                                <div class="flex gap-1.5 shrink-0">
+                                                    <!-- 📍 FIX: Button text shortened to "Resolve" instead of "Mark Resolved" to save space -->
+                                                    <button x-show="canResolve(notif)" @click.stop="openResolveModal(notif, false)" class="text-[9px] px-2.5 py-1.5 rounded-lg font-black uppercase tracking-widest shadow-sm transition-colors flex items-center gap-1.5 active:scale-95 border" :class="meta.type === 'AUDIT' ? 'bg-rose-50 text-rose-600 border-rose-200 hover:bg-rose-500 hover:text-white dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/30' : 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-500 hover:text-white dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30'">
+                                                        <i class="fa-solid" :class="meta.type === 'AUDIT' ? 'fa-wrench' : 'fa-check-double'"></i> 
+                                                        <span x-text="meta.type === 'AUDIT' ? 'Fix' : 'Resolve'"></span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                                
+                                <div x-show="openTicketCount === 0" class="p-8 text-center text-slate-400">
+                                    <i class="fa-regular fa-circle-check text-4xl mb-3 text-emerald-500 opacity-50 drop-shadow-sm"></i>
+                                    <p class="text-[11px] font-black uppercase tracking-widest mt-1">All Clear!</p>
+                                </div>
                             </div>
-                        </template>
-                    </div>
-                </div>
-
-                <div class="mt-3 pt-2.5 border-t border-slate-100 dark:border-white/5 flex items-center justify-between relative z-20 mt-auto w-full">
-                    <span class="flex items-center text-[9px] font-mono font-bold transition-colors text-red-400">
-                        <i class="fa-regular fa-clock mr-1"></i> <span x-text="notif.dateStr ? notif.dateStr : formatDisplayDate(notif.date)"></span>
-                    </span>
-
-                    <div class="flex gap-2">
-                        <button x-show="canResolve(notif)" @click.stop="openResolveModal(notif, false)" class="text-[10px] px-3 py-1.5 rounded-lg font-black uppercase tracking-widest shadow-sm transition-colors flex items-center gap-1.5 active:scale-95 border" :class="meta.type === 'AUDIT' ? 'bg-rose-50 text-rose-600 border-rose-200 hover:bg-rose-500 hover:text-white dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/30' : 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-500 hover:text-white dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30'">
-                            <i class="fa-solid" :class="meta.type === 'AUDIT' ? 'fa-wrench' : 'fa-check-double'"></i> 
-                            <span x-text="meta.type === 'AUDIT' ? 'Fix Findings' : 'Mark Resolved'"></span>
-                        </button>
-                        <button x-show="!canResolve(notif)" @click.stop="openResolveModal(notif, true)" class="text-[10px] bg-slate-50 text-slate-600 border border-slate-200 dark:bg-white/5 dark:text-slate-400 dark:border-white/10 px-3 py-1.5 rounded-lg font-black uppercase tracking-widest shadow-sm hover:bg-slate-200 hover:text-slate-800 dark:hover:bg-white/10 dark:hover:text-white transition-colors flex items-center gap-1.5 active:scale-95">
-                            <i class="fa-solid fa-eye"></i> View Details
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </template>
-    
-    <div x-show="openTicketCount === 0" class="p-8 text-center text-slate-400">
-        <i class="fa-regular fa-circle-check text-4xl mb-3 text-emerald-500 opacity-50 drop-shadow-sm"></i>
-        <p class="text-xs font-bold uppercase tracking-widest mt-1">All clear!</p>
-    </div>
-</div>
-                            <div class="p-3 text-center border-t border-slate-100 dark:border-dark_border bg-slate-50/50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 transition cursor-pointer" @click="scrollToLog()">
-                                <button class="text-[10px] font-black uppercase tracking-widest text-brand hover:text-brand_dark dark:hover:text-brand_glow transition">View all tickets &rarr;</button>
+                            
+                            <!-- 📍 NEW: Quick jump to logs footer -->
+                            <div class="p-3 bg-slate-50/80 dark:bg-black/20 border-t border-slate-100 dark:border-white/5 text-center cursor-pointer hover:bg-slate-100 dark:hover:bg-white/5 transition" @click="scrollToLog(); showNotifs=false;">
+                                <span class="text-[10px] font-black uppercase tracking-widest text-brand hover:text-brand_dark transition">View All Logs &rarr;</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="h-6 w-px bg-slate-200 dark:bg-white/10 mx-0.5 sm:mx-1"></div>
+                <div class="hidden sm:block w-px h-6 bg-slate-200 dark:bg-white/10 mx-0.5 sm:mx-1"></div>
 
-                <div class="relative" @click.outside="showProfile = false">
-                    <div @click="showProfile = !showProfile" class="flex items-center gap-2 sm:gap-2.5 sm:pl-1 sm:pr-4 sm:py-1 rounded-full bg-white dark:bg-dark_surface hover:bg-slate-50 dark:hover:bg-white/5 border border-slate-200 dark:border-white/10 shadow-sm hover:shadow-md transition cursor-pointer group select-none">
-                        <div class="relative">
-                            <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-tr from-brand to-indigo-600 flex items-center justify-center text-white text-xs font-black shadow-md border border-white/20" x-text="userInitials"></div>
-                            <div class="absolute bottom-0 right-0 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-emerald-500 border-2 border-white dark:border-dark_surface rounded-full shadow-[0_0_5px_rgba(16,185,129,0.5)]"></div>
+                <!-- GROUP C: User Profile -->
+                <div class="relative shrink-0" @click.outside="showProfile = false">
+                    <div @click="showProfile = !showProfile" class="flex items-center gap-1.5 sm:gap-2 cursor-pointer group rounded-xl p-0 sm:p-1 sm:pr-2 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-brand to-indigo-600 flex items-center justify-center text-white text-[11px] sm:text-xs font-black shadow-md border border-white/20 relative shrink-0">
+                            <span x-text="userInitials"></span>
+                            <div class="absolute -bottom-1 -right-1 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-emerald-500 border-2 border-white dark:border-dark_surface rounded-full shadow-sm"></div>
                         </div>
-                        <div class="hidden sm:flex flex-col text-left">
-                            <span class="text-xs font-bold text-slate-700 dark:text-white leading-tight" x-text="currentUser.name">User</span>
-                            <span class="text-[9px] text-slate-500 dark:text-slate-400 font-black truncate uppercase tracking-widest mt-0.5" x-text="currentUser.role" :title="currentUser.role">Role</span>
+                        <div class="hidden sm:flex flex-col text-left max-w-[130px] xl:max-w-[180px] min-w-0">
+                            <span class="text-[13px] font-bold text-slate-800 dark:text-white leading-none truncate" x-text="currentUser.name"></span>
+                            <span class="text-[9px] text-slate-500 dark:text-slate-400 font-bold truncate uppercase tracking-widest mt-1" x-text="currentUser.role"></span>
                         </div>
-                        <i class="fa-solid fa-chevron-down text-[9px] text-slate-400 group-hover:text-brand transition hidden sm:block" :class="showProfile ? 'rotate-180' : ''"></i>
+                        <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 group-hover:text-brand transition-transform shrink-0 ml-1 hidden sm:block" :class="showProfile ? 'rotate-180' : ''"></i>
                     </div>
 
-                    <div x-show="showProfile" x-transition.origin.top.right class="absolute right-0 top-full mt-3 w-48 bg-white/95 dark:bg-dark_surface/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-200 dark:border-dark_border z-[100] overflow-hidden" style="display: none;">
+                    <!-- Profile Dropdown -->
+                    <div x-show="showProfile" x-transition.origin.top.right class="absolute right-0 top-full mt-2 w-48 bg-white/95 dark:bg-dark_surface/95 backdrop-blur-xl rounded-2xl shadow-xl border border-slate-200 dark:border-dark_border z-[100] overflow-hidden" style="display: none;">
                         <div class="p-2 space-y-1">
-                            <button @click="openProfile()" class="w-full text-left flex items-center gap-3 px-4 py-2.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 rounded-2xl transition"><i class="fa-regular fa-user opacity-70"></i> My Profile</button>
-                            <button @click="openSettings()" class="w-full text-left flex items-center gap-3 px-4 py-2.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 rounded-2xl transition"><i class="fa-solid fa-sliders opacity-70"></i> Preferences</button>
+                            <a href="PBL_IT_Leave_Tracker.html" class="w-full text-left flex items-center gap-3 px-4 py-2.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-500/10 dark:hover:text-emerald-400 rounded-xl transition">
+                                <i class="fa-regular fa-calendar-check opacity-70"></i> My Leaves
+                            </a>
+                            
                             <div class="h-px bg-slate-100 dark:bg-white/10 my-1"></div>
-                            <button @click="confirmLogout()" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-2xl transition text-left"><i class="fa-solid fa-arrow-right-from-bracket opacity-70"></i> Secure Logout</button>
+                            
+                            <button @click="confirmLogout()" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition text-left">
+                                <i class="fa-solid fa-arrow-right-from-bracket opacity-70"></i> Secure Logout
+                            </button>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </header>
@@ -314,6 +315,7 @@
 
             <!-- APPS GRID -->
             <section class="shrink-0 relative z-20">
+                <!-- 📍 REVERTED: Wapas 6 columns kar diya taaki cards properly expand hon -->
                 <div class="cards-container grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-5">
                     
                     <a href="PBL_Inventory.html" @click="haptic('light')" class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-blue-50/80 to-white/80 border border-blue-200/60 shadow-md hover:shadow-2xl hover:border-blue-400/50 dark:from-blue-900/10 dark:to-dark_surface/80 dark:border-blue-800/30 dark:hover:border-blue-400/50">
@@ -438,7 +440,7 @@
                             </div>
                         </div>
                     </a>
-
+					
                 </div>
             </section>
 
@@ -452,7 +454,7 @@
                         <div>
                             <h3 class="font-heading font-bold text-sm sm:text-base uppercase text-slate-800 dark:text-white flex items-center gap-2">
                                 <i class="fa-solid fa-list-check text-brand"></i> Ticket History
-                                <span class="bg-brand/10 text-brand px-2 py-0.5 rounded-md font-mono text-[10px]" x-text="tickets.length"></span>
+                                <span class="bg-brand/10 text-brand px-2 py-0.5 rounded-md font-mono text-[10px]" x-text="filteredTickets.length"></span>
                             </h3>
                         </div>
                         <button @click="fetchTickets(true)" class="text-[10px] sm:text-xs font-bold text-slate-500 hover:text-brand transition flex items-center gap-1.5 bg-white dark:bg-black/20 px-2 sm:px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 shadow-sm active:scale-95">
@@ -462,7 +464,7 @@
                     
                     <div class="overflow-y-auto custom-scroll flex-1 p-0 relative bg-white dark:bg-transparent">
                         
-                        <template x-if="loading && tickets.length === 0">
+					<template x-if="loading && filteredTickets.length === 0">
                             <div class="absolute inset-0 flex flex-col items-center justify-center bg-white/50 dark:bg-black/50 backdrop-blur-sm z-10">
                                 <div class="loader mb-2">
                                     <div class="loader__bar"></div><div class="loader__bar"></div><div class="loader__bar"></div><div class="loader__bar"></div><div class="loader__bar"></div><div class="loader__ball"></div>
@@ -472,7 +474,7 @@
                         </template>
 
                         <div class="p-2 sm:p-3 bg-slate-50/50 dark:bg-transparent space-y-2.5">
-                            <template x-for="ticket in tickets" :key="ticket.id">
+                            <template x-for="ticket in filteredTickets" :key="ticket.id">
     <div x-data="{ meta: processTicketMeta(ticket) }" class="p-3 flex items-start gap-3 transition-all duration-300 rounded-[1.25rem] border hover:-translate-y-0.5 group relative overflow-hidden flex-col sm:flex-row" 
          :class="ticket.status === 'Open' ? meta.styles.openBg : meta.styles.closedBg">
         
@@ -515,30 +517,30 @@
             </div>
 
             <!-- 🔥 Action Bar & Date (Unified Footer to save space) -->
-            <div class="mt-3 pt-2.5 border-t border-slate-100 dark:border-white/5 flex items-center justify-between relative z-20 mt-auto">
-                <span class="flex items-center text-[9px] font-mono font-bold transition-colors" :class="ticket.status === 'Open' ? 'text-red-400' : 'text-slate-400'">
-                    <i class="fa-regular fa-clock mr-1"></i> <span x-text="formatDisplayDate(ticket.date)"></span>
-                </span>
-
-                <div x-show="ticket.status === 'Open'" class="flex gap-2">
-                    <!-- FOR AUTHORIZED PERSON (Can Resolve) -->
-					<button x-show="canResolve(ticket)" @click.stop="openResolveModal(ticket, false)" class="text-[10px] px-3 py-1.5 rounded-lg font-black uppercase tracking-widest shadow-sm transition-colors flex items-center gap-1.5 active:scale-95 border"
-							:class="ticket.issue.toLowerCase().includes('audit') ? 'bg-rose-50 text-rose-600 border-rose-200 hover:bg-rose-500 hover:text-white dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/30' : 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-500 hover:text-white dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30'">
-						<i class="fa-solid" :class="ticket.issue.toLowerCase().includes('audit') ? 'fa-wrench' : 'fa-check-double'"></i> 
-						<span x-text="ticket.issue.toLowerCase().includes('audit') ? 'Fix Findings' : 'Mark Resolved'"></span>
-					</button>
-
-					<!-- FOR UNAUTHORIZED PERSON (View Only) -->
-					<button x-show="!canResolve(ticket)" @click.stop="openResolveModal(ticket, true)" class="text-[10px] bg-slate-50 text-slate-600 border border-slate-200 dark:bg-white/5 dark:text-slate-400 dark:border-white/10 px-3 py-1.5 rounded-lg font-black uppercase tracking-widest shadow-sm hover:bg-slate-200 hover:text-slate-800 dark:hover:bg-white/10 dark:hover:text-white transition-colors flex items-center gap-1.5 active:scale-95">
-						<i class="fa-solid fa-eye"></i> View Details
-					</button>
-                </div>
-            </div>
+            <div class="mt-3 pt-2.5 border-t border-slate-100/60 dark:border-white/5 flex items-center justify-between relative z-20 mt-auto w-full gap-2">
+                                                <span class="flex items-center text-[9px] font-mono font-bold transition-colors text-red-400 shrink-0">
+                                                    <i class="fa-regular fa-clock mr-1"></i> <span x-text="notif.dateStr ? notif.dateStr : formatDisplayDate(notif.date)"></span>
+                                                </span>
+                                                
+                                                <div class="flex gap-1.5 shrink-0">
+                                                    <!-- Resolve Button -->
+                                                    <button x-show="canResolve(notif)" @click.stop="openResolveModal(notif, false)" class="text-[9px] px-2.5 py-1.5 rounded-lg font-black uppercase tracking-widest shadow-sm transition-colors flex items-center gap-1.5 active:scale-95 border" :class="meta.type === 'AUDIT' ? 'bg-rose-50 text-rose-600 border-rose-200 hover:bg-rose-500 hover:text-white dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/30' : 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-500 hover:text-white dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30'">
+                                                        <i class="fa-solid" :class="meta.type === 'AUDIT' ? 'fa-wrench' : 'fa-check-double'"></i> 
+                                                        <span x-text="meta.type === 'AUDIT' ? 'Fix' : 'Resolve'"></span>
+                                                    </button>
+                                                    
+                                                    <!-- 📍 NEW: Smart "View Details" / "Open Hub" Button -->
+                                                    <button x-show="!canResolve(notif)" @click.stop="meta.type === 'LEAVE' ? window.location.href='PBL_IT_Leave_Tracker.html' : openResolveModal(notif, true)" class="text-[9px] bg-slate-50 text-slate-600 border border-slate-200 dark:bg-white/5 dark:text-slate-400 dark:border-white/10 px-2.5 py-1.5 rounded-lg font-black uppercase tracking-widest shadow-sm hover:bg-slate-200 hover:text-slate-800 dark:hover:bg-white/10 dark:hover:text-white transition-colors flex items-center gap-1.5 active:scale-95">
+                                                        <i class="fa-solid" :class="meta.type === 'LEAVE' ? 'fa-arrow-right' : 'fa-eye'"></i> 
+                                                        <span x-text="meta.type === 'LEAVE' ? 'Open Hub' : 'View Details'"></span>
+                                                    </button>
+                                                </div>
+                                            </div>
         </div>
     </div>
 </template>
                             
-                            <template x-if="!loading && tickets.length === 0">
+                            <template x-if="!loading && filteredTickets.length === 0">
                                 <div class="p-8 text-center text-slate-400 bg-white dark:bg-dark_surface rounded-3xl border border-slate-100 dark:border-white/5">
                                     <i class="fa-solid fa-mug-hot text-3xl mb-2 opacity-50 text-brand animate-pulse"></i>
                                     <p class="text-xs font-bold uppercase tracking-widest">No pending tickets.</p>
@@ -656,7 +658,8 @@
                                 <div class="relative z-10 mt-1">
                                     <div class="flex items-baseline gap-1.5 drop-shadow-sm">
                                         <h3 class="text-3xl sm:text-4xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none" x-text="onlineStaffCount">0</h3>
-                                        <span class="text-xs sm:text-sm font-mono font-bold text-slate-400">/ 3</span>
+                                        <!-- 📍 NAYA: Dynamic total staff count -->
+                                        <span class="text-xs sm:text-sm font-mono font-bold text-slate-400" x-text="'/ ' + staffData.length">/ 4</span>
                                     </div>
                                     
                                     <div class="flex items-center gap-1.5 mt-1.5">
@@ -676,32 +679,75 @@
         </div>
     </main>
 
-    <!-- FOOTER -->
-    <footer class="shrink-0 bg-white/90 dark:bg-[#09090b]/95 backdrop-blur-xl border-t border-slate-200 dark:border-white/5 z-50 py-2 sm:py-2.5 w-full">
-        <div class="max-w-[1920px] mx-auto px-4 md:px-6 relative flex items-center justify-between text-[10px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400">
-            <div class="flex items-center gap-2 sm:gap-3 z-10">
-                <span>&copy; <span x-text="new Date().getFullYear()"></span> <span class="hidden sm:inline font-bold text-slate-700 dark:text-white">PBL Connect</span></span>
-                <span class="h-3 w-px bg-slate-300 dark:bg-white/10"></span>
-                <span class="font-mono text-brand font-bold">v1.3</span>
-            </div>
-            <div class="hidden lg:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 items-center gap-4 bg-slate-50 dark:bg-white/5 px-4 py-1.5 rounded-full border border-slate-200 dark:border-white/5 shadow-sm">
-                <div class="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
-                    <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span> Operational
+    <!-- UNIFIED STATUS BAR (FOOTER) -->
+    <footer class="shrink-0 bg-white/90 dark:bg-[#09090b]/95 backdrop-blur-xl border-t border-slate-200/80 dark:border-white/5 z-50 h-10 sm:h-10 w-full flex items-center">
+        <div class="max-w-[1920px] w-full mx-auto px-3.5 sm:px-6 flex items-center justify-between text-[10px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400">
+            
+            <!-- LEFT: Copyright & Version -->
+            <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                <span class="font-bold flex items-center gap-1">
+                    &copy; <span x-text="new Date().getFullYear()"></span> 
+                    <span class="hidden sm:inline">PBL Connect</span>
+                    <span class="sm:hidden tracking-wider">PBL</span>
+                </span>
+                
+                <div class="w-px h-3.5 bg-slate-300 dark:bg-white/10"></div>
+                
+                <div class="flex items-center gap-1.5">
+                    <!-- 📍 MOBILE FIX: Make version a nice pill instead of loose text -->
+                    <span class="px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-600 border border-blue-200 dark:bg-brand/10 dark:border-brand/30 dark:text-brand_glow font-mono font-black text-[9px] leading-none shadow-sm" x-text="PBL_APP_VERSION"></span>
+                    <span class="hidden sm:inline-block px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[8px] font-black uppercase tracking-widest leading-none shadow-sm">PROD</span>
                 </div>
             </div>
-            <div class="flex items-center gap-2 z-10">
-                <div class="hidden sm:flex items-center gap-2">
-                    <span class="text-slate-500 dark:text-slate-400">User Session:</span>
-                    <div class="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 shadow-sm flex items-center gap-1.5">
-                        <span class="font-bold text-slate-700 dark:text-white" x-text="currentUser.name.split(' ')[0]"></span>
-                    </div>
-                </div>
-                <div class="flex sm:hidden items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest shadow-sm border transition-colors"
-                     :class="myShiftInfo.isOver ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800/50' : 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800/50'">
-                    <div class="w-1.5 h-1.5 rounded-full" :class="myShiftInfo.isOver ? 'bg-red-500 animate-pulse' : 'bg-emerald-500'"></div>
-                    <span x-text="myShiftInfo.timeLeft"></span>
+
+            <!-- CENTER: System Status (Fluid & Centered safely) -->
+            <div class="hidden md:flex flex-1 justify-center items-center px-4 overflow-hidden">
+                <div class="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-100 dark:border-emerald-500/20 shadow-sm cursor-default">
+                    <span class="relative flex h-1.5 w-1.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                    </span>
+                    <span class="font-bold tracking-wide text-[10px] sm:text-[11px]">All Systems Operational</span>
                 </div>
             </div>
+
+            <!-- RIGHT: Tech Vitals -->
+            <div class="flex items-center gap-2.5 sm:gap-3 shrink-0 font-mono font-bold cursor-default">
+                
+                <!-- 📍 MOBILE FIX: Replaces loose "OK" with a proper widget/pill -->
+                <div class="md:hidden flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-100 dark:border-emerald-500/20 shadow-sm">
+                    <span class="relative flex h-1.5 w-1.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                    </span>
+                    <span class="text-[8px] tracking-widest uppercase font-black">Online</span>
+                </div>
+                
+                <div class="md:hidden w-px h-3.5 bg-slate-300 dark:bg-white/10"></div>
+
+                <!-- Network Ping -->
+                <div class="flex items-center gap-1 sm:gap-1.5 hover:text-slate-700 dark:hover:text-slate-300 transition-colors" title="Network Latency">
+                    <i class="fa-solid fa-wifi text-[9px] sm:text-[10px] text-emerald-500"></i>
+                    <span>12ms</span>
+                </div>
+                
+                <div class="hidden sm:block w-px h-3.5 bg-slate-300 dark:bg-white/10"></div>
+                
+                <!-- Security Standard -->
+                <div class="hidden sm:flex items-center gap-1.5 hover:text-slate-700 dark:hover:text-slate-300 transition-colors" title="Encryption Level">
+                    <i class="fa-solid fa-shield-halved text-[10px] text-brand"></i>
+                    <span>AES-256</span>
+                </div>
+                
+                <div class="hidden lg:block w-px h-3.5 bg-slate-300 dark:bg-white/10"></div>
+                
+                <!-- System Clock -->
+                <div class="hidden lg:flex items-center gap-1.5 hover:text-slate-700 dark:hover:text-slate-300 transition-colors">
+                    <i class="fa-regular fa-clock text-[10px] opacity-70"></i>
+                    <span x-text="currentTime"></span>
+                </div>
+            </div>
+
         </div>
     </footer>
 
@@ -893,69 +939,80 @@
     </div>
 </div>
 
-<!-- IT STAFF MODAL  -->
+<!-- IT STAFF MODAL (COMPACT & ERGONOMIC) -->
     <div x-show="showStaffModal" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/70 backdrop-blur-md p-4" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" @click.self="showStaffModal = false">
-        <div class="bg-white dark:bg-dark_surface w-full max-w-lg rounded-[2rem] shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden">
-            <div class="relative p-6 pb-5 border-b border-slate-100 dark:border-white/5 bg-gradient-to-br from-slate-50 to-white dark:from-dark_surface dark:to-black/20 overflow-hidden">
+        <div class="bg-white dark:bg-dark_surface w-full max-w-lg rounded-[2rem] shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden flex flex-col max-h-[95vh]">
+            
+            <!-- 📍 HEADER (Slimmer Padding) -->
+            <div class="relative p-4 sm:p-5 pb-3 sm:pb-4 border-b border-slate-100 dark:border-white/5 bg-gradient-to-br from-slate-50 to-white dark:from-dark_surface dark:to-black/20 overflow-hidden shrink-0">
                 <div class="absolute -right-6 -top-6 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
                 <div class="flex justify-between items-start relative z-10">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-[14px] bg-gradient-to-br from-emerald-400 to-teal-500 text-white flex items-center justify-center shadow-[0_4px_15px_rgba(16,185,129,0.3)] text-xl border border-emerald-300 dark:border-emerald-600 shrink-0"><i class="fa-solid fa-users-viewfinder"></i></div>
-                        <div><h3 class="text-xl font-heading font-black text-slate-800 dark:text-white leading-tight">IT Team Status</h3><div class="flex items-center gap-1.5 mt-1"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span><p class="text-[9px] text-emerald-600 dark:text-emerald-400 uppercase font-black tracking-widest">Live Availability</p></div></div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 text-white flex items-center justify-center shadow-[0_4px_15px_rgba(16,185,129,0.3)] text-lg border border-emerald-300 dark:border-emerald-600 shrink-0"><i class="fa-solid fa-users-viewfinder"></i></div>
+                        <div><h3 class="text-lg font-heading font-black text-slate-800 dark:text-white leading-tight">IT Team Status</h3><div class="flex items-center gap-1.5 mt-0.5"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span><p class="text-[9px] text-emerald-600 dark:text-emerald-400 uppercase font-black tracking-widest">Live Availability</p></div></div>
                     </div>
-                    <button @click="showStaffModal = false" class="w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-white/10 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition shadow-sm border border-slate-200 dark:border-transparent"><i class="fa-solid fa-xmark"></i></button>
+                    <button @click="showStaffModal = false" class="w-7 h-7 flex items-center justify-center rounded-full bg-white dark:bg-white/10 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition shadow-sm border border-slate-200 dark:border-transparent shrink-0"><i class="fa-solid fa-xmark text-sm"></i></button>
                 </div>
             </div>
-            <div class="p-5 space-y-3.5 bg-slate-50/30 dark:bg-transparent">
+            
+            <!-- 📍 LIST (Tighter gaps, sleek cards) -->
+            <div class="p-3 sm:p-4 space-y-2.5 bg-slate-50/30 dark:bg-transparent flex-1 overflow-y-auto custom-scroll relative">
                 <template x-for="staff in staffData" :key="staff.name">
-                    <div class="relative overflow-hidden p-4 rounded-[1.25rem] border transition-all duration-300 group hover:shadow-lg hover:-translate-y-0.5" :class="isStaffOnline(staff) ? 'bg-gradient-to-br from-white to-emerald-50/30 border-emerald-200 dark:from-dark_surface dark:to-emerald-900/10 dark:border-emerald-800/50 shadow-[0_8px_20px_-6px_rgba(16,185,129,0.15)]' : 'bg-white border-slate-200 dark:bg-dark_surface dark:border-white/10 opacity-80 grayscale-[0.1]'">
+                    <div class="relative overflow-hidden p-3 rounded-2xl border transition-all duration-300 group hover:shadow-lg hover:-translate-y-0.5" :class="isStaffOnline(staff) ? 'bg-gradient-to-br from-white to-emerald-50/30 border-emerald-200 dark:from-dark_surface dark:to-emerald-900/10 dark:border-emerald-800/50 shadow-[0_4px_15px_-5px_rgba(16,185,129,0.15)]' : 'bg-white border-slate-200 dark:bg-dark_surface dark:border-white/10 opacity-80 grayscale-[0.1]'">
                         <div class="absolute left-0 top-0 bottom-0 w-1.5 transition-all duration-300" :class="isStaffOnline(staff) ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]' : 'bg-slate-300 dark:bg-slate-700'"></div>
                         <div class="flex items-center justify-between pl-2">
-                            <div class="flex items-center gap-3.5">
-                                <div class="relative"><div class="w-11 h-11 rounded-[12px] flex items-center justify-center text-base font-black text-white shadow-md transition-transform group-hover:scale-105 border border-white/20" :class="staff.color" x-text="staff.avatar"></div><div class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-dark_surface flex items-center justify-center" :class="isStaffOnline(staff) ? 'bg-emerald-500' : 'bg-slate-400'"><span x-show="isStaffOnline(staff)" class="absolute w-full h-full bg-emerald-500 rounded-full animate-ping opacity-75"></span></div></div>
-                                <div class="flex flex-col"><h4 class="text-sm font-black text-slate-800 dark:text-white leading-tight group-hover:text-brand transition-colors" x-text="staff.name"></h4><p class="text-[9px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1.5 mt-0.5 uppercase tracking-wider"><i class="fa-solid fa-id-badge opacity-60"></i> <span x-text="staff.role"></span></p></div>
+                            <div class="flex items-center gap-3">
+                                <div class="relative"><div class="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black text-white shadow-sm transition-transform group-hover:scale-105 border border-white/20" :class="staff.color" x-text="staff.avatar"></div><div class="absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white dark:border-dark_surface flex items-center justify-center" :class="isStaffOnline(staff) ? 'bg-emerald-500' : 'bg-slate-400'"><span x-show="isStaffOnline(staff)" class="absolute w-full h-full bg-emerald-500 rounded-full animate-ping opacity-75"></span></div></div>
+                                <div class="flex flex-col">
+                                    <div class="flex items-center gap-2">
+                                        <h4 class="text-[13px] font-black text-slate-800 dark:text-white leading-tight group-hover:text-brand transition-colors" x-text="staff.name"></h4>
+                                        <span class="text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded border shadow-sm" 
+                                              :class="staff.loc === 'Dehradun' ? 'bg-violet-50 text-violet-600 border-violet-200 dark:bg-violet-500/10 dark:text-violet-400' : (staff.loc === 'Global' ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400' : 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400')" 
+                                              x-text="staff.loc"></span>
+                                    </div>
+                                    <p class="text-[9px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1.5 mt-0.5 uppercase tracking-wider"><i class="fa-solid fa-id-badge opacity-60"></i> <span x-text="staff.role"></span></p>
+                                </div>
                             </div>
-                            <div class="px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border shadow-sm flex items-center gap-1" :class="isStaffOnline(staff) ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/30' : 'bg-slate-50 text-slate-500 border-slate-200 dark:bg-white/5 dark:border-white/10'"><span x-text="isStaffOnline(staff) ? 'Active' : 'Offline'"></span></div>
+                            <div class="px-2 py-1 rounded-md text-[8px] font-black uppercase tracking-widest border shadow-sm flex items-center gap-1" :class="isStaffOnline(staff) ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/30' : 'bg-slate-50 text-slate-500 border-slate-200 dark:bg-white/5 dark:border-white/10'"><span x-text="isStaffOnline(staff) ? 'Active' : 'Offline'"></span></div>
                         </div>
-                        <div class="mt-3.5 pt-3 border-t flex justify-between items-center pl-2" :class="isStaffOnline(staff) ? 'border-emerald-100 dark:border-emerald-800/30' : 'border-slate-100 dark:border-white/5'">
-                            <div class="flex flex-col"><span class="text-[8px] font-black uppercase tracking-widest mb-0.5" :class="isStaffOnline(staff) ? 'text-emerald-600/70 dark:text-emerald-400/70' : 'text-slate-400'">Shift Timing</span><span class="text-[11px] font-mono font-bold text-slate-600 dark:text-slate-300"><span x-text="formatTimeAMPM(staff.start)"></span> - <span x-text="formatTimeAMPM(staff.end)"></span></span></div>
-                            <div class="px-2 py-1 rounded-lg border shadow-sm" :class="isStaffOnline(staff) ? 'bg-white dark:bg-black/30 border-emerald-100 dark:border-emerald-800/40' : 'bg-slate-50 dark:bg-black/20 border-slate-200 dark:border-white/10'"><span class="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest" x-text="staff.shift"></span></div>
+                        <div class="mt-2.5 pt-2 border-t flex justify-between items-center pl-2" :class="isStaffOnline(staff) ? 'border-emerald-100 dark:border-emerald-800/30' : 'border-slate-100 dark:border-white/5'">
+                            <div class="flex flex-col"><span class="text-[7px] font-black uppercase tracking-widest mb-0.5" :class="isStaffOnline(staff) ? 'text-emerald-600/70 dark:text-emerald-400/70' : 'text-slate-400'">Shift Timing</span><span class="text-[10px] font-mono font-bold text-slate-600 dark:text-slate-300"><span x-text="formatTimeAMPM(staff.start)"></span> - <span x-text="formatTimeAMPM(staff.end)"></span></span></div>
+                            <div class="px-2 py-0.5 rounded-md border shadow-sm" :class="isStaffOnline(staff) ? 'bg-white dark:bg-black/30 border-emerald-100 dark:border-emerald-800/40' : 'bg-slate-50 dark:bg-black/20 border-slate-200 dark:border-white/10'"><span class="text-[8px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest" x-text="staff.shift"></span></div>
                         </div>
                     </div>
                 </template>
             </div>
-			<!-- 🔥 LIVE CLOCKS FOOTER -->
-            <div class="px-6 py-4 bg-slate-50/80 dark:bg-black/40 backdrop-blur-md border-t border-slate-100 dark:border-white/5 flex flex-col gap-3 rounded-b-[2rem]">
+            
+			<!-- 📍 FOOTER (Slimmer Padding) -->
+            <div class="px-4 py-3 sm:px-5 bg-slate-50/80 dark:bg-black/40 backdrop-blur-md border-t border-slate-100 dark:border-white/5 flex flex-col gap-2 rounded-b-[2rem] shrink-0">
                 
-                <!-- 🇮🇳 INDIA TIME (NOIDA) -->
                 <div class="flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center border border-slate-200 dark:border-white/10 shadow-sm">
-                            <i class="fa-solid fa-earth-asia text-brand text-sm"></i>
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center border border-slate-200 dark:border-white/10 shadow-sm">
+                            <i class="fa-solid fa-earth-asia text-brand text-xs"></i>
                         </div>
                         <div class="flex flex-col">
-                            <p class="text-[10px] font-black tracking-widest uppercase text-slate-600 dark:text-slate-300">Noida, India</p>
-                            <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">IST Timezone</p>
+                            <p class="text-[9px] font-black tracking-widest uppercase text-slate-600 dark:text-slate-300">Noida, India</p>
+                            <p class="text-[7px] font-bold text-slate-400 uppercase tracking-widest">IST Timezone</p>
                         </div>
                     </div>
-                    <div class="px-3 py-1.5 rounded-lg bg-white dark:bg-dark_surface border border-slate-200 dark:border-white/10 shadow-sm">
-                        <p class="text-[11px] sm:text-xs text-brand dark:text-brand_glow font-mono font-black tracking-tight" x-text="currentTime"></p>
+                    <div class="px-2.5 py-1 rounded-md bg-white dark:bg-dark_surface border border-slate-200 dark:border-white/10 shadow-sm">
+                        <p class="text-[10px] sm:text-xs text-brand dark:text-brand_glow font-mono font-black tracking-tight" x-text="currentTime"></p>
                     </div>
                 </div>
 
-                <!-- 🇩🇪 GERMANY TIME (BERLIN) -->
                 <div class="flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center border border-slate-200 dark:border-white/10 shadow-sm">
-                            <i class="fa-solid fa-earth-europe text-amber-500 text-sm"></i>
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center border border-slate-200 dark:border-white/10 shadow-sm">
+                            <i class="fa-solid fa-earth-europe text-amber-500 text-xs"></i>
                         </div>
                         <div class="flex flex-col">
-                            <p class="text-[10px] font-black tracking-widest uppercase text-slate-600 dark:text-slate-300">Berlin, Germany</p>
-                            <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">CET Timezone</p>
+                            <p class="text-[9px] font-black tracking-widest uppercase text-slate-600 dark:text-slate-300">Berlin, Germany</p>
+                            <p class="text-[7px] font-bold text-slate-400 uppercase tracking-widest">CET Timezone</p>
                         </div>
                     </div>
-                    <div class="px-3 py-1.5 rounded-lg bg-white dark:bg-dark_surface border border-slate-200 dark:border-white/10 shadow-sm">
-                        <p class="text-[11px] sm:text-xs text-amber-600 dark:text-amber-400 font-mono font-black tracking-tight" x-text="germanTime"></p>
+                    <div class="px-2.5 py-1 rounded-md bg-white dark:bg-dark_surface border border-slate-200 dark:border-white/10 shadow-sm">
+                        <p class="text-[10px] sm:text-xs text-amber-600 dark:text-amber-400 font-mono font-black tracking-tight" x-text="germanTime"></p>
                     </div>
                 </div>
 
@@ -1036,18 +1093,18 @@
         </div>
     </div>
 	
-	<!-- MEGA CHANGELOG MODAL (RELEASE NOTES v1.3) -->
+	<!-- MEGA CHANGELOG MODAL (RELEASE NOTES v1.5) -->
     <div x-show="showChangelogModal" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/70 backdrop-blur-md p-4" x-transition.opacity @click.self="showChangelogModal = false">
         <div class="bg-white dark:bg-dark_surface w-full max-w-4xl rounded-[2rem] shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden flex flex-col max-h-[85vh] sm:max-h-[90vh] transform transition-all scale-100">
             
-            <!-- Hero Header (Green Theme for v1.3) -->
-            <div class="p-6 sm:p-8 border-b border-slate-100 dark:border-white/10 bg-gradient-to-br from-emerald-500 to-teal-700 text-white shrink-0 relative overflow-hidden">
+            <!-- Hero Header (Violet Theme for v1.5) -->
+            <div class="p-6 sm:p-8 border-b border-slate-100 dark:border-white/10 bg-gradient-to-br from-violet-500 to-fuchsia-700 text-white shrink-0 relative overflow-hidden">
                 <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
                 <div class="relative z-10 flex justify-between items-start">
                     <div>
-                        <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest bg-white/20 border border-white/20 shadow-sm px-2.5 py-1 rounded-md mb-3 inline-block flex items-center gap-1.5 w-max"><span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span> Official Release Notes</span>
-                        <h3 class="text-2xl sm:text-3xl font-heading font-black leading-tight drop-shadow-md">What's New in v1.3 🚀</h3>
-                        <p class="text-xs font-medium opacity-80 mt-1.5 font-mono">Workflow Evolution • Jun 30, 2026</p>
+                        <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest bg-white/20 border border-white/20 shadow-sm px-2.5 py-1 rounded-md mb-3 inline-block flex items-center gap-1.5 w-max"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Official Release Notes</span>
+                        <h3 class="text-2xl sm:text-3xl font-heading font-black leading-tight drop-shadow-md">What's New in v1.5 🚀</h3>
+                        <p class="text-xs font-medium opacity-80 mt-1.5 font-mono">Zero-Latency, Unified UI & HR Ops • Jul 24, 2026</p>
                     </div>
                     <button @click="showChangelogModal = false" class="w-8 h-8 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/40 text-white transition shadow-sm active:scale-95"><i class="fa-solid fa-xmark text-sm"></i></button>
                 </div>
@@ -1056,8 +1113,70 @@
             <!-- Scrollable Content -->
             <div class="p-5 sm:p-6 overflow-y-auto custom-scroll flex-1 bg-slate-50/50 dark:bg-transparent space-y-6">
                 
-                <!-- === VERSION 1.3 (LATEST) === -->
+                <!-- === VERSION 1.5 (LATEST) === -->
                 <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="px-2 py-0.5 rounded bg-violet-500 text-white font-black text-[10px] uppercase tracking-widest shadow-sm">v1.5</span>
+                        <h4 class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-widest">Major Platform Upgrade</h4>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                        
+                        <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition">
+                            <h4 class="text-[11px] font-black text-brand dark:text-brand_glow uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-bolt"></i> Performance & Unified UI</h4>
+                            <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-violet-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Zero-Latency Engine:</strong> Loading screens eliminated! Apps now load instantly via Optimistic Caching, while data syncs quietly in the background.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-violet-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Unified Fluid Layout:</strong> Standardized a cohesive Command Header and a sleek, VS-Code style Status Bar (Footer) across all apps for a premium workspace.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-violet-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Smart Iconography:</strong> System now automatically assigns relevant emojis to devices, holidays, and ISP events even if backend icons are missing.</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition">
+                            <h4 class="text-[11px] font-black text-emerald-500 dark:text-emerald-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-umbrella-beach"></i> Leave Hub Insights</h4>
+                            <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-violet-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Interactive Policies:</strong> Tap any Leave KPI card to instantly view your quota, usage, and the official year-end Encashment Algorithm.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-violet-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Smart Long Weekends:</strong> The tracker now automatically predicts and tags upcoming "Take Friday Off" or 3-Day weekend opportunities.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-violet-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Mobile-First UX:</strong> Fixed overlapping tooltips on touch devices and implemented full-block clicking for faster Audit Trail access.</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition md:col-span-2">
+                            <h4 class="text-[11px] font-black text-rose-500 dark:text-rose-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-earth-asia"></i> Branch Virtualization</h4>
+                            <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium grid grid-cols-1 sm:grid-cols-2 gap-x-4">
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-violet-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Dehradun Expansion:</strong> Fully integrated DDN branch operations. Network & Asset data now restructure automatically per location.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-violet-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Context Switcher:</strong> Head of IT can dynamically toggle between NOIDA and DDN environments without refreshing the platform.</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- === VERSION 1.3 (PREVIOUS) === -->
+                <div class="pt-5 border-t border-slate-200 dark:border-white/10">
                     <div class="flex items-center gap-2 mb-4">
                         <span class="px-2 py-0.5 rounded bg-emerald-500 text-white font-black text-[10px] uppercase tracking-widest shadow-sm">v1.3</span>
                         <h4 class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-widest">Major Update</h4>
@@ -1067,14 +1186,8 @@
                         <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition">
                             <h4 class="text-[11px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Strict Audit Governance</h4>
                             <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
-                                <li class="flex items-start gap-1.5">
-                                    <span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
-                                    <span><strong>Access Control (RBAC):</strong> Only assigned auditors can resolve compliance findings. Super Admin overrides removed.</span>
-                                </li>
-                                <li class="flex items-start gap-1.5">
-                                    <span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
-                                    <span><strong>View-Only Mode:</strong> IT Head and non-assigned engineers can only view audit remarks without edit permissions.</span>
-                                </li>
+                                <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Access Control (RBAC):</strong> Only assigned auditors can resolve compliance findings. Super Admin overrides removed.</span></li>
+                                <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>View-Only Mode:</strong> IT Head and non-assigned engineers can only view audit remarks without edit permissions.</span></li>
                             </ul>
                         </div>
 
@@ -1089,17 +1202,15 @@
                     </div>
                 </div>
 
-                <!-- === VERSION 1.2.5 (PREVIOUS) === -->
+                <!-- === VERSION 1.2.5 (OLDER) === -->
                 <div class="pt-5 border-t border-slate-200 dark:border-white/10">
                     <div class="flex items-center gap-2 mb-3">
-                        <span class="px-2 py-0.5 rounded bg-indigo-500 text-white font-black text-[10px] uppercase tracking-widest shadow-sm">v1.2.5</span>
+                        <span class="px-2 py-0.5 rounded bg-slate-400 text-white font-black text-[10px] uppercase tracking-widest shadow-sm">v1.2.5</span>
                         <h4 class="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Global Audit Trail</h4>
                     </div>
                     <div class="bg-slate-50 dark:bg-black/20 p-3 rounded-xl border border-slate-200 dark:border-white/5 flex items-start gap-3">
-                        <i class="fa-solid fa-globe text-indigo-500 mt-0.5"></i>
-                        <p class="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed m-0">
-                            Added a 'Recent Changes' hub to track every IP and ISP switch across all PCs globally. Resolved RMA & WAN tickets are safely locked with Admin Key requirements.
-                        </p>
+                        <i class="fa-solid fa-globe text-slate-400 mt-0.5"></i>
+                        <p class="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed m-0">Added a 'Recent Changes' hub to track every IP and ISP switch across all PCs globally. Resolved RMA & WAN tickets are safely locked with Admin Key requirements.</p>
                     </div>
                 </div>
 
@@ -1111,9 +1222,7 @@
                     </div>
                     <div class="bg-slate-50 dark:bg-black/20 p-3 rounded-xl border border-slate-200 dark:border-white/5 flex items-start gap-3">
                         <i class="fa-solid fa-shield-halved text-slate-400 mt-0.5"></i>
-                        <p class="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed m-0">
-                            <strong>Bi-Monthly Audits:</strong> Introduced a strict 12-point IT Security checklist that automatically generates high-priority tickets for non-compliance.
-                        </p>
+                        <p class="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed m-0"><strong>Bi-Monthly Audits:</strong> Introduced a strict 12-point IT Security checklist that automatically generates high-priority tickets for non-compliance.</p>
                     </div>
                 </div>
 
@@ -1125,9 +1234,7 @@
                     </div>
                     <div class="bg-slate-50 dark:bg-black/20 p-3 rounded-xl border border-slate-200 dark:border-white/5 flex items-start gap-3">
                         <i class="fa-solid fa-link text-slate-400 mt-0.5"></i>
-                        <p class="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed m-0">
-                            Successfully linked IT Inventory, IP Manager, and Switch logs for automated data syncing across the platform.
-                        </p>
+                        <p class="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed m-0">Successfully linked IT Inventory, IP Manager, and Switch logs for automated data syncing across the platform.</p>
                     </div>
                 </div>
 
@@ -1158,7 +1265,7 @@
         Alpine.data('dashboard', () => {
             let safeDark = false;
             let safeSettings = { notifications: true, animations: true };
-            let safeUser = { name: 'Guest', role: 'Viewer', empId: '-', email: '-', location: 'Noida' };
+            let safeUser = { name: 'Guest', role: 'Viewer', empId: '-', email: '-', location: 'Noida', allowedLocation: 'Noida' };
 
             try { safeDark = localStorage.getItem('theme') === 'dark'; } catch(e) {}
             try { safeSettings = JSON.parse(localStorage.getItem('pbl_settings')) || safeSettings; } catch(e) {}
@@ -1168,6 +1275,11 @@
                 isDark: safeDark,
                 settings: safeSettings,
                 currentUser: safeUser,
+				leaveAlerts: [],
+                
+                // 📍 SMART LOCATION VARIABLES
+                isGlobal: safeUser.allowedLocation === 'Global',
+                currentLocation: safeUser.allowedLocation === 'Global' ? (localStorage.getItem('pbl_loc_pref') || 'Noida') : (safeUser.allowedLocation || 'Noida'),
                 
                 showNotifs: false, showProfile: false, highlightLog: false,
                 showLogoutModal: false, showProfileModal: false, showSettingsModal: false, 
@@ -1217,10 +1329,12 @@
                 stats: { total: 0, open: 0, resolved: 0 },
                 currentTime: '', germanTime: '', currentDate: '', 
                 
+                 // 👨‍💻 IT TEAM UPDATED WITH DEEPENDRA & LOCATIONS
                 staffData: [
-                    { name: 'Vikas Rawat', role: 'Head of IT', shift: 'General Shift', start: '09:30', end: '17:30', avatar: 'VR', color: 'bg-indigo-500' },
-                    { name: 'Anil Singh', role: 'Sr. Network Eng.', shift: 'Morning Shift', start: '08:00', end: '15:45', avatar: 'AS', color: 'bg-blue-500' },
-                    { name: 'Ashok Singh', role: 'Desktop Support', shift: 'Evening Shift', start: '14:15', end: '21:30', avatar: 'AS', color: 'bg-emerald-500' }
+                    { name: 'Vikas Rawat', role: 'Head of IT', shift: 'General Shift', start: '09:30', end: '17:30', avatar: 'VR', color: 'bg-rose-500', loc: 'Global' },
+                    { name: 'Anil Singh', role: 'Sr. Network Eng.', shift: 'Morning Shift', start: '08:00', end: '15:45', avatar: 'AS', color: 'bg-blue-500', loc: 'Noida' },
+                    { name: 'Ashok Singh', role: 'IT Engineer', shift: 'Evening Shift', start: '14:15', end: '21:30', avatar: 'AS', color: 'bg-emerald-500', loc: 'Noida' },
+                    { name: 'Deependra Singh', role: 'IT Engineer', shift: 'General Shift', start: '09:30', end: '17:30', avatar: 'DS', color: 'bg-violet-500', loc: 'Dehradun' }
                 ],
                 
                 chartConfig: { type: 'status', time: 'all' },
@@ -1230,7 +1344,23 @@
                     if (this.isDark) document.documentElement.classList.add('dark');
                     document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
                     
-                    this.fetchTickets();
+                    // ⚡ 1. SMART CACHE: Load instantly from LocalStorage
+                    try { 
+                        let cachedData = localStorage.getItem('pbl_tickets_cache');
+                        if (cachedData) {
+                            this.tickets = JSON.parse(cachedData);
+                            if(!Array.isArray(this.tickets)) this.tickets = []; 
+                            this.updateKPIs();
+                            setTimeout(() => this.renderChart(), 50); 
+                        }
+                    } catch(e) {}
+
+                    // ⏱️ Exactly 1 second loader for professional visual effect
+                    this.loading = true;
+                    setTimeout(() => { this.loading = false; }, 1000);
+
+                    // 🔄 2. BACKGROUND SYNC: Fetch silently without blocking UI
+                    this.fetchTickets(false);
                     this.checkAuditStatus();
                     
                     setInterval(() => {
@@ -1239,7 +1369,7 @@
                         this.germanTime = now.toLocaleTimeString('en-US', { timeZone: 'Europe/Berlin', hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
                         this.currentDate = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
                     }, 1000);
-                    setInterval(() => this.fetchTickets(), 300000); 
+                    setInterval(() => this.fetchTickets(false), 300000); // Background refresh every 5 mins
                 },
 
                 haptic(type = 'light') {
@@ -1250,10 +1380,26 @@
                         else if (type === 'error' || type === 'delete') navigator.vibrate([50, 50, 50, 50]); 
                     } catch(e) {}
                 },
+				
+				// 📍 TOGGLE LOGIC
+                toggleLocation() {
+                    if (!this.isGlobal) return;
+                    this.haptic('light');
+                    this.currentLocation = this.currentLocation === 'Noida' ? 'Dehradun' : 'Noida';
+                    localStorage.setItem('pbl_loc_pref', this.currentLocation);
+                    this.updateKPIs();
+                    this.renderChart();
+                },
 
-                get openTickets() { 
+                // 📍 SMART LOCATION FILTERING LOGIC
+                get filteredTickets() {
                     if (!Array.isArray(this.tickets)) return [];
-                    return this.tickets.filter(t => t.status === 'Open').sort((a, b) => new Date(a.date) - new Date(b.date)); 
+                    return this.tickets.filter(t => t.location === this.currentLocation);
+                },
+
+                // Ab openTickets directly filteredTickets se banega, toh galat branch ki ticket kabhi dikhegi hi nahi!
+                get openTickets() { 
+                    return this.filteredTickets.filter(t => t.status === 'Open').sort((a, b) => new Date(a.date) - new Date(b.date)); 
                 },
                 
                 get auditAlert() {
@@ -1305,6 +1451,7 @@
 				
                 // 🔥 SMART RESOLVE MODAL FUNCTIONS & ACCESS CONTROL
                 canResolve(ticket) {
+					if (ticket.type === 'LEAVE') return false; // 📍 HR tickets IT helpdesk se resolve nahi hongi!
                     if (ticket.issue && ticket.issue.toLowerCase().includes('audit')) {
                         // 🛑 STRICT GOVERNANCE: Sirf assigned auditor hi resolve kar payega.
                         // Head of IT (Vikas) ko bhi sirf 'View Details' ka access milega.
@@ -1457,7 +1604,20 @@
                         // 🔥 NAYA: Remove extra blank lines and unnecessary boilerplate text to save space!
                         meta.cleanDesc = rawDesc.replace(/\n\n/g, '\n').replace(/Please review and initiate remediation immediately\./ig, '').trim();
                     } 
-                    else {
+                    
+					else if (ticket.type === 'LEAVE') {
+                        meta.type = 'LEAVE';
+                        meta.isSystem = true;
+                        meta.color = ticket.status === 'PENDING' ? 'amber' : (ticket.status === 'APPROVED' ? 'sky' : 'rose');
+                        meta.watermarkClass = 'fa-calendar-day text-' + meta.color + '-500';
+                        meta.badgeText = ticket.status === 'PENDING' ? 'APPROVAL REQ.' : 'LEAVE UPDATE';
+                        meta.icon = 'fa-calendar-check';
+                        meta.statusTextOpen = ticket.status;
+                        meta.statusTextClosed = ticket.status;
+                        meta.cleanDesc = rawDesc;
+                        meta.shortAsset = ticket.asset || 'HR-OPS';
+                    }
+					else {
                         meta.badgeClass = 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/30';
                     }
 
@@ -1521,6 +1681,33 @@
                     let notifs = [...this.openTickets];
                     const aAlert = this.auditAlert;
                     if (aAlert) notifs.unshift(aAlert);
+                    
+                    // 📍 NEW: INJECT LEAVE ALERTS
+                    const myName = this.currentUser?.name || '';
+                    const isAdmin = myName.includes('Vikas');
+                    const now = new Date();
+
+                    this.leaveAlerts.forEach(la => {
+                        const diffDays = (now - new Date(la.rawDate)) / 86400000;
+                        
+                        if (isAdmin && la.status === 'Pending') {
+                            notifs.unshift({
+                                id: la.id, type: 'LEAVE', urgency: 'Normal',
+                                issue: `${la.empName.split(' ')[0]} applied for ${la.type}`,
+                                desc: `${la.calcDays} Day(s) from ${la.startDate} to ${la.endDate}`,
+                                dateStr: 'Action Req.', name: 'HR Operations', status: 'PENDING', asset: 'LEAVE-HUB'
+                            });
+                        } else if (!isAdmin && la.empName === myName && (la.status === 'Approved' || la.status === 'Rejected') && diffDays <= 3) {
+                            // User ko sirf pichle 3 din ke results dikhenge taaki bheed na ho
+                            notifs.unshift({
+                                id: la.id, type: 'LEAVE', urgency: 'Normal',
+                                issue: `Leave Request ${la.status}`,
+                                desc: `Your ${la.type} request (${la.calcDays} Days) was ${la.status}.`,
+                                dateStr: 'Info', name: 'HR Operations', status: la.status.toUpperCase(), asset: 'LEAVE-HUB'
+                            });
+                        }
+                    });
+
                     return notifs; 
                 },
                 get openTicketCount() { return this.notifications.length; },
@@ -1716,22 +1903,11 @@
                 async fetchTickets(force = false) {
                     if(force) { this.haptic('light'); this.loading = true; }
                     try {
-                        let cachedData = null;
-                        try { cachedData = localStorage.getItem('pbl_tickets_cache'); } catch(e) {}
-                        
                         const url = API_URL + '?action=getTickets&t=' + new Date().getTime();
-                        
-                        if (cachedData && !force) {
-                            this.tickets = JSON.parse(cachedData);
-                            if(!Array.isArray(this.tickets)) this.tickets = []; 
-                            this.updateKPIs();
-                            setTimeout(() => this.renderChart(), 50); 
-                            this.loading = false; 
-                        }
-                        
                         const res = await fetch(url);
                         const data = await res.json();
                         
+                        this.leaveAlerts = data.leaveAlerts || [];
                         const freshTickets = (data.tickets || []).map(t => ({
                             id: t.id || t.uniqueId || 'N/A', 
                             date: t.date || '-', 
@@ -1744,7 +1920,8 @@
                             asset: t.asset || 'N/A',
                             hasExtra: !!t.extraInfo,
                             extraInfo: t.extraInfo || {},
-                            hasRma: t.hasRma || false
+                            hasRma: t.hasRma || false,
+                            location: t.location || 'Noida'
                         }));
 
                         if (JSON.stringify(this.tickets) !== JSON.stringify(freshTickets)) {
@@ -1761,21 +1938,21 @@
                         if(force) this.haptic('error'); 
                         if(!Array.isArray(this.tickets)) this.tickets = []; 
                     } finally { 
-                        this.loading = false; 
+                        if (force) { setTimeout(() => { this.loading = false; }, 500); }
                     }
                 },
 
                 updateKPIs() {
-                    if(!Array.isArray(this.tickets)) return;
-                    this.stats.total = this.tickets.length;
-                    this.stats.open = this.tickets.filter(t => t.status === 'Open').length;
-                    this.stats.resolved = this.tickets.filter(t => t.status === 'Resolved').length;
+                    if(!Array.isArray(this.filteredTickets)) return;
+                    this.stats.total = this.filteredTickets.length;
+                    this.stats.open = this.filteredTickets.filter(t => t.status === 'Open').length;
+                    this.stats.resolved = this.filteredTickets.filter(t => t.status === 'Resolved').length;
                 },
 
                 renderChart() {
                     const chartEl = document.querySelector("#analyticsChart");
                     if (!chartEl) return;
-                    let filteredData = Array.isArray(this.tickets) ? this.tickets : [];
+                    let filteredData = Array.isArray(this.filteredTickets) ? this.filteredTickets : []; // 📍 Updated to filteredTickets
                     if (this.chartConfig.time === 'month') {
                         const now = new Date();
                         filteredData = filteredData.filter(t => {
