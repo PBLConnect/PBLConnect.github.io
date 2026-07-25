@@ -175,24 +175,24 @@
 
                 <div class="hidden sm:block w-px h-6 bg-slate-200 dark:bg-white/10"></div>
 
-                <!-- GROUP B: System Controls Pill -->
-                <div class="flex items-center gap-0.5 sm:gap-1 bg-white dark:bg-dark_surface p-0.5 sm:p-1 rounded-full border border-slate-200 dark:border-white/10 shadow-sm">
+              <!-- GROUP B: System Controls Pill (100% Mobile Touch Fix) -->
+                <div class="flex items-center gap-1 bg-white dark:bg-dark_surface p-1 rounded-full border border-slate-200 dark:border-white/10 shadow-sm shrink-0 relative z-[60]">
                     
-                    <!-- Location Toggle -->
-                    <template x-if="isGlobal">
-                        <button @click="toggleLocation()" class="h-7 px-2.5 sm:px-3 flex items-center justify-center rounded-full bg-slate-800 text-white dark:bg-white dark:text-slate-900 shadow-sm transition-transform active:scale-95 gap-1 font-bold text-[9px] sm:text-[10px]">
-                            <i class="fa-solid fa-location-dot"></i> <span x-text="currentLocation"></span>
-                        </button>
-                    </template>
-                    <template x-if="!isGlobal">
-                        <div class="h-7 px-2.5 sm:px-3 flex items-center justify-center rounded-full bg-slate-100 dark:bg-black/30 text-slate-500 dark:text-slate-400 gap-1 font-bold text-[9px] sm:text-[10px] cursor-default">
-                            <i class="fa-solid fa-location-dot opacity-70"></i> <span x-text="currentLocation"></span>
-                        </div>
-                    </template>
+                    <!-- Persistent Location Button (Fixed Touch Target & DOM Shifting) -->
+                    <button type="button" 
+                            @click.prevent="toggleLocation()" 
+                            :class="isGlobal ? 'bg-slate-800 text-white dark:bg-white dark:text-slate-900 shadow-sm active:scale-95 hover:opacity-90' : 'bg-slate-100 dark:bg-black/30 text-slate-500 dark:text-slate-400 opacity-60 cursor-default pointer-events-none'"
+                            class="h-8 px-3 sm:px-4 flex items-center justify-center rounded-full transition-all gap-1.5 font-bold text-[10px] sm:text-[11px] select-none touch-manipulation">
+                        <!-- pointer-events-none ensures touch goes directly to the parent button -->
+                        <i class="fa-solid fa-location-dot pointer-events-none"></i> 
+                        <span x-text="currentLocation" class="pointer-events-none"></span>
+                    </button>
 
                     <!-- Theme Toggle -->
-                    <button @click="toggleTheme()" class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors">
-                        <i class="fa-solid text-[12px] sm:text-[13px]" :class="isDark ? 'fa-sun text-amber-400' : 'fa-moon'"></i>
+                    <button type="button" 
+                            @click.prevent="toggleTheme()" 
+                            class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors active:scale-95 select-none touch-manipulation">
+                        <i class="fa-solid text-[13px] sm:text-[14px] pointer-events-none" :class="isDark ? 'fa-sun text-amber-400' : 'fa-moon'"></i>
                     </button>
 
                     <!-- Notifications -->
@@ -210,15 +210,7 @@
                         <div x-show="showNotifs" x-transition.origin.top.right class="absolute right-0 top-full mt-3 w-[320px] sm:w-96 bg-white/95 dark:bg-dark_surface/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-200 dark:border-dark_border z-[100] overflow-hidden" style="display: none;">
                             <div class="p-4 border-b border-slate-100 dark:border-dark_border flex justify-between items-center bg-slate-50/50 dark:bg-white/5">
                                 <h4 class="font-heading font-black text-sm text-slate-800 dark:text-white">Pending Requests</h4>
-                                <span class="text-[9px] bg-red-100 text-red-600 px-2.5 py-0.5 rounded-md font-black uppercase tracking-wider border border-red-200 dark:border-red-500/20 shadow-sm" x-text="openTicketCount + ' New'">0 New</span>
-                            </div>
-                            
-                            <!-- 📍 FIX: Increased padding and added space-y-3 for proper gaps between cards -->
-                            <div class="max-h-[380px] overflow-y-auto custom-scroll p-3 space-y-3">
-                                <template x-for="notif in notifications" :key="notif.id">
-                                    <div x-data="{ meta: processTicketMeta(notif) }" class="p-3 sm:p-4 border rounded-2xl shadow-sm hover:-translate-y-0.5 transition-all duration-300 group relative overflow-hidden flex items-start gap-3 cursor-pointer" :class="meta.styles.openBg" @click="if(meta.type === 'AUDIT') { showNotifs = false; openAuditModal(); } else if (meta.type === 'LEAVE') { window.location.href='PBL_IT_Leave_Tracker.html'; } else { scrollToLog(); }">
-                                        <i class="fa-solid absolute -bottom-3 -right-2 text-6xl opacity-[0.03] dark:opacity-[0.02] group-hover:scale-110 transition-transform duration-500 pointer-events-none" :class="meta.watermarkClass"></i>
-                                        <div class="absolute left-0 top-0 bottom-0 w-1.5 transition-all group-hover:w-2" :class="meta.styles.openBar"></div>
+                                <span class="text-[9px] bg-red-100 text-red-600 px-2.5 py-0.5 rounded-md font-black uppercase tracking-wider border border-red-200 dark:border-red-500/20 shadow-sm" x-text="                                        <div class="absolute left-0 top-0 bottom-0 w-1.5 transition-all group-hover:w-2" :class="meta.styles.openBar"></div>
                                         
                                         <div class="w-8 h-8 rounded-xl flex items-center justify-center text-sm shrink-0 shadow-sm border border-black/5 transition-transform group-hover:scale-105 relative z-10 hidden sm:flex" :class="getIssueConfig(notif.issue).color">
                                             <i class="fa-solid" :class="meta.type === 'AUDIT' ? 'fa-shield-halved ' + meta.styles.iconColor : (meta.type === 'Helpdesk' ? getIssueConfig(notif.issue).icon + ' ' + meta.styles.iconColor : meta.icon + ' ' + meta.styles.iconColor)"></i>
