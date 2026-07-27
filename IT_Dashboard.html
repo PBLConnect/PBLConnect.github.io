@@ -128,6 +128,16 @@
         .flip-overlay.flip .flip-overlay-bottom { animation: flip-bot-anim 0.4s ease-out forwards; }
         @keyframes flip-top-anim { 0% { transform: rotateX(0deg); } 100% { transform: rotateX(-90deg); } }
         @keyframes flip-bot-anim { 0% { transform: rotateX(90deg); } 100% { transform: rotateX(0deg); } }
+
+        /* 🚀 CUSTOM MOUSE CURSOR CSS */
+        @media (min-width: 769px) {
+            body { cursor: none !important; }
+            a, button, input, select, textarea, .cursor-pointer { cursor: none !important; }
+        }
+        .custom-cursor { position: fixed; left: 0; top: 0; width: 8px; height: 8px; background-color: #3b82f6; border-radius: 50%; z-index: 100000; pointer-events: none; transition: background-color 0.4s ease; transform: translate(-50%, -50%); margin: -4px 0 0 -4px; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
+        .custom-cursor.follower { width: 32px; height: 32px; background-color: transparent; border: 2px solid rgba(59, 130, 246, 0.5); transition: transform 0.15s ease-out, background-color 0.3s ease, border-color 0.3s ease; z-index: 99999; margin: -16px 0 0 -16px; }
+        body.cursor-grow .custom-cursor.follower { transform: scale(1.5); background-color: rgba(59, 130, 246, 0.15); border-color: #3b82f6; }
+        @media (max-width: 768px) { .custom-cursor { display: none !important; } }
     </style>
 </head>
 
@@ -1372,6 +1382,9 @@
                     if (this.isDark) document.documentElement.classList.add('dark');
                     document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
                     
+                    // 🚀 INITIALIZE CUSTOM MOUSE CURSOR
+                    this.setupCustomCursor();
+
                     // 🚀 INITIALIZE HACKER DECRYPTION
                     this.runDecryption('decrypt-title');
                     
@@ -1409,6 +1422,36 @@
                     }, 1000);
 
                     setInterval(() => this.fetchTickets(false), 300000);
+                },
+
+                // 🚀 CUSTOM MOUSE CURSOR ENGINE
+                setupCustomCursor() { 
+                    if(window.matchMedia("(max-width: 768px)").matches) return; // Disable on mobile
+                    
+                    const c = document.createElement('div'); 
+                    c.classList.add('custom-cursor'); 
+                    document.body.appendChild(c);
+                    
+                    const f = document.createElement('div'); 
+                    f.classList.add('custom-cursor', 'follower'); 
+                    document.body.appendChild(f);
+                    
+                    window.addEventListener('mousemove', (e) => { 
+                        c.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`; 
+                        f.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`; 
+                    });
+                    
+                    // Smart Event Delegation: Automatically detects hoverable elements globally
+                    document.body.addEventListener('mouseover', (e) => {
+                        if (e.target.closest('a, button, input, select, .cursor-pointer, [x-on\\:click], [@click]')) {
+                            document.body.classList.add('cursor-grow');
+                        }
+                    });
+                    document.body.addEventListener('mouseout', (e) => {
+                        if (e.target.closest('a, button, input, select, .cursor-pointer, [x-on\\:click], [@click]')) {
+                            document.body.classList.remove('cursor-grow');
+                        }
+                    });
                 },
 
                 // 🚀 HACKER DECRYPTION ENGINE (No Jitter & 30s Loop)
