@@ -73,6 +73,19 @@
 
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #3b82f6; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* 🫧 SMOOTH LAGGING BUBBLE CURSOR CSS */
+		@media (hover: hover) and (pointer: fine) {
+			body, a, button, input, select, textarea, .cursor-pointer { cursor: none !important; }
+		}
+		.custom-dot { position: fixed; left: 0; top: 0; width: 8px; height: 8px; background-color: #3b82f6; border-radius: 50%; z-index: 100001; pointer-events: none; transition: transform 0.1s ease-out, opacity 0.2s ease; will-change: transform; }
+		.custom-ring { position: fixed; left: 0; top: 0; width: 30px; height: 30px; border: 2px solid rgba(59, 130, 246, 0.5); border-radius: 50%; z-index: 100000; pointer-events: none; transition: transform 0.35s ease-out, background-color 0.3s ease, border-color 0.3s ease; will-change: transform; }
+		body.cursor-grow .custom-ring { --scale: 2.5; background-color: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.3); backdrop-filter: blur(1.5px); }
+		body.cursor-grow .custom-dot { opacity: 0; }
+		@media (prefers-reduced-motion: reduce), (max-width: 768px) {
+			.custom-dot, .custom-ring { display: none !important; }
+			body, a, button, input, select, textarea, .cursor-pointer { cursor: auto !important; }
+		}
     </style>
 </head>
 
@@ -934,7 +947,21 @@
                     return { name: 'GENERAL SHIFT', time: '09:30 AM - 05:30 PM', timeLeft: `${h}H ${m}M LEFT`, isOver: false };
                 },
 
+                setupCustomCursor() { 
+					if(!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+					if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+					const dot = document.createElement('div'); dot.classList.add('custom-dot'); document.body.appendChild(dot);
+					const ring = document.createElement('div'); ring.classList.add('custom-ring'); document.body.appendChild(ring);
+					document.addEventListener('mousemove', (e) => {
+						dot.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%)`;
+						ring.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%) scale(var(--scale, 1))`;
+					});
+					document.body.addEventListener('mouseover', (e) => { if (e.target.closest('a, button, input, select, textarea, .cursor-pointer, [x-on\\:click], [@click]')) document.body.classList.add('cursor-grow'); });
+					document.body.addEventListener('mouseout', (e) => { if (e.target.closest('a, button, input, select, textarea, .cursor-pointer, [x-on\\:click], [@click]')) document.body.classList.remove('cursor-grow'); });
+				},
+
                 init() {
+                    this.setupCustomCursor();
                     this.isAdmin = !!(this.user && this.user.name && this.user.name.includes('Vikas'));
                     if (this.isDark) document.documentElement.classList.add('dark');
                     document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
