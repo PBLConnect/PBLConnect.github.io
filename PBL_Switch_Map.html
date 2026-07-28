@@ -73,6 +73,14 @@
         .words { overflow: hidden; height: 100%; }
         .word { display: block; height: 100%; padding-left: 6px; color: #3b82f6; animation: cycle-words 6s infinite; }
         @keyframes cycle-words { 0% { transform: translateY(-0%); } 20% { transform: translateY(-100%); } 40% { transform: translateY(-200%); } 60% { transform: translateY(-300%); } 80% { transform: translateY(-400%); } 100% { transform: translateY(-500%); } }
+
+        /* 🫧 SMOOTH LAGGING BUBBLE CURSOR CSS */
+		@media (hover: hover) and (pointer: fine) { body, a, button, input, select, textarea, .cursor-pointer { cursor: none !important; } }
+		.custom-dot { position: fixed; left: 0; top: 0; width: 8px; height: 8px; background-color: #3b82f6; border-radius: 50%; z-index: 100001; pointer-events: none; transition: transform 0.1s ease-out, opacity 0.2s ease; will-change: transform; }
+		.custom-ring { position: fixed; left: 0; top: 0; width: 30px; height: 30px; border: 2px solid rgba(59, 130, 246, 0.5); border-radius: 50%; z-index: 100000; pointer-events: none; transition: transform 0.35s ease-out, background-color 0.3s ease, border-color 0.3s ease; will-change: transform; }
+		body.cursor-grow .custom-ring { --scale: 2.5; background-color: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.3); backdrop-filter: blur(1.5px); }
+		body.cursor-grow .custom-dot { opacity: 0; }
+		@media (prefers-reduced-motion: reduce), (max-width: 768px) { .custom-dot, .custom-ring { display: none !important; } body, a, button, input, select, textarea, .cursor-pointer { cursor: auto !important; } }
     </style>
 </head>
 
@@ -653,7 +661,21 @@
                         } catch(e){}
                     },
 
+                    setupCustomCursor() { 
+					    if(!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+					    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+					    const dot = document.createElement('div'); dot.classList.add('custom-dot'); document.body.appendChild(dot);
+					    const ring = document.createElement('div'); ring.classList.add('custom-ring'); document.body.appendChild(ring);
+					    document.addEventListener('mousemove', (e) => {
+						    dot.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%)`;
+						    ring.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%) scale(var(--scale, 1))`;
+					    });
+					    document.body.addEventListener('mouseover', (e) => { if (e.target.closest('a, button, input, select, textarea, .cursor-pointer, [x-on\\:click], [@click]')) document.body.classList.add('cursor-grow'); });
+					    document.body.addEventListener('mouseout', (e) => { if (e.target.closest('a, button, input, select, textarea, .cursor-pointer, [x-on\\:click], [@click]')) document.body.classList.remove('cursor-grow'); });
+				    },
+
                     async init() {
+                        this.setupCustomCursor();
                         if (this.isDark) document.documentElement.classList.add('dark');
                         
                         // Initialize selected switch
