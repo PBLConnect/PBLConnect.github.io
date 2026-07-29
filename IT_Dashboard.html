@@ -174,19 +174,21 @@
 
     <!-- NAVBAR (ULTRA-MODERN COHESIVE REDESIGN) -->
     <header class="bg-white/80 dark:bg-[#020617]/80 backdrop-blur-2xl border-b border-slate-200/80 dark:border-white/5 flex-shrink-0 h-16 sm:h-20 z-40">
-        <div class="max-w-[1920px] mx-auto px-4 sm:px-6 h-full flex justify-between items-center">
+        <div class="max-w-[1920px] mx-auto px-3 sm:px-6 h-full flex justify-between items-center gap-1 sm:gap-4">
             
-            <!-- 1. LEFT: Brand Identity -->
-            <div class="flex items-center gap-3 sm:gap-4">
-                <div class="relative h-9 sm:h-11 w-auto flex items-center">
-                    <img src="pbl-logo.png" alt="PBL Logo" class="h-full w-auto object-contain drop-shadow-md" @error="$el.style.display='none'; $refs.fbLogo.style.display='flex'">
-                    <div x-ref="fbLogo" style="display:none;" class="w-9 h-9 sm:w-11 sm:h-11 bg-gradient-to-tr from-brand to-indigo-600 text-white rounded-xl flex items-center justify-center font-black text-xl shadow-[0_0_15px_rgba(59,130,246,0.4)]">P</div>
-                </div>
-                <div class="flex flex-col justify-center">
-                    <div class="flex items-center gap-2 mb-0.5">
-                        <!-- 🚀 RESTORED: Clickable Version Pill for Changelog -->
-                        <div class="relative group cursor-pointer" @click="showChangelogModal = true; haptic('light')" title="View Release Notes">
-                            <button class="relative bg-white dark:bg-[#020617] px-2 py-0.5 rounded-md font-mono font-black text-[9px] leading-none border border-slate-200 dark:border-white/10 shadow-sm flex items-center gap-1.5 hover:bg-slate-50 transition-colors">
+            <!-- 1. LEFT: Brand Identity (LOCKED LAYOUT) -->
+            <div class="flex items-center gap-2 sm:gap-4 shrink-0 min-w-0">
+                <a href="IT_Dashboard.html" @click="haptic('light')" class="group flex items-center transition-transform active:scale-95 shrink-0" title="Return to IT Dashboard">
+                    <div class="relative h-8 sm:h-11 w-auto flex items-center">
+                        <img src="pbl-logo.png" alt="PBL Logo" class="h-full w-auto object-contain drop-shadow-md" @error="$el.style.display='none'; $refs.fbLogo.style.display='flex'">
+                        <div x-ref="fbLogo" style="display:none;" class="w-8 h-8 sm:w-11 sm:h-11 bg-gradient-to-tr from-brand to-indigo-600 text-white rounded-xl flex items-center justify-center font-black text-lg sm:text-xl shadow-[0_0_15px_rgba(59,130,246,0.4)]">P</div>
+                    </div>
+                </a>
+                <div class="flex flex-col justify-center min-w-0">
+                    <div class="flex items-center gap-1.5 sm:gap-2 mb-0.5">
+                        <!-- 🚀 Clickable Version Pill (Shrink-0) -->
+                        <div class="relative group cursor-pointer shrink-0" @click="showChangelogModal = true; haptic('light')" title="View Release Notes">
+                            <button class="relative bg-white dark:bg-[#020617] px-1.5 sm:px-2 py-0.5 rounded-md font-mono font-black text-[9px] leading-none border border-slate-200 dark:border-white/10 shadow-sm flex items-center gap-1.5 hover:bg-slate-50 transition-colors">
                                 <span class="text-emerald-600 dark:text-emerald-400" x-text="PBL_APP_VERSION"></span> 
                                 <span class="relative flex h-1.5 w-1.5">
                                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -194,17 +196,17 @@
                                 </span>
                             </button>
                         </div>
-                        <span class="hidden sm:inline-block text-[9px] font-black text-slate-400 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-md">IT Operations</span>
+                        <span class="hidden sm:inline-block text-[9px] font-black text-slate-400 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-md truncate">IT Operations</span>
                     </div>
-                    <!-- 🚀 Hacker Effect Applied Here (Original Design Kept Intact & Layout Locked) -->
-                    <h2 class="font-heading font-black text-lg sm:text-2xl text-slate-800 dark:text-white leading-tight tracking-tight mt-0.5">
-                        IT<span id="decrypt-title" data-val="Dashboard" class="text-brand dark:text-brand_glow inline-block" style="min-width: 5.2em;">Dashboard</span>
+                    <!-- 🚀 Hacker Effect Applied Here (Now IMMUTABLE / No Wrap) -->
+                    <h2 class="font-heading font-black text-[17px] sm:text-2xl text-slate-800 dark:text-white leading-tight tracking-tight mt-0.5 whitespace-nowrap">
+                        IT<span id="decrypt-title" data-val="Dashboard" class="text-brand dark:text-brand_glow inline-block ml-1" style="min-width: 5.2em;">Dashboard</span>
                     </h2>
                 </div>
             </div>
 
-            <!-- 2. CENTER: Sleek Clock Capsule (Fixed Overlap using Flex-1) -->
-            <div class="hidden xl:flex items-center justify-center flex-1 z-20 px-2 min-w-0 transition-all duration-300">
+            <!-- 2. CENTER: Sleek Clock Capsule -->
+            <div class="hidden lg:flex items-center justify-center flex-1 z-20 px-2 min-w-0 transition-all duration-300">
                 <div class="bg-slate-50/80 dark:bg-black/30 backdrop-blur-xl px-3 py-1.5 rounded-2xl border border-slate-200/80 dark:border-white/5 flex items-center shadow-sm gap-2 shrink-0">
                     <div class="flex items-center gap-1.5 whitespace-nowrap shrink-0 text-slate-700 dark:text-slate-200">
                         <i class="fa-regular fa-clock text-brand text-[12px] animate-pulse"></i>
@@ -222,16 +224,15 @@
                 </div>
             </div>
 
-         <!-- 3. RIGHT: Grouped Controls -->
+            <!-- 3. RIGHT: Grouped Controls -->
             <div class="flex items-center justify-end gap-1.5 sm:gap-4 w-auto relative z-30 shrink-0">
                 
-                <!-- GROUP A: Quick Tools -->
+                <!-- GROUP A: Quick Tools (Hidden on Mobile) -->
                 <div class="hidden sm:flex items-center gap-2">
                     <a href="PBL_IT_Leave_Tracker.html" @click="haptic('light')" class="flex items-center gap-1.5 h-9 px-3 rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-all border border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/30 dark:text-emerald-400 shadow-sm font-bold text-[11px] active:scale-95">
                         <i class="fa-regular fa-calendar-check text-[13px]"></i> <span>Leave Hub</span>
                     </a>
                     
-                    <!-- 🔒 ADMIN TOOL: Restricted to Vikas, Anil & Ashok -->
                     <a x-show="['vikas', 'anil', 'ashok'].some(n => (currentUser?.name || '').toLowerCase().includes(n))" x-cloak href="pbl-toolkit://start" class="flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-500 hover:text-white transition-all border border-indigo-200 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400 shadow-sm active:scale-95" title="Launch Admin Toolkit">
                         <i class="fa-solid fa-terminal text-[13px]"></i>
                     </a>
@@ -239,29 +240,125 @@
 
                 <div class="hidden sm:block w-px h-6 bg-slate-200 dark:bg-white/10"></div>
 
-              <!-- GROUP B: System Controls Pill (100% Mobile Touch Fix) -->
-                <div class="flex items-center gap-1 bg-white dark:bg-dark_surface p-1 rounded-full border border-slate-200 dark:border-white/10 shadow-sm shrink-0 relative z-[60]">
+                <!-- GROUP B: System Controls Pill (Mobile optimized sizes) -->
+                <div class="flex items-center gap-0.5 sm:gap-1 bg-white dark:bg-dark_surface p-1 rounded-full border border-slate-200 dark:border-white/10 shadow-sm shrink-0 relative z-[60]">
                     
-                    <!-- Persistent Location Button (Fixed Touch Target & DOM Shifting) -->
+                    <!-- Persistent Location Button -->
                     <button type="button" 
                             @click.prevent="toggleLocation()" 
                             :class="isGlobal ? 'bg-slate-800 text-white dark:bg-white dark:text-slate-900 shadow-sm active:scale-95 hover:opacity-90' : 'bg-slate-100 dark:bg-black/30 text-slate-500 dark:text-slate-400 opacity-60 cursor-default pointer-events-none'"
-                            class="h-8 px-3 sm:px-4 flex items-center justify-center rounded-full transition-all gap-1.5 font-bold text-[10px] sm:text-[11px] select-none touch-manipulation">
-                        <!-- pointer-events-none ensures touch goes directly to the parent button -->
-                        <i class="fa-solid fa-location-dot pointer-events-none"></i> 
+                            class="h-7 sm:h-8 px-2.5 sm:px-4 flex items-center justify-center rounded-full transition-all gap-1 sm:gap-1.5 font-bold text-[10px] sm:text-[11px] select-none touch-manipulation">
+                        <i class="fa-solid fa-location-dot pointer-events-none text-[11px] sm:text-[13px]"></i> 
                         <span x-text="currentLocation" class="pointer-events-none"></span>
                     </button>
 
                     <!-- Theme Toggle -->
                     <button type="button" 
                             @click.prevent="toggleTheme()" 
-                            class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors active:scale-95 select-none touch-manipulation">
-                        <i class="fa-solid text-[13px] sm:text-[14px] pointer-events-none" :class="isDark ? 'fa-sun text-amber-400' : 'fa-moon'"></i>
+                            class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors active:scale-95 select-none touch-manipulation">
+                        <i class="fa-solid text-[12px] sm:text-[14px] pointer-events-none" :class="isDark ? 'fa-sun text-amber-400' : 'fa-moon'"></i>
                     </button>
+
+                    <!-- 🚀 IT PORTALS / GATEWAYS DROPDOWN (10 LINKS, NO-SCROLL COMPACT UI) -->
+                    <div class="relative" x-data="{ showPortals: false }" @click.outside="showPortals = false">
+                        <button @click="showPortals = !showPortals" class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors active:scale-95">
+                            <i class="fa-solid fa-layer-group text-[11px] sm:text-[13px]"></i>
+                        </button>
+
+                        <div x-show="showPortals" x-transition.origin.top.right 
+                             class="absolute -right-6 sm:right-0 top-full mt-3 w-[320px] sm:w-[380px] max-w-[95vw] bg-white/95 dark:bg-dark_surface/95 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-slate-200 dark:border-dark_border z-[100] overflow-hidden" 
+                             style="display: none;">
+                            
+                            <div class="px-4 py-3 border-b border-slate-100 dark:border-dark_border bg-slate-50/50 dark:bg-white/5 flex items-center justify-between">
+                                <h4 class="font-heading font-black text-[13px] text-slate-800 dark:text-white flex items-center"><i class="fa-solid fa-link text-brand mr-2"></i> Quick Gateways</h4>
+                                <button @click="showPortals = false" class="sm:hidden w-6 h-6 rounded-full bg-slate-200 dark:bg-white/10 text-slate-500 flex items-center justify-center hover:bg-red-100 hover:text-red-500 transition"><i class="fa-solid fa-xmark text-[10px]"></i></button>
+                            </div>
+                            
+                            <!-- 📍 Removed custom-scroll and fixed heights to allow natural compact fitting -->
+                            <div class="p-3 sm:p-4 space-y-3.5 max-h-[85vh] overflow-y-auto">
+                                
+                                <!-- 🌐 INTERNAL NETWORK (5 LINKS) -->
+                                <div>
+                                    <h5 class="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-2 pl-1">Internal Network</h5>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        
+                                        <!-- SonicWall -->
+                                        <a href="http://192.168.231.1/sonicui/7/login/#/" target="_blank" class="flex items-center gap-2 p-1.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 hover:border-blue-300 dark:hover:border-blue-500/50 hover:shadow-sm transition active:scale-95 group">
+                                            <div class="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 group-hover:bg-blue-500 group-hover:text-white transition-colors"><i class="fa-solid fa-shield-virus text-[11px]"></i></div>
+                                            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 truncate">SonicWall</span>
+                                        </a>
+                                        
+                                        <!-- Airtel Graph -->
+                                        <a href="https://smartnet4.bharti.com/VPortal/" target="_blank" class="flex items-center gap-2 p-1.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 hover:border-red-300 dark:hover:border-red-500/50 hover:shadow-sm transition active:scale-95 group">
+                                            <div class="w-7 h-7 rounded-lg bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0 group-hover:bg-red-500 group-hover:text-white transition-colors"><i class="fa-solid fa-chart-line text-[11px]"></i></div>
+                                            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 truncate">Airtel Graph</span>
+                                        </a>
+
+                                        <!-- ILO DC -->
+                                        <a href="https://192.168.0.250/" target="_blank" class="flex items-center gap-2 p-1.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 hover:border-emerald-300 dark:hover:border-emerald-500/50 hover:shadow-sm transition active:scale-95 group">
+                                            <div class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 group-hover:bg-emerald-500 group-hover:text-white transition-colors"><i class="fa-solid fa-server text-[11px]"></i></div>
+                                            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 truncate">ILO DC</span>
+                                        </a>
+
+                                        <!-- ILO ADC -->
+                                        <a href="https://192.168.0.251/" target="_blank" class="flex items-center gap-2 p-1.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 hover:border-teal-300 dark:hover:border-teal-500/50 hover:shadow-sm transition active:scale-95 group">
+                                            <div class="w-7 h-7 rounded-lg bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0 group-hover:bg-teal-500 group-hover:text-white transition-colors"><i class="fa-solid fa-server text-[11px]"></i></div>
+                                            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 truncate">ILO ADC</span>
+                                        </a>
+
+                                        <!-- PBL Server (Spans Full Width) -->
+                                        <a href="https://192.168.0.252/" target="_blank" class="flex items-center gap-2 p-1.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:shadow-sm transition active:scale-95 group col-span-2">
+                                            <div class="w-7 h-7 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 group-hover:bg-indigo-500 group-hover:text-white transition-colors"><i class="fa-solid fa-network-wired text-[11px]"></i></div>
+                                            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 truncate">PBL Server</span>
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!-- 🏢 VENDOR PORTALS (5 LINKS) -->
+                                <div>
+                                    <h5 class="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-2 pl-1">Vendor Portals</h5>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        
+                                        <!-- Sophos -->
+                                        <a href="https://central.sophos.com/manage/login" target="_blank" class="flex items-center gap-2 p-1.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 hover:border-sky-300 dark:hover:border-sky-500/50 hover:shadow-sm transition active:scale-95 group">
+                                            <div class="w-7 h-7 rounded-lg bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 group-hover:bg-sky-500 group-hover:text-white transition-colors"><i class="fa-solid fa-shield-halved text-[11px]"></i></div>
+                                            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 truncate">Sophos</span>
+                                        </a>
+
+                                        <!-- HP Workstation -->
+                                        <a href="https://support.hp.com/in-en" target="_blank" class="flex items-center gap-2 p-1.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 hover:border-cyan-300 dark:hover:border-cyan-500/50 hover:shadow-sm transition active:scale-95 group">
+                                            <div class="w-7 h-7 rounded-lg bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0 group-hover:bg-cyan-500 group-hover:text-white transition-colors"><i class="fa-solid fa-laptop text-[11px]"></i></div>
+                                            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 truncate">HP Work.</span>
+                                        </a>
+
+                                        <!-- Lenovo -->
+                                        <a href="https://account.lenovo.com/in/en/signin?returnurl=https%3A%2F%2Fpcsupport.lenovo.com%2Fin%2Fen%2F&source=b2cuser&linkTrack=account:pcsupport:home" target="_blank" class="flex items-center gap-2 p-1.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 hover:border-rose-300 dark:hover:border-rose-500/50 hover:shadow-sm transition active:scale-95 group">
+                                            <div class="w-7 h-7 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 group-hover:bg-rose-500 group-hover:text-white transition-colors"><i class="fa-solid fa-laptop-code text-[11px]"></i></div>
+                                            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 truncate">Lenovo</span>
+                                        </a>
+
+                                        <!-- HPE Server -->
+                                        <a href="https://auth.hpe.com/hpe/cf/?fromURI=..." target="_blank" class="flex items-center gap-2 p-1.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 hover:border-emerald-300 dark:hover:border-emerald-500/50 hover:shadow-sm transition active:scale-95 group">
+                                            <div class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 group-hover:bg-emerald-500 group-hover:text-white transition-colors"><i class="fa-solid fa-server text-[11px]"></i></div>
+                                            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 truncate">HPE Server</span>
+                                        </a>
+
+                                        <!-- Abbyy Fine Reader (Spans Full Width) -->
+                                        <a href="https://support.abbyy.com/auth/v3/signin?brand_id=5741727..." target="_blank" class="flex items-center gap-2 p-1.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 hover:border-orange-300 dark:hover:border-orange-500/50 hover:shadow-sm transition active:scale-95 group col-span-2">
+                                            <div class="w-7 h-7 rounded-lg bg-orange-500/10 text-orange-600 dark:text-orange-400 flex items-center justify-center shrink-0 group-hover:bg-orange-500 group-hover:text-white transition-colors"><i class="fa-solid fa-file-pdf text-[11px]"></i></div>
+                                            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 truncate">Abbyy Fine Reader Portal</span>
+                                        </a>
+                                        
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- Notifications -->
                     <div class="relative" @click.outside="showNotifs = false">
-                        <button @click="showNotifs = !showNotifs" class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors">
+                        <button @click="showNotifs = !showNotifs" class="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors">
                             <i class="fa-regular fa-bell text-[12px] sm:text-[13px]"></i>
                             <span x-show="openTicketCount > 0" class="absolute top-0 right-0 flex h-2.5 w-2.5">
                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -270,14 +367,12 @@
                         </button>
 
                         <!-- Notification Dropdown -->
-                        <!-- 📍 FIX: Width increased to sm:w-96 (384px) for better breathing room -->
                         <div x-show="showNotifs" x-transition.origin.top.right class="absolute right-0 top-full mt-3 w-[320px] sm:w-96 bg-white/95 dark:bg-dark_surface/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-200 dark:border-dark_border z-[100] overflow-hidden" style="display: none;">
                             <div class="p-4 border-b border-slate-100 dark:border-dark_border flex justify-between items-center bg-slate-50/50 dark:bg-white/5">
                                 <h4 class="font-heading font-black text-sm text-slate-800 dark:text-white">Pending Requests</h4>
                                 <span class="text-[9px] bg-red-100 text-red-600 px-2.5 py-0.5 rounded-md font-black uppercase tracking-wider border border-red-200 dark:border-red-500/20 shadow-sm" x-text="openTicketCount + ' New'">0 New</span>
                             </div>
                             
-                            <!-- 📍 FIX: Increased padding and added space-y-3 for proper gaps between cards -->
                             <div class="max-h-[380px] overflow-y-auto custom-scroll p-3 space-y-3">
                                 <template x-for="notif in notifications" :key="notif.id">
                                     <div x-data="{ meta: processTicketMeta(notif) }" class="p-3 sm:p-4 border rounded-2xl shadow-sm hover:-translate-y-0.5 transition-all duration-300 group relative overflow-hidden flex items-start gap-3 cursor-pointer" :class="meta.styles.openBg" @click="if(meta.type === 'AUDIT') { showNotifs = false; openAuditModal(); } else if (meta.type === 'LEAVE') { window.location.href='PBL_IT_Leave_Tracker.html'; } else { scrollToLog(); }">
@@ -292,13 +387,11 @@
                                             <div class="flex justify-between items-start mb-1 gap-2">
                                                 <div class="min-w-0 flex-1">
                                                     <span x-show="meta.isSystem" class="inline-block mb-1.5 px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border shadow-sm" :class="meta.badgeClass" x-text="meta.badgeText"></span>
-                                                    <!-- 📍 FIX: Truncated title if too long -->
                                                     <h4 class="font-bold text-[13px] sm:text-[14px] mb-0.5 transition leading-tight truncate" :class="meta.styles.textOpen" x-text="notif.issue" :title="notif.issue"></h4>
                                                 </div>
                                                 <span class="text-[7px] sm:text-[8px] font-black tracking-widest px-1.5 py-0.5 rounded border shrink-0 mt-0.5 shadow-sm" :class="meta.styles.openPill" x-text="meta.statusTextOpen"></span>
                                             </div>
                                             
-                                            <!-- 📍 FIX: line-clamp-2 prevents description from taking infinite height -->
                                             <p class="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 leading-snug whitespace-normal group-hover:text-slate-700 dark:group-hover:text-slate-300 transition-colors mt-0.5 line-clamp-2" x-text="meta.cleanDesc.replace(/\n/g, ' ')"></p>
                                             
                                             <div class="mt-3 pt-2.5 border-t border-slate-100/60 dark:border-white/5 flex items-center justify-between relative z-20 mt-auto w-full gap-2">
@@ -307,7 +400,6 @@
                                                 </span>
                                                 
                                                 <div class="flex gap-1.5 shrink-0">
-                                                    <!-- 📍 FIX: Button text shortened to "Resolve" instead of "Mark Resolved" to save space -->
                                                     <button x-show="canResolve(notif)" @click.stop="openResolveModal(notif, false)" class="text-[9px] px-2.5 py-1.5 rounded-lg font-black uppercase tracking-widest shadow-sm transition-colors flex items-center gap-1.5 active:scale-95 border" :class="meta.type === 'AUDIT' ? 'bg-rose-50 text-rose-600 border-rose-200 hover:bg-rose-500 hover:text-white dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/30' : 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-500 hover:text-white dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30'">
                                                         <i class="fa-solid" :class="meta.type === 'AUDIT' ? 'fa-wrench' : 'fa-check-double'"></i> 
                                                         <span x-text="meta.type === 'AUDIT' ? 'Fix' : 'Resolve'"></span>
@@ -324,7 +416,6 @@
                                 </div>
                             </div>
                             
-                            <!-- 📍 NEW: Quick jump to logs footer -->
                             <div class="p-3 bg-slate-50/80 dark:bg-black/20 border-t border-slate-100 dark:border-white/5 text-center cursor-pointer hover:bg-slate-100 dark:hover:bg-white/5 transition" @click="scrollToLog(); showNotifs=false;">
                                 <span class="text-[10px] font-black uppercase tracking-widest text-brand hover:text-brand_dark transition">View All Logs &rarr;</span>
                             </div>
@@ -337,7 +428,7 @@
                 <!-- GROUP C: User Profile -->
                 <div class="relative shrink-0" @click.outside="showProfile = false">
                     <div @click="showProfile = !showProfile" class="flex items-center gap-1.5 sm:gap-2 cursor-pointer group rounded-xl p-0 sm:p-1 sm:pr-2 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
-                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-brand to-indigo-600 flex items-center justify-center text-white text-[11px] sm:text-xs font-black shadow-md border border-white/20 relative shrink-0">
+                        <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-brand to-indigo-600 flex items-center justify-center text-white text-[11px] sm:text-xs font-black shadow-md border border-white/20 relative shrink-0">
                             <span x-text="userInitials"></span>
                             <div class="absolute -bottom-1 -right-1 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-emerald-500 border-2 border-white dark:border-dark_surface rounded-full shadow-sm"></div>
                         </div>
