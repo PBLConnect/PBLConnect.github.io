@@ -129,41 +129,31 @@
         @keyframes flip-top-anim { 0% { transform: rotateX(0deg); } 100% { transform: rotateX(-90deg); } }
         @keyframes flip-bot-anim { 0% { transform: rotateX(90deg); } 100% { transform: rotateX(0deg); } }
 
-        /* 🫧 SMOOTH LAGGING BUBBLE CURSOR CSS (NO GSAP NEEDED) */
-		@media (hover: hover) and (pointer: fine) {
-			body, a, button, input, select, textarea, .cursor-pointer { cursor: none !important; }
-		}
+        /* 🫧 SMOOTH LAGGING BUBBLE CURSOR CSS (HARDWARE ACCELERATED) */
+        @media (hover: hover) and (pointer: fine) { 
+            body, html { 
+                /* Native Hardware Cursor: Zero Jitter, 100% Smooth */
+                cursor: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24'%3e%3cpath d='M4.5.79v22.42l6.56-6.57h9.29L4.5.79z' fill='%233b82f6' stroke='%23ffffff' stroke-width='1.5' stroke-linejoin='round'/%3e%3c/svg%3e") 2 2, default !important; 
+            }
+            /* Clickable elements pe OS ka default 'Hand' icon aane do, wo best lagta hai */
+            a, button, input, select, textarea, .cursor-pointer { 
+                cursor: pointer !important; 
+            }
+        }
 
-		.custom-dot {
-			position: fixed; left: 0; top: 0; width: 8px; height: 8px;
-			background-color: #3b82f6; border-radius: 50%; z-index: 100001; pointer-events: none;
-			transition: transform 0.1s ease-out, opacity 0.2s ease; /* Fast follow */
-			will-change: transform;
-		}
+        /* 🫧 Lagging Ring (Yeh DOM mein hi rahegi smooth lag ke liye) */
+        .custom-ring { 
+            position: fixed; left: 0; top: 0; width: 30px; height: 30px; border: 2px solid rgba(59, 130, 246, 0.5); border-radius: 50%; 
+            z-index: 100000; pointer-events: none; 
+            transition: transform 0.35s ease-out, background-color 0.3s ease, border-color 0.3s ease; 
+            will-change: transform; 
+        }
 
-		.custom-ring {
-			position: fixed; left: 0; top: 0; width: 30px; height: 30px;
-			border: 2px solid rgba(59, 130, 246, 0.5); border-radius: 50%; z-index: 100000; pointer-events: none;
-			transition: transform 0.35s ease-out, background-color 0.3s ease, border-color 0.3s ease; /* Lagging follow */
-			will-change: transform;
-		}
-
-		/* 🔥 HOVER STATE: Bubble Scale Effect */
-		body.cursor-grow .custom-ring {
-			--scale: 2.5; /* Big scale effect */
-			background-color: rgba(59, 130, 246, 0.15); /* Light fill */
-			border-color: rgba(59, 130, 246, 0.3);
-			backdrop-filter: blur(1.5px);
-		}
-
-		body.cursor-grow .custom-dot { 
-			opacity: 0; /* Hide small dot on hover to match clean UI */
-		}
-
-		@media (prefers-reduced-motion: reduce), (max-width: 768px) {
-			.custom-dot, .custom-ring { display: none !important; }
-			body, a, button, input, select, textarea, .cursor-pointer { cursor: auto !important; }
-		}
+        body.cursor-grow .custom-ring { --scale: 2.5; background-color: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.3); backdrop-filter: blur(1.5px); }
+        
+        @media (prefers-reduced-motion: reduce), (max-width: 768px) { 
+            .custom-ring { display: none !important; } 
+        }
     </style>
 </head>
 
@@ -1541,41 +1531,34 @@
                     setInterval(() => this.fetchTickets(false), 300000);
                 },
 
-                // 🫧 SMOOTH LAGGING BUBBLE CURSOR ENGINE
-				setupCustomCursor() { 
-					if(!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-					if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+                // 🫧 SMOOTH LAGGING BUBBLE CURSOR ENGINE (OPTIMIZED)
+                setupCustomCursor() { 
+                    if(!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+                    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-					const dot = document.createElement('div');
-					dot.classList.add('custom-dot');
-					document.body.appendChild(dot);
+                    // Sirf Ring create karenge
+                    const ring = document.createElement('div'); 
+                    ring.classList.add('custom-ring'); 
+                    document.body.appendChild(ring);
 
-					const ring = document.createElement('div');
-					ring.classList.add('custom-ring');
-					document.body.appendChild(ring);
+                    document.addEventListener('mousemove', (e) => {
+                        // 📍 Ring smoothly mouse position (jo ab native OS handle kar raha hai) ko follow karegi
+                        ring.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%) scale(var(--scale, 1))`;
+                    });
 
-					// CSS Transition handles the TweenMax lagging math perfectly!
-					document.addEventListener('mousemove', (e) => {
-						// Fast instant snap for the dot
-						dot.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%)`;
-						
-						// Lagging follow for the ring with dynamic scaling via CSS variable
-						ring.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%) scale(var(--scale, 1))`;
-					});
-
-					// Smart Delegation: Triggers hover scaling automatically
-					document.body.addEventListener('mouseover', (e) => {
-						if (e.target.closest('a, button, input, select, textarea, .cursor-pointer, [x-on\\:click], [@click]')) {
-							document.body.classList.add('cursor-grow');
-						}
-					});
-
-					document.body.addEventListener('mouseout', (e) => {
-						if (e.target.closest('a, button, input, select, textarea, .cursor-pointer, [x-on\\:click], [@click]')) {
-							document.body.classList.remove('cursor-grow');
-						}
-					});
-				},
+                    // Hover States for Bubble growth
+                    document.body.addEventListener('mouseover', (e) => { 
+                        if (e.target.closest('a, button, input, select, textarea, .cursor-pointer, [x-on\\:click], [@click]')) {
+                            document.body.classList.add('cursor-grow'); 
+                        }
+                    });
+                    
+                    document.body.addEventListener('mouseout', (e) => { 
+                        if (e.target.closest('a, button, input, select, textarea, .cursor-pointer, [x-on\\:click], [@click]')) {
+                            document.body.classList.remove('cursor-grow'); 
+                        }
+                    });
+                },
 
                 // 🚀 HACKER DECRYPTION ENGINE (No Jitter & 30s Loop)
                 runDecryption(elementId) {
