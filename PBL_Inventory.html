@@ -33,7 +33,7 @@
         theme: {
             extend: {
                 fontFamily: { sans: ['Inter', 'sans-serif'], heading: ['Outfit', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
-                colors: { brand: '#3b82f6', brand_glow: '#60a5fa', dark_bg: '#020617', dark_surface: '#0f172a', dark_border: '#1e293b' }
+                colors: { brand: '#4f46e5', brand_glow: '#818cf8', dark_bg: '#020617', dark_surface: '#0f172a', dark_border: '#1e293b' }
             }
         }
     }
@@ -87,13 +87,25 @@
     .dark .word { color: #60a5fa; }
     @keyframes cycle-words { 0%, 25% { transform: translateY(0%); } 33%, 58% { transform: translateY(-100%); } 66%, 91% { transform: translateY(-200%); } 100% { transform: translateY(-300%); } }
 
-    /* 🫧 SMOOTH LAGGING BUBBLE CURSOR CSS */
-	@media (hover: hover) and (pointer: fine) { body, a, button, input, select, textarea, .cursor-pointer { cursor: none !important; } }
-	.custom-dot { position: fixed; left: 0; top: 0; width: 8px; height: 8px; background-color: #3b82f6; border-radius: 50%; z-index: 100001; pointer-events: none; transition: transform 0.1s ease-out, opacity 0.2s ease; will-change: transform; }
-	.custom-ring { position: fixed; left: 0; top: 0; width: 30px; height: 30px; border: 2px solid rgba(59, 130, 246, 0.5); border-radius: 50%; z-index: 100000; pointer-events: none; transition: transform 0.35s ease-out, background-color 0.3s ease, border-color 0.3s ease; will-change: transform; }
-	body.cursor-grow .custom-ring { --scale: 2.5; background-color: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.3); backdrop-filter: blur(1.5px); }
-	body.cursor-grow .custom-dot { opacity: 0; }
-	@media (prefers-reduced-motion: reduce), (max-width: 768px) { .custom-dot, .custom-ring { display: none !important; } body, a, button, input, select, textarea, .cursor-pointer { cursor: auto !important; } }
+    /* 🫧 SMOOTH LAGGING BUBBLE CURSOR CSS (HARDWARE ACCELERATED) */
+        @media (hover: hover) and (pointer: fine) { 
+            body, html { 
+                cursor: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24'%3e%3cpath d='M4.5.79v22.42l6.56-6.57h9.29L4.5.79z' fill='%233b82f6' stroke='%23ffffff' stroke-width='1.5' stroke-linejoin='round'/%3e%3c/svg%3e") 2 2, default !important; 
+            }
+            a, button, input, select, textarea, .cursor-pointer, [x-on\:click], [@click] { 
+                cursor: pointer !important; 
+            }
+        }
+        .custom-ring { 
+            position: fixed; left: 0; top: 0; width: 30px; height: 30px; border: 2px solid rgba(59, 130, 246, 0.5); border-radius: 50%; 
+            z-index: 100000; pointer-events: none; 
+            transition: transform 0.35s ease-out, background-color 0.3s ease, border-color 0.3s ease; 
+            will-change: transform; 
+        }
+        body.cursor-grow .custom-ring { --scale: 2.5; background-color: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.3); backdrop-filter: blur(1.5px); }
+        @media (prefers-reduced-motion: reduce), (max-width: 768px) { 
+            .custom-ring { display: none !important; } 
+        }
 </style>
 </head>
 
@@ -121,7 +133,7 @@
                 </a>
                 <div class="flex flex-col justify-center">
                     <div class="flex items-center gap-2 mb-0.5">
-                        <span class="px-2 py-0.5 rounded-md bg-blue-50 text-blue-600 border border-blue-200 dark:bg-brand/10 dark:border-brand/30 dark:text-brand_glow font-mono font-black text-[9px] leading-none shadow-sm" x-text="PBL_APP_VERSION"></span>
+                        <span class="px-2 py-0.5 rounded-md bg-brand/10 text-brand border border-brand/20 dark:bg-brand/20 dark:border-brand/30 dark:text-brand_glow font-mono font-black text-[9px] leading-none shadow-sm" x-text="PBL_APP_VERSION"></span>
                         <span class="hidden sm:inline-block text-[9px] font-black text-slate-400 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-md">IT OPERATIONS</span>
                     </div>
                     <h2 class="font-heading font-black text-lg sm:text-2xl text-slate-800 dark:text-white leading-tight tracking-tight mt-0.5">Asset<span class="text-brand dark:text-brand_glow">DB</span></h2>
@@ -185,8 +197,11 @@
                             <i class="fa-solid fa-location-dot opacity-70"></i> <span x-text="currentLocation"></span>
                         </div>
                     </template>
-                    <button @click="toggleTheme()" class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors">
-                        <i class="fa-solid text-[12px] sm:text-[13px]" :class="isDark ? 'fa-sun text-amber-400' : 'fa-moon'"></i>
+                    <button @click="toggleTheme()" class="group relative w-7 h-7 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors">
+                        <i class="fa-solid text-[12px] sm:text-[13px] pointer-events-none" :class="isDark ? 'fa-sun text-amber-400' : 'fa-moon'"></i>
+                        <span class="hidden sm:block absolute top-full mt-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-white dark:bg-white dark:text-slate-800 text-[9px] font-black uppercase tracking-widest rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-[999]">
+                            <span x-text="isDark ? 'Light Mode' : 'Dark Mode'"></span>
+                        </span>
                     </button>
                 </div>
 
@@ -194,7 +209,7 @@
 
                 <div class="relative shrink-0" x-data="{ showProfile: false }" @click.outside="showProfile = false">
                     <div @click="showProfile = !showProfile" class="flex items-center gap-1.5 sm:gap-2 cursor-pointer group rounded-xl p-0 sm:p-1 sm:pr-2 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
-                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-brand to-indigo-600 flex items-center justify-center text-white text-[11px] sm:text-xs font-black shadow-md border border-white/20 relative shrink-0">
+                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-brand to-violet-600 flex items-center justify-center text-white text-[11px] sm:text-xs font-black shadow-md border border-white/20 relative shrink-0">
                             <span x-text="currentUser?.name ? currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0,2) : '??'"></span>
                             <div class="absolute -bottom-1 -right-1 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-brand border-2 border-white dark:border-dark_surface rounded-full shadow-sm"></div>
                         </div>
@@ -234,7 +249,7 @@
             <div class="cards-container grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 shrink-0 transition-all duration-500 ease-in-out overflow-hidden origin-top"
                  :class="hideMobileKPI ? 'max-h-0 opacity-0 !mb-0 md:max-h-[500px] md:opacity-100 md:!mb-4' : 'max-h-[500px] opacity-100 mb-3 sm:mb-4'">
                 
-                <div class="kpi-card bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/10 dark:to-transparent rounded-2xl md:rounded-[1.25rem] p-3 sm:p-4 shadow-sm border border-blue-100 dark:border-blue-900/50 flex flex-col justify-between min-h-[90px] sm:min-h-[125px] relative group">
+                <div @click="haptic('light'); filterStatus = []; filterType = []; filterLoc = []; searchQuery = '';" class="kpi-card cursor-pointer select-none bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/10 dark:to-transparent rounded-2xl md:rounded-[1.25rem] p-3 sm:p-4 shadow-sm border border-blue-100 dark:border-blue-900/50 flex flex-col justify-between min-h-[90px] sm:min-h-[125px] relative group">
                     <i class="fa-solid absolute -bottom-2 -right-2 text-6xl sm:text-8xl text-blue-500 opacity-20 dark:opacity-10 group-hover:scale-110 transition-transform duration-500" :class="currentTab === 'hardware' ? 'fa-computer' : 'fa-compact-disc'"></i>
                     <div class="flex items-center justify-between relative z-10 mb-1 sm:mb-2">
                         <div class="flex items-center gap-1.5 sm:gap-2">
@@ -244,12 +259,12 @@
                     </div>
                     <div class="relative z-10 mt-auto">
                         <!-- 📍 Using baseFilteredHardware to ensure accurate branch counts -->
-                        <h3 class="text-2xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none" x-text="currentTab === 'hardware' ? baseFilteredHardware.length : filteredSoftware.length">0</h3>
+                        <h3 class="text-2xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-indigo-600 dark:text-indigo-400 leading-none" x-text="currentTab === 'hardware' ? baseFilteredHardware.length : filteredSoftware.length">0</h3>
                         <p class="text-[12px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1.5 truncate" x-text="currentTab === 'hardware' ? 'Hardware Assets 💻' : 'Total Licenses 📀'"></p>
                     </div>
                 </div>
 
-                <div class="kpi-card bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-900/10 dark:to-transparent rounded-2xl md:rounded-[1.25rem] p-3 sm:p-4 shadow-sm border border-emerald-100 dark:border-emerald-900/50 flex flex-col justify-between min-h-[90px] sm:min-h-[125px] relative group">
+                <div @click="haptic('light'); filterStatus = currentTab === 'hardware' ? ['In Use'] : ['Active'];" class="kpi-card cursor-pointer select-none bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-900/10 dark:to-transparent rounded-2xl md:rounded-[1.25rem] p-3 sm:p-4 shadow-sm border border-emerald-100 dark:border-emerald-900/50 flex flex-col justify-between min-h-[90px] sm:min-h-[125px] relative group">
                     <i class="fa-solid fa-check absolute -bottom-2 -right-2 text-7xl sm:text-8xl text-emerald-500 opacity-20 dark:opacity-10 group-hover:scale-110 transition-transform duration-500"></i>
                     <div class="flex items-center justify-between relative z-10 mb-1 sm:mb-2">
                         <div class="flex items-center gap-1.5 sm:gap-2">
@@ -258,12 +273,12 @@
                         </div>
                     </div>
                     <div class="relative z-10 mt-auto">
-                        <h3 class="text-2xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none" x-text="currentTab === 'hardware' ? baseFilteredHardware.filter(a=>a.Status=='In Use').length : filteredSoftware.filter(s=>s.Status=='Active').length">0</h3>
+                        <h3 class="text-2xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-emerald-600 dark:text-emerald-400 leading-none" x-text="currentTab === 'hardware' ? baseFilteredHardware.filter(a=>a.Status=='In Use').length : filteredSoftware.filter(s=>s.Status=='Active').length">0</h3>
                         <p class="text-[12px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1.5 truncate" x-text="currentTab === 'hardware' ? 'Active / In Use ✅' : 'Active Software ✅'"></p>
                     </div>
                 </div>
 
-                <div class="kpi-card bg-gradient-to-br from-amber-50 to-white dark:from-amber-900/10 dark:to-transparent rounded-2xl md:rounded-[1.25rem] p-3 sm:p-4 shadow-sm border border-amber-100 dark:border-amber-900/50 flex flex-col justify-between min-h-[90px] sm:min-h-[125px] relative group">
+                <div @click="haptic('light'); if(currentTab === 'hardware') filterStatus = ['Spare'];" class="kpi-card cursor-pointer select-none bg-gradient-to-br from-amber-50 to-white dark:from-amber-900/10 dark:to-transparent rounded-2xl md:rounded-[1.25rem] p-3 sm:p-4 shadow-sm border border-amber-100 dark:border-amber-900/50 flex flex-col justify-between min-h-[90px] sm:min-h-[125px] relative group">
                     <i class="fa-solid fa-box absolute -bottom-2 -right-2 text-7xl sm:text-8xl text-amber-500 opacity-20 dark:opacity-10 group-hover:scale-110 transition-transform duration-500"></i>
                     <div class="flex items-center justify-between relative z-10 mb-1 sm:mb-2">
                         <div class="flex items-center gap-1.5 sm:gap-2">
@@ -272,12 +287,12 @@
                         </div>
                     </div>
                     <div class="relative z-10 mt-auto">
-                        <h3 class="text-2xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none" x-text="currentTab === 'hardware' ? baseFilteredHardware.filter(a=>a.Status=='Spare').length : filteredSoftware.filter(s=>s.Type=='Subscription').length">0</h3>
+                        <h3 class="text-2xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-amber-600 dark:text-amber-400 leading-none" x-text="currentTab === 'hardware' ? baseFilteredHardware.filter(a=>a.Status=='Spare').length : filteredSoftware.filter(s=>s.Type=='Subscription').length">0</h3>
                         <p class="text-[12px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1.5 truncate" x-text="currentTab === 'hardware' ? 'In Stock / Spare 📦' : 'Subscriptions 🔁'"></p>
                     </div>
                 </div>
 
-                <div class="kpi-card bg-gradient-to-br from-red-50 to-white dark:from-red-900/10 dark:to-transparent rounded-2xl md:rounded-[1.25rem] p-3 sm:p-4 shadow-sm border border-red-100 dark:border-red-900/50 flex flex-col justify-between min-h-[90px] sm:min-h-[125px] relative group">
+                <div @click="haptic('light'); if(currentTab === 'hardware') filterStatus = ['Decommissioned', 'In Repair'];" class="kpi-card cursor-pointer select-none bg-gradient-to-br from-red-50 to-white dark:from-red-900/10 dark:to-transparent rounded-2xl md:rounded-[1.25rem] p-3 sm:p-4 shadow-sm border border-red-100 dark:border-red-900/50 flex flex-col justify-between min-h-[90px] sm:min-h-[125px] relative group">
                     <i class="fa-solid fa-triangle-exclamation absolute -bottom-2 -right-2 text-7xl sm:text-8xl text-red-500 opacity-20 dark:opacity-10 group-hover:scale-110 transition-transform duration-500"></i>
                     <div class="flex items-center justify-between relative z-10 mb-1 sm:mb-2">
                         <div class="flex items-center gap-1.5 sm:gap-2">
@@ -286,7 +301,7 @@
                         </div>
                     </div>
                     <div class="relative z-10 mt-auto">
-                        <h3 class="text-2xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none" x-text="currentTab === 'hardware' ? baseFilteredHardware.filter(a=>['Decommissioned','In Repair'].includes(a.Status)).length : filteredSoftware.filter(s=> (s.TotalLicense - getTotalUsed(s)) < 0).length">0</h3>
+                        <h3 class="text-2xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-red-600 dark:text-red-400 leading-none" x-text="currentTab === 'hardware' ? baseFilteredHardware.filter(a=>['Decommissioned','In Repair'].includes(a.Status)).length : filteredSoftware.filter(s=> (s.TotalLicense - getTotalUsed(s)) < 0).length">0</h3>
                         <p class="text-[12px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1.5 truncate" x-text="currentTab === 'hardware' ? 'Decom / Repair 🔴' : 'License Deficit 🔴'"></p>
                     </div>
                 </div>
@@ -426,8 +441,8 @@
                             </template>
                         </div>
 
-                        <div x-show="currentTab === 'hardware' && filteredHardware.length === 0" class="p-8 text-center text-slate-400 bg-white dark:bg-dark_surface rounded-xl border border-slate-200 dark:border-white/10 shadow-sm"><i class="fa-solid fa-box-open text-4xl mb-3 opacity-30 text-blue-500"></i><p class="text-xs font-bold uppercase tracking-widest">No hardware found.</p></div>
-                        <div x-show="currentTab === 'software' && filteredSoftware.length === 0" class="p-8 text-center text-slate-400 bg-white dark:bg-dark_surface rounded-xl border border-slate-200 dark:border-white/10 shadow-sm"><i class="fa-solid fa-compact-disc text-4xl mb-3 opacity-30 text-purple-500"></i><p class="text-xs font-bold uppercase tracking-widest">No software found.</p></div>
+                        <div x-show="currentTab === 'hardware' && filteredHardware.length === 0" class="p-8 text-center text-slate-400 bg-white dark:bg-dark_surface rounded-xl border border-slate-200 dark:border-white/10 shadow-sm"><i class="fa-solid fa-box-open text-4xl mb-3 opacity-30 text-brand"></i><p class="text-xs font-bold uppercase tracking-widest">No hardware found.</p></div>
+                        <div x-show="currentTab === 'software' && filteredSoftware.length === 0" class="p-8 text-center text-slate-400 bg-white dark:bg-dark_surface rounded-xl border border-slate-200 dark:border-white/10 shadow-sm"><i class="fa-solid fa-compact-disc text-4xl mb-3 opacity-30 text-brand"></i><p class="text-xs font-bold uppercase tracking-widest">No software found.</p></div>
                     </div>
 
                     <!-- 💻 DESKTOP VIEW -->
@@ -951,18 +966,31 @@
                         return this.softwareList.filter(item => item.SoftwareName && item.SoftwareName.toLowerCase().includes(q)); 
                     },
 
+                    // 🫧 SMOOTH LAGGING BUBBLE CURSOR ENGINE (OPTIMIZED)
                     setupCustomCursor() { 
-					    if(!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-					    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-					    const dot = document.createElement('div'); dot.classList.add('custom-dot'); document.body.appendChild(dot);
-					    const ring = document.createElement('div'); ring.classList.add('custom-ring'); document.body.appendChild(ring);
-					    document.addEventListener('mousemove', (e) => {
-						    dot.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%)`;
-						    ring.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%) scale(var(--scale, 1))`;
-					    });
-					    document.body.addEventListener('mouseover', (e) => { if (e.target.closest('a, button, input, select, textarea, .cursor-pointer, [x-on\\:click], [@click]')) document.body.classList.add('cursor-grow'); });
-					    document.body.addEventListener('mouseout', (e) => { if (e.target.closest('a, button, input, select, textarea, .cursor-pointer, [x-on\\:click], [@click]')) document.body.classList.remove('cursor-grow'); });
-				    },
+                        if(!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+                        if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+                        const ring = document.createElement('div'); 
+                        ring.classList.add('custom-ring'); 
+                        document.body.appendChild(ring);
+
+                        document.addEventListener('mousemove', (e) => {
+                            ring.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%) scale(var(--scale, 1))`;
+                        });
+
+                        document.body.addEventListener('mouseover', (e) => { 
+                            if (e.target.closest('a, button, input, select, textarea, .cursor-pointer, [x-on\\:click], [@click]')) {
+                                document.body.classList.add('cursor-grow'); 
+                            }
+                        });
+                        
+                        document.body.addEventListener('mouseout', (e) => { 
+                            if (e.target.closest('a, button, input, select, textarea, .cursor-pointer, [x-on\\:click], [@click]')) {
+                                document.body.classList.remove('cursor-grow'); 
+                            }
+                        });
+                    },
 
                     async init() {
                         this.setupCustomCursor();
