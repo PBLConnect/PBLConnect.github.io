@@ -32,7 +32,7 @@
             theme: {
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'], heading: ['Outfit', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
-                    colors: { brand: '#3b82f6', brand_dark: '#1d4ed8', dark_bg: '#020617', dark_surface: '#0f172a', dark_border: '#1e293b', sidebar_bg: '#f8fafc' },
+                    colors: { brand: '#14b8a6', brand_dark: '#0f766e', brand_glow: '#2dd4bf', dark_bg: '#020617', dark_surface: '#0f172a', dark_border: '#1e293b', sidebar_bg: '#f8fafc' },
                     zIndex: { '100': '100', 'modal': '9999' }
                 }
             }
@@ -74,13 +74,25 @@
         .word { display: block; height: 100%; padding-left: 6px; color: #3b82f6; animation: cycle-words 6s infinite; }
         @keyframes cycle-words { 0% { transform: translateY(-0%); } 20% { transform: translateY(-100%); } 40% { transform: translateY(-200%); } 60% { transform: translateY(-300%); } 80% { transform: translateY(-400%); } 100% { transform: translateY(-500%); } }
 
-        /* 🫧 SMOOTH LAGGING BUBBLE CURSOR CSS */
-		@media (hover: hover) and (pointer: fine) { body, a, button, input, select, textarea, .cursor-pointer { cursor: none !important; } }
-		.custom-dot { position: fixed; left: 0; top: 0; width: 8px; height: 8px; background-color: #3b82f6; border-radius: 50%; z-index: 100001; pointer-events: none; transition: transform 0.1s ease-out, opacity 0.2s ease; will-change: transform; }
-		.custom-ring { position: fixed; left: 0; top: 0; width: 30px; height: 30px; border: 2px solid rgba(59, 130, 246, 0.5); border-radius: 50%; z-index: 100000; pointer-events: none; transition: transform 0.35s ease-out, background-color 0.3s ease, border-color 0.3s ease; will-change: transform; }
-		body.cursor-grow .custom-ring { --scale: 2.5; background-color: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.3); backdrop-filter: blur(1.5px); }
-		body.cursor-grow .custom-dot { opacity: 0; }
-		@media (prefers-reduced-motion: reduce), (max-width: 768px) { .custom-dot, .custom-ring { display: none !important; } body, a, button, input, select, textarea, .cursor-pointer { cursor: auto !important; } }
+        /* 🫧 SMOOTH LAGGING BUBBLE CURSOR CSS (HARDWARE ACCELERATED) */
+        @media (hover: hover) and (pointer: fine) { 
+            body, html { 
+                cursor: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24'%3e%3cpath d='M4.5.79v22.42l6.56-6.57h9.29L4.5.79z' fill='%233b82f6' stroke='%23ffffff' stroke-width='1.5' stroke-linejoin='round'/%3e%3c/svg%3e") 2 2, default !important; 
+            }
+            a, button, input, select, textarea, .cursor-pointer, [x-on\:click], [@click] { 
+                cursor: pointer !important; 
+            }
+        }
+        .custom-ring { 
+            position: fixed; left: 0; top: 0; width: 30px; height: 30px; border: 2px solid rgba(59, 130, 246, 0.5); border-radius: 50%; 
+            z-index: 100000; pointer-events: none; 
+            transition: transform 0.35s ease-out, background-color 0.3s ease, border-color 0.3s ease; 
+            will-change: transform; 
+        }
+        body.cursor-grow .custom-ring { --scale: 2.5; background-color: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.3); backdrop-filter: blur(1.5px); }
+        @media (prefers-reduced-motion: reduce), (max-width: 768px) { 
+            .custom-ring { display: none !important; } 
+        }
     </style>
 </head>
 
@@ -222,7 +234,7 @@
                 </a>
                 <div class="flex flex-col justify-center">
                     <div class="flex items-center gap-2 mb-0.5">
-                        <span class="px-2 py-0.5 rounded-md bg-blue-50 text-blue-600 border border-blue-200 dark:bg-brand/10 dark:border-brand/30 dark:text-brand_glow font-mono font-black text-[9px] leading-none shadow-sm" x-text="PBL_APP_VERSION"></span>
+                        <span class="px-2 py-0.5 rounded-md bg-brand/10 text-brand border border-brand/20 dark:bg-brand/20 dark:border-brand/30 dark:text-brand_glow font-mono font-black text-[9px] leading-none shadow-sm" x-text="PBL_APP_VERSION"></span>
                         <span class="hidden sm:inline-block text-[9px] font-black text-slate-400 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-md">NETWORK OPS</span>
                     </div>
                     <h2 class="font-heading font-black text-lg sm:text-2xl text-slate-800 dark:text-white leading-tight tracking-tight mt-0.5">Switch<span class="text-brand dark:text-brand_glow">Manager</span></h2>
@@ -269,8 +281,11 @@
                             <i class="fa-solid fa-location-dot opacity-70"></i> <span x-text="currentLocation"></span>
                         </div>
                     </template>
-                    <button @click="toggleTheme()" class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors">
-                        <i class="fa-solid text-[12px] sm:text-[13px]" :class="isDark ? 'fa-sun text-amber-400' : 'fa-moon'"></i>
+                    <button @click="toggleTheme()" class="group relative w-7 h-7 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors">
+                        <i class="fa-solid text-[12px] sm:text-[13px] pointer-events-none" :class="isDark ? 'fa-sun text-amber-400' : 'fa-moon'"></i>
+                        <span class="hidden sm:block absolute top-full mt-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-white dark:bg-white dark:text-slate-800 text-[9px] font-black uppercase tracking-widest rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-[999]">
+                            <span x-text="isDark ? 'Light Mode' : 'Dark Mode'"></span>
+                        </span>
                     </button>
                 </div>
 
@@ -279,7 +294,7 @@
                 <!-- Unified Profile Dropdown -->
                 <div class="relative shrink-0" x-data="{ showProfile: false }" @click.outside="showProfile = false">
                     <div @click="showProfile = !showProfile" class="flex items-center gap-1.5 sm:gap-2 cursor-pointer group rounded-xl p-0 sm:p-1 sm:pr-2 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
-                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-brand to-indigo-600 flex items-center justify-center text-white text-[11px] sm:text-xs font-black shadow-md border border-white/20 relative shrink-0">
+                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-brand to-emerald-600 flex items-center justify-center text-white text-[11px] sm:text-xs font-black shadow-md border border-white/20 relative shrink-0">
                             <span x-text="currentUser?.name ? currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0,2) : '??'"></span>
                             <div class="absolute -bottom-1 -right-1 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-brand border-2 border-white dark:border-dark_surface rounded-full shadow-sm"></div>
                         </div>
@@ -366,7 +381,7 @@
                             <div class="w-6 h-6 sm:w-6 sm:h-6 rounded-full bg-white dark:bg-dark_surface shadow-sm flex items-center justify-center text-emerald-500 text-[12px] sm:text-[15px] shrink-0"><i class="fa-solid fa-network-wired"></i></div>
                             <span class="text-[10px] sm:text-[15px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest leading-none truncate">Active</span>
                         </div>
-                        <h3 class="text-3xl sm:text-5xl font-black font-heading tracking-tight text-slate-800 dark:text-white relative z-10 leading-none mt-0.5" x-text="getStats().active">0</h3>
+                        <h3 class="text-3xl sm:text-5xl font-black font-heading tracking-tight text-emerald-600 dark:text-emerald-400 relative z-10 leading-none mt-0.5" x-text="getStats().active">0</h3>
                         <p class="text-[10px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 mt-1 sm:mt-1.5 relative z-10 truncate">Devices 🟢</p>
                     </div>
                     <div @click="haptic('light'); openKpiModal('uplink')" class="relative p-2.5 sm:p-3.5 rounded-[1.25rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between bg-blue-50/80 border border-blue-200/70 shadow-sm hover:shadow-md hover:border-blue-300 dark:bg-blue-900/10 dark:border-blue-800/50 dark:hover:border-blue-700/50 w-full xl:w-[150px]">
@@ -375,7 +390,7 @@
                             <div class="w-6 h-6 sm:w-6 sm:h-6 rounded-full bg-white dark:bg-dark_surface shadow-sm flex items-center justify-center text-brand text-[12px] sm:text-[15px] shrink-0"><i class="fa-solid fa-arrow-up-right-from-square"></i></div>
                             <span class="text-[10px] sm:text-[15px] font-black text-brand dark:text-blue-400 uppercase tracking-widest leading-none truncate">Uplinks</span>
                         </div>
-                        <h3 class="text-3xl sm:text-5xl font-black font-heading tracking-tight text-slate-800 dark:text-white relative z-10 leading-none mt-0.5" x-text="getStats().uplink">0</h3>
+                        <h3 class="text-3xl sm:text-5xl font-black font-heading tracking-tight text-blue-600 dark:text-blue-400 relative z-10 leading-none mt-0.5" x-text="getStats().uplink">0</h3>
                         <p class="text-[10px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 mt-1 sm:mt-1.5 relative z-10 truncate">Backbone 🔵</p>
                     </div>
                     <div @click="haptic('light'); openKpiModal('empty')" class="relative p-2.5 sm:p-3.5 rounded-[1.25rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between bg-amber-50/80 border border-amber-200/70 shadow-sm hover:shadow-md hover:border-amber-300 dark:bg-amber-900/10 dark:border-amber-800/50 dark:hover:border-amber-700/50 w-full xl:w-[150px]">
@@ -384,7 +399,7 @@
                             <div class="w-6 h-6 sm:w-6 sm:h-6 rounded-full bg-white dark:bg-dark_surface shadow-sm flex items-center justify-center text-amber-500 text-[12px] sm:text-[15px] shrink-0"><i class="fa-solid fa-plug"></i></div>
                             <span class="text-[10px] sm:text-[15px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest leading-none truncate">Free</span>
                         </div>
-                        <h3 class="text-3xl sm:text-5xl font-black font-heading tracking-tight text-slate-800 dark:text-white relative z-10 leading-none mt-0.5" x-text="getStats().empty">0</h3>
+                        <h3 class="text-3xl sm:text-5xl font-black font-heading tracking-tight text-amber-600 dark:text-amber-400 relative z-10 leading-none mt-0.5" x-text="getStats().empty">0</h3>
                         <p class="text-[10px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 mt-1 sm:mt-1.5 relative z-10 truncate">Available 🟡</p>
                     </div>
                 </div>
@@ -661,19 +676,31 @@
                         } catch(e){}
                     },
 
+                    // 🫧 SMOOTH LAGGING BUBBLE CURSOR ENGINE (OPTIMIZED)
                     setupCustomCursor() { 
-					    if(!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-					    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-					    const dot = document.createElement('div'); dot.classList.add('custom-dot'); document.body.appendChild(dot);
-					    const ring = document.createElement('div'); ring.classList.add('custom-ring'); document.body.appendChild(ring);
-					    document.addEventListener('mousemove', (e) => {
-						    dot.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%)`;
-						    ring.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%) scale(var(--scale, 1))`;
-					    });
-					    document.body.addEventListener('mouseover', (e) => { if (e.target.closest('a, button, input, select, textarea, .cursor-pointer, [x-on\\:click], [@click]')) document.body.classList.add('cursor-grow'); });
-					    document.body.addEventListener('mouseout', (e) => { if (e.target.closest('a, button, input, select, textarea, .cursor-pointer, [x-on\\:click], [@click]')) document.body.classList.remove('cursor-grow'); });
-				    },
+                        if(!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+                        if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
+                        const ring = document.createElement('div'); 
+                        ring.classList.add('custom-ring'); 
+                        document.body.appendChild(ring);
+
+                        document.addEventListener('mousemove', (e) => {
+                            ring.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%) scale(var(--scale, 1))`;
+                        });
+
+                        document.body.addEventListener('mouseover', (e) => { 
+                            if (e.target.closest('a, button, input, select, textarea, .cursor-pointer, [x-on\\:click], [@click]')) {
+                                document.body.classList.add('cursor-grow'); 
+                            }
+                        });
+                        
+                        document.body.addEventListener('mouseout', (e) => { 
+                            if (e.target.closest('a, button, input, select, textarea, .cursor-pointer, [x-on\\:click], [@click]')) {
+                                document.body.classList.remove('cursor-grow'); 
+                            }
+                        });
+                    },
                     async init() {
                         this.setupCustomCursor();
                         if (this.isDark) document.documentElement.classList.add('dark');
