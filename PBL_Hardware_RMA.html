@@ -76,13 +76,25 @@
         .dark .word { color: #a78bfa; }
         @keyframes cycle-words { 0%, 25% { transform: translateY(0%); } 33%, 58% { transform: translateY(-100%); } 66%, 91% { transform: translateY(-200%); } 100% { transform: translateY(-300%); } }
 
-        /* 🫧 SMOOTH LAGGING BUBBLE CURSOR CSS */
-		@media (hover: hover) and (pointer: fine) { body, a, button, input, select, textarea, .cursor-pointer { cursor: none !important; } }
-		.custom-dot { position: fixed; left: 0; top: 0; width: 8px; height: 8px; background-color: #3b82f6; border-radius: 50%; z-index: 100001; pointer-events: none; transition: transform 0.1s ease-out, opacity 0.2s ease; will-change: transform; }
-		.custom-ring { position: fixed; left: 0; top: 0; width: 30px; height: 30px; border: 2px solid rgba(59, 130, 246, 0.5); border-radius: 50%; z-index: 100000; pointer-events: none; transition: transform 0.35s ease-out, background-color 0.3s ease, border-color 0.3s ease; will-change: transform; }
-		body.cursor-grow .custom-ring { --scale: 2.5; background-color: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.3); backdrop-filter: blur(1.5px); }
-		body.cursor-grow .custom-dot { opacity: 0; }
-		@media (prefers-reduced-motion: reduce), (max-width: 768px) { .custom-dot, .custom-ring { display: none !important; } body, a, button, input, select, textarea, .cursor-pointer { cursor: auto !important; } }
+        /* 🫧 SMOOTH LAGGING BUBBLE CURSOR CSS (HARDWARE ACCELERATED) */
+        @media (hover: hover) and (pointer: fine) { 
+            body, html { 
+                cursor: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24'%3e%3cpath d='M4.5.79v22.42l6.56-6.57h9.29L4.5.79z' fill='%233b82f6' stroke='%23ffffff' stroke-width='1.5' stroke-linejoin='round'/%3e%3c/svg%3e") 2 2, default !important; 
+            }
+            a, button, input, select, textarea, .cursor-pointer, [x-on\:click], [@click] { 
+                cursor: pointer !important; 
+            }
+        }
+        .custom-ring { 
+            position: fixed; left: 0; top: 0; width: 30px; height: 30px; border: 2px solid rgba(59, 130, 246, 0.5); border-radius: 50%; 
+            z-index: 100000; pointer-events: none; 
+            transition: transform 0.35s ease-out, background-color 0.3s ease, border-color 0.3s ease; 
+            will-change: transform; 
+        }
+        body.cursor-grow .custom-ring { --scale: 2.5; background-color: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.3); backdrop-filter: blur(1.5px); }
+        @media (prefers-reduced-motion: reduce), (max-width: 768px) { 
+            .custom-ring { display: none !important; } 
+        }
     </style>
 </head>
 
@@ -159,8 +171,11 @@
                             <i class="fa-solid fa-location-dot opacity-70"></i> <span x-text="currentLocation"></span>
                         </div>
                     </template>
-                    <button @click="toggleTheme()" class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors">
-                        <i class="fa-solid text-[12px] sm:text-[13px]" :class="isDark ? 'fa-sun text-amber-400' : 'fa-moon'"></i>
+                    <button @click="toggleTheme()" class="group relative w-7 h-7 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors">
+                        <i class="fa-solid text-[12px] sm:text-[13px] pointer-events-none" :class="isDark ? 'fa-sun text-amber-400' : 'fa-moon'"></i>
+                        <span class="hidden sm:block absolute top-full mt-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-white dark:bg-white dark:text-slate-800 text-[9px] font-black uppercase tracking-widest rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-[999]">
+                            <span x-text="isDark ? 'Light Mode' : 'Dark Mode'"></span>
+                        </span>
                     </button>
                 </div>
 
@@ -215,7 +230,7 @@
                         </div>
                     </div>
                     <div class="relative z-10 mt-auto">
-                        <h3 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none" x-text="baseFilteredLogs.length">0</h3>
+                        <h3 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-violet-600 dark:text-violet-400 leading-none" x-text="baseFilteredLogs.length">0</h3>
                         <p class="text-[12px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1.5 truncate">Total Claims 📋</p>
                     </div>
                 </div>
@@ -229,7 +244,7 @@
                         </div>
                     </div>
                     <div class="relative z-10 mt-auto">
-                        <h3 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none" x-text="baseFilteredLogs.filter(l => l.status === 'Resolved').length">0</h3>
+                        <h3 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-emerald-600 dark:text-emerald-400 leading-none" x-text="baseFilteredLogs.filter(l => l.status === 'Resolved').length">0</h3>
                         <p class="text-[12px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1.5 truncate">Replaced / Fixed ✅</p>
                     </div>
                 </div>
@@ -243,7 +258,7 @@
                         </div>
                     </div>
                     <div class="relative z-10 mt-auto">
-                        <h3 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none" x-text="baseFilteredLogs.filter(l => l.status === 'AMC Logged').length">0</h3>
+                        <h3 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-blue-600 dark:text-blue-400 leading-none" x-text="baseFilteredLogs.filter(l => l.status === 'AMC Logged').length">0</h3>
                         <p class="text-[12px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1.5 truncate">Waiting for AMC 🧰</p>
                     </div>
                 </div>
@@ -258,7 +273,7 @@
                         </div>
                     </div>
                     <div class="relative z-10 mt-auto">
-                        <h3 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none" x-text="baseFilteredLogs.filter(l => l.status === 'Pending').length">0</h3>
+                        <h3 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-red-600 dark:text-red-400 leading-none" x-text="baseFilteredLogs.filter(l => l.status === 'Pending').length">0</h3>
                         <p class="text-[12px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1.5 truncate">Open Cases 🔴</p>
                     </div>
                 </div>
@@ -722,18 +737,31 @@
                         this.haptic('light');
                     },
 
+                    // 🫧 SMOOTH LAGGING BUBBLE CURSOR ENGINE (OPTIMIZED)
                     setupCustomCursor() { 
-					    if(!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-					    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-					    const dot = document.createElement('div'); dot.classList.add('custom-dot'); document.body.appendChild(dot);
-					    const ring = document.createElement('div'); ring.classList.add('custom-ring'); document.body.appendChild(ring);
-					    document.addEventListener('mousemove', (e) => {
-						    dot.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%)`;
-						    ring.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%) scale(var(--scale, 1))`;
-					    });
-					    document.body.addEventListener('mouseover', (e) => { if (e.target.closest('a, button, input, select, textarea, .cursor-pointer, [x-on\\:click], [@click]')) document.body.classList.add('cursor-grow'); });
-					    document.body.addEventListener('mouseout', (e) => { if (e.target.closest('a, button, input, select, textarea, .cursor-pointer, [x-on\\:click], [@click]')) document.body.classList.remove('cursor-grow'); });
-				    },
+                        if(!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+                        if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+                        const ring = document.createElement('div'); 
+                        ring.classList.add('custom-ring'); 
+                        document.body.appendChild(ring);
+
+                        document.addEventListener('mousemove', (e) => {
+                            ring.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%) scale(var(--scale, 1))`;
+                        });
+
+                        document.body.addEventListener('mouseover', (e) => { 
+                            if (e.target.closest('a, button, input, select, textarea, .cursor-pointer, [x-on\\:click], [@click]')) {
+                                document.body.classList.add('cursor-grow'); 
+                            }
+                        });
+                        
+                        document.body.addEventListener('mouseout', (e) => { 
+                            if (e.target.closest('a, button, input, select, textarea, .cursor-pointer, [x-on\\:click], [@click]')) {
+                                document.body.classList.remove('cursor-grow'); 
+                            }
+                        });
+                    },
 
                     async init() {
                         this.setupCustomCursor();
