@@ -24,7 +24,7 @@
             theme: {
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'], heading: ['Outfit', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
-                    colors: { brand: '#3b82f6', dark_bg: '#020617', dark_surface: '#0f172a' }
+                    colors: { brand: '#10b981', brand_glow: '#34d399', dark_bg: '#020617', dark_surface: '#0f172a' }
                 }
             }
         }
@@ -74,18 +74,25 @@
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #3b82f6; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* 🫧 SMOOTH LAGGING BUBBLE CURSOR CSS */
-		@media (hover: hover) and (pointer: fine) {
-			body, a, button, input, select, textarea, .cursor-pointer { cursor: none !important; }
-		}
-		.custom-dot { position: fixed; left: 0; top: 0; width: 8px; height: 8px; background-color: #3b82f6; border-radius: 50%; z-index: 100001; pointer-events: none; transition: transform 0.1s ease-out, opacity 0.2s ease; will-change: transform; }
-		.custom-ring { position: fixed; left: 0; top: 0; width: 30px; height: 30px; border: 2px solid rgba(59, 130, 246, 0.5); border-radius: 50%; z-index: 100000; pointer-events: none; transition: transform 0.35s ease-out, background-color 0.3s ease, border-color 0.3s ease; will-change: transform; }
-		body.cursor-grow .custom-ring { --scale: 2.5; background-color: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.3); backdrop-filter: blur(1.5px); }
-		body.cursor-grow .custom-dot { opacity: 0; }
-		@media (prefers-reduced-motion: reduce), (max-width: 768px) {
-			.custom-dot, .custom-ring { display: none !important; }
-			body, a, button, input, select, textarea, .cursor-pointer { cursor: auto !important; }
-		}
+        /* 🫧 SMOOTH LAGGING BUBBLE CURSOR CSS (HARDWARE ACCELERATED) */
+        @media (hover: hover) and (pointer: fine) { 
+            body, html { 
+                cursor: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24'%3e%3cpath d='M4.5.79v22.42l6.56-6.57h9.29L4.5.79z' fill='%233b82f6' stroke='%23ffffff' stroke-width='1.5' stroke-linejoin='round'/%3e%3c/svg%3e") 2 2, default !important; 
+            }
+            a, button, input, select, textarea, .cursor-pointer, [x-on\:click], [@click] { 
+                cursor: pointer !important; 
+            }
+        }
+        .custom-ring { 
+            position: fixed; left: 0; top: 0; width: 30px; height: 30px; border: 2px solid rgba(59, 130, 246, 0.5); border-radius: 50%; 
+            z-index: 100000; pointer-events: none; 
+            transition: transform 0.35s ease-out, background-color 0.3s ease, border-color 0.3s ease; 
+            will-change: transform; 
+        }
+        body.cursor-grow .custom-ring { --scale: 2.5; background-color: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.3); backdrop-filter: blur(1.5px); }
+        @media (prefers-reduced-motion: reduce), (max-width: 768px) { 
+            .custom-ring { display: none !important; } 
+        }
     </style>
 </head>
 
@@ -104,10 +111,10 @@
                 </a>
                 <div class="flex flex-col justify-center">
                     <div class="flex items-center gap-2 mb-0.5">
-                        <span class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/30 dark:text-emerald-400 font-mono font-black text-[9px] leading-none shadow-sm" x-text="PBL_APP_VERSION"></span>
+                        <span class="px-2 py-0.5 rounded-md bg-brand/10 text-brand border border-brand/20 dark:bg-brand/20 dark:border-brand/30 dark:text-brand_glow font-mono font-black text-[9px] leading-none shadow-sm" x-text="PBL_APP_VERSION"></span>
                         <span class="hidden sm:inline-block text-[9px] font-black text-slate-400 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-md">HR OPERATIONS</span>
                     </div>
-                    <h2 class="font-heading font-black text-lg sm:text-2xl text-slate-800 dark:text-white leading-tight tracking-tight mt-0.5">Leave<span class="text-emerald-500">Tracker</span></h2>
+                    <h2 class="font-heading font-black text-lg sm:text-2xl text-slate-800 dark:text-white leading-tight tracking-tight mt-0.5">Leave<span class="text-brand dark:text-brand_glow">Tracker</span></h2>
                 </div>
             </div>
 
@@ -128,7 +135,7 @@
             </div>
 
             <div class="flex items-center justify-end gap-1.5 sm:gap-4 w-auto relative z-30 shrink-0">
-                <button @click="showApplyModal = true" class="hidden sm:flex items-center gap-1.5 h-9 px-4 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white transition-all shadow-[0_4px_10px_-2px_rgba(16,185,129,0.5)] font-bold text-[11px] active:scale-95 shrink-0">
+                <button @click="showApplyModal = true" class="hidden sm:flex items-center gap-1.5 h-9 px-4 rounded-full bg-brand hover:bg-emerald-600 text-white transition-all shadow-[0_4px_10px_-2px_rgba(16,185,129,0.5)] font-bold text-[11px] active:scale-95 shrink-0">
                     <i class="fa-solid fa-calendar-plus text-[13px]"></i> <span class="tracking-wide">Apply Leave</span>
                 </button>
                 <button @click="showApplyModal = true" class="sm:hidden w-8 h-8 flex items-center justify-center rounded-full bg-emerald-500 text-white shadow-md active:scale-95 shrink-0">
@@ -148,8 +155,11 @@
                             <i class="fa-solid fa-location-dot opacity-70"></i> <span x-text="currentLocation"></span>
                         </div>
                     </template>
-                    <button @click="toggleTheme()" class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors">
-                        <i class="fa-solid text-[12px] sm:text-[13px]" :class="isDark ? 'fa-sun text-amber-400' : 'fa-moon'"></i>
+                    <button @click="toggleTheme()" class="group relative w-7 h-7 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors">
+                        <i class="fa-solid text-[12px] sm:text-[13px] pointer-events-none" :class="isDark ? 'fa-sun text-amber-400' : 'fa-moon'"></i>
+                        <span class="hidden sm:block absolute top-full mt-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-white dark:bg-white dark:text-slate-800 text-[9px] font-black uppercase tracking-widest rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-[999]">
+                            <span x-text="isDark ? 'Light Mode' : 'Dark Mode'"></span>
+                        </span>
                     </button>
                 </div>
 
@@ -157,7 +167,7 @@
 
                 <div class="relative shrink-0" @click.outside="showProfile = false">
                     <div @click="showProfile = !showProfile" class="flex items-center gap-1.5 sm:gap-2 cursor-pointer group rounded-xl p-0 sm:p-1 sm:pr-2 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
-                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white text-[11px] sm:text-xs font-black shadow-md border border-white/20 relative shrink-0">
+                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-brand to-teal-600 flex items-center justify-center text-white text-[11px] sm:text-xs font-black shadow-md border border-white/20 relative shrink-0">
                             <span x-text="userInitials"></span>
                             <div class="absolute -bottom-1 -right-1 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-emerald-500 border-2 border-white dark:border-dark_surface rounded-full shadow-sm"></div>
                         </div>
@@ -194,21 +204,21 @@
                     <div @click="openPolicy('CL')" class="bg-white dark:bg-dark_surface p-3 sm:p-5 rounded-[1.5rem] shadow-sm border border-emerald-100 dark:border-emerald-900/30 flex flex-col relative overflow-hidden transition hover:-translate-y-1 hover:shadow-md cursor-pointer active:scale-95 group">
                         <div class="absolute -right-4 -top-4 text-5xl sm:text-7xl text-emerald-500 opacity-5 group-hover:scale-110 transition-transform duration-500"><i class="fa-solid fa-mug-hot"></i></div>
                         <span class="text-[8px] sm:text-[11px] font-black uppercase text-emerald-600 dark:text-emerald-400 tracking-tight sm:tracking-widest mb-1 leading-tight whitespace-normal break-words line-clamp-2 sm:truncate">Casual Leave (CL)</span>
-                        <h2 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading text-slate-800 dark:text-white mb-2 sm:mb-3 leading-none mt-1"><span x-text="balance.cl"></span> <span class="text-[10px] sm:text-sm text-slate-400 font-bold">/ 7</span></h2>
+                        <h2 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading text-emerald-600 dark:text-emerald-400 mb-2 sm:mb-3 leading-none mt-1"><span x-text="balance.cl"></span> <span class="text-[10px] sm:text-sm text-slate-400 font-bold">/ 7</span></h2>
                         <div class="w-full bg-slate-100 dark:bg-black/30 h-1.5 sm:h-2 rounded-full mt-auto"><div class="bg-emerald-500 h-full rounded-full transition-all" :style="`width: ${(balance.cl/7)*100}%`"></div></div>
                     </div>
                     
                     <div @click="openPolicy('ML')" class="bg-white dark:bg-dark_surface p-3 sm:p-5 rounded-[1.5rem] shadow-sm border border-rose-100 dark:border-rose-900/30 flex flex-col relative overflow-hidden transition hover:-translate-y-1 hover:shadow-md cursor-pointer active:scale-95 group">
                         <div class="absolute -right-4 -top-4 text-5xl sm:text-7xl text-rose-500 opacity-5 group-hover:scale-110 transition-transform duration-500"><i class="fa-solid fa-briefcase-medical"></i></div>
                         <span class="text-[8px] sm:text-[11px] font-black uppercase text-rose-600 dark:text-rose-400 tracking-tight sm:tracking-widest mb-1 leading-tight whitespace-normal break-words line-clamp-2 sm:truncate">Sick Leave (ML)</span>
-                        <h2 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading text-slate-800 dark:text-white mb-2 sm:mb-3 leading-none mt-1"><span x-text="balance.ml"></span> <span class="text-[10px] sm:text-sm text-slate-400 font-bold">/ 7</span></h2>
+                        <h2 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading text-rose-600 dark:text-rose-400 mb-2 sm:mb-3 leading-none mt-1"><span x-text="balance.ml"></span> <span class="text-[10px] sm:text-sm text-slate-400 font-bold">/ 7</span></h2>
                         <div class="w-full bg-slate-100 dark:bg-black/30 h-1.5 sm:h-2 rounded-full mt-auto"><div class="bg-rose-500 h-full rounded-full transition-all" :style="`width: ${(balance.ml/7)*100}%`"></div></div>
                     </div>
 
                     <div @click="openPolicy('PL')" class="bg-white dark:bg-dark_surface p-3 sm:p-5 rounded-[1.5rem] shadow-sm border border-blue-100 dark:border-blue-900/30 flex flex-col relative overflow-hidden transition hover:-translate-y-1 hover:shadow-md cursor-pointer active:scale-95 group">
                         <div class="absolute -right-4 -top-4 text-5xl sm:text-7xl text-blue-500 opacity-5 group-hover:scale-110 transition-transform duration-500"><i class="fa-solid fa-plane-departure"></i></div>
                         <span class="text-[8px] sm:text-[11px] font-black uppercase text-blue-600 dark:text-blue-400 tracking-tight sm:tracking-widest mb-1 leading-tight whitespace-normal break-words line-clamp-2 sm:truncate">Privilege Leave (PL)</span>
-                        <h2 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading text-slate-800 dark:text-white mb-2 sm:mb-3 leading-none mt-1"><span x-text="balance.pl"></span> <span class="text-[10px] sm:text-sm text-slate-400 font-bold">/ 18</span></h2>
+                        <h2 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading text-blue-600 dark:text-blue-400 mb-2 sm:mb-3 leading-none mt-1"><span x-text="balance.pl"></span> <span class="text-[10px] sm:text-sm text-slate-400 font-bold">/ 18</span></h2>
                         <div class="w-full bg-slate-100 dark:bg-black/30 h-1.5 sm:h-2 rounded-full mt-auto"><div class="bg-blue-500 h-full rounded-full transition-all" :style="`width: ${(balance.pl/18)*100}%`"></div></div>
                     </div>
                 </div>
@@ -947,18 +957,31 @@
                     return { name: 'GENERAL SHIFT', time: '09:30 AM - 05:30 PM', timeLeft: `${h}H ${m}M LEFT`, isOver: false };
                 },
 
-                setupCustomCursor() { 
-					if(!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-					if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-					const dot = document.createElement('div'); dot.classList.add('custom-dot'); document.body.appendChild(dot);
-					const ring = document.createElement('div'); ring.classList.add('custom-ring'); document.body.appendChild(ring);
-					document.addEventListener('mousemove', (e) => {
-						dot.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%)`;
-						ring.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%) scale(var(--scale, 1))`;
-					});
-					document.body.addEventListener('mouseover', (e) => { if (e.target.closest('a, button, input, select, textarea, .cursor-pointer, [x-on\\:click], [@click]')) document.body.classList.add('cursor-grow'); });
-					document.body.addEventListener('mouseout', (e) => { if (e.target.closest('a, button, input, select, textarea, .cursor-pointer, [x-on\\:click], [@click]')) document.body.classList.remove('cursor-grow'); });
-				},
+                // 🫧 SMOOTH LAGGING BUBBLE CURSOR ENGINE (OPTIMIZED)
+                    setupCustomCursor() { 
+                        if(!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+                        if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+                        const ring = document.createElement('div'); 
+                        ring.classList.add('custom-ring'); 
+                        document.body.appendChild(ring);
+
+                        document.addEventListener('mousemove', (e) => {
+                            ring.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%) scale(var(--scale, 1))`;
+                        });
+
+                        document.body.addEventListener('mouseover', (e) => { 
+                            if (e.target.closest('a, button, input, select, textarea, .cursor-pointer, [x-on\\:click], [@click]')) {
+                                document.body.classList.add('cursor-grow'); 
+                            }
+                        });
+                        
+                        document.body.addEventListener('mouseout', (e) => { 
+                            if (e.target.closest('a, button, input, select, textarea, .cursor-pointer, [x-on\\:click], [@click]')) {
+                                document.body.classList.remove('cursor-grow'); 
+                            }
+                        });
+                    },
 
                 init() {
                     this.setupCustomCursor();
