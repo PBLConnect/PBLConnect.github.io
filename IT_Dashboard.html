@@ -548,8 +548,9 @@
                     </a>
 
                    <!-- 🚀 IT SEC AUDIT CARD (ENHANCED VISIBLE GLOW & NEON EDGE) -->
-                    <a @click.prevent="haptic('light'); openAuditModal()" 
-                       class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-indigo-50/80 to-white/80 border border-indigo-200/60 dark:from-indigo-900/10 dark:to-dark_surface/80 dark:border-indigo-800/30 dark:hover:border-indigo-400/50"
+<a x-show="currentLocation === 'Noida' ? ['vikas', 'anil', 'ashok'].some(n => (currentUser?.name || '').toLowerCase().includes(n)) : ['vikas', 'deependra'].some(n => (currentUser?.name || '').toLowerCase().includes(n))" 
+   @click.prevent="haptic('light'); openAuditModal()" 
+   class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-indigo-50/80 to-white/80 border border-indigo-200/60 dark:from-indigo-900/10 dark:to-dark_surface/80 dark:border-indigo-800/30 dark:hover:border-indigo-400/50"
                        :class="
                             auditMeta.status === 'Overdue' 
                             ? '!border-red-500 shadow-[0_0_30px_rgba(239,68,68,0.65)] ring-1 ring-red-400/50' 
@@ -584,13 +585,14 @@
                         </div>
                         
                         <!-- Bottom Row (Text) -->
-                        <div class="relative z-10 mt-auto">
+                        <div class="relative z-10 mt-auto w-full">
                             <h3 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">IT Sec Audit</h3>
                             
                             <!-- Tightly stacked 2 lines to prevent layout shift -->
-                            <div class="mt-1 flex flex-col gap-0.5">
+                            <div class="mt-1 flex flex-col gap-0.5 w-full">
                                 <span class="text-[11px] sm:text-[13px] font-bold truncate transition-colors duration-300 text-slate-500 dark:text-slate-400 leading-tight" x-text="auditMeta.status === 'Overdue' ? 'Action Required 🚨' : (auditMeta.status === 'Draft' ? 'In Progress 📝' : (auditMeta.status === 'Submitted' ? 'Completed ✅' : 'Audit Open 🛡️'))"></span>
-                                <span x-show="auditMeta.status !== 'Submitted'" x-cloak class="font-mono text-[8.5px] sm:text-[9.5px] font-black text-slate-800 dark:text-white drop-shadow-md truncate leading-none" x-text="auditMeta.cycle"></span>
+                                <!-- 🚀 Smart Fix: Removed truncate, allowing text to wrap naturally up to 2 lines -->
+                                <span x-show="auditMeta.status !== 'Submitted'" x-cloak class="font-mono text-[8.5px] sm:text-[9.5px] font-black text-slate-800 dark:text-white drop-shadow-md whitespace-normal line-clamp-2 leading-snug break-words" x-text="auditMeta.cycle"></span>
                             </div>
                         </div>
                     </a>
@@ -928,16 +930,17 @@
                         </h3>
                         
                         <!-- Pulsing Smart Badge for Cycle -->
-                        <div class="flex items-center gap-1.5">
-                            <span class="px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30 text-[8px] sm:text-[9px] font-black uppercase tracking-widest shadow-sm flex items-center gap-1.5">
-                                <span class="relative flex h-1.5 w-1.5 shrink-0">
-                                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                                  <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-indigo-500"></span>
-                                </span>
-                                <span x-text="auditMeta.cycle" class="truncate max-w-[150px] sm:max-w-full"></span>
-                            </span>
-                            <span class="hidden sm:flex text-[8px] text-slate-400 uppercase tracking-widest font-bold items-center gap-1"><i class="fa-solid fa-shield-halved opacity-50"></i> Protocol</span>
-                        </div>
+						<div class="flex items-center gap-1.5 mt-1 sm:mt-0">
+							<span class="px-2.5 py-1 sm:py-0.5 rounded-lg sm:rounded-md bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30 text-[8px] sm:text-[9px] font-black uppercase tracking-widest shadow-sm flex items-center gap-1.5">
+								<span class="relative flex h-1.5 w-1.5 shrink-0">
+								  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+								  <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-indigo-500"></span>
+								</span>
+								<!-- 🚀 Smart Fix: Allows text to naturally wrap on mobile instead of showing dots (...) -->
+								<span x-text="auditMeta.cycle" class="whitespace-normal sm:whitespace-nowrap leading-tight max-w-[165px] sm:max-w-full text-left"></span>
+							</span>
+							<span class="hidden sm:flex text-[8px] text-slate-400 uppercase tracking-widest font-bold items-center gap-1"><i class="fa-solid fa-shield-halved opacity-50"></i> Protocol</span>
+						</div>
                     </div>
                 </div>
                 
@@ -1726,7 +1729,8 @@
                     return "";
                 },
 
-                masterAuditPoints: [
+                // 🏢 NOIDA AUDIT CHECKLIST (15 Standard Points)
+                noidaAuditPoints: [
                     // 🧱 PHASE 1: Core Infrastructure & Backups
                     { id: 'p1', title: '1. 🧱 SonicWall TZ270 Firewall Maintenance', desc: 'Login to the <span class="font-bold text-orange-500 dark:text-orange-400">SonicWall TZ270</span> to check for pending firmware updates and securely export the latest configuration backup.' },
                     { id: 'p2', title: '2. 💾 WinSvr100 (DC) Backup Integrity', desc: 'Verify that the daily <span class="font-bold text-blue-500 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-1 rounded">System State</span> and <span class="font-bold text-blue-500 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-1 rounded">Event Logs</span> backups for the Domain Controller are executing successfully without errors.' },
@@ -1737,10 +1741,10 @@
                     { id: 'p5', title: '5. 🔐 Server Room Access Review', desc: 'Audit physical entry/exit register against <span class="font-bold text-teal-600 dark:text-teal-400">Access Control/CCTV</span> logs for the last 15 days.' },
                     { id: 'p6', title: '6. 🖥️ Hardware & Asset Audit', desc: 'Cross-verify physical workstations and storage devices against the active <span class="font-bold text-indigo-500 dark:text-indigo-400">AssetDB</span> count.' },
                     { id: 'p7', title: '7. 🛠️ AMC & Vendor RMA Logs', desc: 'Audit hardware replacement history and ensure all vendor calls have valid <span class="font-bold text-sky-500 dark:text-sky-400">Case IDs</span> mapped.' },
-                    { id: 'p8', title: '8. 💥 Faulty Hardware Disposal', desc: 'Verify that defective storage drives (HDD) are <span class="font-bold text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-500/10 px-1 rounded">physically destroyed</span> before vendor handover.' },
+                    { id: 'p8', title: '8. 💥 Faulty Hardware Disposal', desc: 'Verify that defective storage drives HDD are <span class="font-bold text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-500/10 px-1 rounded">physically destroyed</span> before vendor handover.' },
 
                     // 💻 PHASE 3: Endpoint & Software Health
-                    { id: 'p9', title: '9. 🛡️ Endpoint Antivirus & License Health', desc: 'Ensure <span class="font-bold text-violet-500 dark:text-violet-400">Sophos Endpoint Protection</span> agents are running. Log in to the Sophos Dashboard to cross-verify active vs. remaining licenses for compliance.' },
+                    { id: 'p9', title: '9. 🛡️ Endpoint Antivirus & License Health', desc: 'Ensure <span class="font-bold text-violet-500 dark:text-violet-400">Sophos</span> agents are running. Log in to the Sophos Dashboard to cross-verify active vs. remaining licenses for compliance.' },
                     { id: 'p10', title: '10. 💿 Software Compliance & Free-ware Scan', desc: 'Audit one-time purchase (perpetual) licenses against installed counts and identify <span class="font-bold text-rose-500 dark:text-rose-400">commercial violations</span> by catching personal-use apps like <span class="font-bold text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-500/10 px-1 rounded">WinRAR, AnyDesk, or TeamViewer</span>.' },
                     { id: 'p11', title: '11. 🚫 USB Port Security Check', desc: 'Random physical testing on floor PCs to ensure Mass Storage restriction policy is <span class="font-bold text-emerald-600 dark:text-emerald-400">strictly active</span>.' },
 
@@ -1750,6 +1754,145 @@
                     { id: 'p14', title: '14. 🕵️‍♂️ Clean Desk & Screen Lock Policy', desc: 'Physical floor audit to ensure unattended PCs are <span class="font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-1 rounded">locked (Win + L)</span> and no sensitive passwords are left on <span class="font-bold text-rose-500 dark:text-rose-400 italic">sticky notes</span>.' },
                     { id: 'p15', title: '15. 📅 IT Renewals & Certificate Calendar', desc: 'Ensure upcoming expiry dates for <span class="font-bold text-blue-500 dark:text-blue-400">domain names, SSL certificates</span>, and ISP contracts are <span class="font-bold text-emerald-600 dark:text-emerald-400">actively tracked</span>.' }
                 ],
+
+                // ⛰️ DEHRADUN AUDIT CHECKLIST (15 Standard Points - Dehradun Specific Variables)
+                ddnAuditPoints: [
+                    // 🧱 PHASE 1: Core Infrastructure & Backups
+                    { id: 'd1', title: '1. 🧱 SonicWall TZ270 Firewall Maintenance', desc: 'Login to the <span class="font-bold text-orange-500 dark:text-orange-400">SonicWall TZ270</span> to check for pending firmware updates and securely export the latest configuration backup.' },
+                    { id: 'd2', title: '2. 💾 S08DD001 (DC) Backup Integrity', desc: 'Verify that the daily <span class="font-bold text-blue-500 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-1 rounded">System State</span> and <span class="font-bold text-blue-500 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-1 rounded">Event Logs</span> backups for the Domain Controller (S08DD001) are executing successfully without errors.' },
+                    { id: 'd3', title: '3. 🔄 Backup Restore Validation', desc: 'Perform an actual dummy file restore test from the backup PC, <span class="font-bold text-amber-500 dark:text-amber-400 italic">avoiding blind trust</span> on "Success" emails.' },
+                    { id: 'd4', title: '4. 📡 WAN & Network Reliability', desc: 'Analyze ISP downtime logs over the last 30 days and review <span class="font-bold text-blue-500 dark:text-blue-400">RCA (Root Cause Analysis)</span> reports.' },
+
+                    // 🔐 PHASE 2: Hardware & Physical Security
+                    { id: 'd5', title: '5. 🔐 Server Room Access Review', desc: 'Audit physical entry/exit register against <span class="font-bold text-teal-600 dark:text-teal-400">Access Control/CCTV</span> logs for the last 15 days.' },
+                    { id: 'd6', title: '6. 🖥️ Hardware & Asset Audit', desc: 'Cross-verify physical workstations and storage devices against the active <span class="font-bold text-indigo-500 dark:text-indigo-400">AssetDB</span> count.' },
+                    { id: 'd7', title: '7. 🛠️ AMC & Vendor RMA Logs', desc: 'Audit hardware replacement history and ensure all vendor calls have valid <span class="font-bold text-sky-500 dark:text-sky-400">Case IDs</span> mapped.' },
+                    { id: 'd8', title: '8. 💥 Faulty Hardware Disposal', desc: 'Verify that defective storage drives HDD are <span class="font-bold text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-500/10 px-1 rounded">physically destroyed</span> before vendor handover.' },
+
+                    // 💻 PHASE 3: Endpoint & Software Health
+                    { id: 'd9', title: '9. 🛡️ Endpoint Antivirus & License Health', desc: 'Ensure <span class="font-bold text-violet-500 dark:text-violet-400">Seqrite</span> agents are running. Log in to the Seqrite Endpoint Dashboard to cross-verify active vs. remaining licenses for compliance.' },
+                    { id: 'd10', title: '10. 💿 Software Compliance & Free-ware Scan', desc: 'Audit one-time purchase (perpetual) licenses against installed counts and identify <span class="font-bold text-rose-500 dark:text-rose-400">commercial violations</span> by catching personal-use apps like <span class="font-bold text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-500/10 px-1 rounded">WinRAR, AnyDesk, or TeamViewer</span>.' },
+                    { id: 'd11', title: '11. 🚫 USB Port Security Check', desc: 'Random physical testing on floor PCs to ensure Mass Storage restriction policy is <span class="font-bold text-emerald-600 dark:text-emerald-400">strictly active</span>.' },
+
+                    // 👨‍💻 PHASE 4: Identity, Data & Floor Governance
+                    { id: 'd12', title: '12. 🚷 Active Directory (AD) Cleanup', desc: 'Verify that AD accounts for all recently resigned employees are <span class="font-bold text-rose-600 dark:text-rose-400 uppercase">disabled</span>.' },
+                    { id: 'd13', title: '13. 📁 Shared Drive Sanity Scan', desc: 'Inspect central file server to remove personal or unwanted media files.' },
+                    { id: 'd14', title: '14. 🕵️‍♂️ Clean Desk & Screen Lock Policy', desc: 'Physical floor audit to ensure unattended PCs are <span class="font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-1 rounded">locked (Win + L)</span> and no sensitive passwords are left on <span class="font-bold text-rose-500 dark:text-rose-400 italic">sticky notes</span>.' },
+                    { id: 'd15', title: '15. 📅 IT Renewals & Certificate Calendar', desc: 'Ensure upcoming expiry dates for <span class="font-bold text-blue-500 dark:text-blue-400">domain names, SSL certificates</span>, and ISP contracts are <span class="font-bold text-emerald-600 dark:text-emerald-400">actively tracked</span>.' }
+                ],
+
+                // 🔄 Dynamic Checklist Getter
+                get currentAuditTemplate() {
+                    return this.currentLocation === 'Dehradun' ? this.ddnAuditPoints : this.noidaAuditPoints;
+                },
+
+                // ⏱️ Dynamic Cycle Generator (15-day vs Monthly)
+                calculateAuditCycle() {
+                    const d = new Date();
+                    const date = d.getDate();
+                    const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+                    const month = monthNames[d.getMonth()];
+                    const year = d.getFullYear();
+
+                    if (this.currentLocation === 'Dehradun') {
+                        // ⛰️ DEHRADUN: Monthly Audit (1st to 7th)
+                        this.auditMeta.cycle = `Dehradun Monthly Audit - ${month} ${year}`;
+                        this.auditMeta.auditor = "Deependra Singh";
+                        this.auditMeta.status = date > 7 ? 'Overdue' : 'Active';
+                        
+                        const diffDays = 7 - date;
+                        if (diffDays < 0) this.auditMeta.deadlineText = `Overdue by ${Math.abs(diffDays)} days 🚨`;
+                        else if (diffDays === 0) this.auditMeta.deadlineText = `Last day to submit! ⏳`;
+                        else this.auditMeta.deadlineText = `${diffDays} days remaining ⏳`;
+
+                    } else {
+                        // 🏢 NOIDA: Bi-Monthly Audit
+                        let deadlineDate;
+                        if (date <= 14) {
+                            // 🚀 Smart Fix: Added 'Noida Audit' for branch clarity and symmetry
+                            this.auditMeta.cycle = `Noida Audit - Cycle 01 (1st to 7th ${month})`;
+                            this.auditMeta.auditor = "Anil Singh";
+                            this.auditMeta.status = date > 7 ? 'Overdue' : 'Active';
+                            deadlineDate = new Date(year, d.getMonth(), 7);
+                        } else {
+                            // 🚀 Smart Fix: Added 'Noida Audit' for branch clarity and symmetry
+                            this.auditMeta.cycle = `Noida Audit - Cycle 02 (15th to 21st ${month})`;
+                            this.auditMeta.auditor = "Ashok Singh";
+                            this.auditMeta.status = date > 21 ? 'Overdue' : 'Active';
+                            deadlineDate = new Date(year, d.getMonth(), 21);
+                        }
+                        const diffDays = Math.ceil((deadlineDate - d) / (1000 * 60 * 60 * 24));
+                        if (diffDays < 0) this.auditMeta.deadlineText = `Overdue by ${Math.abs(diffDays)} days 🚨`;
+                        else if (diffDays === 0) this.auditMeta.deadlineText = `Last day! ⏳`;
+                        else this.auditMeta.deadlineText = `${diffDays} days remaining ⏳`;
+                    }
+                },
+
+                // 1️⃣ CACHE PROCESSOR HELPER
+                processAuditData(data) {
+                    this.allAudits = data.audits || []; 
+                    const current = this.allAudits.find(a => a.cycle === this.auditMeta.cycle);
+                    
+                    if (current) {
+                        this.auditMeta.status = current.status;
+                        this.auditMeta.date = current.date;
+                        if (current.status === 'Submitted') {
+                            this.auditMeta.deadlineText = "Audit Completed 🎉";
+                        }
+                        const parsedDetails = JSON.parse(current.details);
+                        // Map against the currently active location template
+                        this.auditForm.points = this.currentAuditTemplate.map(masterPt => {
+                            const savedPt = parsedDetails[masterPt.id] || Object.values(parsedDetails).find(p => p.id === masterPt.id);
+                            return {
+                                ...masterPt, 
+                                status: savedPt ? savedPt.status : '',
+                                remarks: savedPt ? savedPt.remarks : '',
+                                severity: savedPt ? savedPt.severity : ''
+                            };
+                        });
+                        this.auditForm.summary = current.summary || '';
+                    } else {
+                        // Empty form for new audit
+                        this.auditForm.points = this.currentAuditTemplate.map(p => ({ ...p, status: '', remarks: '', severity: '' }));
+                        this.auditForm.summary = '';
+                    }
+                },
+
+                // 2️⃣ MAIN LOAD FUNCTION
+                async checkAuditStatus() {
+                    this.calculateAuditCycle();
+                    
+                    // ⚡ STEP 1: INSTANT CACHE LOAD (0.1s mein purana draft show karega)
+                    try {
+                        const cachedAudit = localStorage.getItem('pbl_audit_cache');
+                        if (cachedAudit) {
+                            this.processAuditData(JSON.parse(cachedAudit));
+                        }
+                    } catch(e) {}
+
+                    // 🔄 STEP 2: BACKGROUND SYNC (Google Sheet se silently naya data layega)
+                    try {
+                        const res = await fetch(API_URL + '?action=getBiMonthlyAudit');
+                        const data = await res.json();
+                        
+                        // Cache update kardo future ke liye
+                        try { localStorage.setItem('pbl_audit_cache', JSON.stringify(data)); } catch(e) {}
+                        
+                        // Data refresh in UI
+                        this.processAuditData(data);
+                    } catch(e) { console.error(e); }
+                },
+
+                // 🔓 Open Modal Logic
+                openAuditModal() {
+                    this.auditSecret = '';
+                    this.viewAuditHistory = false;
+                    // Reset if array length mismatches (e.g. switched branch)
+                    if (this.auditForm.points.length === 0 || this.auditForm.points[0].id !== this.currentAuditTemplate[0].id) {
+                        this.auditForm.points = this.currentAuditTemplate.map(p => ({ ...p, status: '', remarks: '', severity: '' }));
+                    }
+                    this.showAuditModal = true;
+                },
 			
                 loading: true, 
                 tickets: [],
@@ -1953,14 +2096,20 @@
 				
 				// 📍 TOGGLE LOGIC
                 toggleLocation() {
-				if (!this.isGlobal) return;
-				this.haptic('light');
-				this.currentLocation = this.currentLocation === 'Noida' ? 'Dehradun' : 'Noida';
-				localStorage.setItem('pbl_loc_pref', this.currentLocation);
-				this.updateKPIs();
-				// 🚀 Smart Fix: Wait 50ms for Alpine to update the DOM container dimensions before drawing
-				setTimeout(() => { this.renderChart(); }, 50);
-			},
+                    if (!this.isGlobal) return;
+                    this.haptic('light');
+                    this.currentLocation = this.currentLocation === 'Noida' ? 'Dehradun' : 'Noida';
+                    localStorage.setItem('pbl_loc_pref', this.currentLocation);
+                    
+                    // Update Tickets & KPIs
+                    this.updateKPIs();
+                    
+                    // 🚀 SMART FIX: Instantly recalculate & load Audit Status/Cycle for the new location
+                    this.checkAuditStatus();
+
+                    // 🚀 Smart Fix: Wait 50ms for Alpine to update the DOM container dimensions before drawing
+                    setTimeout(() => { this.renderChart(); }, 50);
+                },
 
                 // 📍 SMART LOCATION FILTERING LOGIC
                 get filteredTickets() {
@@ -2352,100 +2501,8 @@
                     if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); this.highlightLog = true; setTimeout(() => this.highlightLog = false, 2000); } 
                 },
 
-                calculateAuditCycle() {
-                    const d = new Date();
-                    const date = d.getDate();
-                    const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
-                    const month = monthNames[d.getMonth()];
-                    const year = d.getFullYear();
-
-                    let deadlineDate;
-                    if (date <= 14) {
-                        this.auditMeta.cycle = `Cycle 01 (1st to 7th ${month})`;
-                        this.auditMeta.auditor = "Anil Singh";
-                        this.auditMeta.status = date > 7 ? 'Overdue' : 'Active';
-                        deadlineDate = new Date(year, d.getMonth(), 7, 23, 59, 59);
-                    } else {
-                        this.auditMeta.cycle = `Cycle 02 (15th to 21st ${month})`;
-                        this.auditMeta.auditor = "Ashok Singh";
-                        this.auditMeta.status = date > 21 ? 'Overdue' : 'Active';
-                        deadlineDate = new Date(year, d.getMonth(), 21, 23, 59, 59);
-                    }
-
-                    // ⏳ Calculate Days Left
-                    const diffTime = deadlineDate - d;
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                    
-                    if (diffDays < 0) {
-                        this.auditMeta.deadlineText = `Overdue by ${Math.abs(diffDays)} days 🚨`;
-                    } else if (diffDays === 0) {
-                        this.auditMeta.deadlineText = `Last day to submit! ⏳`;
-                    } else {
-                        this.auditMeta.deadlineText = `${diffDays} days remaining ⏳`;
-                    }
-                },
-
-                // 1️⃣ NAYA HELPER FUNCTION ADD KARO (Data Map karne ke liye)
-				processAuditData(data) {
-					this.allAudits = data.audits || []; 
-					const current = this.allAudits.find(a => a.cycle === this.auditMeta.cycle);
-					
-					if (current) {
-						this.auditMeta.status = current.status;
-						this.auditMeta.date = current.date;
-						if (current.status === 'Submitted') {
-							this.auditMeta.deadlineText = "Audit Completed 🎉";
-						}
-						const parsedDetails = JSON.parse(current.details);
-						this.auditForm.points = this.masterAuditPoints.map(masterPt => {
-							const savedPt = parsedDetails[masterPt.id] || Object.values(parsedDetails).find(p => p.id === masterPt.id);
-							return {
-								...masterPt, 
-								status: savedPt ? savedPt.status : '',
-								remarks: savedPt ? savedPt.remarks : '',
-								severity: savedPt ? savedPt.severity : ''
-							};
-						});
-						this.auditForm.summary = current.summary || '';
-					} else {
-						this.auditForm.points = this.masterAuditPoints.map(p => ({ ...p, status: '', remarks: '', severity: '' }));
-						this.auditForm.summary = '';
-					}
-				},
-
-				// 2️⃣ UPDATED MAIN FUNCTION (Ultra Fast Load)
-				async checkAuditStatus() {
-					this.calculateAuditCycle();
-					
-					// ⚡ STEP 1: INSTANT CACHE LOAD (0.1s mein purana draft show karega)
-					try {
-						const cachedAudit = localStorage.getItem('pbl_audit_cache');
-						if (cachedAudit) {
-							this.processAuditData(JSON.parse(cachedAudit));
-						}
-					} catch(e) {}
-
-					// 🔄 STEP 2: BACKGROUND SYNC (Google Sheet se silently naya data layega)
-					try {
-						const res = await fetch(API_URL + '?action=getBiMonthlyAudit');
-						const data = await res.json();
-						
-						// Cache update kardo future ke liye
-						try { localStorage.setItem('pbl_audit_cache', JSON.stringify(data)); } catch(e) {}
-						
-						// Data refresh in UI
-						this.processAuditData(data);
-					} catch(e) { console.error(e); }
-				},
-
-                openAuditModal() {
-                    this.auditSecret = '';
-                    this.viewAuditHistory = false;
-                    if (this.auditForm.points.length === 0) {
-                        this.auditForm.points = this.masterAuditPoints.map(p => ({ ...p, status: '', remarks: '' }));
-                    }
-                    this.showAuditModal = true;
-                },
+                                
+				
 
                 async submitAudit(submitType) {
                     let isValid = true;
