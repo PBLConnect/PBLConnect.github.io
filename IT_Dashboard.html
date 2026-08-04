@@ -2334,39 +2334,58 @@
                     }
                 },
 
-                async checkAuditStatus() {
-                    this.calculateAuditCycle();
-                    try {
-                        const res = await fetch(API_URL + '?action=getBiMonthlyAudit');
-                        const data = await res.json();
-                        
-                        this.allAudits = data.audits || []; 
-                        
-                        const current = this.allAudits.find(a => a.cycle === this.auditMeta.cycle);
-                        if (current) {
-                            this.auditMeta.status = current.status;
-                            this.auditMeta.date = current.date;
-                            if (current.status === 'Submitted') {
-                                this.auditMeta.deadlineText = "Audit Completed 🎉";
-                            }
-                            const parsedDetails = JSON.parse(current.details);
-                            // 🚀 BUG FIX: Merge database status with the LATEST colored master points
-                            this.auditForm.points = this.masterAuditPoints.map(masterPt => {
-                                const savedPt = parsedDetails[masterPt.id] || Object.values(parsedDetails).find(p => p.id === masterPt.id);
-                                return {
-                                    ...masterPt, 
-                                    status: savedPt ? savedPt.status : '',
-                                    remarks: savedPt ? savedPt.remarks : '',
-                                    severity: savedPt ? savedPt.severity : ''
-                                };
-                            });
-                            this.auditForm.summary = current.summary || '';
-                        } else {
-                            this.auditForm.points = this.masterAuditPoints.map(p => ({ ...p, status: '', remarks: '', severity: '' }));
-                            this.auditForm.summary = '';
-                        }
-                    } catch(e) { console.error(e); }
-                },
+                // 1️⃣ NAYA HELPER FUNCTION ADD KARO (Data Map karne ke liye)
+				processAuditData(data) {
+					this.allAudits = data.audits || []; 
+					const current = this.allAudits.find(a => a.cycle === this.auditMeta.cycle);
+					
+					if (current) {
+						this.auditMeta.status = current.status;
+						this.auditMeta.date = current.date;
+						if (current.status === 'Submitted') {
+							this.auditMeta.deadlineText = "Audit Completed 🎉";
+						}
+						const parsedDetails = JSON.parse(current.details);
+						this.auditForm.points = this.masterAuditPoints.map(masterPt => {
+							const savedPt = parsedDetails[masterPt.id] || Object.values(parsedDetails).find(p => p.id === masterPt.id);
+							return {
+								...masterPt, 
+								status: savedPt ? savedPt.status : '',
+								remarks: savedPt ? savedPt.remarks : '',
+								severity: savedPt ? savedPt.severity : ''
+							};
+						});
+						this.auditForm.summary = current.summary || '';
+					} else {
+						this.auditForm.points = this.masterAuditPoints.map(p => ({ ...p, status: '', remarks: '', severity: '' }));
+						this.auditForm.summary = '';
+					}
+				},
+
+				// 2️⃣ UPDATED MAIN FUNCTION (Ultra Fast Load)
+				async checkAuditStatus() {
+					this.calculateAuditCycle();
+					
+					// ⚡ STEP 1: INSTANT CACHE LOAD (0.1s mein purana draft show karega)
+					try {
+						const cachedAudit = localStorage.getItem('pbl_audit_cache');
+						if (cachedAudit) {
+							this.processAuditData(JSON.parse(cachedAudit));
+						}
+					} catch(e) {}
+
+					// 🔄 STEP 2: BACKGROUND SYNC (Google Sheet se silently naya data layega)
+					try {
+						const res = await fetch(API_URL + '?action=getBiMonthlyAudit');
+						const data = await res.json();
+						
+						// Cache update kardo future ke liye
+						try { localStorage.setItem('pbl_audit_cache', JSON.stringify(data)); } catch(e) {}
+						
+						// Data refresh in UI
+						this.processAuditData(data);
+					} catch(e) { console.error(e); }
+				},
 
                 openAuditModal() {
                     this.auditSecret = '';
