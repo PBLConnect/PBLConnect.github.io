@@ -90,7 +90,7 @@
         .audit-radio-group .radio:hover .name { background: rgba(255,255,255,0.7); }
         .dark .audit-radio-group .radio:hover .name { background: rgba(255,255,255,0.05); }
         
-        .audit-radio-group .radio input:disabled:not(:checked) + .name { cursor: not-allowed; opacity: 0.4; background: transparent; }
+        .audit-radio-group .radio input:disabled:not(:checked) + .name { cursor: not-allowed; opacity: 0.8; background: transparent; color: #94a3b8; }
 
         .audit-radio-group .radio input:checked + .name {
             background: linear-gradient(145deg, var(--c-main), var(--c-dark));
@@ -912,157 +912,253 @@
         <div class="bg-slate-50 dark:bg-dark_surface w-full max-w-4xl rounded-[2rem] shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden flex flex-col max-h-[90vh]">
             
             <!-- Modal Header -->
-            <div class="p-5 sm:p-6 border-b border-slate-200 dark:border-white/10 flex justify-between items-center shrink-0 bg-white dark:bg-black/20">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-500/30 text-xl shrink-0">
-                        <i class="fa-solid fa-user-shield"></i>
+            <div class="p-5 sm:p-6 border-b border-slate-200 dark:border-white/10 flex justify-between items-center shrink-0 bg-white dark:bg-black/20 relative z-20">
+                <!-- 🛡️ MODERN LEFT HEADER -->
+                <div class="flex items-center gap-3 sm:gap-4 group cursor-default">
+                    <!-- Glassmorphic Icon with Glare Effect -->
+                    <div class="relative w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-indigo-500 via-violet-600 to-purple-700 text-white flex items-center justify-center shadow-[0_8px_20px_-4px_rgba(99,102,241,0.5)] border border-white/20 shrink-0 overflow-hidden transform group-hover:scale-105 transition-all duration-300">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform -translate-x-full group-hover:translate-x-full"></div>
+                        <i class="fa-solid fa-user-shield text-xl sm:text-2xl drop-shadow-md"></i>
                     </div>
-                    <div>
-                        <h3 class="font-heading font-black text-lg sm:text-xl text-slate-800 dark:text-white leading-tight">Security & Compliance Audit</h3>
-                        <p class="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-indigo-500 mt-0.5" x-text="auditMeta.cycle"></p>
+                    
+                    <div class="flex flex-col justify-center">
+                        <!-- Gradient Text Title -->
+                        <h3 class="font-heading font-black text-lg sm:text-[22px] leading-none tracking-tight text-slate-800 dark:text-white drop-shadow-sm mb-1.5 sm:mb-2">
+                            Security & <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-500 dark:from-indigo-400 dark:to-violet-400">Compliance</span>
+                        </h3>
+                        
+                        <!-- Pulsing Smart Badge for Cycle -->
+                        <div class="flex items-center gap-1.5">
+                            <span class="px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30 text-[8px] sm:text-[9px] font-black uppercase tracking-widest shadow-sm flex items-center gap-1.5">
+                                <span class="relative flex h-1.5 w-1.5 shrink-0">
+                                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                                  <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-indigo-500"></span>
+                                </span>
+                                <span x-text="auditMeta.cycle" class="truncate max-w-[150px] sm:max-w-full"></span>
+                            </span>
+                            <span class="hidden sm:flex text-[8px] text-slate-400 uppercase tracking-widest font-bold items-center gap-1"><i class="fa-solid fa-shield-halved opacity-50"></i> Protocol</span>
+                        </div>
                     </div>
                 </div>
-                <button @click="showAuditModal = false" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-400 hover:text-red-500 transition shrink-0"><i class="fa-solid fa-xmark"></i></button>
+                
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <!-- 🚀 MODERN PROGRESS CAPSULE -->
+                    <div class="flex items-center gap-2 sm:gap-3 bg-white dark:bg-black/40 border p-1 sm:p-1.5 rounded-2xl shadow-sm transition-all duration-500"
+                         x-data="{ 
+                            get completed() { return auditForm.points.filter(p => p.status !== '').length; }, 
+                            get total() { return auditForm.points.length || 15; }, 
+                            get percent() { return Math.round((this.completed / this.total) * 100) || 0; } 
+                         }"
+                         :class="percent === 100 ? 'border-emerald-200 dark:border-emerald-900/50 shadow-[0_0_15px_rgba(16,185,129,0.15)] bg-emerald-50/50 dark:bg-emerald-900/10' : 'border-slate-200 dark:border-white/10'">
+                        
+                        <!-- Left: Clean Ring Element -->
+                        <div class="relative w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center shrink-0 bg-slate-50 dark:bg-white/5 rounded-[0.6rem] border border-slate-100 dark:border-white/5">
+                            <svg class="w-7 h-7 sm:w-8 sm:h-8 transform -rotate-90">
+                                <circle cx="50%" cy="50%" r="13" stroke="currentColor" stroke-width="2.5" fill="transparent" class="text-slate-200 dark:text-slate-700" />
+                                <circle cx="50%" cy="50%" r="13" stroke="currentColor" stroke-width="2.5" fill="transparent" 
+                                        :class="percent === 100 ? 'text-emerald-500' : 'text-indigo-500'"
+                                        stroke-dasharray="81.68" 
+                                        :stroke-dashoffset="81.68 - (81.68 * percent) / 100" 
+                                        stroke-linecap="round" 
+                                        class="transition-all duration-700 ease-out" />
+                            </svg>
+                            <!-- Center Icon based on status -->
+                            <i class="fa-solid absolute text-[9px] sm:text-[10px] transition-all" 
+                               :class="percent === 100 ? 'fa-check text-emerald-500 animate-bounce' : 'fa-bolt text-indigo-400 opacity-80'"></i>
+                        </div>
+                        
+                        <!-- Right: Sleek Typography -->
+                        <div class="flex flex-col pr-2 sm:pr-3">
+                            <div class="flex items-center gap-1.5 mb-0.5">
+                                <span class="text-[7px] sm:text-[8px] font-black uppercase tracking-widest transition-colors" 
+                                      :class="percent === 100 ? 'text-emerald-500' : 'text-slate-400'">Audit Progress</span>
+                                <span x-show="percent === 100" class="flex h-1.5 w-1.5 relative" x-cloak>
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                                </span>
+                            </div>
+                            <div class="flex items-baseline gap-1 leading-none mt-0.5">
+                                <span class="text-xs sm:text-sm font-black font-mono leading-none transition-colors" 
+                                      :class="percent === 100 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-800 dark:text-slate-200'" x-text="completed"></span>
+                                <span class="text-[9px] sm:text-[10px] font-bold text-slate-500" x-text="'/ ' + total + ' Done'"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="w-px h-8 bg-slate-200 dark:bg-white/10 hidden sm:block"></div>
+
+                    <button @click="showAuditModal = false" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-400 hover:text-red-500 transition shadow-sm border border-slate-200 dark:border-transparent shrink-0 active:scale-95"><i class="fa-solid fa-xmark"></i></button>
+                </div>
             </div>
             
             <!-- Modal Body (Scrollable Checklist) -->
-            <div class="flex-1 overflow-y-auto custom-scroll p-4 sm:p-6 bg-slate-50/50 dark:bg-transparent">
-                
-                <!-- Lock Warning -->
-                <div x-show="isAuditLocked" class="mb-5 bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-xl text-xs font-bold flex items-start gap-2 shadow-sm dark:bg-amber-500/10 dark:border-amber-500/30 dark:text-amber-400">
-                    <i class="fa-solid fa-lock mt-0.5 shrink-0"></i>
-                    <span x-text="auditLockReason"></span>
-                </div>
-
-                <div class="space-y-4">
-                    <template x-for="(pt, index) in auditForm.points" :key="pt.id">
-                        <div class="bg-white dark:bg-black/20 p-4 sm:p-5 rounded-2xl border shadow-sm transition-all" :class="pt.status === 'Fail' ? 'border-red-200 dark:border-red-500/30 bg-red-50/30 dark:bg-red-900/10' : 'border-slate-200 dark:border-white/5'">
-                            <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                                <div class="flex-1">
-                                    <h4 class="text-sm font-black text-slate-800 dark:text-white" x-text="pt.title"></h4>
-                                    <!-- Use x-html so the spans render properly -->
-                                    <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-1" x-html="pt.desc"></p>
-                                </div>
-                                
-                                <div class="w-full md:w-56 shrink-0">
-                                    <!-- 🚀 PASS / FAIL / NA BUTTONS -->
-                                    <div class="audit-radio-group">
-                                        <label class="radio pass">
-                                            <input type="radio" :name="'status_'+pt.id" value="Pass" x-model="pt.status" @click="pt.status === 'Pass' ? setTimeout(() => pt.status = '', 0) : null" :disabled="isAuditLocked">
-                                            <span class="name">PASS</span>
-                                        </label>
-                                        <label class="radio fail">
-                                            <input type="radio" :name="'status_'+pt.id" value="Fail" x-model="pt.status" @click="pt.status === 'Fail' ? setTimeout(() => { pt.status = ''; pt.severity = ''; pt.remarks = ''; }, 0) : null" :disabled="isAuditLocked">
-                                            <span class="name">FAIL</span>
-                                        </label>
-                                        <label class="radio na">
-                                            <input type="radio" :name="'status_'+pt.id" value="N/A" x-model="pt.status" @click="pt.status === 'N/A' ? setTimeout(() => pt.status = '', 0) : null" :disabled="isAuditLocked">
-                                            <span class="name">N/A</span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Input Fields (Remarks & Severity) -->
-                            <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
-                                <div :class="pt.status === 'Fail' ? 'md:col-span-2' : 'md:col-span-3'">
-                                    <input type="text" x-model="pt.remarks" placeholder="Auditor Remarks / Evidence..." class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2 text-xs font-medium outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition dark:text-white shadow-inner" :disabled="isAuditLocked">
-                                </div>
-                                
-                                <!-- 🚀 MODERN RISK SEVERITY BUTTONS -->
-                                <div x-show="pt.status === 'Fail'" x-cloak class="w-full mt-2 md:mt-0 flex flex-col justify-center">
-                                    <div class="audit-radio-group !bg-red-50 dark:!bg-red-900/10 border border-red-200 dark:border-red-500/30">
-                                        <label class="radio" style="--c-main: #eab308; --c-dark: #ca8a04; --c-light: #fef08a;" title="Low Risk">
-                                            <input type="radio" :name="'sev_'+pt.id" value="Low" x-model="pt.severity" @click="pt.severity === 'Low' ? setTimeout(() => pt.severity = '', 0) : null" :disabled="isAuditLocked">
-                                            <span class="name !text-[10px]">LOW</span>
-                                        </label>
-                                        <label class="radio" style="--c-main: #f97316; --c-dark: #ea580c; --c-light: #fed7aa;" title="Medium Risk">
-                                            <input type="radio" :name="'sev_'+pt.id" value="Medium" x-model="pt.severity" @click="pt.severity === 'Medium' ? setTimeout(() => pt.severity = '', 0) : null" :disabled="isAuditLocked">
-                                            <span class="name !text-[10px]">MED</span>
-                                        </label>
-                                        <label class="radio" style="--c-main: #ef4444; --c-dark: #dc2626; --c-light: #fecaca;" title="High Risk">
-                                            <input type="radio" :name="'sev_'+pt.id" value="High" x-model="pt.severity" @click="pt.severity === 'High' ? setTimeout(() => pt.severity = '', 0) : null" :disabled="isAuditLocked">
-                                            <span class="name !text-[10px]">HIGH</span>
-                                        </label>
-                                        <label class="radio" style="--c-main: #9f1239; --c-dark: #881337; --c-light: #fda4af;" title="Critical Risk">
-                                            <input type="radio" :name="'sev_'+pt.id" value="Critical" x-model="pt.severity" @click="pt.severity === 'Critical' ? setTimeout(() => pt.severity = '', 0) : null" :disabled="isAuditLocked">
-                                            <span class="name !text-[10px]">CRIT</span>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </template>
-                </div>
-
-                <!-- 📝 AUDIT SUMMARY (TERMINAL / HANDOVER STYLE) -->
-                <div x-data="{ get wordCount() { return auditForm.summary ? auditForm.summary.trim().split(/\s+/).filter(Boolean).length : 0; } }" 
-                     class="bg-white dark:bg-black/20 p-5 sm:p-6 rounded-3xl shadow-sm mt-6 relative overflow-hidden group transition-all duration-300 border"
-                     :class="wordCount >= 100 ? 'border-emerald-200 dark:border-emerald-900/30' : 'border-rose-200 dark:border-rose-900/30'">
-                    
-                    <div class="absolute -right-10 -bottom-10 w-32 h-32 rounded-full blur-3xl opacity-10 pointer-events-none transition-all duration-700" 
-                         :class="wordCount >= 100 ? 'bg-emerald-500' : 'bg-rose-500'"></div>
-                    
-                    <!-- Header -->
-                    <div class="flex justify-between items-center mb-4 relative z-10 shrink-0">
-                        <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-xl flex items-center justify-center text-lg shadow-sm border transition-all duration-500 bg-slate-50 text-slate-400 border-slate-100 dark:bg-white/5 dark:border-white/10">
-                                <i class="fa-solid fa-pen-nib" :class="wordCount > 0 ? 'animate-bounce' : ''"></i>
-                            </div>
-                            <div>
-                                <h3 class="text-[13px] sm:text-sm font-black tracking-tight text-slate-800 dark:text-white leading-none mb-1">Audit Executive Summary</h3>
-                                <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Min 100 Words Required</p>
-                            </div>
-                        </div>
-                        
-                        <!-- Dynamic Right Side Counter -->
-                        <div class="flex flex-col items-end gap-1">
-                            <span x-show="wordCount < 100" class="text-[8px] bg-rose-500 text-white px-2 py-1 rounded-md font-black uppercase tracking-widest shadow-[0_0_8px_rgba(244,63,94,0.6)] animate-pulse border border-rose-400">Required</span>
-                            
-                            <div class="flex items-center gap-1.5 bg-white/80 dark:bg-black/40 backdrop-blur border px-2 py-0.5 rounded shadow-sm transition-colors"
-                                 :class="wordCount >= 100 ? 'border-emerald-200 dark:border-white/10' : 'border-rose-200 dark:border-rose-900/50'">
-                                <div class="w-1.5 h-1.5 rounded-full shadow-sm" 
-                                     :class="wordCount >= 100 ? 'bg-emerald-500 shadow-emerald-500/50' : 'bg-amber-400 shadow-amber-400/50'"></div>
-                                <span class="text-[9px] font-mono font-black" 
-                                      :class="wordCount >= 100 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400'">
-                                    <span x-text="wordCount"></span> / 100 W
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Terminal Style Text Area -->
-                    <div class="relative z-10 group/terminal flex-1 flex flex-col">
-                        <!-- OS Terminal Dots Decoration -->
-                        <div class="absolute top-3 left-3 flex gap-1.5 opacity-60 z-20 transition-opacity group-focus-within/terminal:opacity-100">
-                            <div class="w-2 h-2 rounded-full bg-rose-400 shadow-sm"></div>
-                            <div class="w-2 h-2 rounded-full bg-amber-400 shadow-sm"></div>
-                            <div class="w-2 h-2 rounded-full bg-emerald-400 shadow-sm"></div>
-                        </div>
-                        
-                        <textarea x-model="auditForm.summary"
-                                  class="w-full bg-slate-50/80 dark:bg-black/40 border rounded-2xl p-4 pt-8 text-xs font-bold text-slate-700 dark:text-slate-300 outline-none transition-all duration-300 shadow-inner resize-y min-h-[120px]" 
-                                  :class="wordCount >= 100 ? 'border-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:bg-white dark:focus:bg-black/60 focus:border-emerald-400 dark:border-white/10' : 'border-rose-200 focus:ring-2 focus:bg-white dark:focus:bg-black/60 focus:ring-rose-500/20 focus:border-rose-400 dark:border-rose-900/50'"
-                                  placeholder="Type comprehensive audit findings, major risks, or handover messages here..." 
-                                  :disabled="isAuditLocked"></textarea>
-                                  
-                        <!-- Corner Drag Indicator -->
-                        <i class="fa-solid fa-sort-down absolute bottom-2 right-2 text-slate-300 transform -rotate-45 pointer-events-none opacity-50"></i>
-                    </div>
-
-                    <!-- Live Error / Success Message -->
-                    <div class="mt-3 flex justify-between items-center text-[10px] font-bold relative z-10 px-1">
-                        <span x-show="wordCount < 100" class="text-rose-500 flex items-center gap-1.5 animate-pulse" x-cloak>
-                            <i class="fa-solid fa-triangle-exclamation"></i> 
-                            <span><span x-text="100 - wordCount"></span> more words required to unlock submission.</span>
-                        </span>
-                        <span x-show="wordCount >= 100" class="text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5" x-cloak>
-                            <i class="fa-solid fa-check-double"></i> Meticulous summary captured. Ready for submission.
-                        </span>
-                    </div>
-                </div>
-
+<div class="flex-1 overflow-y-auto custom-scroll p-4 sm:p-8 bg-slate-50/80 dark:bg-[#020617]/50 relative">
+    
+    <!-- 🔒 Sleek Lock Warning -->
+    <div x-show="isAuditLocked" x-cloak class="mb-6 bg-gradient-to-r from-amber-50 to-orange-50/50 border border-amber-200/80 text-amber-800 px-5 py-3.5 rounded-2xl text-xs font-bold flex items-center justify-between shadow-sm dark:from-amber-900/20 dark:to-orange-900/10 dark:border-amber-500/30 dark:text-amber-400 group">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center shrink-0">
+                <i class="fa-solid fa-lock text-amber-500"></i>
             </div>
+            <span x-text="auditLockReason" class="leading-snug"></span>
+        </div>
+        <span class="hidden sm:inline-block px-2.5 py-1 bg-white/60 dark:bg-black/40 rounded-lg text-[9px] uppercase tracking-widest border border-amber-100 dark:border-amber-500/20">Read Only</span>
+    </div>
+
+    <!-- 📝 Avant-garde Checklist Grid -->
+    <div class="space-y-5">
+        <template x-for="(pt, index) in auditForm.points" :key="pt.id">
+            
+            <!-- ✨ Premium Card Structure -->
+            <div class="group relative bg-white dark:bg-dark_surface rounded-[1.75rem] p-5 sm:p-6 border transition-all duration-400 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:hover:shadow-[0_8px_30px_rgba(255,255,255,0.02)] overflow-hidden" 
+                 :class="pt.status === 'Fail' ? 'border-rose-200 dark:border-rose-900/50 bg-rose-50/30 dark:bg-rose-900/10' : 'border-slate-200/70 dark:border-white/5'">
+                 
+                <!-- ⚡ Dynamic Left Edge Glow -->
+                <div class="absolute left-0 top-0 bottom-0 w-1.5 transition-all duration-500 ease-out" 
+                     :class="pt.status === 'Pass' ? 'bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.6)]' : (pt.status === 'Fail' ? 'bg-rose-500 shadow-[0_0_12px_rgba(244,63,94,0.6)]' : (pt.status === 'N/A' ? 'bg-amber-400' : 'bg-slate-200 dark:bg-slate-700'))"></div>
+                
+                <div class="flex flex-col xl:flex-row xl:items-start justify-between gap-5 pl-2">
+                    
+                    <!-- Left: Numbering & Text -->
+                    <div class="flex items-start gap-4 flex-1 min-w-0">
+                        <div class="w-10 h-10 rounded-[0.8rem] flex items-center justify-center font-heading font-black text-sm shrink-0 border shadow-sm transition-colors duration-300"
+                             :class="pt.status === 'Pass' ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400' : (pt.status === 'Fail' ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400' : 'bg-slate-50 text-slate-400 border-slate-200 dark:bg-white/5 dark:text-slate-500')"
+                             x-text="index + 1"></div>
+                        
+                        <div class="flex-1 min-w-0 pt-0.5">
+						<!-- 🚀 Smart Regex applied to strip hardcoded numbers from the database string -->
+						<h4 class="text-[15px] font-black text-slate-800 dark:text-white leading-tight mb-1.5" x-text="pt.title.replace(/^\d+\.\s*/, '')"></h4>
+						<p class="text-xs font-medium text-slate-500 dark:text-slate-400 leading-relaxed max-w-3xl" x-html="pt.desc"></p>
+					</div>
+                    </div>
+                    
+                    <!-- Right: Action Pills -->
+                    <div class="w-full xl:w-auto shrink-0 flex items-center xl:justify-end mt-2 xl:mt-0 ml-14 xl:ml-0">
+                        <div class="p-1 bg-slate-50 dark:bg-black/30 rounded-2xl border border-slate-200/80 dark:border-white/5 shadow-inner" :class="isAuditLocked ? 'opacity-90' : ''">
+                            <div class="audit-radio-group !bg-transparent !shadow-none !border-0 !p-0">
+                                <label class="radio pass">
+                                    <input type="radio" :name="'status_'+pt.id" value="Pass" x-model="pt.status" @click="pt.status === 'Pass' ? setTimeout(() => pt.status = '', 0) : null" :disabled="isAuditLocked">
+                                    <span class="name !py-2 !px-4 !text-[11px] !rounded-xl tracking-wider">PASS</span>
+                                </label>
+                                <label class="radio fail">
+                                    <input type="radio" :name="'status_'+pt.id" value="Fail" x-model="pt.status" @click="pt.status === 'Fail' ? setTimeout(() => { pt.status = ''; pt.severity = ''; pt.remarks = ''; }, 0) : null" :disabled="isAuditLocked">
+                                    <span class="name !py-2 !px-4 !text-[11px] !rounded-xl tracking-wider">FAIL</span>
+                                </label>
+                                <label class="radio na">
+                                    <input type="radio" :name="'status_'+pt.id" value="N/A" x-model="pt.status" @click="pt.status === 'N/A' ? setTimeout(() => pt.status = '', 0) : null" :disabled="isAuditLocked">
+                                    <span class="name !py-2 !px-4 !text-[11px] !rounded-xl tracking-wider">N/A</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ✍️ Integrated Sleek Inputs -->
+                <div class="mt-5 pl-14 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    
+                    <div :class="pt.status === 'Fail' ? 'md:col-span-2' : 'md:col-span-3'" class="relative group/remark transition-all duration-300">
+                        <textarea x-model="pt.remarks" rows="2" placeholder="Document your findings, evidence, or observations here..." 
+                                  class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-2xl px-5 py-3.5 text-xs font-bold text-slate-800 dark:text-slate-100 outline-none focus:bg-white dark:focus:bg-black/60 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-300 shadow-inner resize-y min-h-[52px] custom-scroll disabled:opacity-100 disabled:text-slate-800 disabled:bg-slate-50 dark:disabled:text-white dark:disabled:bg-black/40" 
+                                  :class="isAuditLocked ? 'cursor-not-allowed' : ''"
+                                  :disabled="isAuditLocked"></textarea>
+                        <i x-show="!isAuditLocked" class="fa-solid fa-pen-clip absolute top-3.5 right-4 text-slate-300 dark:text-slate-600 pointer-events-none opacity-50 group-hover/remark:opacity-100 group-hover/remark:text-brand transition-all duration-300"></i>
+                    </div>
+                    
+                    <!-- 🚨 Severity Buttons -->
+                    <div x-show="pt.status === 'Fail'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0" x-cloak class="w-full flex flex-col justify-center">
+                        <span class="text-[9px] font-black uppercase tracking-widest text-rose-500 mb-1.5 pl-1 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span> Risk Severity</span>
+                        <div class="audit-radio-group !bg-rose-50/80 dark:!bg-rose-900/20 border border-rose-200/80 dark:border-rose-500/30 shadow-inner p-1 rounded-2xl">
+                            <label class="radio" style="--c-main: #eab308; --c-dark: #ca8a04; --c-light: #fef08a;" title="Low Risk">
+                                <input type="radio" :name="'sev_'+pt.id" value="Low" x-model="pt.severity" @click="pt.severity === 'Low' ? setTimeout(() => pt.severity = '', 0) : null" :disabled="isAuditLocked">
+                                <span class="name !text-[9px] !py-2 !rounded-xl">LOW</span>
+                            </label>
+                            <label class="radio" style="--c-main: #f97316; --c-dark: #ea580c; --c-light: #fed7aa;" title="Medium Risk">
+                                <input type="radio" :name="'sev_'+pt.id" value="Medium" x-model="pt.severity" @click="pt.severity === 'Medium' ? setTimeout(() => pt.severity = '', 0) : null" :disabled="isAuditLocked">
+                                <span class="name !text-[9px] !py-2 !rounded-xl">MED</span>
+                            </label>
+                            <label class="radio" style="--c-main: #ef4444; --c-dark: #dc2626; --c-light: #fecaca;" title="High Risk">
+                                <input type="radio" :name="'sev_'+pt.id" value="High" x-model="pt.severity" @click="pt.severity === 'High' ? setTimeout(() => pt.severity = '', 0) : null" :disabled="isAuditLocked">
+                                <span class="name !text-[9px] !py-2 !rounded-xl">HIGH</span>
+                            </label>
+                            <label class="radio" style="--c-main: #9f1239; --c-dark: #881337; --c-light: #fda4af;" title="Critical Risk">
+                                <input type="radio" :name="'sev_'+pt.id" value="Critical" x-model="pt.severity" @click="pt.severity === 'Critical' ? setTimeout(() => pt.severity = '', 0) : null" :disabled="isAuditLocked">
+                                <span class="name !text-[9px] !py-2 !rounded-xl">CRIT</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+
+    <!-- 📊 AVANT-GARDE EXECUTIVE SUMMARY -->
+    <div x-data="{ get wordCount() { return auditForm.summary ? auditForm.summary.trim().split(/\s+/).filter(Boolean).length : 0; } }" 
+         class="bg-white dark:bg-dark_surface p-6 sm:p-8 rounded-[2rem] shadow-sm hover:shadow-lg mt-8 relative overflow-hidden group transition-all duration-400 border"
+         :class="wordCount >= 100 ? 'border-emerald-200 dark:border-emerald-900/50' : 'border-slate-200 dark:border-white/5'">
+        
+        <!-- Elegant Background Mesh/Blur -->
+        <div class="absolute -right-20 -bottom-20 w-64 h-64 rounded-full blur-[80px] opacity-20 pointer-events-none transition-all duration-1000" 
+             :class="wordCount >= 100 ? 'bg-emerald-500' : 'bg-brand'"></div>
+        
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-5 relative z-10 shrink-0 gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-[1rem] flex items-center justify-center text-xl shadow-inner border transition-all duration-500"
+                     :class="wordCount >= 100 ? 'bg-emerald-50 text-emerald-500 border-emerald-200 dark:bg-emerald-500/10' : 'bg-slate-50 text-slate-400 border-slate-200 dark:bg-white/5 dark:border-white/10'">
+                    <i class="fa-solid fa-file-contract" :class="wordCount > 0 && wordCount < 100 ? 'animate-pulse' : ''"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-black tracking-tight text-slate-800 dark:text-white leading-none mb-1">Executive Summary</h3>
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Mandatory Handover Report</p>
+                </div>
+            </div>
+            
+            <!-- Dynamic Right Side Counter -->
+            <div class="flex items-center gap-2">
+                <span x-show="wordCount < 100" class="text-[9px] bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/30 px-2.5 py-1 rounded-lg font-black uppercase tracking-widest shadow-sm animate-pulse" x-cloak>Min 100 Words</span>
+                
+                <div class="flex items-center gap-2 bg-slate-50 dark:bg-black/40 border px-3 py-1.5 rounded-xl shadow-inner transition-colors"
+                     :class="wordCount >= 100 ? 'border-emerald-200 dark:border-emerald-900/50' : 'border-slate-200 dark:border-white/10'">
+                    <div class="w-2 h-2 rounded-full shadow-sm" 
+                         :class="wordCount >= 100 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]' : 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]'"></div>
+                    <span class="text-[11px] font-mono font-black" 
+                          :class="wordCount >= 100 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-300'">
+                        <span x-text="wordCount"></span> / 100 W
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Premium Terminal Text Area -->
+        <div class="relative z-10 group/terminal flex-1 flex flex-col mt-2">
+            <!-- Mac/Terminal Style Dots -->
+            <div class="absolute top-4 left-4 flex gap-1.5 opacity-40 z-20 transition-opacity duration-300 group-focus-within/terminal:opacity-100">
+                <div class="w-2.5 h-2.5 rounded-full bg-rose-400 shadow-sm"></div>
+                <div class="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-sm"></div>
+                <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-sm"></div>
+            </div>
+            
+            <textarea x-model="auditForm.summary"
+                      class="w-full bg-slate-50/80 dark:bg-black/40 border rounded-2xl p-5 pt-10 text-xs font-bold text-slate-800 dark:text-slate-100 outline-none transition-all duration-300 shadow-inner resize-y min-h-[180px] custom-scroll disabled:opacity-100 disabled:text-slate-800 disabled:bg-slate-50 dark:disabled:text-white dark:disabled:bg-black/40" 
+                      :class="wordCount >= 100 ? 'border-emerald-200 focus:ring-4 focus:ring-emerald-500/20 focus:bg-white dark:focus:bg-black/60 focus:border-emerald-400 dark:border-emerald-500/30' : 'border-slate-200 focus:ring-4 focus:bg-white dark:focus:bg-black/60 focus:ring-brand/10 focus:border-brand/50 dark:border-white/10'"
+                      placeholder="Type comprehensive audit findings, major risks, or handover messages here..." 
+                      :disabled="isAuditLocked"></textarea>
+                      
+            <i class="fa-solid fa-sort-down absolute bottom-3 right-4 text-slate-300 transform -rotate-45 pointer-events-none opacity-50"></i>
+        </div>
+
+        <!-- Live Status Bar -->
+        <div class="mt-4 flex justify-between items-center text-[10px] font-bold relative z-10 px-2 bg-slate-50 dark:bg-black/20 py-2 rounded-lg border border-slate-100 dark:border-white/5">
+            <span x-show="wordCount < 100" class="text-rose-500 dark:text-rose-400 flex items-center gap-2" x-cloak>
+                <i class="fa-solid fa-circle-exclamation animate-bounce"></i> 
+                <span><span x-text="100 - wordCount"></span> more words required to unlock final submission.</span>
+            </span>
+            <span x-show="wordCount >= 100" class="text-emerald-600 dark:text-emerald-400 flex items-center gap-2" x-cloak>
+                <i class="fa-solid fa-shield-check"></i> Report criteria met. Ready for executive sign-off.
+            </span>
+        </div>
+    </div>
+</div>
 
             <!-- Modal Footer -->
             <div class="p-4 sm:p-5 border-t border-slate-200 dark:border-white/10 bg-white dark:bg-black/20 flex flex-col sm:flex-row justify-between items-center gap-4 shrink-0 rounded-b-[2rem]">
@@ -1580,18 +1676,30 @@
                 },
 
                 masterAuditPoints: [
-                    { id: 'p1', title: '1. 🖥️ Hardware & Asset Audit', desc: 'Cross-verify physical workstations and storage devices against the active <span class="font-bold text-indigo-500 dark:text-indigo-400">AssetDB</span> count.' },
-                    { id: 'p2', title: '2. 💿 Software License Compliance', desc: 'Scan for <span class="font-bold text-rose-500 dark:text-rose-400">unauthorized software</span> and validate active vendor subscription counts.' },
+                    // 🚶‍♂️ PHASE 1: Floor & Workstation Audit
+                    { id: 'p1', title: '1. 🖥️ Hardware & Asset Audit', desc: 'Cross-verify physical workstations, laptops, and storage devices against the active <span class="font-bold text-indigo-500 dark:text-indigo-400">AssetDB</span> count.' },
+                    { id: 'p2', title: '2. 🕵️‍♂️ Clean Desk & Screen Lock Policy', desc: 'Physical floor audit to ensure unattended PCs are <span class="font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-1 rounded">locked (Win + L)</span> and no sensitive passwords are left on <span class="font-bold text-rose-500 dark:text-rose-400 italic">sticky notes</span>.' },
                     { id: 'p3', title: '3. 🚫 USB Port Security Check', desc: 'Random physical testing on floor PCs to ensure Mass Storage restriction policy is <span class="font-bold text-emerald-600 dark:text-emerald-400">strictly active</span>.' },
-                    { id: 'p4', title: '4. 🛡️ Endpoint Antivirus Health', desc: 'Ensure <span class="font-bold text-violet-500 dark:text-violet-400">Sophos</span> agents are actively running with the latest virus definition updates.' },
-                    { id: 'p5', title: '5. 📁 Shared Drive Sanity Scan', desc: 'Inspect central file server <span class="font-mono text-[10px] bg-slate-100 dark:bg-black/30 border border-slate-200 dark:border-white/10 px-1 py-0.5 rounded text-slate-600 dark:text-slate-300">192.168.0.223</span> to remove personal/unwanted media files.' },
-                    { id: 'p6', title: '6. 🛠️ AMC & Vendor RMA Logs', desc: 'Audit hardware replacement history and ensure all vendor calls have valid <span class="font-bold text-sky-500 dark:text-sky-400">Case IDs</span> mapped.' },
-                    { id: 'p7', title: '7. 💥 Faulty Hardware Disposal', desc: 'Verify that defective storage drives (HDD/SSD) are <span class="font-bold text-amber-500 dark:text-amber-400">physically destroyed</span> before vendor handover.' },
-                    { id: 'p8', title: '8. 📡 WAN & Network Reliability', desc: 'Analyze ISP downtime logs over the last 15 days and review <span class="font-bold text-blue-500 dark:text-blue-400">RCA (Root Cause Analysis)</span> reports.' },
-                    { id: 'p9', title: '9. 🚷 Active Directory (AD) Cleanup', desc: 'Verify that AD accounts, VPN, and email access for all recently resigned employees are <span class="font-bold text-rose-600 dark:text-rose-400">disabled</span>.' },
-                    { id: 'p10', title: '10. 🔄 Backup Restore Validation', desc: 'Perform an actual dummy file restore test from the backup server, <span class="font-bold text-amber-500 dark:text-amber-400">avoiding blind trust</span> on "Success" emails.' },
-                    { id: 'p11', title: '11. 🚨 Critical Security Vulnerabilities', desc: 'Log any <span class="font-bold text-rose-500 dark:text-rose-400">high-risk</span> out-of-the-box anomalies, <span class="font-bold text-rose-500 dark:text-rose-400">policy breaches</span>, or physical security threats.' },
-                    { id: 'p12', title: '12. 🔐 Server Room Access Review', desc: 'Audit physical entry/exit register against <span class="font-bold text-teal-600 dark:text-teal-400">CCTV</span> logs for the last 15 days.' }
+                    
+                    // 💻 PHASE 2: Endpoint & Software Health
+                    { id: 'p4', title: '4. 🛡️ Endpoint Antivirus Health', desc: 'Ensure <span class="font-bold text-violet-500 dark:text-violet-400">Sophos/Seqrite</span> agents are actively running with the latest virus definition updates.' },
+                    { id: 'p5', title: '5. 💿 Software License Compliance', desc: 'Validate active vendor subscription counts and ensure <span class="font-bold text-emerald-600 dark:text-emerald-400">authorized usage</span> of paid enterprise software.' },
+                    { id: 'p6', title: '6. ⚠️ Unlicensed "Free" Software Scan', desc: 'Identify <span class="font-bold text-rose-500 dark:text-rose-400">commercial violations</span> by checking for personal-use software like <span class="font-bold text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-500/10 px-1 rounded">WinRAR, AnyDesk, or TeamViewer</span>.' },
+                    
+                    // 🌐 PHASE 3: Network & Data Infrastructure
+                    { id: 'p7', title: '7. 📡 WAN & Network Reliability', desc: 'Analyze ISP downtime logs over the last 15 days and review <span class="font-bold text-blue-500 dark:text-blue-400">RCA (Root Cause Analysis)</span> reports.' },
+                    { id: 'p8', title: '8. 📁 Shared Drive Sanity Scan', desc: 'Inspect central file server <span class="font-mono font-bold text-[10px] bg-slate-100 dark:bg-black/30 border border-slate-200 dark:border-white/10 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-300 shadow-sm">192.168.0.223</span> to remove personal or unwanted media files.' },
+                    { id: 'p9', title: '9. 🔄 Backup Restore Validation', desc: 'Perform an actual dummy file restore test from the backup server, <span class="font-bold text-amber-500 dark:text-amber-400 italic">avoiding blind trust</span> on "Success" emails.' },
+                    
+                    // 🗄️ PHASE 4: Hardware Lifecycle & Perimeter Security
+                    { id: 'p10', title: '10. 🔐 Server Room Access Review', desc: 'Audit physical entry/exit register against <span class="font-bold text-teal-600 dark:text-teal-400">CCTV/biometric</span> logs for the last 15 days.' },
+                    { id: 'p11', title: '11. 🛠️ AMC & Vendor RMA Logs', desc: 'Audit hardware replacement history and ensure all vendor calls have valid <span class="font-bold text-sky-500 dark:text-sky-400">Case IDs</span> mapped.' },
+                    { id: 'p12', title: '12. 💥 Faulty Hardware Disposal', desc: 'Verify that defective storage drives (HDD/SSD) are <span class="font-bold text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-500/10 px-1 rounded">physically destroyed</span> before vendor handover.' },
+                    
+                    // 👨‍💻 PHASE 5: Admin & Compliance Desk
+                    { id: 'p13', title: '13. 🚷 Active Directory (AD) Cleanup', desc: 'Verify that AD accounts, VPN, and email access for all recently resigned employees are <span class="font-bold text-rose-600 dark:text-rose-400 uppercase">disabled</span>.' },
+                    { id: 'p14', title: '14. 📅 IT Renewals & Certificate Calendar', desc: 'Ensure upcoming expiry dates for <span class="font-bold text-blue-500 dark:text-blue-400">domain names, SSL certificates</span>, and ISP contracts are <span class="font-bold text-emerald-600 dark:text-emerald-400">actively tracked</span>.' },
+                    { id: 'p15', title: '15. 🚨 Critical Security Vulnerabilities', desc: 'Log any <span class="font-bold text-rose-500 dark:text-rose-400">high-risk</span> out-of-the-box anomalies, <span class="font-bold text-rose-500 dark:text-rose-400 underline">policy breaches</span>, or physical security threats.' }
                 ],
 			
                 loading: true, 
@@ -2293,11 +2401,18 @@
                         this.haptic('error'); alert("❌ Invalid Admin Key!"); return;
                     }
 
-                    const passCount = this.auditForm.points.filter(p => p.status === 'Pass').length;
-                    const score = Math.round((passCount / 12) * 100);
+                    // 🚀 SMART CALCULATION ENGINE: Dynamically adjust total points based on N/A selections
+					const passCount = this.auditForm.points.filter(p => p.status === 'Pass').length;
+					const naCount = this.auditForm.points.filter(p => p.status === 'N/A').length;
+					const totalApplicablePoints = this.auditForm.points.length - naCount;
 
-                    const pointsObj = {};
-                    this.auditForm.points.forEach((p, i) => pointsObj['p'+(i+1)] = p);
+					// Prevent Division by Zero if literally EVERYTHING is marked N/A
+					const score = totalApplicablePoints > 0 
+						? Math.round((passCount / totalApplicablePoints) * 100) 
+						: 100; 
+
+					const pointsObj = {};
+					this.auditForm.points.forEach((p, i) => pointsObj['p'+(i+1)] = p);
 
                     this.auditLoading = true;
                     try {
