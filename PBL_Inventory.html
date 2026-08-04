@@ -1231,21 +1231,29 @@
 
                     // 🚀 SMART SOFTWARE SYNC CALCULATION ENGINE (WITH TRIM FIX & ARRAY PASSING)
                     getSoftwareUsage(swId, hwArray = this.hardwareList) {
-                        let noida = 0, ddn = 0;
-                        let deployedList = [];
-                        hwArray.forEach(hw => {
-                            if(hw.Status === 'In Use' && hw.InstalledSoftware) {
-                                // Split by comma and clean extra spaces
-                                let swArray = String(hw.InstalledSoftware).split(',').map(s => s.trim());
-                                if (swArray.includes(String(swId))) {
-                                    if(String(hw.Location).toUpperCase().includes('DEHRADUN')) ddn++;
-                                    else noida++;
-                                    deployedList.push(hw);
-                                }
-                            }
-                        });
-                        return { total: noida + ddn, noida, ddn, list: deployedList };
-                    },
+					let noida = 0, ddn = 0;
+					let deployedList = [];
+					hwArray.forEach(hw => {
+						if(hw.Status === 'In Use' && hw.InstalledSoftware) {
+							let swArray = String(hw.InstalledSoftware).split(',').map(s => s.trim());
+							if (swArray.includes(String(swId))) {
+								
+								// 🚀 SMART FIX: Robust Dehradun check (Matches Hostname, AssetID, and Location variations)
+								const host = String(hw.Hostname || '').toUpperCase();
+								const asset = String(hw.AssetID || '').toUpperCase();
+								const loc = String(hw.Location || '').toUpperCase();
+								
+								const isDDN = host.includes('DDN-') || asset.includes('DDN-') || loc.includes('DEHRADUN') || loc.includes('DDN');
+								
+								if(isDDN) ddn++;
+								else noida++;
+								
+								deployedList.push(hw);
+							}
+						}
+					});
+					return { total: noida + ddn, noida, ddn, list: deployedList };
+				},
                     getTotalUsed(sw, hwArray = this.hardwareList) { return this.getSoftwareUsage(sw.SoftwareID, hwArray).total; },
                     getUsagePercent(sw) { const used = this.getTotalUsed(sw); return Math.round((used / sw.TotalLicense) * 100) || 0; },
                     
@@ -1360,38 +1368,54 @@
                     },
 
                     async saveAsset() {
-                        if(!this.form.secret || this.form.secret !== 'PBL2026') { this.showToast('Error', 'Invalid Admin Key', 'error'); this.haptic('error'); return; }
-                        this.submitting = true;
-                        try {
-                            let payloadData = JSON.parse(JSON.stringify(this.form));
-                            
-                            // 🚀 Force Parse Int just to be 100% bulletproof
-                            if (this.currentTab === 'software') {
-                                payloadData.TotalLicense = parseInt(payloadData.TotalLicense) || 0;
-                            }
-                            
-                            if (this.currentTab === 'hardware' && Array.isArray(payloadData.InstalledSoftware)) {
-                                payloadData.InstalledSoftware = payloadData.InstalledSoftware.map(s => s.trim()).join(',');
-                            }
-                            
-                            const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: this.modalMode, locationContext: this.currentLocation, ...payloadData }) });
-                            const result = await res.json();
-                            
-                            // 🛑 STRICT ERROR CHECKING
-                            if (result.status === 'success') {
-                                this.showToast('Success', 'Record Saved', 'success'); 
-                                this.haptic('success'); 
-                                this.showModal = false; 
-                                this.fetchData(true); // Sync fresh data from DB
-                            } else {
-                                this.showToast('Error', result.message || 'Save Failed in DB', 'error'); 
-                                this.haptic('error');
-                                alert("❌ Database Error: " + (result.message || 'Check if SoftwareID is missing in the Google Sheet!'));
-                            }
-                        } catch(e) { 
-                            this.showToast('Error', 'Network Error', 'error'); this.haptic('error');
-                        } finally { this.submitting = false; }
-                    },
+					if(!this.form.secret || this.form.secret !== 'PBL2026') { this.showToast('Error', 'Invalid Admin Key', 'error'); this.haptic('error'); return; }
+					this.submitting = true;
+					try {
+						let payloadData = JSON.parse(JSON.stringify(this.form));
+						
+						if (this.currentTab === 'software') {
+							payloadData.TotalLicense = parseInt(payloadData.TotalLicense) || 0;
+						}
+						
+						if (this.currentTab === 'hardware' && Array.isArray(payloadData.InstalledSoftware)) {
+							payloadData.InstalledSoftware = payloadData.InstalledSoftware.map(s => s.trim()).join(',');
+						}
+						
+						const res = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: this.modalMode, locationContext: this.currentLocation, ...payloadData }) });
+						const result = await res.json();
+						
+						if (result.status === 'success') {
+							this.showToast('Success', 'Record Saved', 'success'); 
+							this.haptic('success'); 
+							
+							// 🚀 OPTIMISTIC CACHE UPDATE: Instant UI refresh without waiting for Google Sheets
+							if (this.currentTab === 'hardware') {
+								let idx = this.hardwareList.findIndex(h => h.AssetID === payloadData.AssetID);
+								if (idx !== -1) this.hardwareList[idx] = payloadData;
+								else this.hardwareList.push(payloadData);
+							} else {
+								let idx = this.softwareList.findIndex(s => s.SoftwareID === payloadData.SoftwareID);
+								if (idx !== -1) this.softwareList[idx] = payloadData;
+								else this.softwareList.push(payloadData);
+							}
+							
+							// 🔄 Force Software Array Resorting so UI lists update instantly
+							this.softwareList = this.sortSoftwareList(this.softwareList, this.hardwareList);
+							
+							this.showModal = false; 
+							
+							// ⏱️ Delay background fetch by 2 seconds to let Google Sheets flush cache securely
+							setTimeout(() => { this.fetchData(false); }, 2000); 
+							
+						} else {
+							this.showToast('Error', result.message || 'Save Failed in DB', 'error'); 
+							this.haptic('error');
+							alert("❌ Database Error: " + (result.message || 'Check if SoftwareID is missing in the Google Sheet!'));
+						}
+					} catch(e) { 
+						this.showToast('Error', 'Network Error', 'error'); this.haptic('error');
+					} finally { this.submitting = false; }
+				},
 
                     async deleteAsset(id) { 
                         this.haptic('delete');
