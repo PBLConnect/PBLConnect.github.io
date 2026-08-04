@@ -1953,13 +1953,14 @@
 				
 				// 📍 TOGGLE LOGIC
                 toggleLocation() {
-                    if (!this.isGlobal) return;
-                    this.haptic('light');
-                    this.currentLocation = this.currentLocation === 'Noida' ? 'Dehradun' : 'Noida';
-                    localStorage.setItem('pbl_loc_pref', this.currentLocation);
-                    this.updateKPIs();
-                    this.renderChart();
-                },
+				if (!this.isGlobal) return;
+				this.haptic('light');
+				this.currentLocation = this.currentLocation === 'Noida' ? 'Dehradun' : 'Noida';
+				localStorage.setItem('pbl_loc_pref', this.currentLocation);
+				this.updateKPIs();
+				// 🚀 Smart Fix: Wait 50ms for Alpine to update the DOM container dimensions before drawing
+				setTimeout(() => { this.renderChart(); }, 50);
+			},
 
                 // 📍 SMART LOCATION FILTERING LOGIC
                 get filteredTickets() {
@@ -2557,21 +2558,26 @@
                 },
 
                 renderChart() {
-                    const chartEl = document.querySelector("#analyticsChart");
-                    if (!chartEl) return;
-                    let filteredData = Array.isArray(this.filteredTickets) ? this.filteredTickets : []; // 📍 Updated to filteredTickets
-                    if (this.chartConfig.time === 'month') {
-                        const now = new Date();
-                        filteredData = filteredData.filter(t => {
-                            if (!t.date || t.date === '-') return false; const d = new Date(t.date);
-                            return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-                        });
-                    }
-                    if (filteredData.length === 0) {
-                        if (this.chartInstance) this.chartInstance.destroy();
-                        chartEl.innerHTML = '<div class="flex items-center justify-center h-full text-slate-400 text-xs font-medium">No Data Available</div>';
-                        return;
-                    }
+				const chartEl = document.querySelector("#analyticsChart");
+				if (!chartEl) return;
+				let filteredData = Array.isArray(this.filteredTickets) ? this.filteredTickets : []; // 📍 Updated to filteredTickets
+				if (this.chartConfig.time === 'month') {
+					const now = new Date();
+					filteredData = filteredData.filter(t => {
+						if (!t.date || t.date === '-') return false; const d = new Date(t.date);
+						return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+					});
+				}
+				
+				// 🧹 Smart Fix: Wipe out previous text/HTML completely before ApexCharts takes over
+				chartEl.innerHTML = ''; 
+				
+				if (filteredData.length === 0) {
+					if (this.chartInstance) this.chartInstance.destroy();
+					chartEl.innerHTML = '<div class="flex items-center justify-center h-full text-slate-400 text-xs font-medium">No Data Available</div>';
+					return;
+				}
+				
                     let series = [], labels = [], colors = [], chartType = 'donut';
                     if (this.chartConfig.type === 'status') {
                         const open = filteredData.filter(t => t.status === 'Open').length;
