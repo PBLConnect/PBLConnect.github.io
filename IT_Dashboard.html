@@ -187,7 +187,7 @@
                         <!-- 📶 NEW: Smart WiFi Sync Button -->
                         <button @click="manualSync()" 
                                 class="w-5 h-5 sm:w-6 sm:h-6 rounded-md flex items-center justify-center border shadow-sm transition-all duration-300 active:scale-95 shrink-0"
-                                :class="wifiStatus === 'syncing' ? 'bg-amber-50 text-amber-500 border-amber-200 dark:bg-amber-500/10 dark:border-amber-500/30' : (wifiStatus === 'success' ? 'bg-emerald-50 text-emerald-500 border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/30' : 'bg-slate-50 text-slate-400 border-slate-200 hover:text-brand dark:bg-white/5 dark:border-white/10 dark:hover:text-brand')">
+                                :class="wifiStatus === 'syncing' ? 'bg-amber-50 text-amber-500 border-amber-200 dark:bg-amber-500/10 dark:border-amber-500/30' : 'bg-emerald-50 text-emerald-500 border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:border-emerald-500/30 dark:hover:bg-emerald-500/20'">
                             <i class="fa-solid text-[9px] sm:text-[10px]" 
                                :class="wifiStatus === 'syncing' ? 'fa-spinner fa-spin' : (wifiStatus === 'success' ? 'fa-check' : 'fa-wifi')"></i>
                         </button>
