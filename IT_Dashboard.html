@@ -257,7 +257,7 @@
                     </button>
 
                     <!-- 🚀 IT PORTALS / GATEWAYS DROPDOWN (10 LINKS, NO-SCROLL COMPACT UI) -->
-                    <div class="relative" x-data="{ showPortals: false }" @click.outside="showPortals = false">
+                    <div class="relative" x-show="currentLocation !== 'Dehradun'" x-cloak x-data="{ showPortals: false }" @click.outside="showPortals = false">
                         <button @click="showPortals = !showPortals" class="group relative w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors active:scale-95">
                             <i class="fa-solid fa-layer-group text-[11px] sm:text-[13px]"></i>
                             <span class="hidden sm:block absolute top-full mt-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-white dark:bg-white dark:text-slate-800 text-[9px] font-black uppercase tracking-widest rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-[999]">
