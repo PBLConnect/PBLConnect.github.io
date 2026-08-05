@@ -128,32 +128,27 @@
         .flip-overlay.flip .flip-overlay-bottom { animation: flip-bot-anim 0.4s ease-out forwards; }
         @keyframes flip-top-anim { 0% { transform: rotateX(0deg); } 100% { transform: rotateX(-90deg); } }
         @keyframes flip-bot-anim { 0% { transform: rotateX(90deg); } 100% { transform: rotateX(0deg); } }
-
-        /* 🫧 SMOOTH LAGGING BUBBLE CURSOR CSS (HARDWARE ACCELERATED) */
+		
+		/* 🫧 SMOOTH LAGGING BUBBLE CURSOR CSS (HARDWARE ACCELERATED) */
         @media (hover: hover) and (pointer: fine) { 
             body, html { 
-                /* Native Hardware Cursor: Zero Jitter, 100% Smooth */
                 cursor: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24'%3e%3cpath d='M4.5.79v22.42l6.56-6.57h9.29L4.5.79z' fill='%233b82f6' stroke='%23ffffff' stroke-width='1.5' stroke-linejoin='round'/%3e%3c/svg%3e") 2 2, default !important; 
             }
-            /* Clickable elements pe OS ka default 'Hand' icon aane do, wo best lagta hai */
-            a, button, input, select, textarea, .cursor-pointer { 
+            a, button, input, select, textarea, .cursor-pointer, [x-on\:click], [@click] { 
                 cursor: pointer !important; 
             }
         }
-
-        /* 🫧 Lagging Ring (Yeh DOM mein hi rahegi smooth lag ke liye) */
         .custom-ring { 
             position: fixed; left: 0; top: 0; width: 30px; height: 30px; border: 2px solid rgba(59, 130, 246, 0.5); border-radius: 50%; 
             z-index: 100000; pointer-events: none; 
-            transition: transform 0.35s ease-out, background-color 0.3s ease, border-color 0.3s ease; 
+            transition: transform 0.35s ease-out; 
             will-change: transform; 
         }
-
-        body.cursor-grow .custom-ring { --scale: 2.5; background-color: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.3); backdrop-filter: blur(1.5px); }
-        
         @media (prefers-reduced-motion: reduce), (max-width: 768px) { 
             .custom-ring { display: none !important; } 
         }
+
+        
     </style>
 </head>
 
@@ -590,11 +585,28 @@
                         <div class="relative z-10 mt-auto w-full">
                             <h3 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">IT Sec Audit</h3>
                             
-                            <!-- Tightly stacked 2 lines to prevent layout shift -->
-                            <div class="mt-1 flex flex-col gap-0.5 w-full">
-                                <span class="text-[11px] sm:text-[13px] font-bold truncate transition-colors duration-300 text-slate-500 dark:text-slate-400 leading-tight" x-text="auditMeta.status === 'Overdue' ? 'Action Required 🚨' : (auditMeta.status === 'Draft' ? 'In Progress 📝' : (auditMeta.status === 'Submitted' ? 'Completed ✅' : 'Audit Open 🛡️'))"></span>
-                                <!-- 🚀 Smart Fix: Removed truncate, allowing text to wrap naturally up to 2 lines -->
-                                <span x-show="auditMeta.status !== 'Submitted'" x-cloak class="font-mono text-[8.5px] sm:text-[9.5px] font-black text-slate-800 dark:text-white drop-shadow-md whitespace-normal line-clamp-2 leading-snug break-words" x-text="auditMeta.cycle"></span>
+                            <div class="mt-1 flex flex-col w-full">
+                                
+                                <!-- 🔴 STATE 1: PENDING / DRAFT / OVERDUE -->
+                                <div x-show="auditMeta.status !== 'Submitted'" class="flex flex-col gap-0.5 w-full">
+                                    <div class="flex items-center gap-1.5 text-[11px] sm:text-[13px] font-bold truncate transition-colors duration-300 text-slate-500 dark:text-slate-400 leading-tight">
+                                        <span x-text="auditMeta.status === 'Overdue' ? 'Action Required' : (auditMeta.status === 'Draft' ? 'In Progress' : 'Audit Open')"></span>
+                                        <i class="fa-solid" :class="auditMeta.status === 'Overdue' ? 'fa-triangle-exclamation text-red-500 animate-pulse' : (auditMeta.status === 'Draft' ? 'fa-pen text-amber-500' : 'fa-shield text-indigo-500')"></i>
+                                    </div>
+                                    <span class="font-mono text-[8.5px] sm:text-[9.5px] font-black text-slate-800 dark:text-white drop-shadow-md whitespace-normal line-clamp-2 leading-snug break-words" x-text="auditMeta.cycle"></span>
+                                </div>
+
+                                <!-- 🟢 STATE 2: SUBMITTED (COMPLETED) -->
+                                <div x-show="auditMeta.status === 'Submitted'" x-cloak class="flex flex-col w-full">
+                                    <div class="flex items-center gap-1.5 text-[11px] sm:text-[13px] font-black text-emerald-600 dark:text-emerald-500 leading-tight mb-0.5">
+                                        <i class="fa-solid fa-clipboard-check"></i>
+                                        <span class="truncate">Verified by <span x-text="auditMeta.auditor ? auditMeta.auditor.split(' ')[0] : 'IT'"></span></span>
+                                    </div>
+                                    <span class="text-[8.5px] sm:text-[9px] font-bold text-slate-500 dark:text-slate-400 leading-snug line-clamp-2 break-words">
+                                        <span class="font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest" x-text="auditMeta.cycle.includes('(') ? auditMeta.cycle.split('(')[0].trim() : auditMeta.cycle"></span> • <span class="font-mono" x-text="auditMeta.date"></span>
+                                    </span>
+                                </div>
+
                             </div>
                         </div>
                     </a>
@@ -914,464 +926,397 @@
 
     <!-- 🛡️ IT SEC AUDIT MODAL (Restored) -->
     <div x-show="showAuditModal" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 sm:p-6" x-transition.opacity @click.self="if(!auditLoading) showAuditModal = false">
-        <div class="bg-slate-50 dark:bg-dark_surface w-full max-w-4xl rounded-[2rem] shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden flex flex-col max-h-[90vh]">
+        
+        <!-- 🚀 Main Modal Container -->
+        <div class="bg-slate-50 dark:bg-dark_surface w-full max-w-4xl rounded-[2rem] shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden flex flex-col max-h-[90vh] relative">
             
-            <!-- Modal Header (Adaptive Flex Layout) -->
-            <div class="p-4 sm:p-5 border-b border-slate-200 dark:border-white/10 bg-white dark:bg-black/20 flex flex-col lg:flex-row justify-between lg:items-center gap-4 shrink-0 relative z-20">
+            <!-- 🔒 FULL MODAL OVERLAY (Covers Header, Body & Footer using Full Space) -->
+            <!-- 🚀 Lightened background and blur so the content behind is visible -->
+            <div x-show="auditMeta.status === 'Submitted' && currentUser.name !== auditMeta.auditor && !auditUnblurred" x-cloak class="absolute inset-0 z-[100] bg-slate-50/40 dark:bg-[#020617]/50 backdrop-blur-sm flex flex-col items-center justify-center p-4 sm:p-6 transition-all duration-500">
                 
-                <!-- 1. LEFT: Icon, Title & Cycle -->
-                <div class="flex justify-between items-start lg:items-center w-full lg:w-auto flex-1 min-w-0 shrink-0 pr-0 lg:pr-4">
-                    <div class="flex items-center gap-3 sm:gap-4 group cursor-default min-w-0">
-                        <!-- Glassmorphic Icon -->
-                        <div class="relative w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-indigo-500 via-violet-600 to-purple-700 text-white flex items-center justify-center shadow-[0_8px_20px_-4px_rgba(99,102,241,0.5)] border border-white/20 shrink-0 overflow-hidden transform group-hover:scale-105 transition-all duration-300">
-                            <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform -translate-x-full group-hover:translate-x-full"></div>
-                            <i class="fa-solid fa-user-shield text-xl sm:text-2xl drop-shadow-md"></i>
-                        </div>
-                        
-                        <div class="flex flex-col justify-center min-w-0 flex-1">
-                            <!-- New Punchy Title -->
-                            <h3 class="font-heading font-black text-[17px] sm:text-[20px] leading-none tracking-tight text-slate-800 dark:text-white drop-shadow-sm mb-1.5 truncate">
-                                IT Security <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-500 dark:from-indigo-400 dark:to-violet-400">Audit</span>
-                            </h3>
-                            
-                            <!-- Pulsing Cycle Badge -->
-                            <div class="flex items-center mt-1 w-full">
-                                <div class="inline-flex items-start gap-2 px-2.5 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/30 shadow-sm max-w-full">
-                                    <!-- Pulsing Dot (Aligned to top) -->
-                                    <div class="relative flex h-1.5 w-1.5 shrink-0 mt-1">
-                                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                                      <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-indigo-500"></span>
-                                    </div>
-                                    
-                                    <!-- 🚀 Smart 2-Line Formatted Text -->
-                                    <div class="flex flex-col text-left">
-                                        <!-- Line 1: Main Cycle Name -->
-                                        <span class="text-[9.5px] sm:text-[10px] font-black text-indigo-700 dark:text-indigo-300 uppercase tracking-widest leading-none" 
-                                              x-text="auditMeta.cycle.includes('(') ? auditMeta.cycle.split('(')[0].trim() : auditMeta.cycle"></span>
-                                        
-                                        <!-- Line 2: Dates (With Calendar Icon) -->
-                                        <span class="text-[8px] font-bold text-indigo-500 dark:text-indigo-400 uppercase tracking-wider mt-1 flex items-center gap-1 leading-none" 
-                                              x-show="auditMeta.cycle.includes('(')" x-cloak>
-                                            <i class="fa-regular fa-calendar-days text-[9px] opacity-70"></i> 
-                                            <span x-text="auditMeta.cycle.includes('(') ? auditMeta.cycle.split('(')[1].replace(')', '') : ''"></span>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-							</div>
-                    </div>
-                    <!-- Mobile Close Button -->
-                    <button @click="showAuditModal = false" class="lg:hidden w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-400 hover:text-red-500 transition shadow-sm border border-slate-200 dark:border-transparent shrink-0 active:scale-95"><i class="fa-solid fa-xmark"></i></button>
-                </div>
+                <!-- Close Button for Overlay -->
+                <button @click="showAuditModal = false" class="absolute top-4 right-4 sm:top-6 sm:right-6 w-10 h-10 rounded-full bg-white dark:bg-white/10 shadow-lg flex items-center justify-center text-slate-500 hover:text-red-500 transition active:scale-95 border border-slate-200 dark:border-white/10"><i class="fa-solid fa-xmark"></i></button>
 
-                <!-- 2. RIGHT: Pills & Progress (Wraps cleanly) -->
-                <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full lg:w-auto shrink-0 border-t border-slate-200/60 dark:border-white/10 lg:border-0 pt-3 lg:pt-0">
-                    
-                    <!-- Auditor Pill -->
-                    <div class="flex items-center gap-2 sm:gap-3 p-1.5 pr-3 sm:pr-4 rounded-2xl border shadow-sm transition-all duration-300 flex-1 sm:flex-none bg-slate-50 dark:bg-black/30 border-slate-200 dark:border-white/5 min-w-[130px]">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-white border border-slate-100 text-indigo-600 dark:bg-dark_surface dark:border-white/10 dark:text-indigo-400 flex items-center justify-center text-sm sm:text-base font-black shrink-0 shadow-sm">
-                            <i class="fa-solid fa-user-tie"></i>
-                        </div>
-                        <div class="flex flex-col min-w-0 justify-center">
-                            <span class="text-[7px] sm:text-[8px] font-black uppercase tracking-widest text-slate-400 leading-none mb-1">Assigned To</span>
-                            <span class="text-[11px] sm:text-[13px] font-bold text-slate-800 dark:text-slate-200 leading-tight truncate" x-text="auditMeta.auditor || '-'"></span>
-                        </div>
+                <div class="flex flex-col items-center justify-center text-center w-full max-w-md mx-auto">
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 bg-white dark:bg-dark_surface rounded-3xl shadow-2xl flex items-center justify-center text-3xl sm:text-4xl mb-5 sm:mb-6 border border-slate-200 dark:border-white/10 ring-8 ring-white/50 dark:ring-white/5">
+                        <i class="fa-solid fa-lock text-indigo-500"></i>
                     </div>
                     
-                    <!-- Live Status Pill -->
-                    <div class="flex items-center gap-2 sm:gap-3 p-1.5 pr-3 sm:pr-4 rounded-2xl border shadow-sm transition-all duration-300 flex-1 sm:flex-none min-w-[130px]"
-                         :class="auditMeta.status === 'Submitted' ? 'bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-500/30' : (auditMeta.status === 'Overdue' ? 'bg-rose-50/50 dark:bg-rose-900/10 border-rose-200 dark:border-rose-500/30' : 'bg-slate-50 dark:bg-black/30 border-slate-200 dark:border-white/5')">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-sm sm:text-lg font-black shrink-0 shadow-sm transition-colors duration-300 border"
-                             :class="auditMeta.status === 'Submitted' ? 'bg-emerald-100 text-emerald-600 border-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-400' : (auditMeta.status === 'Overdue' ? 'bg-rose-100 text-rose-600 border-rose-200 dark:bg-rose-500/20 dark:text-rose-400' : 'bg-white text-amber-500 border-slate-100 dark:bg-dark_surface dark:border-white/10')">
-                            <!-- 🚀 Fixed: Replaced heavy icon with a minimal 'fa-check' for symmetry -->
-                            <i class="fa-solid" :class="auditMeta.status === 'Submitted' ? 'fa-check' : (auditMeta.status === 'Overdue' ? 'fa-triangle-exclamation' : 'fa-hourglass-half')"></i>
+                    <h3 class="text-2xl sm:text-3xl font-black font-heading text-slate-800 dark:text-white mb-3 tracking-tight">Audit Locked</h3>
+                    
+                    <div class="bg-white/95 dark:bg-black/80 backdrop-blur-xl p-5 sm:p-6 rounded-3xl border border-slate-200 dark:border-white/10 shadow-xl mb-6 w-full">
+                        <p class="text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300 leading-relaxed mb-5">
+                            This audit has been <span class="text-emerald-600 dark:text-emerald-400">successfully submitted</span>. You cannot make any changes to it now.
+                        </p>
+                        
+                        <div class="flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-6 text-[10px] sm:text-xs font-mono font-bold bg-slate-50 dark:bg-white/5 py-3 rounded-xl border border-slate-100 dark:border-white/5">
+                            <span class="flex items-center gap-1.5"><i class="fa-solid fa-user-check text-indigo-500 dark:text-indigo-400"></i> <span x-text="auditMeta.auditor"></span></span>
+                            <span class="hidden sm:block w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
+                            <span class="flex items-center gap-1.5"><i class="fa-regular fa-calendar-check text-emerald-500 dark:text-emerald-400"></i> <span x-text="auditMeta.date"></span></span>
                         </div>
-                        <div class="flex flex-col min-w-0 justify-center">
-                            <span class="text-[7px] sm:text-[8px] font-black uppercase tracking-widest text-slate-400 leading-none mb-1">Audit Status</span>
-                            <!-- 🚀 Fixed: Removed messy OS-dependent emojis for a clean corporate look -->
-                            <span class="text-[11px] sm:text-[13px] font-bold leading-tight truncate"
-                                  :class="auditMeta.status === 'Submitted' ? 'text-emerald-700 dark:text-emerald-400' : (auditMeta.status === 'Overdue' ? 'text-rose-700 dark:text-rose-400' : 'text-slate-800 dark:text-slate-200')"
-                                  x-text="auditMeta.status === 'Draft' ? 'In Progress' : (auditMeta.status === 'Submitted' ? 'Completed' : (auditMeta.status === 'Overdue' ? 'Overdue' : 'Audit Open'))"></span>
-                        </div>
+                        
+                        <p class="text-[10px] sm:text-xs font-medium text-slate-500 mt-5 leading-snug">
+                            A copy of the final report and score details has been sent to the IT team via email.
+                        </p>
                     </div>
                     
-                    <!-- Progress Capsule -->
-                    <div class="flex items-center gap-2 sm:gap-3 p-1.5 pr-3 sm:pr-4 rounded-2xl border shadow-sm transition-all duration-500 flex-1 sm:flex-none min-w-[130px]"
-                         x-data="{ 
-                            get completed() { return auditForm.points.filter(p => p.status !== '').length; }, 
-                            get total() { return auditForm.points.length || 15; }, 
-                            get percent() { return Math.round((this.completed / this.total) * 100) || 0; } 
-                         }"
-                         :class="percent === 100 ? 'bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 shadow-[0_0_15px_rgba(16,185,129,0.15)] dark:border-emerald-500/30' : 'bg-slate-50 dark:bg-black/30 border-slate-200 dark:border-white/5'">
-                        
-                        <!-- Left: Clean Ring Element -->
-                        <div class="relative w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center shrink-0 rounded-xl border shadow-sm transition-colors duration-300"
-                             :class="percent === 100 ? 'bg-emerald-100 border-emerald-200 dark:bg-emerald-500/20' : 'bg-white border-slate-100 dark:bg-dark_surface dark:border-white/10'">
-                            <svg class="w-7 h-7 sm:w-8 sm:h-8 transform -rotate-90">
-                                <circle cx="50%" cy="50%" r="13" stroke="currentColor" stroke-width="2.5" fill="transparent" class="text-slate-200 dark:text-slate-700" />
-                                <circle cx="50%" cy="50%" r="13" stroke="currentColor" stroke-width="2.5" fill="transparent" 
-                                        :class="percent === 100 ? 'text-emerald-500' : 'text-indigo-500'"
-                                        stroke-dasharray="81.68" 
-                                        :stroke-dashoffset="81.68 - (81.68 * percent) / 100" 
-                                        stroke-linecap="round" 
-                                        class="transition-all duration-700 ease-out" />
-                            </svg>
-                            <i class="fa-solid absolute text-[9px] sm:text-[10px] transition-all" 
-                               :class="percent === 100 ? 'fa-check text-emerald-500 animate-bounce' : 'fa-bolt text-indigo-400 opacity-80'"></i>
-                        </div>
-                        
-                        <!-- Right: Sleek Typography -->
-                        <div class="flex flex-col min-w-0 justify-center">
-                            <div class="flex items-center gap-1.5 mb-0.5 leading-none">
-                                <span class="text-[7px] sm:text-[8px] font-black uppercase tracking-widest transition-colors leading-none" 
-                                      :class="percent === 100 ? 'text-emerald-500' : 'text-slate-400'">Audit Progress</span>
-                            </div>
-                            <div class="flex items-baseline gap-1 leading-none">
-                                <span class="text-[11px] sm:text-[13px] font-black font-mono leading-tight transition-colors" 
-                                      :class="percent === 100 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-800 dark:text-slate-200'" x-text="completed"></span>
-                                <span class="text-[9px] sm:text-[10px] font-bold text-slate-500 leading-tight" x-text="'/ ' + total + ' Done'"></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="w-px h-8 bg-slate-200 dark:bg-white/10 hidden lg:block mx-1 shrink-0"></div>
-
-                    <!-- Desktop Close Button -->
-                    <button @click="showAuditModal = false" class="hidden lg:flex w-9 h-9 rounded-full bg-slate-100 dark:bg-white/10 items-center justify-center text-slate-400 hover:text-red-500 transition shadow-sm border border-slate-200 dark:border-transparent shrink-0 active:scale-95"><i class="fa-solid fa-xmark"></i></button>
+                    <!-- 👁️ IT Head Exclusive Unhide Button -->
+                    <button x-show="(currentUser?.name || '').toLowerCase().includes('vikas')" @click="auditUnblurred = true; haptic('light')" class="bg-indigo-600 text-white px-8 py-3.5 sm:py-4 rounded-xl text-[11px] sm:text-xs font-black uppercase tracking-widest shadow-[0_5px_15px_-3px_rgba(79,70,229,0.4)] hover:shadow-[0_8px_20px_-3px_rgba(79,70,229,0.6)] hover:-translate-y-0.5 transition-all flex items-center gap-2 active:scale-95 w-full justify-center">
+                        <i class="fa-solid fa-eye"></i> View Hidden Details
+                    </button>
                 </div>
             </div>
-            
-            <!-- Modal Body (Scrollable Area with History Toggle) -->
-            <div class="flex-1 overflow-y-auto custom-scroll p-4 sm:p-8 bg-slate-50/80 dark:bg-[#020617]/50 relative">
+
+            <!-- 🚀 BLUR WRAPPER: Perfectly constrained to modal height -->
+            <div class="flex-1 flex flex-col min-h-0 w-full transition-all duration-500" :class="auditMeta.status === 'Submitted' && currentUser.name !== auditMeta.auditor && !auditUnblurred ? 'blur-[3px] opacity-60 pointer-events-none select-none grayscale-[0.2]' : ''">
                 
-                <!-- Normal Audit View (Hides when history is open) -->
-                <div x-show="!viewAuditHistory">
+                <!-- 📌 MODAL HEADER -->
+                <div class="p-4 sm:p-5 border-b border-slate-200 dark:border-white/10 bg-white dark:bg-black/20 flex flex-col lg:flex-row justify-between lg:items-center gap-4 shrink-0 relative z-20">
                     
-                    <!-- 🔒 Sleek Lock Warning -->
-                    <div x-show="isAuditLocked" x-cloak class="mb-6 bg-gradient-to-r from-amber-50 to-orange-50/50 border border-amber-200/80 text-amber-800 px-5 py-3.5 rounded-2xl text-xs font-bold flex items-center justify-between shadow-sm dark:from-amber-900/20 dark:to-orange-900/10 dark:border-amber-500/30 dark:text-amber-400 group">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center shrink-0">
-                                <i class="fa-solid fa-lock text-amber-500"></i>
-                            </div>
-                            <span x-text="auditLockReason" class="leading-snug"></span>
-                        </div>
-                        <span class="hidden sm:inline-block px-2.5 py-1 bg-white/60 dark:bg-black/40 rounded-lg text-[9px] uppercase tracking-widest border border-amber-100 dark:border-amber-500/20">Read Only</span>
-                    </div>
-
-                    <!-- 🚀 WRAPPER FOR BLUR EFFECT & OVERLAY -->
-                    <div class="relative mt-2">
-                        
-                        <!-- 🔒 THE BLUR OVERLAY MESSAGE (Role-Based Access) -->
-                        <div x-show="auditMeta.status === 'Submitted' && currentUser.name !== auditMeta.auditor && !auditUnblurred" x-cloak class="absolute inset-0 z-40 flex flex-col items-center justify-center bg-white/40 dark:bg-[#020617]/50 backdrop-blur-md rounded-[2rem] border border-slate-200/50 dark:border-white/5 p-6 text-center transition-all duration-500">
-                            <div class="w-16 h-16 bg-white dark:bg-dark_surface rounded-2xl shadow-xl flex items-center justify-center text-3xl mb-4 border border-slate-200 dark:border-white/10">
-                                <i class="fa-solid fa-user-lock text-slate-400"></i>
-                            </div>
-                            <h3 class="text-xl font-black text-slate-800 dark:text-white mb-2">Audit Officially Closed</h3>
-                            <p class="text-xs font-bold text-slate-500 max-w-md mb-6 leading-relaxed">
-                                This audit was submitted by <span class="text-brand dark:text-brand_glow" x-text="auditMeta.auditor"></span> on <span class="font-mono text-slate-700 dark:text-slate-300" x-text="auditMeta.date"></span>.<br><br>Please check your registered email for the detailed compliance report and metrics.
-                            </p>
-                            
-                            <!-- 👁️ IT Head Exclusive Unhide Button -->
-                            <button x-show="(currentUser?.name || '').toLowerCase().includes('vikas')" @click="auditUnblurred = true; haptic('light')" class="bg-slate-800 text-white dark:bg-white dark:text-slate-900 px-6 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-lg hover:scale-105 transition-all flex items-center gap-2 active:scale-95">
-                                <i class="fa-solid fa-eye text-brand"></i> Unhide Details
-                            </button>
-                        </div>
-
-                        <!-- 🚀 CONTENT TO BE BLURRED -->
-                        <div class="transition-all duration-500 pb-2" :class="auditMeta.status === 'Submitted' && currentUser.name !== auditMeta.auditor && !auditUnblurred ? 'blur-[8px] opacity-40 pointer-events-none select-none' : ''">
-                            
-                            <!-- 📝 Avant-garde Checklist Grid -->
-                            <div class="space-y-4 sm:space-y-5">
-                                <template x-for="(pt, index) in auditForm.points" :key="pt.id">
-                                    <!-- ✨ Premium Card Structure (Adjusted padding for mobile) -->
-                                    <div class="group relative bg-white dark:bg-dark_surface rounded-3xl sm:rounded-[1.75rem] p-4 sm:p-6 border transition-all duration-400 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:hover:shadow-[0_8px_30px_rgba(255,255,255,0.02)] overflow-hidden" 
-                                         :class="pt.status === 'Fail' ? 'border-rose-200 dark:border-rose-900/50 bg-rose-50/30 dark:bg-rose-900/10' : 'border-slate-200/70 dark:border-white/5'">
-                                         
-                                        <!-- ⚡ Dynamic Left Edge Glow -->
-                                        <div class="absolute left-0 top-0 bottom-0 w-1.5 transition-all duration-500 ease-out" 
-                                             :class="pt.status === 'Pass' ? 'bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.6)]' : (pt.status === 'Fail' ? 'bg-rose-500 shadow-[0_0_12px_rgba(244,63,94,0.6)]' : (pt.status === 'N/A' ? 'bg-amber-400' : 'bg-slate-200 dark:bg-slate-700'))"></div>
-                                        
-                                        <div class="flex flex-col xl:flex-row xl:items-start justify-between gap-3 sm:gap-5 pl-1.5 sm:pl-2">
-                                            <!-- Left: Numbering & Text -->
-                                            <div class="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
-                                                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-[0.8rem] flex items-center justify-center font-heading font-black text-xs sm:text-sm shrink-0 border shadow-sm transition-colors duration-300"
-                                                     :class="pt.status === 'Pass' ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400' : (pt.status === 'Fail' ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400' : 'bg-slate-50 text-slate-400 border-slate-200 dark:bg-white/5 dark:text-slate-500')"
-                                                     x-text="index + 1"></div>
-                                                
-                                                <div class="flex-1 min-w-0 pt-0.5">
-                                                    <h4 class="text-[14px] sm:text-[15px] font-black text-slate-800 dark:text-white leading-tight mb-1 sm:mb-1.5" x-text="pt.title.replace(/^\d+\.\s*/, '')"></h4>
-                                                    <p class="text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 leading-relaxed max-w-3xl" x-html="pt.desc"></p>
-                                                </div>
-                                            </div>
-                                            
-                                            <!-- Right: Action Pills -->
-                                            <div class="w-full xl:w-auto shrink-0 flex items-center xl:justify-end mt-1 sm:mt-0 ml-0 sm:ml-14 xl:ml-0">
-                                                <div class="p-1 w-full xl:w-auto bg-slate-50 dark:bg-black/30 rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-white/5 shadow-inner" :class="isAuditLocked ? 'opacity-90' : ''">
-                                                    <div class="audit-radio-group !bg-transparent !shadow-none !border-0 !p-0 flex w-full">
-                                                        <label class="radio pass flex-1">
-                                                            <input type="radio" :name="'status_'+pt.id" value="Pass" x-model="pt.status" @click="pt.status === 'Pass' ? setTimeout(() => pt.status = '', 0) : null" :disabled="isAuditLocked">
-                                                            <span class="name !py-2 !px-2 sm:!px-4 !text-[10px] sm:!text-[11px] !rounded-lg sm:!rounded-xl tracking-wider w-full">PASS</span>
-                                                        </label>
-                                                        <label class="radio fail flex-1">
-                                                            <input type="radio" :name="'status_'+pt.id" value="Fail" x-model="pt.status" @click="pt.status === 'Fail' ? setTimeout(() => { pt.status = ''; pt.severity = ''; pt.remarks = ''; }, 0) : null" :disabled="isAuditLocked">
-                                                            <span class="name !py-2 !px-2 sm:!px-4 !text-[10px] sm:!text-[11px] !rounded-lg sm:!rounded-xl tracking-wider w-full">FAIL</span>
-                                                        </label>
-                                                        <label class="radio na flex-1">
-                                                            <input type="radio" :name="'status_'+pt.id" value="N/A" x-model="pt.status" @click="pt.status === 'N/A' ? setTimeout(() => pt.status = '', 0) : null" :disabled="isAuditLocked">
-                                                            <span class="name !py-2 !px-2 sm:!px-4 !text-[10px] sm:!text-[11px] !rounded-lg sm:!rounded-xl tracking-wider w-full">N/A</span>
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- ✍️ Integrated Sleek Inputs -->
-                                        <div class="mt-3 sm:mt-5 pl-0 sm:pl-14 grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
-                                            <div :class="pt.status === 'Fail' ? 'md:col-span-2' : 'md:col-span-3'" class="relative group/remark transition-all duration-300">
-                                                <textarea x-model="pt.remarks" rows="2" placeholder="Document your findings, evidence, or observations here..." 
-                                                          class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl sm:rounded-2xl px-4 sm:px-5 py-3 sm:py-3.5 text-[11px] sm:text-xs font-bold text-slate-800 dark:text-slate-100 outline-none focus:bg-white dark:focus:bg-black/60 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-300 shadow-inner resize-y min-h-[52px] custom-scroll disabled:opacity-100 disabled:text-slate-800 disabled:bg-slate-50 dark:disabled:text-white dark:disabled:bg-black/40" 
-                                                          :class="isAuditLocked ? 'cursor-not-allowed' : ''"
-                                                          :disabled="isAuditLocked"></textarea>
-                                                <i x-show="!isAuditLocked" class="fa-solid fa-pen-clip absolute top-3.5 right-4 text-slate-300 dark:text-slate-600 pointer-events-none opacity-50 group-hover/remark:opacity-100 group-hover/remark:text-brand transition-all duration-300 hidden sm:block"></i>
-                                            </div>
-                                            
-                                            <!-- 🚨 Severity Buttons -->
-                                            <div x-show="pt.status === 'Fail'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0" x-cloak class="w-full flex flex-col justify-center mt-1 sm:mt-0">
-                                                <span class="text-[9px] font-black uppercase tracking-widest text-rose-500 mb-1.5 pl-1 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span> Risk Severity</span>
-                                                <div class="audit-radio-group !bg-rose-50/80 dark:!bg-rose-900/20 border border-rose-200/80 dark:border-rose-500/30 shadow-inner p-1 rounded-xl sm:rounded-2xl flex w-full">
-                                                    <label class="radio flex-1" style="--c-main: #eab308; --c-dark: #ca8a04; --c-light: #fef08a;" title="Low Risk">
-                                                        <input type="radio" :name="'sev_'+pt.id" value="Low" x-model="pt.severity" @click="pt.severity === 'Low' ? setTimeout(() => pt.severity = '', 0) : null" :disabled="isAuditLocked">
-                                                        <span class="name !text-[9px] !py-2 !rounded-lg sm:!rounded-xl w-full">LOW</span>
-                                                    </label>
-                                                    <label class="radio flex-1" style="--c-main: #f97316; --c-dark: #ea580c; --c-light: #fed7aa;" title="Medium Risk">
-                                                        <input type="radio" :name="'sev_'+pt.id" value="Medium" x-model="pt.severity" @click="pt.severity === 'Medium' ? setTimeout(() => pt.severity = '', 0) : null" :disabled="isAuditLocked">
-                                                        <span class="name !text-[9px] !py-2 !rounded-lg sm:!rounded-xl w-full">MED</span>
-                                                    </label>
-                                                    <label class="radio flex-1" style="--c-main: #ef4444; --c-dark: #dc2626; --c-light: #fecaca;" title="High Risk">
-                                                        <input type="radio" :name="'sev_'+pt.id" value="High" x-model="pt.severity" @click="pt.severity === 'High' ? setTimeout(() => pt.severity = '', 0) : null" :disabled="isAuditLocked">
-                                                        <span class="name !text-[9px] !py-2 !rounded-lg sm:!rounded-xl w-full">HIGH</span>
-                                                    </label>
-                                                    <label class="radio flex-1" style="--c-main: #9f1239; --c-dark: #881337; --c-light: #fda4af;" title="Critical Risk">
-                                                        <input type="radio" :name="'sev_'+pt.id" value="Critical" x-model="pt.severity" @click="pt.severity === 'Critical' ? setTimeout(() => pt.severity = '', 0) : null" :disabled="isAuditLocked">
-                                                        <span class="name !text-[9px] !py-2 !rounded-lg sm:!rounded-xl w-full">CRIT</span>
-                                                    </label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </template>
+                    <!-- LEFT: Icon, Title & Cycle -->
+                    <div class="flex justify-between items-start lg:items-center w-full lg:w-auto flex-1 min-w-0 shrink-0 pr-0 lg:pr-4">
+                        <div class="flex items-center gap-3 sm:gap-4 group cursor-default min-w-0">
+                            <div class="relative w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-indigo-500 via-violet-600 to-purple-700 text-white flex items-center justify-center shadow-[0_8px_20px_-4px_rgba(99,102,241,0.5)] border border-white/20 shrink-0 overflow-hidden transform group-hover:scale-105 transition-all duration-300">
+                                <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform -translate-x-full group-hover:translate-x-full"></div>
+                                <i class="fa-solid fa-user-shield text-xl sm:text-2xl drop-shadow-md"></i>
                             </div>
                             
-                            <!-- 📊 AVANT-GARDE EXECUTIVE SUMMARY -->
-                            <div x-data="{ get wordCount() { return auditForm.summary ? auditForm.summary.trim().split(/\s+/).filter(Boolean).length : 0; } }" 
-                                 class="bg-white dark:bg-dark_surface p-6 sm:p-8 rounded-[2rem] shadow-sm hover:shadow-lg mt-8 relative overflow-hidden group transition-all duration-400 border"
-                                 :class="wordCount >= 100 ? 'border-emerald-200 dark:border-emerald-900/50' : 'border-slate-200 dark:border-white/5'">
+                            <div class="flex flex-col justify-center min-w-0 flex-1">
+                                <h3 class="font-heading font-black text-[17px] sm:text-[20px] leading-none tracking-tight text-slate-800 dark:text-white drop-shadow-sm mb-1.5 truncate">
+                                    IT Security <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-500 dark:from-indigo-400 dark:to-violet-400">Audit</span>
+                                </h3>
                                 
-                                <!-- Elegant Background Mesh/Blur -->
-                                <div class="absolute -right-20 -bottom-20 w-64 h-64 rounded-full blur-[80px] opacity-20 pointer-events-none transition-all duration-1000" 
-                                     :class="wordCount >= 100 ? 'bg-emerald-500' : 'bg-brand'"></div>
-                                
-                                <!-- Header -->
-                                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-5 relative z-10 shrink-0 gap-4">
-                                    <div class="flex items-center gap-4">
-                                        <div class="w-12 h-12 rounded-[1rem] flex items-center justify-center text-xl shadow-inner border transition-all duration-500"
-                                             :class="wordCount >= 100 ? 'bg-emerald-50 text-emerald-500 border-emerald-200 dark:bg-emerald-500/10' : 'bg-slate-50 text-slate-400 border-slate-200 dark:bg-white/5 dark:border-white/10'">
-                                            <i class="fa-solid fa-file-contract" :class="wordCount > 0 && wordCount < 100 ? 'animate-pulse' : ''"></i>
+                                <div class="flex items-center mt-1 w-full">
+                                    <div class="inline-flex items-start gap-2 px-2.5 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/30 shadow-sm max-w-full">
+                                        <div class="relative flex h-1.5 w-1.5 shrink-0 mt-1">
+                                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                                          <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-indigo-500"></span>
                                         </div>
-                                        <div>
-                                            <h3 class="text-base font-black tracking-tight text-slate-800 dark:text-white leading-none mb-1">Executive Summary</h3>
-                                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Mandatory Handover Report</p>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Dynamic Right Side Counter -->
-                                    <div class="flex items-center gap-2">
-                                        <span x-show="wordCount < 100" class="text-[9px] bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/30 px-2.5 py-1 rounded-lg font-black uppercase tracking-widest shadow-sm animate-pulse" x-cloak>Min 100 Words</span>
-                                        
-                                        <div class="flex items-center gap-2 bg-slate-50 dark:bg-black/40 border px-3 py-1.5 rounded-xl shadow-inner transition-colors"
-                                             :class="wordCount >= 100 ? 'border-emerald-200 dark:border-emerald-900/50' : 'border-slate-200 dark:border-white/10'">
-                                            <div class="w-2 h-2 rounded-full shadow-sm" 
-                                                 :class="wordCount >= 100 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]' : 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]'"></div>
-                                            <span class="text-[11px] font-mono font-black" 
-                                                  :class="wordCount >= 100 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-300'">
-                                                <span x-text="wordCount"></span> / 100 W
+                                        <div class="flex flex-col text-left">
+                                            <span class="text-[9.5px] sm:text-[10px] font-black text-indigo-700 dark:text-indigo-300 uppercase tracking-widest leading-none" 
+                                                  x-text="auditMeta.cycle.includes('(') ? auditMeta.cycle.split('(')[0].trim() : auditMeta.cycle"></span>
+                                            <span class="text-[8px] font-bold text-indigo-500 dark:text-indigo-400 uppercase tracking-wider mt-1 flex items-center gap-1 leading-none" 
+                                                  x-show="auditMeta.cycle.includes('(')" x-cloak>
+                                                <i class="fa-regular fa-calendar-days text-[9px] opacity-70"></i> 
+                                                <span x-text="auditMeta.cycle.includes('(') ? auditMeta.cycle.split('(')[1].replace(')', '') : ''"></span>
                                             </span>
                                         </div>
                                     </div>
                                 </div>
-                                
-                                <!-- Premium Terminal Text Area -->
-                                <div class="relative z-10 group/terminal flex-1 flex flex-col mt-2">
-                                    <!-- Mac/Terminal Style Dots -->
-                                    <div class="absolute top-4 left-4 flex gap-1.5 opacity-40 z-20 transition-opacity duration-300 group-focus-within/terminal:opacity-100">
-                                        <div class="w-2.5 h-2.5 rounded-full bg-rose-400 shadow-sm"></div>
-                                        <div class="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-sm"></div>
-                                        <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-sm"></div>
-                                    </div>
-                                    
-                                    <textarea x-model="auditForm.summary"
-                                              class="w-full bg-slate-50/80 dark:bg-black/40 border rounded-2xl p-5 pt-10 text-xs font-bold text-slate-800 dark:text-slate-100 outline-none transition-all duration-300 shadow-inner resize-y min-h-[180px] custom-scroll disabled:opacity-100 disabled:text-slate-800 disabled:bg-slate-50 dark:disabled:text-white dark:disabled:bg-black/40" 
-                                              :class="wordCount >= 100 ? 'border-emerald-200 focus:ring-4 focus:ring-emerald-500/20 focus:bg-white dark:focus:bg-black/60 focus:border-emerald-400 dark:border-emerald-500/30' : 'border-slate-200 focus:ring-4 focus:bg-white dark:focus:bg-black/60 focus:ring-brand/10 focus:border-brand/50 dark:border-white/10'"
-                                              placeholder="Type comprehensive audit findings, major risks, or handover messages here..." 
-                                              :disabled="isAuditLocked"></textarea>
-                                              
-                                    <i class="fa-solid fa-sort-down absolute bottom-3 right-4 text-slate-300 transform -rotate-45 pointer-events-none opacity-50"></i>
-                                </div>
-
-                                <!-- Live Status Bar -->
-                                <div class="mt-4 flex justify-between items-center text-[10px] font-bold relative z-10 px-2 bg-slate-50 dark:bg-black/20 py-2 rounded-lg border border-slate-100 dark:border-white/5">
-                                    <span x-show="wordCount < 100" class="text-rose-500 dark:text-rose-400 flex items-center gap-2" x-cloak>
-                                        <i class="fa-solid fa-circle-exclamation animate-bounce"></i> 
-                                        <span><span x-text="100 - wordCount"></span> more words required to unlock final submission.</span>
-                                    </span>
-                                    <span x-show="wordCount >= 100" class="text-emerald-600 dark:text-emerald-400 flex items-center gap-2" x-cloak>
-                                        <i class="fa-solid fa-shield-check"></i> Report criteria met. Ready for executive sign-off.
-                                    </span>
-                                </div>
-                            </div>
-                        </div> <!-- End of Blurred Content Wrapper -->
-                    </div> <!-- End of Relative Wrapper -->
-
-                <!-- 🚀 EXCLUSIVE AUDIT HISTORY VIEW (FOR IT HEAD) -->
-                <div x-show="viewAuditHistory" x-cloak class="pb-4" x-data="{ selectedHistory: null, parsedPoints: [] }">
-                    
-                    <!-- 📜 LIST VIEW (Hides when an audit is clicked) -->
-                    <div x-show="!selectedHistory" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0" class="space-y-4">
-                        <div class="flex items-center gap-3 mb-6 border-b border-slate-200 dark:border-white/10 pb-4">
-                            <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400 flex items-center justify-center text-lg shadow-inner"><i class="fa-solid fa-clock-rotate-left"></i></div>
-                            <div>
-                                <h3 class="font-heading font-black text-lg text-slate-800 dark:text-white leading-tight">Master Audit Log</h3>
-                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Global Submissions Retrospective</p>
                             </div>
                         </div>
-
-                        <div x-show="allAudits.length === 0" class="text-center py-12">
-                            <i class="fa-solid fa-folder-open text-4xl text-slate-300 dark:text-slate-600 mb-3"></i>
-                            <p class="text-[11px] font-bold text-slate-500 uppercase tracking-widest">No previous audits found in database.</p>
-                        </div>
-
-                        <template x-for="(hist, idx) in allAudits" :key="idx">
-                            <div @click="selectedHistory = hist; parsedPoints = (typeof hist.details === 'string') ? JSON.parse(hist.details) : hist.details; haptic('light')" class="bg-white dark:bg-dark_surface p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition group flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-3 cursor-pointer hover:border-indigo-300 dark:hover:border-indigo-500/50">
-                                <div class="flex items-start gap-3">
-                                    <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 border shadow-sm transition-transform group-hover:scale-110"
-                                         :class="hist.status === 'Submitted' ? 'bg-emerald-50 text-emerald-500 border-emerald-200 dark:bg-emerald-500/10' : 'bg-amber-50 text-amber-500 border-amber-200 dark:bg-amber-500/10'">
-                                        <i class="fa-solid" :class="hist.status === 'Submitted' ? 'fa-check' : 'fa-pen'"></i>
-                                    </div>
-                                    <div>
-                                        <h4 class="text-sm font-black text-slate-800 dark:text-white leading-tight mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors" x-text="hist.cycle"></h4>
-                                        <div class="flex items-center flex-wrap gap-2 text-[10px] font-bold text-slate-500">
-                                            <span class="flex items-center gap-1"><i class="fa-solid fa-user-tie text-indigo-400"></i> <span x-text="hist.auditor"></span></span>
-                                            <span class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600 hidden sm:block"></span>
-                                            <span class="flex items-center gap-1"><i class="fa-regular fa-calendar text-indigo-400"></i> <span x-text="hist.date"></span></span>
-                                            <span class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600 hidden sm:block"></span>
-                                            <span class="uppercase tracking-widest" :class="hist.status === 'Submitted' ? 'text-emerald-500' : 'text-amber-500'" x-text="hist.status"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-4 shrink-0">
-                                    <div class="bg-slate-50 dark:bg-black/20 px-4 py-2 rounded-xl border border-slate-100 dark:border-white/5 text-center">
-                                        <span class="block text-[8px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Score</span>
-                                        <span class="text-lg font-black font-mono leading-none" :class="parseInt(hist.score) >= 80 ? 'text-emerald-500' : 'text-rose-500'" x-text="hist.score + (typeof hist.score === 'string' && hist.score.includes('%') ? '' : '%')"></span>
-                                    </div>
-                                    <i class="fa-solid fa-chevron-right text-slate-300 dark:text-slate-600 group-hover:text-indigo-500 transition-transform group-hover:translate-x-1 hidden sm:block"></i>
-                                </div>
-                            </div>
-                        </template>
+                        <button @click="showAuditModal = false" class="lg:hidden w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-400 hover:text-red-500 transition shadow-sm border border-slate-200 dark:border-transparent shrink-0 active:scale-95"><i class="fa-solid fa-xmark"></i></button>
                     </div>
 
-                    <!-- 🔍 DETAILED DRILL-DOWN VIEW -->
-                    <div x-show="selectedHistory" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 -translate-x-4" x-transition:enter-end="opacity-100 translate-x-0" class="flex flex-col space-y-5">
+                    <!-- RIGHT: Pills & Progress -->
+                    <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full lg:w-auto shrink-0 border-t border-slate-200/60 dark:border-white/10 lg:border-0 pt-3 lg:pt-0">
+                        <div class="flex items-center gap-2 sm:gap-3 p-1.5 pr-3 sm:pr-4 rounded-2xl border shadow-sm transition-all duration-300 flex-1 sm:flex-none bg-slate-50 dark:bg-black/30 border-slate-200 dark:border-white/5 min-w-[130px]">
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-white border border-slate-100 text-indigo-600 dark:bg-dark_surface dark:border-white/10 dark:text-indigo-400 flex items-center justify-center text-sm sm:text-base font-black shrink-0 shadow-sm">
+                                <i class="fa-solid fa-user-tie"></i>
+                            </div>
+                            <div class="flex flex-col min-w-0 justify-center">
+                                <span class="text-[7px] sm:text-[8px] font-black uppercase tracking-widest text-slate-400 leading-none mb-1">Assigned To</span>
+                                <span class="text-[11px] sm:text-[13px] font-bold text-slate-800 dark:text-slate-200 leading-tight truncate" x-text="auditMeta.auditor || '-'"></span>
+                            </div>
+                        </div>
                         
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-white/10 pb-5">
-                            <div class="flex items-center gap-3">
-                                <button @click="selectedHistory = null; haptic('light')" class="w-9 h-9 rounded-full bg-white dark:bg-black/30 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 dark:hover:bg-indigo-500/20 dark:hover:text-indigo-400 transition shadow-sm active:scale-95 shrink-0">
-                                    <i class="fa-solid fa-arrow-left"></i>
-                                </button>
-                                <div class="min-w-0">
-                                    <h3 class="font-heading font-black text-lg sm:text-xl text-slate-800 dark:text-white leading-tight truncate" x-text="selectedHistory?.cycle"></h3>
-                                    <div class="flex items-center gap-2 mt-1 text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-widest flex-wrap">
-                                        <span x-text="selectedHistory?.auditor"></span>
-                                        <span class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
-                                        <span x-text="selectedHistory?.date"></span>
-                                    </div>
+                        <div class="flex items-center gap-2 sm:gap-3 p-1.5 pr-3 sm:pr-4 rounded-2xl border shadow-sm transition-all duration-300 flex-1 sm:flex-none min-w-[130px]"
+                             :class="auditMeta.status === 'Submitted' ? 'bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-500/30' : (auditMeta.status === 'Overdue' ? 'bg-rose-50/50 dark:bg-rose-900/10 border-rose-200 dark:border-rose-500/30' : 'bg-slate-50 dark:bg-black/30 border-slate-200 dark:border-white/5')">
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-sm sm:text-lg font-black shrink-0 shadow-sm transition-colors duration-300 border"
+                                 :class="auditMeta.status === 'Submitted' ? 'bg-emerald-100 text-emerald-600 border-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-400' : (auditMeta.status === 'Overdue' ? 'bg-rose-100 text-rose-600 border-rose-200 dark:bg-rose-500/20 dark:text-rose-400' : 'bg-white text-amber-500 border-slate-100 dark:bg-dark_surface dark:border-white/10')">
+                                <i class="fa-solid" :class="auditMeta.status === 'Submitted' ? 'fa-check' : (auditMeta.status === 'Overdue' ? 'fa-triangle-exclamation' : 'fa-hourglass-half')"></i>
+                            </div>
+                            <div class="flex flex-col min-w-0 justify-center">
+                                <span class="text-[7px] sm:text-[8px] font-black uppercase tracking-widest text-slate-400 leading-none mb-1">Audit Status</span>
+                                <span class="text-[11px] sm:text-[13px] font-bold leading-tight truncate"
+                                      :class="auditMeta.status === 'Submitted' ? 'text-emerald-700 dark:text-emerald-400' : (auditMeta.status === 'Overdue' ? 'text-rose-700 dark:text-rose-400' : 'text-slate-800 dark:text-slate-200')"
+                                      x-text="auditMeta.status === 'Draft' ? 'In Progress' : (auditMeta.status === 'Submitted' ? 'Completed' : (auditMeta.status === 'Overdue' ? 'Overdue' : 'Audit Open'))"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-2 sm:gap-3 p-1.5 pr-3 sm:pr-4 rounded-2xl border shadow-sm transition-all duration-500 flex-1 sm:flex-none min-w-[130px]"
+                             x-data="{ 
+                                get completed() { return auditForm.points.filter(p => p.status !== '').length; }, 
+                                get total() { return auditForm.points.length || 15; }, 
+                                get percent() { return Math.round((this.completed / this.total) * 100) || 0; } 
+                             }"
+                             :class="percent === 100 ? 'bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 shadow-[0_0_15px_rgba(16,185,129,0.15)] dark:border-emerald-500/30' : 'bg-slate-50 dark:bg-black/30 border-slate-200 dark:border-white/5'">
+                            <div class="relative w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center shrink-0 rounded-xl border shadow-sm transition-colors duration-300"
+                                 :class="percent === 100 ? 'bg-emerald-100 border-emerald-200 dark:bg-emerald-500/20' : 'bg-white border-slate-100 dark:bg-dark_surface dark:border-white/10'">
+                                <svg class="w-7 h-7 sm:w-8 sm:h-8 transform -rotate-90">
+                                    <circle cx="50%" cy="50%" r="13" stroke="currentColor" stroke-width="2.5" fill="transparent" class="text-slate-200 dark:text-slate-700" />
+                                    <circle cx="50%" cy="50%" r="13" stroke="currentColor" stroke-width="2.5" fill="transparent" 
+                                            :class="percent === 100 ? 'text-emerald-500' : 'text-indigo-500'"
+                                            stroke-dasharray="81.68" 
+                                            :stroke-dashoffset="81.68 - (81.68 * percent) / 100" 
+                                            stroke-linecap="round" 
+                                            class="transition-all duration-700 ease-out" />
+                                </svg>
+                                <i class="fa-solid absolute text-[9px] sm:text-[10px] transition-all" 
+                                   :class="percent === 100 ? 'fa-check text-emerald-500 animate-bounce' : 'fa-bolt text-indigo-400 opacity-80'"></i>
+                            </div>
+                            <div class="flex flex-col min-w-0 justify-center">
+                                <div class="flex items-center gap-1.5 mb-0.5 leading-none">
+                                    <span class="text-[7px] sm:text-[8px] font-black uppercase tracking-widest transition-colors leading-none" 
+                                          :class="percent === 100 ? 'text-emerald-500' : 'text-slate-400'">Audit Progress</span>
+                                </div>
+                                <div class="flex items-baseline gap-1 leading-none">
+                                    <span class="text-[11px] sm:text-[13px] font-black font-mono leading-tight transition-colors" 
+                                          :class="percent === 100 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-800 dark:text-slate-200'" x-text="completed"></span>
+                                    <span class="text-[9px] sm:text-[10px] font-bold text-slate-500 leading-tight" x-text="'/ ' + total + ' Done'"></span>
                                 </div>
                             </div>
-                            <div class="text-center px-4 py-2 bg-slate-50 dark:bg-black/20 rounded-xl border border-slate-100 dark:border-white/5 shrink-0 sm:min-w-[100px] flex sm:flex-col items-center justify-between sm:justify-center gap-2 sm:gap-0 w-full sm:w-auto">
-                                <span class="block text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-slate-400 sm:mb-1">Final Score</span>
-                                <span class="text-xl sm:text-2xl font-black font-mono leading-none" :class="parseInt(selectedHistory?.score) >= 80 ? 'text-emerald-500' : 'text-rose-500'" x-text="selectedHistory?.score + (typeof selectedHistory?.score === 'string' && selectedHistory?.score.includes('%') ? '' : '%')"></span>
+                        </div>
+
+                        <div class="w-px h-8 bg-slate-200 dark:bg-white/10 hidden lg:block mx-1 shrink-0"></div>
+                        <button @click="showAuditModal = false" class="hidden lg:flex w-9 h-9 rounded-full bg-slate-100 dark:bg-white/10 items-center justify-center text-slate-400 hover:text-red-500 transition shadow-sm border border-slate-200 dark:border-transparent shrink-0 active:scale-95"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                </div>
+                
+                <!-- 📌 MODAL BODY (SCROLLABLE AREA) -->
+                <div class="flex-1 overflow-y-auto custom-scroll p-4 sm:p-8 bg-slate-50/80 dark:bg-[#020617]/50 relative">
+                    
+                    <!-- ✨ NORMAL AUDIT CHECKLIST VIEW -->
+                    <div x-show="!viewAuditHistory">
+                        
+                        <div x-show="isAuditLocked" x-cloak class="mb-6 bg-gradient-to-r from-amber-50 to-orange-50/50 border border-amber-200/80 text-amber-800 px-5 py-3.5 rounded-2xl text-xs font-bold flex items-center justify-between shadow-sm dark:from-amber-900/20 dark:to-orange-900/10 dark:border-amber-500/30 dark:text-amber-400 group">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center shrink-0"><i class="fa-solid fa-lock text-amber-500"></i></div>
+                                <span x-text="auditLockReason" class="leading-snug"></span>
                             </div>
+                            <span class="hidden sm:inline-block px-2.5 py-1 bg-white/60 dark:bg-black/40 rounded-lg text-[9px] uppercase tracking-widest border border-amber-100 dark:border-amber-500/20">Read Only</span>
                         </div>
 
-                        <div class="bg-indigo-50/50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-800/30 p-5 rounded-[1.25rem] shadow-sm relative overflow-hidden">
-                            <i class="fa-solid fa-file-contract absolute -bottom-4 -right-2 text-6xl text-indigo-500/10"></i>
-                            <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 mb-2.5 flex items-center gap-1.5"><i class="fa-solid fa-list-check"></i> Executive Summary</span>
-                            <p class="text-xs sm:text-[13px] font-medium text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap relative z-10" x-text="selectedHistory?.summary || 'No summary provided by the auditor.'"></p>
-                        </div>
-
-                        <div>
-                            <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2 mb-3 px-1">Detailed Findings & Evidence</h4>
-                            <div class="space-y-3">
-                                <template x-for="(pt, idx) in Object.values(parsedPoints)" :key="idx">
-                                    <div class="bg-white dark:bg-black/20 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm relative overflow-hidden transition-all hover:shadow-md">
-                                        <div class="absolute left-0 top-0 bottom-0 w-1.5" :class="pt.status === 'Pass' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]' : (pt.status === 'Fail' ? 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)]' : 'bg-amber-400')"></div>
+                        <div class="space-y-4 sm:space-y-5">
+                            <template x-for="(pt, index) in auditForm.points" :key="pt.id">
+                                <div class="group relative bg-white dark:bg-dark_surface rounded-3xl sm:rounded-[1.75rem] p-4 sm:p-6 border transition-all duration-400 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:hover:shadow-[0_8px_30px_rgba(255,255,255,0.02)] overflow-hidden" 
+                                     :class="pt.status === 'Fail' ? 'border-rose-200 dark:border-rose-900/50 bg-rose-50/30 dark:bg-rose-900/10' : 'border-slate-200/70 dark:border-white/5'">
+                                    
+                                    <div class="absolute left-0 top-0 bottom-0 w-1.5 transition-all duration-500 ease-out" 
+                                         :class="pt.status === 'Pass' ? 'bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.6)]' : (pt.status === 'Fail' ? 'bg-rose-500 shadow-[0_0_12px_rgba(244,63,94,0.6)]' : (pt.status === 'N/A' ? 'bg-amber-400' : 'bg-slate-200 dark:bg-slate-700'))"></div>
+                                    
+                                    <div class="flex flex-col xl:flex-row xl:items-start justify-between gap-3 sm:gap-5 pl-1.5 sm:pl-2">
+                                        <div class="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
+                                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-[0.8rem] flex items-center justify-center font-heading font-black text-xs sm:text-sm shrink-0 border shadow-sm transition-colors duration-300"
+                                                 :class="pt.status === 'Pass' ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400' : (pt.status === 'Fail' ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400' : 'bg-slate-50 text-slate-400 border-slate-200 dark:bg-white/5 dark:text-slate-500')"
+                                                 x-text="index + 1"></div>
+                                            
+                                            <div class="flex-1 min-w-0 pt-0.5">
+                                                <h4 class="text-[14px] sm:text-[15px] font-black text-slate-800 dark:text-white leading-tight mb-1 sm:mb-1.5" x-text="pt.title.replace(/^\d+\.\s*/, '')"></h4>
+                                                <p class="text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 leading-relaxed max-w-3xl" x-html="pt.desc"></p>
+                                            </div>
+                                        </div>
                                         
-                                        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pl-2">
-                                            <div class="flex-1 min-w-0">
-                                                <div class="flex items-center gap-2 mb-2 flex-wrap">
-                                                    <span class="px-2.5 py-0.5 rounded-md text-[8px] sm:text-[9px] font-black uppercase tracking-widest border shadow-sm"
-                                                          :class="pt.status === 'Pass' ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400' : (pt.status === 'Fail' ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400' : 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400')"
-                                                          x-text="pt.status || 'Unmarked'"></span>
-                                                          
-                                                    <span x-show="pt.status === 'Fail' && pt.severity" class="px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest border shadow-sm text-white"
-                                                          :class="pt.severity === 'Low' ? 'bg-yellow-500 border-yellow-600' : (pt.severity === 'Medium' ? 'bg-orange-500 border-orange-600' : (pt.severity === 'High' ? 'bg-red-500 border-red-600' : 'bg-rose-800 border-rose-900'))"
-                                                          x-text="pt.severity + ' RISK'" x-cloak></span>
-                                                </div>
-                                                
-                                                <h5 class="text-xs sm:text-sm font-bold text-slate-800 dark:text-white leading-snug pr-2" x-text="pt.title.replace(/^\d+\.\s*/, '')"></h5>
-                                                
-                                                <div class="mt-2.5 bg-slate-50 dark:bg-black/40 p-3 rounded-xl border border-slate-100 dark:border-white/5 shadow-inner">
-                                                    <span class="text-[8px] font-black uppercase tracking-widest text-slate-400 block mb-1">Auditor Remarks</span>
-                                                    <p class="text-[11px] font-medium text-slate-600 dark:text-slate-400 leading-relaxed italic" x-text="pt.remarks ? '&quot;' + pt.remarks + '&quot;' : 'No remarks documented.'"></p>
+                                        <div class="w-full xl:w-auto shrink-0 flex items-center xl:justify-end mt-1 sm:mt-0 ml-0 sm:ml-14 xl:ml-0">
+                                            <div class="p-1 w-full xl:w-auto bg-slate-50 dark:bg-black/30 rounded-xl sm:rounded-2xl border border-slate-200/80 dark:border-white/5 shadow-inner" :class="isAuditLocked ? 'opacity-90' : ''">
+                                                <div class="audit-radio-group !bg-transparent !shadow-none !border-0 !p-0 flex w-full">
+                                                    <label class="radio pass flex-1">
+                                                        <input type="radio" :name="'status_'+pt.id" value="Pass" x-model="pt.status" @click="pt.status === 'Pass' ? setTimeout(() => pt.status = '', 0) : null" :disabled="isAuditLocked">
+                                                        <span class="name !py-2 !px-2 sm:!px-4 !text-[10px] sm:!text-[11px] !rounded-lg sm:!rounded-xl tracking-wider w-full">PASS</span>
+                                                    </label>
+                                                    <label class="radio fail flex-1">
+                                                        <input type="radio" :name="'status_'+pt.id" value="Fail" x-model="pt.status" @click="pt.status === 'Fail' ? setTimeout(() => { pt.status = ''; pt.severity = ''; pt.remarks = ''; }, 0) : null" :disabled="isAuditLocked">
+                                                        <span class="name !py-2 !px-2 sm:!px-4 !text-[10px] sm:!text-[11px] !rounded-lg sm:!rounded-xl tracking-wider w-full">FAIL</span>
+                                                    </label>
+                                                    <label class="radio na flex-1">
+                                                        <input type="radio" :name="'status_'+pt.id" value="N/A" x-model="pt.status" @click="pt.status === 'N/A' ? setTimeout(() => pt.status = '', 0) : null" :disabled="isAuditLocked">
+                                                        <span class="name !py-2 !px-2 sm:!px-4 !text-[10px] sm:!text-[11px] !rounded-lg sm:!rounded-xl tracking-wider w-full">N/A</span>
+                                                    </label>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </template>
+                                    
+                                    <div class="mt-3 sm:mt-5 pl-0 sm:pl-14 grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
+                                        <div :class="pt.status === 'Fail' ? 'md:col-span-2' : 'md:col-span-3'" class="relative group/remark transition-all duration-300">
+                                            <textarea x-model="pt.remarks" rows="2" placeholder="Document your findings, evidence, or observations here..." 
+                                                      class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl sm:rounded-2xl px-4 sm:px-5 py-3 sm:py-3.5 text-[11px] sm:text-xs font-bold text-slate-800 dark:text-slate-100 outline-none focus:bg-white dark:focus:bg-black/60 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-300 shadow-inner resize-y min-h-[52px] custom-scroll disabled:opacity-100 disabled:text-slate-800 disabled:bg-slate-50 dark:disabled:text-white dark:disabled:bg-black/40" 
+                                                      :class="isAuditLocked ? 'cursor-not-allowed' : ''" :disabled="isAuditLocked"></textarea>
+                                            <i x-show="!isAuditLocked" class="fa-solid fa-pen-clip absolute top-3.5 right-4 text-slate-300 dark:text-slate-600 pointer-events-none opacity-50 group-hover/remark:opacity-100 group-hover/remark:text-brand transition-all duration-300 hidden sm:block"></i>
+                                        </div>
+                                        
+                                        <div x-show="pt.status === 'Fail'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0" x-cloak class="w-full flex flex-col justify-center mt-1 sm:mt-0">
+                                            <span class="text-[9px] font-black uppercase tracking-widest text-rose-500 mb-1.5 pl-1 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span> Risk Severity</span>
+                                            <div class="audit-radio-group !bg-rose-50/80 dark:!bg-rose-900/20 border border-rose-200/80 dark:border-rose-500/30 shadow-inner p-1 rounded-xl sm:rounded-2xl flex w-full">
+                                                <label class="radio flex-1" style="--c-main: #eab308; --c-dark: #ca8a04; --c-light: #fef08a;" title="Low Risk">
+                                                    <input type="radio" :name="'sev_'+pt.id" value="Low" x-model="pt.severity" @click="pt.severity === 'Low' ? setTimeout(() => pt.severity = '', 0) : null" :disabled="isAuditLocked">
+                                                    <span class="name !text-[9px] !py-2 !rounded-lg sm:!rounded-xl w-full">LOW</span>
+                                                </label>
+                                                <label class="radio flex-1" style="--c-main: #f97316; --c-dark: #ea580c; --c-light: #fed7aa;" title="Medium Risk">
+                                                    <input type="radio" :name="'sev_'+pt.id" value="Medium" x-model="pt.severity" @click="pt.severity === 'Medium' ? setTimeout(() => pt.severity = '', 0) : null" :disabled="isAuditLocked">
+                                                    <span class="name !text-[9px] !py-2 !rounded-lg sm:!rounded-xl w-full">MED</span>
+                                                </label>
+                                                <label class="radio flex-1" style="--c-main: #ef4444; --c-dark: #dc2626; --c-light: #fecaca;" title="High Risk">
+                                                    <input type="radio" :name="'sev_'+pt.id" value="High" x-model="pt.severity" @click="pt.severity === 'High' ? setTimeout(() => pt.severity = '', 0) : null" :disabled="isAuditLocked">
+                                                    <span class="name !text-[9px] !py-2 !rounded-lg sm:!rounded-xl w-full">HIGH</span>
+                                                </label>
+                                                <label class="radio flex-1" style="--c-main: #9f1239; --c-dark: #881337; --c-light: #fda4af;" title="Critical Risk">
+                                                    <input type="radio" :name="'sev_'+pt.id" value="Critical" x-model="pt.severity" @click="pt.severity === 'Critical' ? setTimeout(() => pt.severity = '', 0) : null" :disabled="isAuditLocked">
+                                                    <span class="name !text-[9px] !py-2 !rounded-lg sm:!rounded-xl w-full">CRIT</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                        
+                        <div x-data="{ get wordCount() { return auditForm.summary ? auditForm.summary.trim().split(/\s+/).filter(Boolean).length : 0; } }" class="bg-white dark:bg-dark_surface p-6 sm:p-8 rounded-[2rem] shadow-sm hover:shadow-lg mt-8 relative overflow-hidden group transition-all duration-400 border" :class="wordCount >= 100 ? 'border-emerald-200 dark:border-emerald-900/50' : 'border-slate-200 dark:border-white/5'">
+                            <div class="absolute -right-20 -bottom-20 w-64 h-64 rounded-full blur-[80px] opacity-20 pointer-events-none transition-all duration-1000" :class="wordCount >= 100 ? 'bg-emerald-500' : 'bg-brand'"></div>
+                            
+                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-5 relative z-10 shrink-0 gap-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-[1rem] flex items-center justify-center text-xl shadow-inner border transition-all duration-500" :class="wordCount >= 100 ? 'bg-emerald-50 text-emerald-500 border-emerald-200 dark:bg-emerald-500/10' : 'bg-slate-50 text-slate-400 border-slate-200 dark:bg-white/5 dark:border-white/10'">
+                                        <i class="fa-solid fa-file-contract" :class="wordCount > 0 && wordCount < 100 ? 'animate-pulse' : ''"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-base font-black tracking-tight text-slate-800 dark:text-white leading-none mb-1">Executive Summary</h3>
+                                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Mandatory Handover Report</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center gap-2">
+                                    <span x-show="wordCount < 100" class="text-[9px] bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/30 px-2.5 py-1 rounded-lg font-black uppercase tracking-widest shadow-sm animate-pulse" x-cloak>Min 100 Words</span>
+                                    <div class="flex items-center gap-2 bg-slate-50 dark:bg-black/40 border px-3 py-1.5 rounded-xl shadow-inner transition-colors" :class="wordCount >= 100 ? 'border-emerald-200 dark:border-emerald-900/50' : 'border-slate-200 dark:border-white/10'">
+                                        <div class="w-2 h-2 rounded-full shadow-sm" :class="wordCount >= 100 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]' : 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]'"></div>
+                                        <span class="text-[11px] font-mono font-black" :class="wordCount >= 100 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-300'"><span x-text="wordCount"></span> / 100 W</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="relative z-10 group/terminal flex-1 flex flex-col mt-2">
+                                <div class="absolute top-4 left-4 flex gap-1.5 opacity-40 z-20 transition-opacity duration-300 group-focus-within/terminal:opacity-100">
+                                    <div class="w-2.5 h-2.5 rounded-full bg-rose-400 shadow-sm"></div>
+                                    <div class="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-sm"></div>
+                                    <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-sm"></div>
+                                </div>
+                                <textarea x-model="auditForm.summary" class="w-full bg-slate-50/80 dark:bg-black/40 border rounded-2xl p-5 pt-10 text-xs font-bold text-slate-800 dark:text-slate-100 outline-none transition-all duration-300 shadow-inner resize-y min-h-[180px] custom-scroll disabled:opacity-100 disabled:text-slate-800 disabled:bg-slate-50 dark:disabled:text-white dark:disabled:bg-black/40" :class="wordCount >= 100 ? 'border-emerald-200 focus:ring-4 focus:ring-emerald-500/20 focus:bg-white dark:focus:bg-black/60 focus:border-emerald-400 dark:border-emerald-500/30' : 'border-slate-200 focus:ring-4 focus:bg-white dark:focus:bg-black/60 focus:ring-brand/10 focus:border-brand/50 dark:border-white/10'" placeholder="Type comprehensive audit findings, major risks, or handover messages here..." :disabled="isAuditLocked"></textarea>
+                                <i class="fa-solid fa-sort-down absolute bottom-3 right-4 text-slate-300 transform -rotate-45 pointer-events-none opacity-50"></i>
+                            </div>
+
+                            <div class="mt-4 flex justify-between items-center text-[10px] font-bold relative z-10 px-2 bg-slate-50 dark:bg-black/20 py-2 rounded-lg border border-slate-100 dark:border-white/5">
+                                <span x-show="wordCount < 100" class="text-rose-500 dark:text-rose-400 flex items-center gap-2" x-cloak><i class="fa-solid fa-circle-exclamation animate-bounce"></i> <span><span x-text="100 - wordCount"></span> more words required to unlock final submission.</span></span>
+                                <span x-show="wordCount >= 100" class="text-emerald-600 dark:text-emerald-400 flex items-center gap-2" x-cloak><i class="fa-solid fa-shield-check"></i> Report criteria met. Ready for executive sign-off.</span>
                             </div>
                         </div>
+                    </div> <!-- 🛑 Ends Normal Audit View -->
+
+                    <!-- ✨ EXCLUSIVE AUDIT HISTORY VIEW (FOR IT HEAD) -->
+                    <div x-show="viewAuditHistory" x-cloak class="pb-4" x-data="{ selectedHistory: null, parsedPoints: [] }">
+                        
+                        <div x-show="!selectedHistory" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0" class="space-y-4">
+                            <div class="flex items-center gap-3 mb-6 border-b border-slate-200 dark:border-white/10 pb-4">
+                                <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400 flex items-center justify-center text-lg shadow-inner"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                                <div><h3 class="font-heading font-black text-lg text-slate-800 dark:text-white leading-tight">Master Audit Log</h3><p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Global Submissions Retrospective</p></div>
+                            </div>
+
+                            <div x-show="allAudits.length === 0" class="text-center py-12"><i class="fa-solid fa-folder-open text-4xl text-slate-300 dark:text-slate-600 mb-3"></i><p class="text-[11px] font-bold text-slate-500 uppercase tracking-widest">No previous audits found in database.</p></div>
+
+                            <template x-for="(hist, idx) in allAudits" :key="idx">
+                                <div @click="selectedHistory = hist; parsedPoints = (typeof hist.details === 'string') ? JSON.parse(hist.details) : hist.details; haptic('light')" class="bg-white dark:bg-dark_surface p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition group flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-3 cursor-pointer hover:border-indigo-300 dark:hover:border-indigo-500/50">
+                                    <div class="flex items-start gap-3">
+                                        <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 border shadow-sm transition-transform group-hover:scale-110" :class="hist.status === 'Submitted' ? 'bg-emerald-50 text-emerald-500 border-emerald-200 dark:bg-emerald-500/10' : 'bg-amber-50 text-amber-500 border-amber-200 dark:bg-amber-500/10'"><i class="fa-solid" :class="hist.status === 'Submitted' ? 'fa-check' : 'fa-pen'"></i></div>
+                                        <div>
+                                            <h4 class="text-sm font-black text-slate-800 dark:text-white leading-tight mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors" x-text="hist.cycle"></h4>
+                                            <div class="flex items-center flex-wrap gap-2 text-[10px] font-bold text-slate-500">
+                                                <span class="flex items-center gap-1"><i class="fa-solid fa-user-tie text-indigo-400"></i> <span x-text="hist.auditor"></span></span>
+                                                <span class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600 hidden sm:block"></span>
+                                                <span class="flex items-center gap-1"><i class="fa-regular fa-calendar text-indigo-400"></i> <span x-text="hist.date"></span></span>
+                                                <span class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600 hidden sm:block"></span>
+                                                <span class="uppercase tracking-widest" :class="hist.status === 'Submitted' ? 'text-emerald-500' : 'text-amber-500'" x-text="hist.status"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-4 shrink-0">
+                                        <div class="bg-slate-50 dark:bg-black/20 px-4 py-2 rounded-xl border border-slate-100 dark:border-white/5 text-center">
+                                            <span class="block text-[8px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Score</span>
+                                            <span class="text-lg font-black font-mono leading-none" :class="parseInt(hist.score) >= 80 ? 'text-emerald-500' : 'text-rose-500'" x-text="hist.score + (typeof hist.score === 'string' && hist.score.includes('%') ? '' : '%')"></span>
+                                        </div>
+                                        <i class="fa-solid fa-chevron-right text-slate-300 dark:text-slate-600 group-hover:text-indigo-500 transition-transform group-hover:translate-x-1 hidden sm:block"></i>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- Detailed Drill Down -->
+                        <div x-show="selectedHistory" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 -translate-x-4" x-transition:enter-end="opacity-100 translate-x-0" class="flex flex-col space-y-5 pb-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-white/10 pb-5">
+                                <div class="flex items-center gap-3">
+                                    <button @click="selectedHistory = null; haptic('light')" class="w-9 h-9 rounded-full bg-white dark:bg-black/30 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 dark:hover:bg-indigo-500/20 dark:hover:text-indigo-400 transition shadow-sm active:scale-95 shrink-0"><i class="fa-solid fa-arrow-left"></i></button>
+                                    <div class="min-w-0">
+                                        <h3 class="font-heading font-black text-lg sm:text-xl text-slate-800 dark:text-white leading-tight truncate" x-text="selectedHistory?.cycle"></h3>
+                                        <div class="flex items-center gap-2 mt-1 text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-widest flex-wrap">
+                                            <span x-text="selectedHistory?.auditor"></span>
+                                            <span class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
+                                            <span x-text="selectedHistory?.date"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-center px-4 py-2 bg-slate-50 dark:bg-black/20 rounded-xl border border-slate-100 dark:border-white/5 shrink-0 sm:min-w-[100px] flex sm:flex-col items-center justify-between sm:justify-center gap-2 sm:gap-0 w-full sm:w-auto">
+                                    <span class="block text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-slate-400 sm:mb-1">Final Score</span>
+                                    <span class="text-xl sm:text-2xl font-black font-mono leading-none" :class="parseInt(selectedHistory?.score) >= 80 ? 'text-emerald-500' : 'text-rose-500'" x-text="selectedHistory?.score + (typeof selectedHistory?.score === 'string' && selectedHistory?.score.includes('%') ? '' : '%')"></span>
+                                </div>
+                            </div>
+
+                            <div class="bg-indigo-50/50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-800/30 p-5 rounded-[1.25rem] shadow-sm relative overflow-hidden">
+                                <i class="fa-solid fa-file-contract absolute -bottom-4 -right-2 text-6xl text-indigo-500/10"></i>
+                                <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 mb-2.5 flex items-center gap-1.5"><i class="fa-solid fa-list-check"></i> Executive Summary</span>
+                                <p class="text-xs sm:text-[13px] font-medium text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap relative z-10" x-text="selectedHistory?.summary || 'No summary provided by the auditor.'"></p>
+                            </div>
+
+                            <div>
+                                <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2 mb-3 px-1">Detailed Findings & Evidence</h4>
+                                <div class="space-y-3">
+                                    <template x-for="(pt, idx) in Object.values(parsedPoints)" :key="idx">
+                                        <div class="bg-white dark:bg-black/20 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm relative overflow-hidden transition-all hover:shadow-md">
+                                            <div class="absolute left-0 top-0 bottom-0 w-1.5" :class="pt.status === 'Pass' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]' : (pt.status === 'Fail' ? 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)]' : 'bg-amber-400')"></div>
+                                            <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pl-2">
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="flex items-center gap-2 mb-2 flex-wrap">
+                                                        <span class="px-2.5 py-0.5 rounded-md text-[8px] sm:text-[9px] font-black uppercase tracking-widest border shadow-sm" :class="pt.status === 'Pass' ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400' : (pt.status === 'Fail' ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400' : 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400')" x-text="pt.status || 'Unmarked'"></span>
+                                                        <span x-show="pt.status === 'Fail' && pt.severity" class="px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest border shadow-sm text-white" :class="pt.severity === 'Low' ? 'bg-yellow-500 border-yellow-600' : (pt.severity === 'Medium' ? 'bg-orange-500 border-orange-600' : (pt.severity === 'High' ? 'bg-red-500 border-red-600' : 'bg-rose-800 border-rose-900'))" x-text="pt.severity + ' RISK'" x-cloak></span>
+                                                    </div>
+                                                    <h5 class="text-xs sm:text-sm font-bold text-slate-800 dark:text-white leading-snug pr-2" x-text="pt.title.replace(/^\d+\.\s*/, '')"></h5>
+                                                    <div class="mt-2.5 bg-slate-50 dark:bg-black/40 p-3 rounded-xl border border-slate-100 dark:border-white/5 shadow-inner">
+                                                        <span class="text-[8px] font-black uppercase tracking-widest text-slate-400 block mb-1">Auditor Remarks</span>
+                                                        <p class="text-[11px] font-medium text-slate-600 dark:text-slate-400 leading-relaxed italic" x-text="pt.remarks ? '&quot;' + pt.remarks + '&quot;' : 'No remarks documented.'"></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </div> <!-- 🛑 Ends History View -->
+
+                </div> <!-- 🛑 1. CLOSES THE SCROLLABLE BODY -->
+
+                <!-- 📌 MODAL FOOTER -->
+                <div class="p-4 sm:p-5 border-t border-slate-200 dark:border-white/10 bg-white dark:bg-black/20 flex flex-col sm:flex-row justify-between items-center gap-4 shrink-0 mt-auto relative z-20">
+                    <div class="relative w-full sm:w-64 shrink-0" x-show="!viewAuditHistory">
+                        <i class="fa-solid fa-key absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <input type="password" x-model="auditSecret" placeholder="Admin Key" class="w-full pl-8 pr-3 py-2.5 sm:py-3 bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl text-xs font-mono font-bold outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition shadow-sm" :disabled="isAuditLocked">
                     </div>
-                </div>
-                
-            </div> <!-- 🛑🛑🛑 IMPORTANT: THIS CLOSES THE SCROLLABLE BODY -->
-
-            <!-- Modal Footer (Fixed at Bottom) -->
-            <div class="p-4 sm:p-5 border-t border-slate-200 dark:border-white/10 bg-white dark:bg-black/20 flex flex-col sm:flex-row justify-between items-center gap-4 shrink-0 rounded-b-[2rem] mt-auto relative z-20">
-                <div class="relative w-full sm:w-64 shrink-0" x-show="!viewAuditHistory">
-                    <i class="fa-solid fa-key absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                    <input type="password" x-model="auditSecret" placeholder="Admin Key" class="w-full pl-8 pr-3 py-2.5 sm:py-3 bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl text-xs font-mono font-bold outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition shadow-sm" :disabled="isAuditLocked">
-                </div>
-                
-                <div class="flex items-center gap-2.5 w-full" :class="!viewAuditHistory ? 'justify-end sm:w-auto' : 'justify-start sm:w-full'">
                     
-                    <button x-show="(currentUser?.name || '').toLowerCase().includes('vikas')" 
-                            @click="viewAuditHistory = !viewAuditHistory; haptic('light')" 
-                            class="flex-1 sm:flex-none px-4 py-2.5 sm:py-3 rounded-xl text-xs font-bold transition shadow-sm border flex items-center justify-center gap-1.5 active:scale-95"
-                            :class="viewAuditHistory ? 'bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-500/20 dark:text-indigo-400 dark:border-indigo-500/40 mr-auto' : 'bg-slate-100 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 border-slate-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-indigo-500/10 dark:hover:text-indigo-400 dark:border-white/10'">
-                        <i class="fa-solid" :class="viewAuditHistory ? 'fa-arrow-left' : 'fa-clock-rotate-left'"></i> 
-                        <span x-text="viewAuditHistory ? 'Back to Audit' : 'Audit History'"></span>
-                    </button>
-
-                    <button x-show="!viewAuditHistory" @click="submitAudit('Draft')" class="flex-1 sm:flex-none px-5 py-2.5 sm:py-3 rounded-xl text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition shadow-sm dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10" :disabled="auditLoading || isAuditLocked">
-                        <i class="fa-solid fa-save mr-1 opacity-70"></i> Save Draft
-                    </button>
-                    <button x-show="!viewAuditHistory" @click="submitAudit('Submitted')" class="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 sm:py-3 rounded-xl text-xs font-black uppercase tracking-wider shadow-[0_5px_15px_-3px_rgba(79,70,229,0.4)] transition active:scale-95 flex items-center justify-center gap-2" :disabled="auditLoading || isAuditLocked">
-                        <span x-show="!auditLoading">Final Submit</span>
-                        <span x-show="auditLoading"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+                    <div class="flex items-center gap-2.5 w-full" :class="!viewAuditHistory ? 'justify-end sm:w-auto' : 'justify-start sm:w-full'">
+                        <!-- 🚀 IT HEAD EXCLUSIVE BUTTON -->
+                        <button x-show="(currentUser?.name || '').toLowerCase().includes('vikas')" @click="viewAuditHistory = !viewAuditHistory; haptic('light')" class="flex-1 sm:flex-none px-4 py-2.5 sm:py-3 rounded-xl text-xs font-bold transition shadow-sm border flex items-center justify-center gap-1.5 active:scale-95" :class="viewAuditHistory ? 'bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-500/20 dark:text-indigo-400 dark:border-indigo-500/40 mr-auto' : 'bg-slate-100 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 border-slate-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-indigo-500/10 dark:hover:text-indigo-400 dark:border-white/10'">
+                            <i class="fa-solid" :class="viewAuditHistory ? 'fa-arrow-left' : 'fa-clock-rotate-left'"></i> <span x-text="viewAuditHistory ? 'Back to Audit' : 'Audit History'"></span>
+                        </button>
+                        <button x-show="!viewAuditHistory" @click="submitAudit('Draft')" class="flex-1 sm:flex-none px-5 py-2.5 sm:py-3 rounded-xl text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition shadow-sm dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10" :disabled="auditLoading || isAuditLocked">
+                            <i class="fa-solid fa-save mr-1 opacity-70"></i> Save Draft
+                        </button>
+                        <button x-show="!viewAuditHistory" @click="submitAudit('Submitted')" class="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 sm:py-3 rounded-xl text-xs font-black uppercase tracking-wider shadow-[0_5px_15px_-3px_rgba(79,70,229,0.4)] transition active:scale-95 flex items-center justify-center gap-2" :disabled="auditLoading || isAuditLocked">
+                            <span x-show="!auditLoading">Final Submit</span>
+                            <span x-show="auditLoading"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
+                        </button>
+                    </div>
+                </div> <!-- 🛑 2. CLOSES THE FOOTER -->
+            
+            </div> <!-- 🛑 3. CLOSES THE BLUR WRAPPER -->
+        </div> <!-- 🛑 4. CLOSES THE WHITE MODAL CONTAINER -->
+    </div> <!-- 🛑 5. CLOSES THE MAIN DARK OVERLAY (showAuditModal) -->
 
     <!-- ⬇️ Yahan se baaki modals continued hain... -->
     <div x-show="showLogoutModal" x-cloak class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4" x-transition.opacity>
@@ -2128,13 +2073,27 @@
                 chartConfig: { type: 'status', time: 'all' },
                 chartInstance: null,
 
+                // 🫧 SMOOTH LAGGING BUBBLE CURSOR ENGINE (OPTIMIZED - NO ZOOM)
+                setupCustomCursor() { 
+                    if(!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+                    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+                    const ring = document.createElement('div'); 
+                    ring.classList.add('custom-ring'); 
+                    document.body.appendChild(ring);
+
+                    document.addEventListener('mousemove', (e) => {
+                        ring.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%)`;
+                    });
+                },
+
                 init() {
                     if (this.isDark) document.documentElement.classList.add('dark');
                     document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
                     
                     // 🚀 INITIALIZE CUSTOM MOUSE CURSOR
                     this.setupCustomCursor();
-
+                    
                     // 🚀 INITIALIZE HACKER DECRYPTION
                     this.runDecryption('decrypt-title');
                     
@@ -2174,41 +2133,7 @@
                     setInterval(() => this.fetchTickets(false), 300000);
                 },
 
-                // 🫧 SMOOTH LAGGING BUBBLE CURSOR ENGINE (OPTIMIZED)
-                setupCustomCursor() { 
-                    if(!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-                    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-                    // Sirf Ring create karenge
-                    const ring = document.createElement('div'); 
-                    ring.classList.add('custom-ring'); 
-                    document.body.appendChild(ring);
-
-                    document.addEventListener('mousemove', (e) => {
-                        // 📍 Ring smoothly mouse position (jo ab native OS handle kar raha hai) ko follow karegi
-                        ring.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%) scale(var(--scale, 1))`;
-                    });
-
-                    // Hover States for Bubble growth
-                    document.body.addEventListener('mouseover', (e) => { 
-                        try {
-                            // 🚀 Fixed: Properly escaped \@click and added safety block
-                            if (e.target.closest('a, button, input, select, textarea, .cursor-pointer, [x-on\\:click], [\\@click]')) {
-                                document.body.classList.add('cursor-grow'); 
-                            }
-                        } catch (err) {} // Silent catch to keep console clean
-                    });
-                    
-                    document.body.addEventListener('mouseout', (e) => { 
-                        try {
-                            // 🚀 Fixed: Properly escaped \@click and added safety block
-                            if (e.target.closest('a, button, input, select, textarea, .cursor-pointer, [x-on\\:click], [\\@click]')) {
-                                document.body.classList.remove('cursor-grow'); 
-                            }
-                        } catch (err) {} // Silent catch to keep console clean
-                    });
-                },
-
+                
                 // 🚀 HACKER DECRYPTION ENGINE (No Jitter & 30s Loop)
                 runDecryption(elementId) {
                     const el = document.getElementById(elementId);
@@ -2705,7 +2630,8 @@
                     this.showLogoutModal = false; this.showProfileModal = false; this.showSettingsModal = false; 
                     this.showGuide = false; this.showStaffModal = false; this.showOpenTicketsModal = false;
                     this.showNotifs = false; this.showProfile = false; this.showResolveModal = false;
-                    this.showSuccessPopup = false; // 🚀 YAHAN BHI ADD KIYA
+                    this.showAuditModal = false; // 🚀 Fix: Added Audit Modal to close list
+                    this.sysPopup.show = false; 
                 },
 
                 isStaffOnline(staff) {
