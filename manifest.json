@@ -1,6 +1,6 @@
 {
-  "name": "PBL Connect IT Operations",
-  "short_name": "PBL Connect",
+  "name": "PBL IT Dashboard",
+  "short_name": "IT Dashboard",
   "start_url": "./it-login.html",
   "display": "standalone",
   "background_color": "#0f172a",
