@@ -110,9 +110,17 @@
                     </div>
                 </a>
                 <div class="flex flex-col justify-center">
-                    <div class="flex items-center gap-2 mb-0.5">
+                    <div class="flex items-center gap-1.5 sm:gap-2 mb-0.5">
                         <span class="px-2 py-0.5 rounded-md bg-brand/10 text-brand border border-brand/20 dark:bg-brand/20 dark:border-brand/30 dark:text-brand_glow font-mono font-black text-[9px] leading-none shadow-sm" x-text="PBL_APP_VERSION"></span>
                         <span class="hidden sm:inline-block text-[9px] font-black text-slate-400 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-md">HR OPERATIONS</span>
+                        
+                        <!-- 📶 NEW: Smart WiFi Sync Button (Emerald Theme) -->
+                        <button @click="manualSync()" 
+                                class="w-5 h-5 sm:w-6 sm:h-6 rounded-md flex items-center justify-center border shadow-sm transition-all duration-300 active:scale-95 shrink-0"
+                                :class="wifiStatus === 'syncing' ? 'bg-amber-50 text-amber-500 border-amber-200 dark:bg-amber-500/10 dark:border-amber-500/30' : 'bg-emerald-50 text-emerald-500 border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:border-emerald-500/30 dark:hover:bg-emerald-500/20'">
+                            <i class="fa-solid text-[9px] sm:text-[10px]" 
+                               :class="wifiStatus === 'syncing' ? 'fa-spinner fa-spin' : (wifiStatus === 'success' ? 'fa-check' : 'fa-wifi')"></i>
+                        </button>
                     </div>
                     <h2 class="font-heading font-black text-lg sm:text-2xl text-slate-800 dark:text-white leading-tight tracking-tight mt-0.5">Leave<span class="text-brand dark:text-brand_glow">Tracker</span></h2>
                 </div>
@@ -892,6 +900,14 @@
                 isAdmin: false,
                 showProfile: false, 
                 viewMode: 'list',
+                
+                wifiStatus: 'idle',
+                async manualSync() {
+                    this.haptic('light'); this.wifiStatus = 'syncing';
+                    await this.fetchData(true);
+                    this.wifiStatus = 'success'; setTimeout(() => { this.wifiStatus = 'idle'; }, 3000);
+                },
+
                 loading: false, saving: false,
                 activeTab: 'myLeaves',
                 allLeaves: [],
