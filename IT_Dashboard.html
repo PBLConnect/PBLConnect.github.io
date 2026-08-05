@@ -180,13 +180,17 @@
                         <div class="relative group cursor-pointer shrink-0" @click="showChangelogModal = true; haptic('light')" title="View Release Notes">
                             <button class="relative bg-blue-50 border border-blue-200 dark:bg-brand/10 dark:border-brand/30 px-1.5 sm:px-2 py-0.5 rounded-md font-mono font-black text-[9px] leading-none shadow-sm flex items-center gap-1.5 hover:bg-blue-100 dark:hover:bg-brand/20 transition-colors">
                                 <span class="text-brand dark:text-brand_glow" x-text="PBL_APP_VERSION"></span> 
-                                <span class="relative flex h-1.5 w-1.5">
-                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand opacity-75"></span>
-                                    <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-brand"></span>
-                                </span>
                             </button>
                         </div>
                         <span class="hidden sm:inline-block text-[9px] font-black text-slate-400 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-md truncate">IT Operations</span>
+                        
+                        <!-- 📶 NEW: Smart WiFi Sync Button -->
+                        <button @click="manualSync()" 
+                                class="w-5 h-5 sm:w-6 sm:h-6 rounded-md flex items-center justify-center border shadow-sm transition-all duration-300 active:scale-95 shrink-0"
+                                :class="wifiStatus === 'syncing' ? 'bg-amber-50 text-amber-500 border-amber-200 dark:bg-amber-500/10 dark:border-amber-500/30' : (wifiStatus === 'success' ? 'bg-emerald-50 text-emerald-500 border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/30' : 'bg-slate-50 text-slate-400 border-slate-200 hover:text-brand dark:bg-white/5 dark:border-white/10 dark:hover:text-brand')">
+                            <i class="fa-solid text-[9px] sm:text-[10px]" 
+                               :class="wifiStatus === 'syncing' ? 'fa-spinner fa-spin' : (wifiStatus === 'success' ? 'fa-check' : 'fa-wifi')"></i>
+                        </button>
                     </div>
                     <!-- 🚀 Hacker Effect Applied Here (Now IMMUTABLE / No Wrap) -->
                     <h2 class="font-heading font-black text-[17px] sm:text-2xl text-slate-800 dark:text-white leading-tight tracking-tight mt-0.5 whitespace-nowrap">
@@ -459,11 +463,9 @@
     </header>
 
     <!-- MAIN CONTENT -->
-    <main id="main-scroll" class="flex-1 overflow-y-auto lg:overflow-hidden p-4 sm:p-6 bg-slate-50/50 dark:bg-[#020617] flex flex-col" style="overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch;">
+    <main id="main-scroll" class="flex-1 overflow-y-auto lg:overflow-hidden p-4 sm:p-6 bg-slate-50/50 dark:bg-[#020617] flex flex-col">
         
-        <div id="pull-indicator" class="w-full shrink-0 flex items-center justify-center">
-            <i class="fa-solid fa-arrow-down text-slate-400 text-xl transition-transform duration-300"></i>
-        </div>
+        <!-- 🚀 Removed Clunky Pull-to-refresh indicator -->
 
         <div class="max-w-[1920px] mx-auto w-full flex flex-col gap-4 sm:gap-6 h-full pb-4 lg:pb-0">
 
@@ -1866,8 +1868,18 @@
                 isGlobal: safeUser.allowedLocation === 'Global',
                 currentLocation: safeUser.allowedLocation === 'Global' ? (localStorage.getItem('pbl_loc_pref') || 'Noida') : (safeUser.allowedLocation || 'Noida'),
                 
+                wifiStatus: 'idle', // 📶 State for new WiFi Sync button
+                async manualSync() {
+                    this.haptic('light');
+                    this.wifiStatus = 'syncing';
+                    await this.checkAuditStatus();
+                    await this.fetchTickets(true);
+                    this.wifiStatus = 'success';
+                    setTimeout(() => { this.wifiStatus = 'idle'; }, 3000);
+                },
+
                 showNotifs: false, showProfile: false, highlightLog: false,
-                showLogoutModal: false, showProfileModal: false, showSettingsModal: false, 
+                showLogoutModal: false, showProfileModal: false, showSettingsModal: false,
                 showGuide: false, showStaffModal: false, showOpenTicketsModal: false, showChangelogModal: false, showAuditModal: false,
                 
                 // 🔥 NAYA: RESOLVE MODAL VARIABLES (CONTEXT AWARE)
@@ -2851,36 +2863,6 @@
         }); 
     }); 
     
-    document.addEventListener('DOMContentLoaded', () => {
-        const mainScroll = document.getElementById('main-scroll');
-        const pullIndicator = document.getElementById('pull-indicator');
-        if (!mainScroll || !pullIndicator) return;
-        const pullIcon = pullIndicator.querySelector('i');
-        let startY = 0; let isPulling = false; const pullThreshold = 70; 
-        mainScroll.addEventListener('touchstart', (e) => {
-            if (mainScroll.scrollTop === 0) { startY = e.touches[0].pageY; isPulling = true; pullIndicator.style.transition = 'none'; }
-        }, { passive: true });
-        mainScroll.addEventListener('touchmove', (e) => {
-            if (!isPulling) return;
-            const currentY = e.touches[0].pageY; const diff = currentY - startY;
-            if (diff > 0 && mainScroll.scrollTop <= 0) {
-                const height = Math.min(diff * 0.5, 100); pullIndicator.style.height = height + 'px';
-                if (height >= pullThreshold) { pullIndicator.classList.add('pull-ready'); pullIcon.className = "fa-solid fa-arrow-down text-brand transition-transform duration-300"; } 
-                else { pullIndicator.classList.remove('pull-ready'); pullIcon.className = "fa-solid fa-arrow-down text-slate-400 transition-transform duration-300"; }
-            }
-        }, { passive: true });
-        mainScroll.addEventListener('touchend', () => {
-            if (!isPulling) return;
-            isPulling = false; pullIndicator.style.transition = 'height 0.3s ease';
-            const currentHeight = parseInt(pullIndicator.style.height || '0');
-            if (currentHeight >= pullThreshold) {
-                try { if (window.navigator && window.navigator.vibrate) navigator.vibrate(30); } catch(e){}
-                pullIndicator.style.height = '60px'; pullIcon.className = "fa-solid fa-circle-notch fa-spin text-brand text-xl"; pullIndicator.classList.remove('pull-ready');
-                window.dispatchEvent(new CustomEvent('refresh-dashboard'));
-                setTimeout(() => { pullIndicator.style.height = '0px'; setTimeout(() => { pullIcon.className = "fa-solid fa-arrow-down text-slate-400 text-xl transition-transform duration-300"; }, 300); }, 1500);
-            } else { pullIndicator.style.height = '0px'; }
-        });
-    });
     </script>
 </body>
 </html>
