@@ -234,12 +234,13 @@
         </div>
     </header>
 
-    <main class="flex-1 flex flex-col overflow-y-auto p-4 sm:p-6 bg-slate-50/50 dark:bg-[#020617]" x-data="{ hideMobileKPI: false }">
+    <!-- 🚀 Fixed: Removed artificial scroll logic for natural smooth scrolling -->
+    <main class="flex-1 flex flex-col overflow-y-auto p-4 sm:p-6 bg-slate-50/50 dark:bg-[#020617]">
 
         <div class="max-w-[1920px] mx-auto w-full flex flex-col gap-4 sm:gap-6 h-full">
 
             <!-- 📍 DYNAMIC KPI CARDS -->
-            <div class="cards-container grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 shrink-0 transition-all duration-500 ease-in-out overflow-hidden origin-top" :class="hideMobileKPI ? 'max-h-0 opacity-0 !mb-0 md:max-h-[500px] md:opacity-100 md:!mb-4' : 'max-h-[500px] opacity-100 mb-3 sm:mb-4'">
+            <div class="cards-container grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 shrink-0 mb-3 sm:mb-4">
                 
                 <div @click="filterBy(null)" class="ip-card relative p-3 sm:p-4 rounded-[1.25rem] cursor-pointer overflow-hidden transition-all duration-300 group bg-orange-50/80 border border-orange-200/70 shadow-sm hover:shadow-md hover:border-orange-300 dark:bg-orange-900/10 dark:border-orange-800/50 dark:hover:border-orange-700/50">
                     <i class="fa-solid fa-desktop absolute -bottom-4 -right-2 text-7xl sm:text-8xl text-orange-500 opacity-20 dark:opacity-10 group-hover:scale-110 transition-transform duration-500"></i>
@@ -327,7 +328,8 @@
                     </div>
                 </div>
 
-                <div class="w-full overflow-y-auto flex-1 custom-scroll relative" @scroll="hideMobileKPI = $el.scrollTop > 30">
+                <!-- 🚀 Fixed: Removed @scroll binding to prevent UI jumping -->
+                <div class="w-full overflow-y-auto flex-1 custom-scroll relative">
                     
                     <div x-show="activeFilter" class="absolute top-2 left-1/2 -translate-x-1/2 z-20" x-cloak>
                         <div class="px-3 py-1 rounded-full bg-slate-800 text-white text-[10px] font-bold shadow-lg flex items-center gap-2 cursor-pointer" @click="filterBy(null)">
