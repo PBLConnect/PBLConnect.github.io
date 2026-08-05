@@ -589,22 +589,26 @@
                         <div class="relative z-10 mt-auto w-full">
                             <h3 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">IT Sec Audit</h3>
                             
+                            <!-- 🚀 Fixed: Wrapped text logic to ensure dates are never cut off on mobile -->
                             <div class="mt-1 h-[28px] sm:h-[34px] flex flex-col justify-start w-full">
                                 
+                                <!-- State: Pending / Draft -->
                                 <div x-show="auditMeta.status !== 'Submitted'" class="flex flex-col w-full justify-start mt-0.5">
-                                    <div class="text-[11px] sm:text-[12px] font-bold truncate transition-colors duration-300 text-slate-500 dark:text-slate-400 leading-none mb-1"
-                                         x-text="auditMeta.status === 'Overdue' ? 'Action Required 🚨' : (auditMeta.status === 'Draft' ? 'In Progress 📝' : 'Audit Open 🛡️')">
+                                    <div class="flex items-center gap-1.5 text-[10px] sm:text-[12px] font-bold truncate transition-colors duration-300 text-slate-500 dark:text-slate-400 leading-none mb-0.5">
+                                        <span x-text="auditMeta.status === 'Overdue' ? 'Action Required' : (auditMeta.status === 'Draft' ? 'In Progress' : 'Audit Open')"></span>
+                                        <i class="fa-solid" :class="auditMeta.status === 'Overdue' ? 'fa-triangle-exclamation text-red-500 animate-pulse' : (auditMeta.status === 'Draft' ? 'fa-pen text-amber-500' : 'fa-shield text-indigo-500')"></i>
                                     </div>
-                                    <span class="font-mono text-[8.5px] sm:text-[9.5px] font-black text-slate-800 dark:text-white drop-shadow-md truncate" x-text="auditMeta.cycle"></span>
+                                    <div class="w-full text-[7.5px] sm:text-[9.5px] font-black text-slate-800 dark:text-white drop-shadow-md leading-tight whitespace-normal break-words line-clamp-2" x-text="auditMeta.cycle"></div>
                                 </div>
 
+                                <!-- State: Submitted (Verified) -->
                                 <div x-show="auditMeta.status === 'Submitted'" x-cloak class="flex flex-col w-full justify-start mt-0.5">
-                                    <div class="text-[11px] sm:text-[12px] font-black text-emerald-600 dark:text-emerald-500 leading-none mb-1 truncate">
+                                    <div class="text-[10px] sm:text-[12px] font-black text-emerald-600 dark:text-emerald-500 leading-none mb-0.5 truncate">
                                         ✅ Verified by <span x-text="auditMeta.auditor ? auditMeta.auditor.split(' ')[0] : 'IT'"></span>
                                     </div>
-                                    <div class="flex items-center gap-1 w-full text-[8.5px] sm:text-[9.5px] font-bold text-slate-500 dark:text-slate-400">
-                                        <span class="font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest truncate" x-text="auditMeta.cycle.includes('(') ? auditMeta.cycle.split('(')[0].trim() : auditMeta.cycle"></span>
-                                        <span class="shrink-0 font-mono" x-text="'• ' + auditMeta.date"></span>
+                                    <div class="w-full text-[7.5px] sm:text-[9px] font-bold text-slate-500 dark:text-slate-400 leading-tight whitespace-normal break-words line-clamp-2">
+                                        <span class="font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest" x-text="auditMeta.cycle.includes('(') ? auditMeta.cycle.split('(')[0].trim() : auditMeta.cycle"></span>
+                                        <span class="font-mono whitespace-nowrap" x-text="'' + auditMeta.date"></span>
                                     </div>
                                 </div>
                                 
