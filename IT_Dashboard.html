@@ -913,49 +913,95 @@
     <div x-show="showAuditModal" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 sm:p-6" x-transition.opacity @click.self="if(!auditLoading) showAuditModal = false">
         <div class="bg-slate-50 dark:bg-dark_surface w-full max-w-4xl rounded-[2rem] shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden flex flex-col max-h-[90vh]">
             
-            <!-- Modal Header -->
-            <div class="p-5 sm:p-6 border-b border-slate-200 dark:border-white/10 flex justify-between items-center shrink-0 bg-white dark:bg-black/20 relative z-20">
-                <!-- 🛡️ MODERN LEFT HEADER -->
-                <div class="flex items-center gap-3 sm:gap-4 group cursor-default">
-                    <!-- Glassmorphic Icon with Glare Effect -->
-                    <div class="relative w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-indigo-500 via-violet-600 to-purple-700 text-white flex items-center justify-center shadow-[0_8px_20px_-4px_rgba(99,102,241,0.5)] border border-white/20 shrink-0 overflow-hidden transform group-hover:scale-105 transition-all duration-300">
-                        <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform -translate-x-full group-hover:translate-x-full"></div>
-                        <i class="fa-solid fa-user-shield text-xl sm:text-2xl drop-shadow-md"></i>
+            <!-- Modal Header (Adaptive Flex Layout) -->
+            <div class="p-4 sm:p-5 border-b border-slate-200 dark:border-white/10 bg-white dark:bg-black/20 flex flex-col lg:flex-row justify-between lg:items-center gap-4 shrink-0 relative z-20">
+                
+                <!-- 1. LEFT: Icon, Title & Cycle -->
+                <div class="flex justify-between items-start lg:items-center w-full lg:w-auto flex-1 min-w-0 shrink-0 pr-0 lg:pr-4">
+                    <div class="flex items-center gap-3 sm:gap-4 group cursor-default min-w-0">
+                        <!-- Glassmorphic Icon -->
+                        <div class="relative w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-indigo-500 via-violet-600 to-purple-700 text-white flex items-center justify-center shadow-[0_8px_20px_-4px_rgba(99,102,241,0.5)] border border-white/20 shrink-0 overflow-hidden transform group-hover:scale-105 transition-all duration-300">
+                            <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform -translate-x-full group-hover:translate-x-full"></div>
+                            <i class="fa-solid fa-user-shield text-xl sm:text-2xl drop-shadow-md"></i>
+                        </div>
+                        
+                        <div class="flex flex-col justify-center min-w-0 flex-1">
+                            <!-- New Punchy Title -->
+                            <h3 class="font-heading font-black text-[17px] sm:text-[20px] leading-none tracking-tight text-slate-800 dark:text-white drop-shadow-sm mb-1.5 truncate">
+                                IT Security <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-500 dark:from-indigo-400 dark:to-violet-400">Audit</span>
+                            </h3>
+                            
+                            <!-- Pulsing Cycle Badge -->
+                            <div class="flex items-center mt-1 w-full">
+                                <div class="inline-flex items-start gap-2 px-2.5 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/30 shadow-sm max-w-full">
+                                    <!-- Pulsing Dot (Aligned to top) -->
+                                    <div class="relative flex h-1.5 w-1.5 shrink-0 mt-1">
+                                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                                      <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-indigo-500"></span>
+                                    </div>
+                                    
+                                    <!-- 🚀 Smart 2-Line Formatted Text -->
+                                    <div class="flex flex-col text-left">
+                                        <!-- Line 1: Main Cycle Name -->
+                                        <span class="text-[9.5px] sm:text-[10px] font-black text-indigo-700 dark:text-indigo-300 uppercase tracking-widest leading-none" 
+                                              x-text="auditMeta.cycle.includes('(') ? auditMeta.cycle.split('(')[0].trim() : auditMeta.cycle"></span>
+                                        
+                                        <!-- Line 2: Dates (With Calendar Icon) -->
+                                        <span class="text-[8px] font-bold text-indigo-500 dark:text-indigo-400 uppercase tracking-wider mt-1 flex items-center gap-1 leading-none" 
+                                              x-show="auditMeta.cycle.includes('(')" x-cloak>
+                                            <i class="fa-regular fa-calendar-days text-[9px] opacity-70"></i> 
+                                            <span x-text="auditMeta.cycle.includes('(') ? auditMeta.cycle.split('(')[1].replace(')', '') : ''"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+							</div>
+                    </div>
+                    <!-- Mobile Close Button -->
+                    <button @click="showAuditModal = false" class="lg:hidden w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-400 hover:text-red-500 transition shadow-sm border border-slate-200 dark:border-transparent shrink-0 active:scale-95"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+
+                <!-- 2. RIGHT: Pills & Progress (Wraps cleanly) -->
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full lg:w-auto shrink-0 border-t border-slate-200/60 dark:border-white/10 lg:border-0 pt-3 lg:pt-0">
+                    
+                    <!-- Auditor Pill -->
+                    <div class="flex items-center gap-2 sm:gap-3 p-1.5 pr-3 sm:pr-4 rounded-2xl border shadow-sm transition-all duration-300 flex-1 sm:flex-none bg-slate-50 dark:bg-black/30 border-slate-200 dark:border-white/5 min-w-[130px]">
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-white border border-slate-100 text-indigo-600 dark:bg-dark_surface dark:border-white/10 dark:text-indigo-400 flex items-center justify-center text-sm sm:text-base font-black shrink-0 shadow-sm">
+                            <i class="fa-solid fa-user-tie"></i>
+                        </div>
+                        <div class="flex flex-col min-w-0 justify-center">
+                            <span class="text-[7px] sm:text-[8px] font-black uppercase tracking-widest text-slate-400 leading-none mb-1">Assigned To</span>
+                            <span class="text-[11px] sm:text-[13px] font-bold text-slate-800 dark:text-slate-200 leading-tight truncate" x-text="auditMeta.auditor || '-'"></span>
+                        </div>
                     </div>
                     
-                    <div class="flex flex-col justify-center">
-                        <!-- Gradient Text Title -->
-                        <h3 class="font-heading font-black text-lg sm:text-[22px] leading-none tracking-tight text-slate-800 dark:text-white drop-shadow-sm mb-1.5 sm:mb-2">
-                            Security & <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-500 dark:from-indigo-400 dark:to-violet-400">Compliance</span>
-                        </h3>
-                        
-                        <!-- Pulsing Smart Badge for Cycle -->
-						<div class="flex items-center gap-1.5 mt-1 sm:mt-0">
-							<span class="px-2.5 py-1 sm:py-0.5 rounded-lg sm:rounded-md bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30 text-[8px] sm:text-[9px] font-black uppercase tracking-widest shadow-sm flex items-center gap-1.5">
-								<span class="relative flex h-1.5 w-1.5 shrink-0">
-								  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-								  <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-indigo-500"></span>
-								</span>
-								<!-- 🚀 Smart Fix: Allows text to naturally wrap on mobile instead of showing dots (...) -->
-								<span x-text="auditMeta.cycle" class="whitespace-normal sm:whitespace-nowrap leading-tight max-w-[165px] sm:max-w-full text-left"></span>
-							</span>
-							<span class="hidden sm:flex text-[8px] text-slate-400 uppercase tracking-widest font-bold items-center gap-1"><i class="fa-solid fa-shield-halved opacity-50"></i> Protocol</span>
-						</div>
+                    <!-- Live Status Pill -->
+                    <div class="flex items-center gap-2 sm:gap-3 p-1.5 pr-3 sm:pr-4 rounded-2xl border shadow-sm transition-all duration-300 flex-1 sm:flex-none min-w-[130px]"
+                         :class="auditMeta.status === 'Submitted' ? 'bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-500/30' : (auditMeta.status === 'Overdue' ? 'bg-rose-50/50 dark:bg-rose-900/10 border-rose-200 dark:border-rose-500/30' : 'bg-slate-50 dark:bg-black/30 border-slate-200 dark:border-white/5')">
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-sm sm:text-lg font-black shrink-0 shadow-sm transition-colors duration-300 border"
+                             :class="auditMeta.status === 'Submitted' ? 'bg-emerald-100 text-emerald-600 border-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-400' : (auditMeta.status === 'Overdue' ? 'bg-rose-100 text-rose-600 border-rose-200 dark:bg-rose-500/20 dark:text-rose-400' : 'bg-white text-amber-500 border-slate-100 dark:bg-dark_surface dark:border-white/10')">
+                            <i class="fa-solid" :class="auditMeta.status === 'Submitted' ? 'fa-shield-check' : (auditMeta.status === 'Overdue' ? 'fa-triangle-exclamation' : 'fa-hourglass-half')"></i>
+                        </div>
+                        <div class="flex flex-col min-w-0 justify-center">
+                            <span class="text-[7px] sm:text-[8px] font-black uppercase tracking-widest text-slate-400 leading-none mb-1">Audit Status</span>
+                            <span class="text-[11px] sm:text-[13px] font-bold leading-tight truncate"
+                                  :class="auditMeta.status === 'Submitted' ? 'text-emerald-700 dark:text-emerald-400' : (auditMeta.status === 'Overdue' ? 'text-rose-700 dark:text-rose-400' : 'text-slate-800 dark:text-slate-200')"
+                                  x-text="auditMeta.status === 'Draft' ? 'In Progress 📝' : (auditMeta.status === 'Submitted' ? 'Completed ✅' : (auditMeta.status === 'Overdue' ? 'Overdue 🚨' : 'Audit Open 🛡️'))"></span>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="flex items-center gap-3 sm:gap-4">
-                    <!-- 🚀 MODERN PROGRESS CAPSULE -->
-                    <div class="flex items-center gap-2 sm:gap-3 bg-white dark:bg-black/40 border p-1 sm:p-1.5 rounded-2xl shadow-sm transition-all duration-500"
+                    
+                    <!-- Progress Capsule -->
+                    <div class="flex items-center gap-2 sm:gap-3 p-1.5 pr-3 sm:pr-4 rounded-2xl border shadow-sm transition-all duration-500 flex-1 sm:flex-none min-w-[130px]"
                          x-data="{ 
                             get completed() { return auditForm.points.filter(p => p.status !== '').length; }, 
                             get total() { return auditForm.points.length || 15; }, 
                             get percent() { return Math.round((this.completed / this.total) * 100) || 0; } 
                          }"
-                         :class="percent === 100 ? 'border-emerald-200 dark:border-emerald-900/50 shadow-[0_0_15px_rgba(16,185,129,0.15)] bg-emerald-50/50 dark:bg-emerald-900/10' : 'border-slate-200 dark:border-white/10'">
+                         :class="percent === 100 ? 'bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 shadow-[0_0_15px_rgba(16,185,129,0.15)] dark:border-emerald-500/30' : 'bg-slate-50 dark:bg-black/30 border-slate-200 dark:border-white/5'">
                         
                         <!-- Left: Clean Ring Element -->
-                        <div class="relative w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center shrink-0 bg-slate-50 dark:bg-white/5 rounded-[0.6rem] border border-slate-100 dark:border-white/5">
+                        <div class="relative w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center shrink-0 rounded-xl border shadow-sm transition-colors duration-300"
+                             :class="percent === 100 ? 'bg-emerald-100 border-emerald-200 dark:bg-emerald-500/20' : 'bg-white border-slate-100 dark:bg-dark_surface dark:border-white/10'">
                             <svg class="w-7 h-7 sm:w-8 sm:h-8 transform -rotate-90">
                                 <circle cx="50%" cy="50%" r="13" stroke="currentColor" stroke-width="2.5" fill="transparent" class="text-slate-200 dark:text-slate-700" />
                                 <circle cx="50%" cy="50%" r="13" stroke="currentColor" stroke-width="2.5" fill="transparent" 
@@ -965,32 +1011,28 @@
                                         stroke-linecap="round" 
                                         class="transition-all duration-700 ease-out" />
                             </svg>
-                            <!-- Center Icon based on status -->
                             <i class="fa-solid absolute text-[9px] sm:text-[10px] transition-all" 
                                :class="percent === 100 ? 'fa-check text-emerald-500 animate-bounce' : 'fa-bolt text-indigo-400 opacity-80'"></i>
                         </div>
                         
                         <!-- Right: Sleek Typography -->
-                        <div class="flex flex-col pr-2 sm:pr-3">
-                            <div class="flex items-center gap-1.5 mb-0.5">
-                                <span class="text-[7px] sm:text-[8px] font-black uppercase tracking-widest transition-colors" 
+                        <div class="flex flex-col min-w-0 justify-center">
+                            <div class="flex items-center gap-1.5 mb-0.5 leading-none">
+                                <span class="text-[7px] sm:text-[8px] font-black uppercase tracking-widest transition-colors leading-none" 
                                       :class="percent === 100 ? 'text-emerald-500' : 'text-slate-400'">Audit Progress</span>
-                                <span x-show="percent === 100" class="flex h-1.5 w-1.5 relative" x-cloak>
-                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                    <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
-                                </span>
                             </div>
-                            <div class="flex items-baseline gap-1 leading-none mt-0.5">
-                                <span class="text-xs sm:text-sm font-black font-mono leading-none transition-colors" 
+                            <div class="flex items-baseline gap-1 leading-none">
+                                <span class="text-[11px] sm:text-[13px] font-black font-mono leading-tight transition-colors" 
                                       :class="percent === 100 ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-800 dark:text-slate-200'" x-text="completed"></span>
-                                <span class="text-[9px] sm:text-[10px] font-bold text-slate-500" x-text="'/ ' + total + ' Done'"></span>
+                                <span class="text-[9px] sm:text-[10px] font-bold text-slate-500 leading-tight" x-text="'/ ' + total + ' Done'"></span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="w-px h-8 bg-slate-200 dark:bg-white/10 hidden sm:block"></div>
+                    <div class="w-px h-8 bg-slate-200 dark:bg-white/10 hidden lg:block mx-1 shrink-0"></div>
 
-                    <button @click="showAuditModal = false" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-400 hover:text-red-500 transition shadow-sm border border-slate-200 dark:border-transparent shrink-0 active:scale-95"><i class="fa-solid fa-xmark"></i></button>
+                    <!-- Desktop Close Button -->
+                    <button @click="showAuditModal = false" class="hidden lg:flex w-9 h-9 rounded-full bg-slate-100 dark:bg-white/10 items-center justify-center text-slate-400 hover:text-red-500 transition shadow-sm border border-slate-200 dark:border-transparent shrink-0 active:scale-95"><i class="fa-solid fa-xmark"></i></button>
                 </div>
             </div>
             
@@ -1732,53 +1774,53 @@
                 // 🏢 NOIDA AUDIT CHECKLIST (15 Standard Points)
                 noidaAuditPoints: [
                     // 🧱 PHASE 1: Core Infrastructure & Backups
-                    { id: 'p1', title: '1. 🧱 SonicWall TZ270 Firewall Maintenance', desc: 'Login to the <span class="font-bold text-orange-500 dark:text-orange-400">SonicWall TZ270</span> to check for pending firmware updates and securely export the latest configuration backup.' },
-                    { id: 'p2', title: '2. 💾 WinSvr100 (DC) Backup Integrity', desc: 'Verify that the daily <span class="font-bold text-blue-500 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-1 rounded">System State</span> and <span class="font-bold text-blue-500 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-1 rounded">Event Logs</span> backups for the Domain Controller are executing successfully without errors.' },
-                    { id: 'p3', title: '3. 🔄 Backup Restore Validation', desc: 'Perform an actual dummy file restore test from the backup PC, <span class="font-bold text-amber-500 dark:text-amber-400 italic">avoiding blind trust</span> on "Success" emails.' },
-                    { id: 'p4', title: '4. 📡 WAN & Network Reliability', desc: 'Analyze ISP downtime logs over the last 15 days and review <span class="font-bold text-blue-500 dark:text-blue-400">RCA (Root Cause Analysis)</span> reports.' },
+                    { id: 'p1', title: '1. 🧱 SonicWall TZ270 Firewall Maintenance', desc: 'Login to the <strong class="text-orange-600 dark:text-orange-400 bg-orange-100/60 dark:bg-orange-500/20 px-1 rounded-sm">SonicWall TZ270</strong> to check for <strong class="text-slate-700 dark:text-slate-300">pending firmware updates</strong> and securely export the <strong class="text-indigo-600 dark:text-indigo-400">latest configuration backup</strong>.' },
+                    { id: 'p2', title: '2. 💾 WinSvr100 (DC) Backup Integrity', desc: 'Verify that the daily <strong class="text-blue-600 dark:text-blue-400 bg-blue-100/60 dark:bg-blue-500/20 px-1 rounded-sm">System State</strong> and <strong class="text-blue-600 dark:text-blue-400 bg-blue-100/60 dark:bg-blue-500/20 px-1 rounded-sm">Event Logs</strong> backups for the Domain Controller are executing successfully <strong class="text-emerald-600 dark:text-emerald-400">without errors</strong>.' },
+                    { id: 'p3', title: '3. 🔄 Backup Restore Validation', desc: 'Perform an actual <strong class="text-indigo-600 dark:text-indigo-400">dummy file restore test</strong> from the backup PC, <em class="text-rose-500 dark:text-rose-400 font-bold">avoiding blind trust</em> on <strong class="font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-100/60 dark:bg-emerald-500/20 px-1 rounded-sm">"Success"</strong> emails.' },
+                    { id: 'p4', title: '4. 📡 WAN & Network Reliability', desc: 'Analyze ISP downtime logs over the last <strong class="text-slate-700 dark:text-slate-300">15 days</strong> and review <strong class="text-blue-600 dark:text-blue-400 bg-blue-100/60 dark:bg-blue-500/20 px-1 rounded-sm box-decoration-clone">RCA (Root Cause Analysis)</strong> reports.' },
 
                     // 🔐 PHASE 2: Hardware & Physical Security
-                    { id: 'p5', title: '5. 🔐 Server Room Access Review', desc: 'Audit physical entry/exit register against <span class="font-bold text-teal-600 dark:text-teal-400">Access Control/CCTV</span> logs for the last 15 days.' },
-                    { id: 'p6', title: '6. 🖥️ Hardware & Asset Audit', desc: 'Cross-verify physical workstations and storage devices against the active <span class="font-bold text-indigo-500 dark:text-indigo-400">AssetDB</span> count.' },
-                    { id: 'p7', title: '7. 🛠️ AMC & Vendor RMA Logs', desc: 'Audit hardware replacement history and ensure all vendor calls have valid <span class="font-bold text-sky-500 dark:text-sky-400">Case IDs</span> mapped.' },
-                    { id: 'p8', title: '8. 💥 Faulty Hardware Disposal', desc: 'Verify that defective storage drives HDD are <span class="font-bold text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-500/10 px-1 rounded">physically destroyed</span> before vendor handover.' },
+                    { id: 'p5', title: '5. 🔐 Server Room Access Review', desc: 'Audit <strong class="text-slate-700 dark:text-slate-300">physical entry/exit register</strong> against <strong class="text-teal-600 dark:text-teal-400 bg-teal-100/60 dark:bg-teal-500/20 px-1 rounded-sm">Access Control/CCTV</strong> logs for the last <strong class="text-slate-700 dark:text-slate-300">15 days</strong>.' },
+                    { id: 'p6', title: '6. 🖥️ Hardware & Asset Audit', desc: 'Cross-verify <strong class="text-slate-700 dark:text-slate-300">physical workstations and storage devices</strong> against the active <strong class="text-indigo-600 dark:text-indigo-400 bg-indigo-100/60 dark:bg-indigo-500/20 px-1 rounded-sm">AssetDB</strong> count.' },
+                    { id: 'p7', title: '7. 🛠️ AMC & Vendor RMA Logs', desc: 'Audit <strong class="text-slate-700 dark:text-slate-300">hardware replacement history</strong> and ensure all vendor calls have valid <strong class="font-mono text-sky-600 dark:text-sky-400 bg-sky-100/60 dark:bg-sky-500/20 px-1 rounded-sm">Case IDs</strong> mapped.' },
+                    { id: 'p8', title: '8. 💥 Faulty Hardware Disposal', desc: 'Verify that defective storage drives HDD are <strong class="text-rose-600 dark:text-rose-400 bg-rose-100/60 dark:bg-rose-500/20 px-1 rounded-sm uppercase tracking-wider text-[10px]">physically destroyed</strong> before vendor handover.' },
 
                     // 💻 PHASE 3: Endpoint & Software Health
-                    { id: 'p9', title: '9. 🛡️ Endpoint Antivirus & License Health', desc: 'Ensure <span class="font-bold text-violet-500 dark:text-violet-400">Sophos</span> agents are running. Log in to the Sophos Dashboard to cross-verify active vs. remaining licenses for compliance.' },
-                    { id: 'p10', title: '10. 💿 Software Compliance & Free-ware Scan', desc: 'Audit one-time purchase (perpetual) licenses against installed counts and identify <span class="font-bold text-rose-500 dark:text-rose-400">commercial violations</span> by catching personal-use apps like <span class="font-bold text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-500/10 px-1 rounded">WinRAR, AnyDesk, or TeamViewer</span>.' },
-                    { id: 'p11', title: '11. 🚫 USB Port Security Check', desc: 'Random physical testing on floor PCs to ensure Mass Storage restriction policy is <span class="font-bold text-emerald-600 dark:text-emerald-400">strictly active</span>.' },
+                    { id: 'p9', title: '9. 🛡️ Endpoint Antivirus & License Health', desc: 'Ensure <strong class="text-violet-600 dark:text-violet-400 bg-violet-100/60 dark:bg-violet-500/20 px-1 rounded-sm">Sophos Endpoint Protection</strong> agents are running. Log in to the Sophos Dashboard to cross-verify <strong class="text-emerald-600 dark:text-emerald-400">active vs. remaining licenses</strong> for compliance.' },
+                    { id: 'p10', title: '10. 💿 Software Compliance & Free-ware Scan', desc: 'Audit <strong class="text-indigo-600 dark:text-indigo-400 bg-indigo-100/60 dark:bg-indigo-500/20 px-1 rounded-sm">paid enterprise software</strong> to ensure it matches the actual installed count. Flag <strong class="text-rose-600 dark:text-rose-400 underline decoration-rose-300 decoration-2 underline-offset-2">commercial policy violations</strong> by catching unauthorized free apps like <strong class="text-amber-700 dark:text-amber-500 bg-amber-100/80 dark:bg-amber-500/20 px-1 rounded-sm box-decoration-clone leading-relaxed">WinRAR, AnyDesk, or TeamViewer</strong>.' },
+                    { id: 'p11', title: '11. 🚫 USB Port Security Check', desc: '<strong class="text-slate-700 dark:text-slate-300">Random physical testing</strong> on floor PCs to ensure Mass Storage restriction policy is <strong class="text-emerald-600 dark:text-emerald-400 bg-emerald-100/60 dark:bg-emerald-500/20 px-1 rounded-sm">strictly active</strong>.' },
 
                     // 👨‍💻 PHASE 4: Identity, Data & Floor Governance
-                    { id: 'p12', title: '12. 🚷 Active Directory (AD) Cleanup', desc: 'Verify that AD accounts for all recently resigned employees are <span class="font-bold text-rose-600 dark:text-rose-400 uppercase">disabled</span>.' },
-                    { id: 'p13', title: '13. 📁 Shared Drive Sanity Scan', desc: 'Inspect central file server <span class="font-mono font-bold text-[10px] bg-slate-100 dark:bg-black/30 border border-slate-200 dark:border-white/10 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-300 shadow-sm">192.168.0.223</span> to remove personal or unwanted media files.' },
-                    { id: 'p14', title: '14. 🕵️‍♂️ Clean Desk & Screen Lock Policy', desc: 'Physical floor audit to ensure unattended PCs are <span class="font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-1 rounded">locked (Win + L)</span> and no sensitive passwords are left on <span class="font-bold text-rose-500 dark:text-rose-400 italic">sticky notes</span>.' },
-                    { id: 'p15', title: '15. 📅 IT Renewals & Certificate Calendar', desc: 'Ensure upcoming expiry dates for <span class="font-bold text-blue-500 dark:text-blue-400">domain names, SSL certificates</span>, and ISP contracts are <span class="font-bold text-emerald-600 dark:text-emerald-400">actively tracked</span>.' }
+                    { id: 'p12', title: '12. 🚷 Active Directory (AD) Cleanup', desc: 'Verify that AD accounts for all recently resigned employees are <strong class="text-rose-600 dark:text-rose-400 bg-rose-100/60 dark:bg-rose-500/20 px-1 rounded-sm uppercase tracking-widest text-[10px]">disabled</strong>.' },
+                    { id: 'p13', title: '13. 📁 Shared Drive Sanity Scan', desc: 'Inspect central file server <strong class="font-mono text-blue-600 dark:text-blue-400 bg-blue-100/60 dark:bg-blue-500/20 px-1 rounded-sm">192.168.0.223</strong> to remove <strong class="text-rose-500 dark:text-rose-400">personal or unwanted media files</strong>.' },
+                    { id: 'p14', title: '14. 🕵️‍♂️ Clean Desk & Screen Lock Policy', desc: 'Physical floor audit to ensure unattended PCs are <strong class="text-emerald-600 dark:text-emerald-400 bg-emerald-100/60 dark:bg-emerald-500/20 px-1 rounded-sm">locked (Win + L)</strong> and no sensitive passwords are left on <em class="text-rose-600 dark:text-rose-400 bg-rose-100/60 dark:bg-rose-500/20 px-1 rounded-sm font-bold">sticky notes</em>.' },
+                    { id: 'p15', title: '15. 📅 IT Renewals & Certificate Calendar', desc: 'Ensure upcoming expiry dates for <strong class="text-blue-600 dark:text-blue-400 bg-blue-100/60 dark:bg-blue-500/20 px-1 rounded-sm box-decoration-clone">domain names, SSL certificates</strong>, and ISP contracts are <strong class="text-emerald-600 dark:text-emerald-400">actively tracked</strong>.' }
                 ],
 
                 // ⛰️ DEHRADUN AUDIT CHECKLIST (15 Standard Points - Dehradun Specific Variables)
                 ddnAuditPoints: [
                     // 🧱 PHASE 1: Core Infrastructure & Backups
-                    { id: 'd1', title: '1. 🧱 SonicWall TZ270 Firewall Maintenance', desc: 'Login to the <span class="font-bold text-orange-500 dark:text-orange-400">SonicWall TZ270</span> to check for pending firmware updates and securely export the latest configuration backup.' },
-                    { id: 'd2', title: '2. 💾 S08DD001 (DC) Backup Integrity', desc: 'Verify that the daily <span class="font-bold text-blue-500 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-1 rounded">System State</span> and <span class="font-bold text-blue-500 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-1 rounded">Event Logs</span> backups for the Domain Controller (S08DD001) are executing successfully without errors.' },
-                    { id: 'd3', title: '3. 🔄 Backup Restore Validation', desc: 'Perform an actual dummy file restore test from the backup PC, <span class="font-bold text-amber-500 dark:text-amber-400 italic">avoiding blind trust</span> on "Success" emails.' },
-                    { id: 'd4', title: '4. 📡 WAN & Network Reliability', desc: 'Analyze ISP downtime logs over the last 30 days and review <span class="font-bold text-blue-500 dark:text-blue-400">RCA (Root Cause Analysis)</span> reports.' },
+                    { id: 'd1', title: '1. 🧱 SonicWall TZ270 Firewall Maintenance', desc: 'Login to the <strong class="text-orange-600 dark:text-orange-400 bg-orange-100/60 dark:bg-orange-500/20 px-1 rounded-sm">SonicWall TZ270</strong> to check for <strong class="text-slate-700 dark:text-slate-300">pending firmware updates</strong> and securely export the <strong class="text-indigo-600 dark:text-indigo-400">latest configuration backup</strong>.' },
+                    { id: 'd2', title: '2. 💾 S08DD001 (DC) Backup Integrity', desc: 'Verify that the daily <strong class="text-blue-600 dark:text-blue-400 bg-blue-100/60 dark:bg-blue-500/20 px-1 rounded-sm">System State</strong> and <strong class="text-blue-600 dark:text-blue-400 bg-blue-100/60 dark:bg-blue-500/20 px-1 rounded-sm">Event Logs</strong> backups for the Domain Controller (S08DD001) are executing successfully <strong class="text-emerald-600 dark:text-emerald-400">without errors</strong>.' },
+                    { id: 'd3', title: '3. 🔄 Backup Restore Validation', desc: 'Perform an actual <strong class="text-indigo-600 dark:text-indigo-400">dummy file restore test</strong> from the backup PC, <em class="text-rose-500 dark:text-rose-400 font-bold">avoiding blind trust</em> on <strong class="font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-100/60 dark:bg-emerald-500/20 px-1 rounded-sm">"Success"</strong> emails.' },
+                    { id: 'd4', title: '4. 📡 WAN & Network Reliability', desc: 'Analyze ISP downtime logs over the last <strong class="text-slate-700 dark:text-slate-300">30 days</strong> and review <strong class="text-blue-600 dark:text-blue-400 bg-blue-100/60 dark:bg-blue-500/20 px-1 rounded-sm box-decoration-clone">RCA (Root Cause Analysis)</strong> reports.' },
 
                     // 🔐 PHASE 2: Hardware & Physical Security
-                    { id: 'd5', title: '5. 🔐 Server Room Access Review', desc: 'Audit physical entry/exit register against <span class="font-bold text-teal-600 dark:text-teal-400">Access Control/CCTV</span> logs for the last 15 days.' },
-                    { id: 'd6', title: '6. 🖥️ Hardware & Asset Audit', desc: 'Cross-verify physical workstations and storage devices against the active <span class="font-bold text-indigo-500 dark:text-indigo-400">AssetDB</span> count.' },
-                    { id: 'd7', title: '7. 🛠️ AMC & Vendor RMA Logs', desc: 'Audit hardware replacement history and ensure all vendor calls have valid <span class="font-bold text-sky-500 dark:text-sky-400">Case IDs</span> mapped.' },
-                    { id: 'd8', title: '8. 💥 Faulty Hardware Disposal', desc: 'Verify that defective storage drives HDD are <span class="font-bold text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-500/10 px-1 rounded">physically destroyed</span> before vendor handover.' },
+                    { id: 'd5', title: '5. 🔐 Server Room Access Review', desc: 'Audit <strong class="text-slate-700 dark:text-slate-300">physical entry/exit register</strong> against <strong class="text-teal-600 dark:text-teal-400 bg-teal-100/60 dark:bg-teal-500/20 px-1 rounded-sm">Access Control/CCTV</strong> logs for the last <strong class="text-slate-700 dark:text-slate-300">15 days</strong>.' },
+                    { id: 'd6', title: '6. 🖥️ Hardware & Asset Audit', desc: 'Cross-verify <strong class="text-slate-700 dark:text-slate-300">physical workstations and storage devices</strong> against the active <strong class="text-indigo-600 dark:text-indigo-400 bg-indigo-100/60 dark:bg-indigo-500/20 px-1 rounded-sm">AssetDB</strong> count.' },
+                    { id: 'd7', title: '7. 🛠️ AMC & Vendor RMA Logs', desc: 'Audit <strong class="text-slate-700 dark:text-slate-300">hardware replacement history</strong> and ensure all vendor calls have valid <strong class="font-mono text-sky-600 dark:text-sky-400 bg-sky-100/60 dark:bg-sky-500/20 px-1 rounded-sm">Case IDs</strong> mapped.' },
+                    { id: 'd8', title: '8. 💥 Faulty Hardware Disposal', desc: 'Verify that defective storage drives HDD are <strong class="text-rose-600 dark:text-rose-400 bg-rose-100/60 dark:bg-rose-500/20 px-1 rounded-sm uppercase tracking-wider text-[10px]">physically destroyed</strong> before vendor handover.' },
 
                     // 💻 PHASE 3: Endpoint & Software Health
-                    { id: 'd9', title: '9. 🛡️ Endpoint Antivirus & License Health', desc: 'Ensure <span class="font-bold text-violet-500 dark:text-violet-400">Seqrite</span> agents are running. Log in to the Seqrite Endpoint Dashboard to cross-verify active vs. remaining licenses for compliance.' },
-                    { id: 'd10', title: '10. 💿 Software Compliance & Free-ware Scan', desc: 'Audit one-time purchase (perpetual) licenses against installed counts and identify <span class="font-bold text-rose-500 dark:text-rose-400">commercial violations</span> by catching personal-use apps like <span class="font-bold text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-500/10 px-1 rounded">WinRAR, AnyDesk, or TeamViewer</span>.' },
-                    { id: 'd11', title: '11. 🚫 USB Port Security Check', desc: 'Random physical testing on floor PCs to ensure Mass Storage restriction policy is <span class="font-bold text-emerald-600 dark:text-emerald-400">strictly active</span>.' },
+                    { id: 'd9', title: '9. 🛡️ Endpoint Antivirus & License Health', desc: 'Ensure <strong class="text-violet-600 dark:text-violet-400 bg-violet-100/60 dark:bg-violet-500/20 px-1 rounded-sm">Seqrite</strong> agents are running. Log in to the Seqrite Endpoint Dashboard to cross-verify <strong class="text-emerald-600 dark:text-emerald-400">active vs. remaining licenses</strong> for compliance.' },
+                    { id: 'd10', title: '10. 💿 Software Compliance & Free-ware Scan', desc: 'Audit <strong class="text-indigo-600 dark:text-indigo-400 bg-indigo-100/60 dark:bg-indigo-500/20 px-1 rounded-sm">paid enterprise software</strong> to ensure it matches the actual installed count. Flag <strong class="text-rose-600 dark:text-rose-400 underline decoration-rose-300 decoration-2 underline-offset-2">commercial policy violations</strong> by catching unauthorized free apps like <strong class="text-amber-700 dark:text-amber-500 bg-amber-100/80 dark:bg-amber-500/20 px-1 rounded-sm box-decoration-clone leading-relaxed">WinRAR, AnyDesk, or TeamViewer</strong>.' },
+                    { id: 'd11', title: '11. 🚫 USB Port Security Check', desc: '<strong class="text-slate-700 dark:text-slate-300">Random physical testing</strong> on floor PCs to ensure Mass Storage restriction policy is <strong class="text-emerald-600 dark:text-emerald-400 bg-emerald-100/60 dark:bg-emerald-500/20 px-1 rounded-sm">strictly active</strong>.' },
 
                     // 👨‍💻 PHASE 4: Identity, Data & Floor Governance
-                    { id: 'd12', title: '12. 🚷 Active Directory (AD) Cleanup', desc: 'Verify that AD accounts for all recently resigned employees are <span class="font-bold text-rose-600 dark:text-rose-400 uppercase">disabled</span>.' },
-                    { id: 'd13', title: '13. 📁 Shared Drive Sanity Scan', desc: 'Inspect central file server to remove personal or unwanted media files.' },
-                    { id: 'd14', title: '14. 🕵️‍♂️ Clean Desk & Screen Lock Policy', desc: 'Physical floor audit to ensure unattended PCs are <span class="font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-1 rounded">locked (Win + L)</span> and no sensitive passwords are left on <span class="font-bold text-rose-500 dark:text-rose-400 italic">sticky notes</span>.' },
-                    { id: 'd15', title: '15. 📅 IT Renewals & Certificate Calendar', desc: 'Ensure upcoming expiry dates for <span class="font-bold text-blue-500 dark:text-blue-400">domain names, SSL certificates</span>, and ISP contracts are <span class="font-bold text-emerald-600 dark:text-emerald-400">actively tracked</span>.' }
+                    { id: 'd12', title: '12. 🚷 Active Directory (AD) Cleanup', desc: 'Verify that AD accounts for all recently resigned employees are <strong class="text-rose-600 dark:text-rose-400 bg-rose-100/60 dark:bg-rose-500/20 px-1 rounded-sm uppercase tracking-widest text-[10px]">disabled</strong>.' },
+                    { id: 'd13', title: '13. 📁 Shared Drive Sanity Scan', desc: 'Inspect <strong class="text-blue-600 dark:text-blue-400 bg-blue-100/60 dark:bg-blue-500/20 px-1 rounded-sm">central file server</strong> to remove <strong class="text-rose-500 dark:text-rose-400">personal or unwanted media files</strong>.' },
+                    { id: 'd14', title: '14. 🕵️‍♂️ Clean Desk & Screen Lock Policy', desc: 'Physical floor audit to ensure unattended PCs are <strong class="text-emerald-600 dark:text-emerald-400 bg-emerald-100/60 dark:bg-emerald-500/20 px-1 rounded-sm">locked (Win + L)</strong> and no sensitive passwords are left on <em class="text-rose-600 dark:text-rose-400 bg-rose-100/60 dark:bg-rose-500/20 px-1 rounded-sm font-bold">sticky notes</em>.' },
+                    { id: 'd15', title: '15. 📅 IT Renewals & Certificate Calendar', desc: 'Ensure upcoming expiry dates for <strong class="text-blue-600 dark:text-blue-400 bg-blue-100/60 dark:bg-blue-500/20 px-1 rounded-sm box-decoration-clone">domain names, SSL certificates</strong>, and ISP contracts are <strong class="text-emerald-600 dark:text-emerald-400">actively tracked</strong>.' }
                 ],
 
                 // 🔄 Dynamic Checklist Getter
@@ -1809,13 +1851,13 @@
                         // 🏢 NOIDA: Bi-Monthly Audit
                         let deadlineDate;
                         if (date <= 14) {
-                            // 🚀 Smart Fix: Added 'Noida Audit' for branch clarity and symmetry
+                            // 🚀 Fixed: Matching exact database nomenclature for Noida
                             this.auditMeta.cycle = `Noida Audit - Cycle 01 (1st to 7th ${month})`;
                             this.auditMeta.auditor = "Anil Singh";
                             this.auditMeta.status = date > 7 ? 'Overdue' : 'Active';
                             deadlineDate = new Date(year, d.getMonth(), 7);
                         } else {
-                            // 🚀 Smart Fix: Added 'Noida Audit' for branch clarity and symmetry
+                            // 🚀 Fixed: Matching exact database nomenclature for Noida
                             this.auditMeta.cycle = `Noida Audit - Cycle 02 (15th to 21st ${month})`;
                             this.auditMeta.auditor = "Ashok Singh";
                             this.auditMeta.status = date > 21 ? 'Overdue' : 'Active';
