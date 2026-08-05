@@ -466,8 +466,7 @@
 
             <!-- APPS GRID -->
             <section class="shrink-0 relative z-20">
-                <!-- 📍 REVERTED: Wapas 6 columns kar diya taaki cards properly expand hon -->
-                <div class="cards-container grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-5">
+                <div class="cards-container grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-5 mb-3 sm:mb-4">
                     
                     <a href="PBL_Inventory.html" @click="haptic('light')" class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-indigo-50/80 to-white/80 border border-indigo-200/60 shadow-md hover:shadow-2xl hover:border-indigo-400/50 dark:from-indigo-900/10 dark:to-dark_surface/80 dark:border-indigo-800/30 dark:hover:border-indigo-400/50">
                         <i class="fa-solid fa-laptop absolute -bottom-4 -right-3 text-7xl sm:text-9xl text-indigo-500/20 dark:text-indigo-500/10 group-hover:scale-110 transition-transform duration-500"></i>
@@ -480,7 +479,9 @@
                         </div>
                         <div class="relative z-10 mt-auto">
                             <h3 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">IT Inventory</h3>
-                            <p class="text-[11px] sm:text-[13px] font-bold text-slate-500 dark:text-slate-400 mt-1 truncate">Assets & Users 💻</p>
+                            <div class="mt-1 h-[28px] sm:h-[34px] flex flex-col justify-start w-full">
+                                <span class="text-[11px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 truncate">Assets & Users 💻</span>
+                            </div>
                         </div>
                     </a>
 
@@ -495,7 +496,9 @@
                         </div>
                         <div class="relative z-10 mt-auto">
                             <h3 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">Switch Map</h3>
-                            <p class="text-[11px] sm:text-[13px] font-bold text-slate-500 dark:text-slate-400 mt-1 truncate">Network Ports 🔌</p>
+                            <div class="mt-1 h-[28px] sm:h-[34px] flex flex-col justify-start w-full">
+                                <span class="text-[11px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 truncate">Network Ports 🔌</span>
+                            </div>
                         </div>
                     </a>
 
@@ -510,7 +513,9 @@
                         </div>
                         <div class="relative z-10 mt-auto">
                             <h3 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">WAN Logs</h3>
-                            <p class="text-[11px] sm:text-[13px] font-bold text-slate-500 dark:text-slate-400 mt-1 truncate">ISP Tracking 📡</p>
+                            <div class="mt-1 h-[28px] sm:h-[34px] flex flex-col justify-start w-full">
+                                <span class="text-[11px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 truncate">ISP Tracking 📡</span>
+                            </div>
                         </div>
                     </a>
 
@@ -525,7 +530,9 @@
                         </div>
                         <div class="relative z-10 mt-auto">
                             <h3 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">RMA Tracker</h3>
-                            <p class="text-[11px] sm:text-[13px] font-bold text-slate-500 dark:text-slate-400 mt-1 truncate">Repair & Vendor 🛠️</p>
+                            <div class="mt-1 h-[28px] sm:h-[34px] flex flex-col justify-start w-full">
+                                <span class="text-[11px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 truncate">Repair & Vendor 🛠️</span>
+                            </div>
                         </div>
                     </a>
 
@@ -540,14 +547,16 @@
                         </div>
                         <div class="relative z-10 mt-auto">
                             <h3 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">IP Manager</h3>
-                            <p class="text-[11px] sm:text-[13px] font-bold text-slate-500 dark:text-slate-400 mt-1 truncate">Network Routing 🌐</p>
+                            <div class="mt-1 h-[28px] sm:h-[34px] flex flex-col justify-start w-full">
+                                <span class="text-[11px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 truncate">Network Routing 🌐</span>
+                            </div>
                         </div>
                     </a>
 
-                   <!-- 🚀 IT SEC AUDIT CARD (ENHANCED VISIBLE GLOW & NEON EDGE) -->
-<a x-show="currentLocation === 'Noida' ? ['vikas', 'anil', 'ashok'].some(n => (currentUser?.name || '').toLowerCase().includes(n)) : ['vikas', 'deependra'].some(n => (currentUser?.name || '').toLowerCase().includes(n))" 
-   @click.prevent="haptic('light'); openAuditModal()" 
-   class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-indigo-50/80 to-white/80 border border-indigo-200/60 dark:from-indigo-900/10 dark:to-dark_surface/80 dark:border-indigo-800/30 dark:hover:border-indigo-400/50"
+                   <!-- 🚀 IT SEC AUDIT CARD -->
+                   <a x-show="currentLocation === 'Noida' ? ['vikas', 'anil', 'ashok'].some(n => (currentUser?.name || '').toLowerCase().includes(n)) : ['vikas', 'deependra'].some(n => (currentUser?.name || '').toLowerCase().includes(n))" 
+                      @click.prevent="haptic('light'); openAuditModal()" 
+                      class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-indigo-50/80 to-white/80 border border-indigo-200/60 dark:from-indigo-900/10 dark:to-dark_surface/80 dark:border-indigo-800/30 dark:hover:border-indigo-400/50"
                        :class="
                             auditMeta.status === 'Overdue' 
                             ? '!border-red-500 shadow-[0_0_30px_rgba(239,68,68,0.65)] ring-1 ring-red-400/50' 
@@ -555,16 +564,12 @@
                                 ? '!border-indigo-500 shadow-[0_0_30px_rgba(99,102,241,0.6)] ring-1 ring-indigo-400/50'
                                 : 'shadow-md hover:shadow-2xl hover:border-indigo-400/50 opacity-60 grayscale-[0.5]')
                        ">
-                       
-                        <!-- 🌟 Enhanced Pulsing Inner Glow (Tighter blur, higher opacity) -->
                         <div x-show="auditMeta.status !== 'Submitted' && auditMeta.status !== 'Overdue'" class="absolute -inset-2 bg-indigo-500/35 blur-xl animate-pulse pointer-events-none" x-cloak></div>
                         <div x-show="auditMeta.status === 'Overdue'" class="absolute -inset-2 bg-red-500/35 blur-xl animate-pulse pointer-events-none" x-cloak></div>
                         
-                        <!-- Watermark Icon -->
                         <i class="fa-solid fa-shield-halved absolute -bottom-4 -right-3 text-7xl sm:text-9xl group-hover:scale-110 transition-transform duration-500 text-indigo-500/20 dark:text-indigo-500/10"
                            :class="auditMeta.status === 'Overdue' ? '!text-red-500/20' : ''"></i>
                         
-                        <!-- Top Row (Icon & Title) -->
                         <div class="flex items-center justify-between relative z-10 mb-2">
                             <div class="flex items-center gap-2">
                                 <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-[12px] shrink-0 border border-indigo-100 dark:border-white/5 text-indigo-500 transition-colors duration-300"
@@ -581,32 +586,28 @@
                             </div>
                         </div>
                         
-                        <!-- Bottom Row (Text) -->
                         <div class="relative z-10 mt-auto w-full">
                             <h3 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">IT Sec Audit</h3>
                             
-                            <div class="mt-1 flex flex-col w-full">
+                            <div class="mt-1 h-[28px] sm:h-[34px] flex flex-col justify-start w-full">
                                 
-                                <!-- 🔴 STATE 1: PENDING / DRAFT / OVERDUE -->
-                                <div x-show="auditMeta.status !== 'Submitted'" class="flex flex-col gap-0.5 w-full">
-                                    <div class="flex items-center gap-1.5 text-[11px] sm:text-[13px] font-bold truncate transition-colors duration-300 text-slate-500 dark:text-slate-400 leading-tight">
-                                        <span x-text="auditMeta.status === 'Overdue' ? 'Action Required' : (auditMeta.status === 'Draft' ? 'In Progress' : 'Audit Open')"></span>
-                                        <i class="fa-solid" :class="auditMeta.status === 'Overdue' ? 'fa-triangle-exclamation text-red-500 animate-pulse' : (auditMeta.status === 'Draft' ? 'fa-pen text-amber-500' : 'fa-shield text-indigo-500')"></i>
+                                <div x-show="auditMeta.status !== 'Submitted'" class="flex flex-col w-full justify-start mt-0.5">
+                                    <div class="text-[11px] sm:text-[12px] font-bold truncate transition-colors duration-300 text-slate-500 dark:text-slate-400 leading-none mb-1"
+                                         x-text="auditMeta.status === 'Overdue' ? 'Action Required 🚨' : (auditMeta.status === 'Draft' ? 'In Progress 📝' : 'Audit Open 🛡️')">
                                     </div>
-                                    <span class="font-mono text-[8.5px] sm:text-[9.5px] font-black text-slate-800 dark:text-white drop-shadow-md whitespace-normal line-clamp-2 leading-snug break-words" x-text="auditMeta.cycle"></span>
+                                    <span class="font-mono text-[8.5px] sm:text-[9.5px] font-black text-slate-800 dark:text-white drop-shadow-md truncate" x-text="auditMeta.cycle"></span>
                                 </div>
 
-                                <!-- 🟢 STATE 2: SUBMITTED (COMPLETED) -->
-                                <div x-show="auditMeta.status === 'Submitted'" x-cloak class="flex flex-col w-full">
-                                    <div class="flex items-center gap-1.5 text-[11px] sm:text-[13px] font-black text-emerald-600 dark:text-emerald-500 leading-tight mb-0.5">
-                                        <i class="fa-solid fa-clipboard-check"></i>
-                                        <span class="truncate">Verified by <span x-text="auditMeta.auditor ? auditMeta.auditor.split(' ')[0] : 'IT'"></span></span>
+                                <div x-show="auditMeta.status === 'Submitted'" x-cloak class="flex flex-col w-full justify-start mt-0.5">
+                                    <div class="text-[11px] sm:text-[12px] font-black text-emerald-600 dark:text-emerald-500 leading-none mb-1 truncate">
+                                        ✅ Verified by <span x-text="auditMeta.auditor ? auditMeta.auditor.split(' ')[0] : 'IT'"></span>
                                     </div>
-                                    <span class="text-[8.5px] sm:text-[9px] font-bold text-slate-500 dark:text-slate-400 leading-snug line-clamp-2 break-words">
-                                        <span class="font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest" x-text="auditMeta.cycle.includes('(') ? auditMeta.cycle.split('(')[0].trim() : auditMeta.cycle"></span> • <span class="font-mono" x-text="auditMeta.date"></span>
-                                    </span>
+                                    <div class="flex items-center gap-1 w-full text-[8.5px] sm:text-[9.5px] font-bold text-slate-500 dark:text-slate-400">
+                                        <span class="font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest truncate" x-text="auditMeta.cycle.includes('(') ? auditMeta.cycle.split('(')[0].trim() : auditMeta.cycle"></span>
+                                        <span class="shrink-0 font-mono" x-text="'• ' + auditMeta.date"></span>
+                                    </div>
                                 </div>
-
+                                
                             </div>
                         </div>
                     </a>
