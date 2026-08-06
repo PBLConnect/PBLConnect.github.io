@@ -1420,6 +1420,12 @@
                 <div class="bg-amber-50/50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/30 p-3.5 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-300 whitespace-pre-wrap leading-relaxed shadow-inner max-h-48 overflow-y-auto custom-scroll" x-text="resolveForm.desc"></div>
             </div>
             
+            <!-- ✅ VIEW ONLY: RESOLUTION REMARKS (Dikhega sirf tab jab ticket band ho) -->
+            <div x-show="resolveForm.viewOnly" x-cloak>
+                <span class="text-[9px] font-black uppercase tracking-widest text-emerald-500 block mb-1.5 ml-1">IT Resolution & Action Taken</span>
+                <div class="bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/30 p-3.5 rounded-xl text-xs font-bold text-emerald-700 dark:text-emerald-400 whitespace-pre-wrap leading-relaxed shadow-inner max-h-32 overflow-y-auto custom-scroll" x-text="resolveForm.resolution"></div>
+            </div>
+
             <!-- RESOLUTION INPUT (Hidden if View Only) -->
             <div x-show="!resolveForm.viewOnly">
                 <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1" x-text="resolveForm.isAudit ? 'Remediation Steps Taken *' : 'Resolution Remarks *'"></label>
@@ -1605,18 +1611,18 @@
         </div>
     </div>
 	
-	<!-- MEGA CHANGELOG MODAL (RELEASE NOTES v2.1) -->
+	<!-- MEGA CHANGELOG MODAL (RELEASE NOTES v2.2) -->
     <div x-show="showChangelogModal" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/70 backdrop-blur-md p-4" x-transition.opacity @click.self="showChangelogModal = false">
         <div class="bg-white dark:bg-dark_surface w-full max-w-4xl rounded-[2rem] shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden flex flex-col max-h-[85vh] sm:max-h-[90vh] transform transition-all scale-100">
             
-            <!-- Hero Header (Fuchsia/Purple Theme for v2.1) -->
+            <!-- Hero Header (Fuchsia/Purple Theme for v2.2) -->
             <div class="p-6 sm:p-8 border-b border-slate-100 dark:border-white/10 bg-gradient-to-br from-fuchsia-600 to-purple-800 text-white shrink-0 relative overflow-hidden">
                 <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
                 <div class="relative z-10 flex justify-between items-start">
 				<div>
 					<span class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest bg-white/20 border border-white/20 shadow-sm px-2.5 py-1 rounded-md mb-3 inline-block flex items-center gap-1.5 w-max"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Official Release Notes</span>
-					<h3 class="text-2xl sm:text-3xl font-heading font-black leading-tight drop-shadow-md">What's New in v2.1 🚀</h3>
-					<p class="text-xs font-medium opacity-80 mt-1.5 font-mono">Smart Audit Dashboard & Speed Boost • Aug 04, 2026</p>
+					<h3 class="text-2xl sm:text-3xl font-heading font-black leading-tight drop-shadow-md">What's New in v2.2 🚀</h3>
+					<p class="text-xs font-medium opacity-80 mt-1.5 font-mono">Massive Polish & Deep Sync • Aug 06, 2026</p>
 				</div>
 				<button @click="showChangelogModal = false" class="w-8 h-8 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/40 text-white transition shadow-sm active:scale-95"><i class="fa-solid fa-xmark text-sm"></i></button>
 			</div>
@@ -1625,10 +1631,72 @@
             <!-- Scrollable Content -->
             <div class="p-5 sm:p-6 overflow-y-auto custom-scroll flex-1 bg-slate-50/50 dark:bg-transparent space-y-6">
                 
-                <!-- === VERSION 2.1 (LATEST QUICK UPDATE) === -->
+                <!-- === VERSION 2.2 (LATEST MAJOR UPDATE) === -->
                 <div>
                     <div class="flex items-center gap-2 mb-4">
-                        <span class="px-2 py-0.5 rounded bg-brand text-white font-black text-[10px] uppercase tracking-widest shadow-sm">v2.1</span>
+                        <span class="px-2 py-0.5 rounded bg-brand text-white font-black text-[10px] uppercase tracking-widest shadow-sm">v2.2</span>
+                        <h4 class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-widest">Massive Polish & Deep Sync</h4>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                        
+                        <!-- Block 1: Backend Sync -->
+                        <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition md:col-span-2">
+                            <h4 class="text-[11px] font-black text-indigo-500 dark:text-indigo-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-server"></i> Smart Cross-Module Sync</h4>
+                            <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium grid grid-cols-1 sm:grid-cols-2 gap-x-4">
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-brand shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Humanized Auto-Closure:</strong> Resolved RMA & WAN tickets now log proper engineer names instead of robotic text.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-brand shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Email Alerts Recovered:</strong> Hardware & Network tickets now successfully shoot green success emails upon resolution.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-brand shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Location-Based Routing:</strong> CC emails automatically route to Dehradun or Noida team based on the asset's location.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-brand shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>IP Manager Fixed:</strong> Dehradun IPs are now accurately synced by fixing case-sensitivity and column-mapping bugs.</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Block 2: UI Refinements -->
+                        <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition md:col-span-2">
+                            <h4 class="text-[11px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-wand-magic-sparkles"></i> Premium UI Refinements</h4>
+                            <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium grid grid-cols-1 sm:grid-cols-2 gap-x-4">
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-brand shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Vibrant Audit KPI:</strong> Removed dull grey filters from the "IT Sec Audit" card; it now glows a premium green when submitted.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-brand shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Symmetrical Pop-ups:</strong> Redesigned the audit signature block to be fully responsive and perfectly aligned without text cutting.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-brand shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Read-Only Ticket Details:</strong> Replaced the redundant "Resolve" button on closed tickets with a "View Details" button showcasing final remarks.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-brand shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>WhatsApp-Ready Copy:</strong> The inventory copy button now generates a clean, structured, full-detail format for easy sharing.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-brand shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Uniform Login Cursor:</strong> Removed the zoom effect on the login page cursor to maintain professional consistency across the platform.</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- === VERSION 2.1 (OLDER) === -->
+                <div class="pt-5 border-t border-slate-200 dark:border-white/10">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="px-2 py-0.5 rounded bg-blue-500 text-white font-black text-[10px] uppercase tracking-widest shadow-sm">v2.1</span>
                         <h4 class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-widest">Smart Audit Dashboard & Speed Boost</h4>
                     </div>
 
@@ -1636,14 +1704,14 @@
                         
                         <!-- Block 1: UI/UX -->
                         <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition md:col-span-2">
-                            <h4 class="text-[11px] font-black text-indigo-500 dark:text-indigo-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-wand-magic-sparkles"></i> Premium UI Upgrade</h4>
+                            <h4 class="text-[11px] font-black text-indigo-500 dark:text-indigo-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-palette"></i> Premium UI Upgrade</h4>
                             <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium grid grid-cols-1 sm:grid-cols-2 gap-x-4">
                                 <li class="flex items-start gap-1.5">
-                                    <span class="text-brand shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span class="text-blue-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
                                     <span><strong>Modern Layout:</strong> Replaced the old boxy design. Added color-coded status strips, sleek buttons, and a spacious box for typing summaries easily.</span>
                                 </li>
                                 <li class="flex items-start gap-1.5">
-                                    <span class="text-brand shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span class="text-blue-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
                                     <span><strong>Mobile Friendly:</strong> Fixed spacing issues on mobile phones. The audit checklist now perfectly fits smaller screens without looking squeezed.</span>
                                 </li>
                             </ul>
@@ -1654,7 +1722,7 @@
                             <h4 class="text-[11px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-bolt"></i> Lightning Fast Loading</h4>
                             <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
                                 <li class="flex items-start gap-1.5">
-                                    <span class="text-brand shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span class="text-blue-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
                                     <span><strong>Instant Drafts:</strong> Added local caching. Your saved audit drafts will now open instantly (in 0.1s) without making you wait for the server.</span>
                                 </li>
                             </ul>
@@ -1665,11 +1733,11 @@
                             <h4 class="text-[11px] font-black text-rose-500 dark:text-rose-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-bug-slash"></i> Accurate Scores & Bug-Free Emails</h4>
                             <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
                                 <li class="flex items-start gap-1.5">
-                                    <span class="text-brand shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span class="text-blue-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
                                     <span><strong>Smart Calculation:</strong> Fixed the math behind compliance scores. Marking a point as 'N/A' will no longer mess up your final percentage.</span>
                                 </li>
                                 <li class="flex items-start gap-1.5">
-                                    <span class="text-brand shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span class="text-blue-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
                                     <span><strong>Stable Email Layouts:</strong> Rewrote the email structure. Audit reports will now look perfect on Outlook and mobile phones without breaking.</span>
                                 </li>
                             </ul>
@@ -1677,7 +1745,7 @@
                     </div>
                 </div>
                 
-                <!-- === VERSION 2.0 (LATEST MAJOR UPDATE) === -->
+                <!-- === VERSION 2.0 (OLDER) === -->
                 <div class="pt-5 border-t border-slate-200 dark:border-white/10">
                     <div class="flex items-center gap-2 mb-4">
                         <span class="px-2 py-0.5 rounded bg-fuchsia-600 text-white font-black text-[10px] uppercase tracking-widest shadow-sm">v2.0</span>
@@ -1741,7 +1809,7 @@
                 <!-- === VERSION 1.6 (OLDER) === -->
                 <div class="pt-5 border-t border-slate-200 dark:border-white/10">
                     <div class="flex items-center gap-2 mb-4">
-                        <span class="px-2 py-0.5 rounded bg-blue-600 text-white font-black text-[10px] uppercase tracking-widest shadow-sm">v1.6</span>
+                        <span class="px-2 py-0.5 rounded bg-slate-500 text-white font-black text-[10px] uppercase tracking-widest shadow-sm">v1.6</span>
                         <h4 class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-widest">Cohesive Ecosystem & UI Polish</h4>
                     </div>
 
@@ -1749,24 +1817,24 @@
                         <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition md:col-span-2">
                             <h4 class="text-[11px] font-black text-indigo-500 dark:text-indigo-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-palette"></i> Chromatic App Identities</h4>
                             <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium grid grid-cols-1 sm:grid-cols-2 gap-x-4">
-                                <li class="flex items-start gap-1.5"><span class="text-blue-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Visual Hierarchy:</strong> Main Dashboard is pure Blue, while inner apps have distinct colors (Indigo for Inventory, Teal for Switch, Rose for IP).</span></li>
-                                <li class="flex items-start gap-1.5"><span class="text-blue-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Color-Coded KPIs:</strong> Header titles and data numbers inside each application now dynamically match that app's specific core theme.</span></li>
+                                <li class="flex items-start gap-1.5"><span class="text-slate-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Visual Hierarchy:</strong> Main Dashboard is pure Blue, while inner apps have distinct colors (Indigo for Inventory, Teal for Switch, Rose for IP).</span></li>
+                                <li class="flex items-start gap-1.5"><span class="text-slate-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Color-Coded KPIs:</strong> Header titles and data numbers inside each application now dynamically match that app's specific core theme.</span></li>
                             </ul>
                         </div>
 
                         <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition">
                             <h4 class="text-[11px] font-black text-brand dark:text-brand_glow uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-filter"></i> Smart Data Filtering</h4>
                             <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
-                                <li class="flex items-start gap-1.5"><span class="text-blue-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Clickable KPI Cards:</strong> Tapping on any stat card (like 'Operational' or 'Reserve') now instantly filters the data table below it.</span></li>
-                                <li class="flex items-start gap-1.5"><span class="text-blue-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Quick Reset:</strong> Simply click on 'Inventory' or the 'Total' card to reset the table back to the full view.</span></li>
+                                <li class="flex items-start gap-1.5"><span class="text-slate-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Clickable KPI Cards:</strong> Tapping on any stat card (like 'Operational' or 'Reserve') now instantly filters the data table below it.</span></li>
+                                <li class="flex items-start gap-1.5"><span class="text-slate-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Quick Reset:</strong> Simply click on 'Inventory' or the 'Total' card to reset the table back to the full view.</span></li>
                             </ul>
                         </div>
 
                         <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition">
                             <h4 class="text-[11px] font-black text-emerald-500 dark:text-emerald-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-computer-mouse"></i> Hardware Acceleration</h4>
                             <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
-                                <li class="flex items-start gap-1.5"><span class="text-blue-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Zero-Jitter Cursor:</strong> Replaced the old DOM-based cursor with a native SVG cursor using OS-level GPU acceleration.</span></li>
-                                <li class="flex items-start gap-1.5"><span class="text-blue-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Non-Obtrusive Tooltips:</strong> Tooltips on header icons are now hidden on mobile to prevent accidental touch interruptions.</span></li>
+                                <li class="flex items-start gap-1.5"><span class="text-slate-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Zero-Jitter Cursor:</strong> Replaced the old DOM-based cursor with a native SVG cursor using OS-level GPU acceleration.</span></li>
+                                <li class="flex items-start gap-1.5"><span class="text-slate-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Non-Obtrusive Tooltips:</strong> Tooltips on header icons are now hidden on mobile to prevent accidental touch interruptions.</span></li>
                             </ul>
                         </div>
                     </div>
@@ -1775,7 +1843,7 @@
                 <!-- === VERSION 1.5 (OLDER) === -->
                 <div class="pt-5 border-t border-slate-200 dark:border-white/10">
                     <div class="flex items-center gap-2 mb-4">
-                        <span class="px-2 py-0.5 rounded bg-violet-500 text-white font-black text-[10px] uppercase tracking-widest shadow-sm">v1.5</span>
+                        <span class="px-2 py-0.5 rounded bg-slate-500 text-white font-black text-[10px] uppercase tracking-widest shadow-sm">v1.5</span>
                         <h4 class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-widest">Platform Upgrade</h4>
                     </div>
 
@@ -1784,16 +1852,16 @@
                         <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition">
                             <h4 class="text-[11px] font-black text-brand dark:text-brand_glow uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-bolt"></i> Performance & Unified UI</h4>
                             <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
-                                <li class="flex items-start gap-1.5"><span class="text-violet-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Zero-Latency Engine:</strong> Loading screens eliminated via Optimistic Caching.</span></li>
-                                <li class="flex items-start gap-1.5"><span class="text-violet-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Smart Iconography:</strong> Automatically assigns relevant emojis to devices, holidays, and ISP events.</span></li>
+                                <li class="flex items-start gap-1.5"><span class="text-slate-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Zero-Latency Engine:</strong> Loading screens eliminated via Optimistic Caching.</span></li>
+                                <li class="flex items-start gap-1.5"><span class="text-slate-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Smart Iconography:</strong> Automatically assigns relevant emojis to devices, holidays, and ISP events.</span></li>
                             </ul>
                         </div>
 
                         <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition">
                             <h4 class="text-[11px] font-black text-emerald-500 dark:text-emerald-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-umbrella-beach"></i> Leave Hub Insights</h4>
                             <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
-                                <li class="flex items-start gap-1.5"><span class="text-violet-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Interactive Policies:</strong> Tap any Leave KPI card to instantly view your quota and usage.</span></li>
-                                <li class="flex items-start gap-1.5"><span class="text-violet-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Smart Long Weekends:</strong> The tracker now automatically predicts 3-Day weekend opportunities.</span></li>
+                                <li class="flex items-start gap-1.5"><span class="text-slate-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Interactive Policies:</strong> Tap any Leave KPI card to instantly view your quota and usage.</span></li>
+                                <li class="flex items-start gap-1.5"><span class="text-slate-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Smart Long Weekends:</strong> The tracker now automatically predicts 3-Day weekend opportunities.</span></li>
                             </ul>
                         </div>
                     </div>
@@ -1802,7 +1870,7 @@
                 <!-- === VERSION 1.3 (OLDER) === -->
                 <div class="pt-5 border-t border-slate-200 dark:border-white/10">
                     <div class="flex items-center gap-2 mb-4">
-                        <span class="px-2 py-0.5 rounded bg-emerald-500 text-white font-black text-[10px] uppercase tracking-widest shadow-sm">v1.3</span>
+                        <span class="px-2 py-0.5 rounded bg-slate-500 text-white font-black text-[10px] uppercase tracking-widest shadow-sm">v1.3</span>
                         <h4 class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-widest">Audit Governance</h4>
                     </div>
 
@@ -1810,7 +1878,7 @@
                         <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition">
                             <h4 class="text-[11px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Strict Controls</h4>
                             <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
-                                <li class="flex items-start gap-1.5"><span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Access Control (RBAC):</strong> Only assigned auditors can resolve compliance findings.</span></li>
+                                <li class="flex items-start gap-1.5"><span class="text-slate-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> <span><strong>Access Control (RBAC):</strong> Only assigned auditors can resolve compliance findings.</span></li>
                             </ul>
                         </div>
                     </div>
@@ -2394,6 +2462,7 @@
                         ticketId: ticket.id, 
                         issue: ticket.issue, 
                         desc: ticket.desc, // 🔥 Yahan poora error description aayega
+                        resolution: ticket.resolution, // 🚀 Yahan final action aayega
                         assignedTo: ticket.assigned,
                         remarks: '', 
                         secret: '',
@@ -2794,7 +2863,8 @@
                             hasExtra: !!t.extraInfo,
                             extraInfo: t.extraInfo || {},
                             hasRma: t.hasRma || false,
-                            location: t.location || 'Noida'
+                            location: t.location || 'Noida',
+                            resolution: t.resolution || 'No resolution remarks documented.' // 🚀 FIXED: Added Resolution Mapping
                         }));
 
                         if (JSON.stringify(this.tickets) !== JSON.stringify(freshTickets)) {
