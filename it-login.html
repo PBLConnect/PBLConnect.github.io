@@ -81,10 +81,10 @@
         .custom-ring { 
             position: fixed; left: 0; top: 0; width: 30px; height: 30px; border: 2px solid rgba(59, 130, 246, 0.5); border-radius: 50%; 
             z-index: 100000; pointer-events: none; 
-            transition: transform 0.35s ease-out, background-color 0.3s ease, border-color 0.3s ease; 
+            transition: transform 0.35s ease-out; 
             will-change: transform; 
         }
-        body.cursor-grow .custom-ring { --scale: 2.5; background-color: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.3); backdrop-filter: blur(1.5px); }
+        /* Extra scale transitions aur cursor-grow class hata di gayi hai */
         @media (prefers-reduced-motion: reduce), (max-width: 768px) { 
             .custom-ring { display: none !important; } 
         }
@@ -186,7 +186,7 @@
         // ⏱️ 30-MINUTE SESSION VALIDITY CHECK (App khulte hi chalega)
         const SESSION_TIMEOUT = 30 * 60 * 1000; 
 
-        // 🫧 SMOOTH LAGGING BUBBLE CURSOR ENGINE (OPTIMIZED)
+        // 🫧 SMOOTH LAGGING BUBBLE CURSOR ENGINE (DASHBOARD MATCHED - NO ZOOM)
         function setupCustomCursor() { 
             if(!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
             if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -196,20 +196,11 @@
             document.body.appendChild(ring);
 
             document.addEventListener('mousemove', (e) => {
-                ring.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%) scale(var(--scale, 1))`;
+                // Scale parameter hata diya hai
+                ring.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%)`;
             });
-
-            document.body.addEventListener('mouseover', (e) => {
-                if (e.target.closest('a, button, input, select, textarea, .cursor-pointer')) {
-                    document.body.classList.add('cursor-grow');
-                }
-            });
-
-            document.body.addEventListener('mouseout', (e) => {
-                if (e.target.closest('a, button, input, select, textarea, .cursor-pointer')) {
-                    document.body.classList.remove('cursor-grow');
-                }
-            });
+            
+            // Hover logic removed to maintain 100% uniformity with IT_Dashboard.html
         }
 
         window.addEventListener('DOMContentLoaded', () => {
