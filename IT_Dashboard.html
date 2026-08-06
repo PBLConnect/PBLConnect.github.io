@@ -2375,7 +2375,10 @@
 				
                 // 🔥 SMART RESOLVE MODAL FUNCTIONS & ACCESS CONTROL
                 canResolve(ticket) {
-					if (ticket.type === 'LEAVE') return false; // 📍 HR tickets IT helpdesk se resolve nahi hongi!
+                    // 🛑 LOGICAL FIX: Agar ticket pehle se hi band (Resolved/Closed) ho chuki hai, toh wapas resolve nahi kar sakte!
+                    if (ticket.status !== 'Open') return false;
+
+                    if (ticket.type === 'LEAVE') return false; // 📍 HR tickets IT helpdesk se resolve nahi hongi!
                     if (ticket.issue && ticket.issue.toLowerCase().includes('audit')) {
                         // 🛑 STRICT GOVERNANCE: Sirf assigned auditor hi resolve kar payega.
                         // Head of IT (Vikas) ko bhi sirf 'View Details' ka access milega.
