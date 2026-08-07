@@ -1110,17 +1110,17 @@
                     },
                     
                     // 📍 2. Regular filters applied on top of the base list
-                    get filteredHardware() {
+                   get filteredHardware() {
                         const q = this.searchQuery.toLowerCase().trim();
-                        return this.baseFilteredHardware.filter(a => { 
+                        let list = this.baseFilteredHardware.filter(a => { 
                             const rowStr = Object.values(a).join(' ').toLowerCase(); 
                             
-                            // 🚀 Smart Virtual Location Logic (Includes Developer PCs via Nomenclature)
+                            // 🚀 Smart Virtual Location Logic
                             const locMatch = this.filterLoc.length === 0 
                                 || this.filterLoc.includes(a.Location) 
-                                || (this.filterLoc.includes('Developer PC') && (String(a.AssetID).toUpperCase().includes('NOD-DEV') || String(a.Hostname).toUpperCase().includes('NOD-DEV')));
+                                || (this.filterLoc.includes('Developer PC') && (String(a.AssetID).toUpperCase().includes('-DEV') || String(a.Hostname).toUpperCase().includes('-DEV')));
 
-                            // 🧹 Data Hygiene Check (Finds missing or dummy/kachra values)
+                            // 🧹 Data Hygiene Check
                             const isBadData = 
                                 !a.SerialNo || String(a.SerialNo).trim() === '' || String(a.SerialNo).trim() === '-' || String(a.SerialNo).toUpperCase() === 'N/A' ||
                                 !a.AssignedTo || String(a.AssignedTo).trim() === '' || String(a.AssignedTo).trim() === '-' || String(a.AssignedTo).toUpperCase() === 'UNASSIGNED' ||
@@ -1131,6 +1131,71 @@
                                 && (this.filterStatus.length === 0 || this.filterStatus.includes(a.Status)) 
                                 && locMatch 
                                 && (!this.filterHygiene || isBadData); 
+                        });
+
+                        // 🚀 3-TIER SMART ALPHANUMERIC & HIERARCHICAL SORTING ENGINE
+                        return list.sort((a, b) => {
+                            
+                            // TIER 1: Main Machine vs Monitor Segregation
+                            const getMainDevicePriority = (type) => {
+                                let t = String(type).toUpperCase();
+                                if(t.includes('MONITOR') || t.includes('TFT') || t.includes('DISPLAY')) return 2; // Monitors forced to bottom half
+                                if(t.includes('PRINTER') || t.includes('SCANNER') || t.includes('UPS') || t.includes('CAM') || t.includes('TAP')) return 3; // Accessories at absolute bottom
+                                return 1; // Desktops, Laptops, Servers stay strictly on top
+                            };
+
+                            // TIER 2: Unified Department/Category Sequence (Strict Hostname Check)
+                            const getCategoryPriority = (record) => {
+                                let host = String(record.Hostname || '').toUpperCase().trim();
+                                if (host === '-' || host === 'N/A' || host === 'NOT ALLOCATED') host = ''; // Nullify dummy hostnames
+                                
+                                let n = host;
+                                
+                                // Server Edge Case: If no hostname, check if AssetID is a valid server name (not a PBL inventory tag)
+                                if (!n) {
+                                    let asset = String(record.AssetID || '').toUpperCase().trim();
+                                    if (!asset.startsWith('PBL-')) n = asset; 
+                                }
+
+                                if (n) {
+                                    // Exceptions handled first
+                                    if(n.includes('IT-PEN')) return 11;
+                                    
+                                    // Standard Sequences (Exact mappings you provided)
+                                    if(n.includes('PRD')) return 1;
+                                    if(n.includes('DEV')) return 2;
+                                    if(n.includes('-IT-') || n.includes('NOD-IT') || n.includes('DDN-IT')) return 3;
+                                    if(n.includes('ADM')) return 4;
+                                    if(n.includes('WFH')) return 5;
+                                    
+                                    // Servers & Special Systems
+                                    if(n.includes('SOFTWAREDB')) return 6;
+                                    if(n.includes('WINSVR')) return 7;
+                                    if(n === 'PBL' || n === 'PBL1' || n === 'PBL2') return 8; 
+                                    if(n.includes('LINUX')) return 9;
+                                    if(n.includes('GERMAN')) return 10;
+                                    
+                                    return 50; // Assigned PC, but unknown category
+                                }
+                                
+                                return 99; // 🛑 Spares, Decommissioned, Unassigned (with no Hostnames) drop to the very bottom!
+                            };
+
+                            const devA = getMainDevicePriority(a.DeviceType);
+                            const devB = getMainDevicePriority(b.DeviceType);
+
+                            // 🥇 Level 1: Pehle Desktop, Phir Monitor, Phir Webcams/Misc
+                            if (devA !== devB) return devA - devB;
+
+                            // 🥈 Level 2: Ab dono ke groups ke andar Department sequence lagao
+                            const catA = getCategoryPriority(a);
+                            const catB = getCategoryPriority(b);
+                            if (catA !== catB) return catA - catB;
+
+                            // 🥉 Level 3: Same department hone par Numeric sequence lagao (001 -> 002)
+                            let nameA = String(a.Hostname && a.Hostname !== '-' ? a.Hostname : a.AssetID);
+                            let nameB = String(b.Hostname && b.Hostname !== '-' ? b.Hostname : b.AssetID);
+                            return nameA.localeCompare(nameB, undefined, { numeric: true, sensitivity: 'base' });
                         });
                     },
 
