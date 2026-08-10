@@ -194,32 +194,36 @@
                 </div>
             </div>
 
-            <!-- 2. CENTER: Sleek Clock Capsule -->
-            <div class="hidden lg:flex items-center justify-center flex-1 z-20 px-2 min-w-0 transition-all duration-300">
-                <div class="bg-slate-50/80 dark:bg-black/30 backdrop-blur-xl px-3 py-1.5 rounded-2xl border border-slate-200/80 dark:border-white/5 flex items-center shadow-sm gap-2 shrink-0">
-                    <div class="flex items-center gap-1.5 whitespace-nowrap shrink-0 text-slate-700 dark:text-slate-200">
-                        <i class="fa-regular fa-clock text-brand text-[12px] animate-pulse"></i>
-                        <span class="text-[12px] font-mono font-black tracking-tight" x-text="currentTime"></span>
-                    </div>
-                    <div class="w-px h-3 bg-slate-300 dark:bg-slate-600 shrink-0"></div>
-                    <div class="flex items-center gap-1.5 whitespace-nowrap shrink-0">
-                        <span class="text-[8px] font-black text-slate-500 uppercase tracking-widest" x-text="myShiftInfo.name"></span>
-                        <span class="px-1.5 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest border shadow-sm flex items-center gap-1.5"
-                             :class="myShiftInfo.isOver ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/30' : 'bg-white dark:bg-black/40 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-white/10'">
-                             <div class="w-1 h-1 rounded-full" :class="myShiftInfo.isOver ? 'bg-red-500' : 'bg-emerald-500'"></div>
-                            <span x-text="myShiftInfo.timeLeft"></span>
-                        </span>
-                    </div>
-                </div>
-            </div>
+            <!-- 2. CENTER: Modern & Prominent Clock Capsule -->
+			<div class="hidden lg:flex items-center justify-center flex-1 z-20 px-2 min-w-0 transition-all duration-300">
+				<div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl px-5 py-2 rounded-full border border-slate-200 dark:border-white/10 flex items-center shadow-md hover:shadow-lg transition-all gap-3.5 shrink-0">
+					<div class="flex items-center gap-2 whitespace-nowrap shrink-0 text-slate-800 dark:text-slate-100">
+						<i class="fa-regular fa-clock text-brand text-sm animate-pulse"></i>
+						<span class="text-sm sm:text-[15px] font-mono font-black tracking-tight leading-none pt-0.5" x-text="currentTime"></span>
+					</div>
+					
+					<div class="w-[1.5px] h-5 bg-slate-200 dark:bg-white/10 shrink-0 rounded-full"></div>
+					
+					<div class="flex items-center gap-2.5 whitespace-nowrap shrink-0">
+						<span class="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-0.5" x-text="myShiftInfo.name"></span>
+						<span class="px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-sm flex items-center gap-1.5 transition-colors"
+							 :class="myShiftInfo.isOver ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/30' : 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30'">
+							 <div class="w-1.5 h-1.5 rounded-full" :class="myShiftInfo.isOver ? 'bg-red-500 animate-pulse' : 'bg-emerald-500'"></div>
+							<span class="pt-px" x-text="myShiftInfo.timeLeft"></span>
+						</span>
+					</div>
+				</div>
+			</div>
 
             <!-- 3. RIGHT: Grouped Controls -->
             <div class="flex items-center justify-end gap-1.5 sm:gap-4 w-auto relative z-30 shrink-0">
                 
                 <!-- GROUP A: Quick Tools (Hidden on Mobile) -->
 				<div class="hidden sm:flex items-center gap-2">
-					<a x-show="['vikas', 'anil', 'ashok'].some(n => (currentUser?.name || '').toLowerCase().includes(n))" x-cloak href="pbl-toolkit://start" class="flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-500 hover:text-white transition-all border border-indigo-200 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400 shadow-sm active:scale-95" title="Launch Admin Toolkit">
-						<i class="fa-solid fa-terminal text-[13px]"></i>
+					<a x-show="['vikas', 'anil', 'ashok'].some(n => (currentUser?.name || '').toLowerCase().includes(n))" x-cloak href="pbl-toolkit://start" 
+					   class="group flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 hover:text-indigo-600 hover:border-indigo-300 hover:shadow-md dark:hover:text-indigo-400 dark:hover:border-indigo-500/50 shadow-sm transition-all duration-300 active:scale-95" 
+					   title="Launch Admin CLI">
+						<i class="fa-solid fa-terminal text-[13px] sm:text-sm group-hover:scale-110 transition-transform duration-300"></i>
 					</a>
 				</div>
 
