@@ -147,6 +147,43 @@
         @media (prefers-reduced-motion: reduce), (max-width: 768px) { 
             .custom-ring { display: none !important; } 
         }
+		
+		/* Ambient Aurora Background */
+		.mesh-bg {
+			background-color: #f1f5f9;
+			background-image: 
+				radial-gradient(at 0% 0%, hsla(253,16%,7%,0.03) 0, transparent 50%), 
+				radial-gradient(at 50% 0%, hsla(225,39%,30%,0.03) 0, transparent 50%), 
+				radial-gradient(at 100% 0%, hsla(339,49%,30%,0.03) 0, transparent 50%);
+		}
+		.dark .mesh-bg {
+			background-color: #020617;
+			background-image: 
+				radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+				radial-gradient(at 50% 0%, hsla(225,39%,30%,0.15) 0, transparent 50%), 
+				radial-gradient(at 100% 0%, hsla(339,49%,30%,0.15) 0, transparent 50%);
+		}
+
+		/* Premium Cut-Glass Edge */
+		.glass-edge {
+			box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.6), 0 8px 20px -4px rgba(0, 0, 0, 0.05);
+		}
+		.dark .glass-edge {
+			box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.08), inset 0 -1px 1px rgba(0, 0, 0, 0.2), 0 8px 20px -4px rgba(0, 0, 0, 0.4);
+		}
+
+		/* Real-time Heartbeat Pulse */
+		@keyframes double-beat {
+			0% { transform: scale(1); opacity: 1; }
+			15% { transform: scale(1.4); opacity: 0.8; }
+			30% { transform: scale(1); opacity: 1; }
+			45% { transform: scale(1.4); opacity: 0.8; }
+			60% { transform: scale(1); opacity: 1; }
+			100% { transform: scale(1); opacity: 1; }
+		}
+		.animate-heartbeat {
+			animation: double-beat 2.5s infinite cubic-bezier(0.4, 0, 0.2, 1);
+		}
 
         
     </style>
@@ -458,7 +495,7 @@
     </header>
 
     <!-- MAIN CONTENT -->
-    <main id="main-scroll" class="flex-1 overflow-y-auto lg:overflow-hidden p-4 sm:p-6 bg-slate-50/50 dark:bg-[#020617] flex flex-col">
+    <main id="main-scroll" class="flex-1 overflow-y-auto lg:overflow-hidden p-4 sm:p-6 mesh-bg flex flex-col">
         
         <!-- 🚀 Removed Clunky Pull-to-refresh indicator -->
 
@@ -832,18 +869,21 @@
         </div>
 
         <div class="relative z-10 mt-1">
-            <div class="flex items-baseline gap-1.5 drop-shadow-sm">
-                <h3 class="text-2xl sm:text-4xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none" x-text="onlineStaffCount">0</h3>
-                <span class="text-[10px] sm:text-sm font-mono font-bold text-slate-400" x-text="'/ ' + staffData.length"></span>
-            </div>
-            <div class="flex items-center gap-1 mt-1.5">
-                <span class="relative flex h-2 w-2">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 border border-white dark:border-dark_surface"></span>
-                </span>
-                <p class="text-[7.5px] sm:text-[10px] font-bold text-emerald-600 dark:text-emerald-400 truncate">Active Now</p>
-            </div>
-        </div>
+		<div class="flex items-baseline gap-1.5 drop-shadow-sm">
+			<h3 class="text-2xl sm:text-4xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none" x-text="onlineStaffCount">0</h3>
+			<span class="text-[10px] sm:text-sm font-mono font-bold text-slate-400" x-text="'/ ' + staffData.length"></span>
+		</div>
+		<div class="flex items-center gap-1.5 mt-1.5">
+			<!-- Visual Dots Array -->
+			<div class="flex gap-0.5 mr-1">
+				<template x-for="i in staffData.length">
+					<div class="w-1.5 h-1.5 rounded-full transition-all duration-500" 
+						 :class="i <= onlineStaffCount ? 'bg-emerald-500 shadow-[0_0_6px_#10b981]' : 'bg-slate-200 dark:bg-slate-700'"></div>
+				</template>
+			</div>
+			<p class="text-[7.5px] sm:text-[10px] font-bold text-emerald-600 dark:text-emerald-400 truncate">Active Now</p>
+		</div>
+	</div>
     </div>
 
     <!-- COMPACT KPI 3: LEAVE HUB (NEW) -->
@@ -892,8 +932,10 @@
     </main>
 
     <!-- UNIFIED STATUS BAR (FOOTER) -->
-    <footer class="shrink-0 bg-white/90 dark:bg-[#09090b]/95 backdrop-blur-xl border-t border-slate-200/80 dark:border-white/5 z-50 h-10 sm:h-10 w-full flex items-center">
-        <div class="max-w-[1920px] w-full mx-auto px-3.5 sm:px-6 flex items-center justify-between text-[10px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400">
+    <!-- Floating Dock Footer -->
+	<footer class="shrink-0 z-50 pb-2 sm:pb-4 px-2 sm:px-6 w-full flex items-center justify-center pointer-events-none bg-transparent">
+		<div class="max-w-[1920px] w-full mx-auto bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-2xl border border-slate-200/60 dark:border-white/10 rounded-2xl h-10 sm:h-12 flex items-center px-4 pointer-events-auto glass-edge transition-all">
+			<div class="w-full flex items-center justify-between text-[10px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400">
             
             <!-- LEFT: Copyright & Version -->
             <div class="flex items-center gap-2 sm:gap-3 shrink-0">
@@ -915,10 +957,10 @@
             <!-- CENTER: System Status (Fluid & Centered safely) -->
             <div class="hidden md:flex flex-1 justify-center items-center px-4 overflow-hidden">
                 <div class="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-100 dark:border-emerald-500/20 shadow-sm cursor-default">
-                    <span class="relative flex h-1.5 w-1.5">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
-                    </span>
+                    <span class="relative flex h-2 w-2">
+                <span class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60 animate-heartbeat"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-[0_0_8px_#10b981]"></span>
+            </span>
                     <span class="font-bold tracking-wide text-[10px] sm:text-[11px]">All Systems Operational</span>
                 </div>
             </div>
@@ -2655,7 +2697,7 @@
                         'amber': {
                             openBg: 'bg-amber-50/60 dark:bg-amber-900/10 border-amber-300 dark:border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.15)] hover:shadow-[0_0_25px_rgba(245,158,11,0.25)]',
                             closedBg: 'bg-white dark:bg-dark_surface border-slate-100 dark:border-white/5 hover:border-amber-300 hover:shadow-md',
-                            openBar: 'bg-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.9)] animate-pulse',
+                            openBar: 'bg-sky-400 shadow-[0_0_15px_2px_rgba(56,189,248,0.8)] animate-pulse',
                             closedBar: 'bg-emerald-400 opacity-50',
                             openPill: 'bg-amber-500 text-white border-amber-400 dark:bg-amber-600 dark:border-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.6)] animate-pulse',
                             closedPill: 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20',
@@ -2981,8 +3023,12 @@
                     }
                     if (this.chartInstance) this.chartInstance.destroy();
                     const options = {
-                        // 📍 FIX: Added width 100%, parentHeightOffset 0, aur redrawOnParentResize to forcefully lock it inside its box
-                        chart: { type: chartType, height: '100%', width: '100%', parentHeightOffset: 0, redrawOnParentResize: true, fontFamily: 'Inter, sans-serif', background: 'transparent', toolbar: { show: false } },
+					chart: { 
+						type: chartType, height: '100%', width: '100%', parentHeightOffset: 0, redrawOnParentResize: true, fontFamily: 'Inter, sans-serif', background: 'transparent', toolbar: { show: false },
+						animations: { enabled: true, easing: 'easeinout', speed: 800, dynamicAnimation: { enabled: true, speed: 350 } }, // Smooth counter & loading
+						dropShadow: { enabled: true, top: 4, left: 0, blur: 5, color: this.isDark ? '#000' : '#334155', opacity: this.isDark ? 0.4 : 0.15 } // Premium 3D embossed look
+					},
+					
                         series: series, labels: labels, colors: colors,
                         theme: { mode: this.isDark ? 'dark' : 'light' },
                         plotOptions: { bar: { borderRadius: 4, columnWidth: '40%' }, pie: { donut: { size: '75%', labels: { show: true, total: { show: true, label: 'Total', fontSize: '11px', color: this.isDark ? '#fff' : '#333' } } } } },
