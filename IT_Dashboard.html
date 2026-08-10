@@ -217,15 +217,11 @@
             <div class="flex items-center justify-end gap-1.5 sm:gap-4 w-auto relative z-30 shrink-0">
                 
                 <!-- GROUP A: Quick Tools (Hidden on Mobile) -->
-                <div class="hidden sm:flex items-center gap-2">
-                    <a href="PBL_IT_Leave_Tracker.html" @click="haptic('light')" class="flex items-center gap-1.5 h-9 px-3 rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-all border border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/30 dark:text-emerald-400 shadow-sm font-bold text-[11px] active:scale-95">
-                        <i class="fa-regular fa-calendar-check text-[13px]"></i> <span>Leave Hub</span>
-                    </a>
-                    
-                    <a x-show="['vikas', 'anil', 'ashok'].some(n => (currentUser?.name || '').toLowerCase().includes(n))" x-cloak href="pbl-toolkit://start" class="flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-500 hover:text-white transition-all border border-indigo-200 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400 shadow-sm active:scale-95" title="Launch Admin Toolkit">
-                        <i class="fa-solid fa-terminal text-[13px]"></i>
-                    </a>
-                </div>
+				<div class="hidden sm:flex items-center gap-2">
+					<a x-show="['vikas', 'anil', 'ashok'].some(n => (currentUser?.name || '').toLowerCase().includes(n))" x-cloak href="pbl-toolkit://start" class="flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-500 hover:text-white transition-all border border-indigo-200 dark:bg-indigo-500/10 dark:border-indigo-500/30 dark:text-indigo-400 shadow-sm active:scale-95" title="Launch Admin Toolkit">
+						<i class="fa-solid fa-terminal text-[13px]"></i>
+					</a>
+				</div>
 
                 <div class="hidden sm:block w-px h-6 bg-slate-200 dark:bg-white/10"></div>
 
@@ -777,79 +773,112 @@
                             <div id="analyticsChart" class="w-full h-full drop-shadow-md"></div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-3 mt-3 border-t border-slate-200/50 dark:border-white/10 pt-3 shrink-0 relative z-20">
-                            
-                            <!-- COMPACT KPI 1: PENDING TICKETS -->
-                            <div @click="haptic('light'); showOpenTicketsModal = true" 
-                                 class="relative p-3 sm:p-3.5 rounded-[1.25rem] cursor-pointer overflow-hidden transition-all duration-500 group bg-gradient-to-br from-rose-50 to-white dark:from-rose-900/20 dark:to-transparent border border-rose-100 dark:border-rose-800/30 hover:border-rose-300 dark:hover:border-rose-700 shadow-sm hover:shadow-[0_10px_20px_-5px_rgba(244,63,94,0.15)] flex flex-col justify-between">
-                                
-                                <div class="absolute -right-8 -top-8 w-24 h-24 bg-rose-200/50 dark:bg-rose-500/10 rounded-full blur-2xl group-hover:scale-110 transition-transform duration-500"></div>
+                        <div class="grid grid-cols-3 gap-2 sm:gap-3 mt-3 border-t border-slate-200/50 dark:border-white/10 pt-3 shrink-0 relative z-20">
+    
+    <!-- COMPACT KPI 1: PENDING TICKETS -->
+    <div @click="haptic('light'); showOpenTicketsModal = true" 
+         class="relative p-2.5 sm:p-3.5 rounded-[1.25rem] cursor-pointer overflow-hidden transition-all duration-500 group bg-gradient-to-br from-rose-50 to-white dark:from-rose-900/20 dark:to-transparent border border-rose-100 dark:border-rose-800/30 hover:border-rose-300 dark:hover:border-rose-700 shadow-sm hover:shadow-[0_10px_20px_-5px_rgba(244,63,94,0.15)] flex flex-col justify-between">
+        
+        <div class="absolute -right-8 -top-8 w-24 h-24 bg-rose-200/50 dark:bg-rose-500/10 rounded-full blur-2xl group-hover:scale-110 transition-transform duration-500"></div>
+        <i class="fa-solid fa-ticket absolute -bottom-4 -right-2 text-5xl sm:text-7xl text-rose-500 opacity-[0.05] dark:opacity-[0.03] group-hover:scale-110 group-hover:-rotate-12 transition-all duration-500"></i>
 
-                                <i class="fa-solid fa-ticket absolute -bottom-4 -right-2 text-6xl sm:text-7xl text-rose-500 opacity-[0.05] dark:opacity-[0.03] group-hover:scale-110 group-hover:-rotate-12 transition-all duration-500"></i>
+        <div class="flex items-center justify-between relative z-10 mb-1.5">
+            <div class="flex items-center gap-1.5 sm:gap-2">
+                <div class="w-6 h-6 rounded-lg bg-white dark:bg-black/20 shadow-sm border border-rose-100 dark:border-white/5 flex items-center justify-center text-rose-500 text-[9px] sm:text-[10px]">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <span class="text-[8.5px] sm:text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest truncate">Pending</span>
+            </div>
+            <div class="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-rose-100 dark:bg-rose-500/20 text-rose-500 flex items-center justify-center opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                <i class="fa-solid fa-arrow-right text-[7px] sm:text-[8px]"></i>
+            </div>
+        </div>
 
-                                <div class="flex items-center justify-between relative z-10 mb-1.5">
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-6 h-6 rounded-lg bg-white dark:bg-black/20 shadow-sm border border-rose-100 dark:border-white/5 flex items-center justify-center text-rose-500 text-[9px] sm:text-[10px]">
-                                            <i class="fa-solid fa-bolt"></i>
-                                        </div>
-                                        <span class="text-[9px] sm:text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest">Pending</span>
-                                    </div>
-                                    <div class="w-5 h-5 rounded-full bg-rose-100 dark:bg-rose-500/20 text-rose-500 flex items-center justify-center opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
-                                        <i class="fa-solid fa-arrow-right text-[8px]"></i>
-                                    </div>
-                                </div>
+        <div class="relative z-10 mt-1">
+            <h3 class="text-2xl sm:text-4xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none drop-shadow-sm" x-text="openTickets.length">0</h3>
+            <div class="flex items-center gap-1 mt-1.5">
+                <span class="relative flex h-2 w-2" x-show="openTickets.length > 0">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500 border border-white dark:border-dark_surface"></span>
+                </span>
+                <p class="text-[7.5px] sm:text-[10px] font-bold transition-colors truncate" 
+                   :class="openTickets.length > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-400'"
+                   x-text="openTickets.length > 0 ? 'Action Req.' : 'All Clear ✅'"></p>
+            </div>
+        </div>
+    </div>
 
-                                <div class="relative z-10 mt-1">
-                                    <h3 class="text-3xl sm:text-4xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none drop-shadow-sm" x-text="openTickets.length">0</h3>
-                                    
-                                    <div class="flex items-center gap-1.5 mt-1.5">
-                                        <span class="relative flex h-2 w-2" x-show="openTickets.length > 0">
-                                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                                          <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500 border border-white dark:border-dark_surface"></span>
-                                        </span>
-                                        <p class="text-[8px] sm:text-[10px] font-bold transition-colors" 
-                                           :class="openTickets.length > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-400'"
-                                           x-text="openTickets.length > 0 ? 'Action Required' : 'All Clear ✅'"></p>
-                                    </div>
-                                </div>
-                            </div>
+    <!-- COMPACT KPI 2: IT STAFF -->
+    <div @click="haptic('light'); showStaffModal = true" 
+         class="relative p-2.5 sm:p-3.5 rounded-[1.25rem] cursor-pointer overflow-hidden transition-all duration-500 group bg-gradient-to-br from-teal-50 to-white dark:from-teal-900/20 dark:to-transparent border border-teal-100 dark:border-teal-800/30 hover:border-teal-300 dark:hover:border-teal-700 shadow-sm hover:shadow-[0_10px_20px_-5px_rgba(20,184,166,0.15)] flex flex-col justify-between">
+        
+        <div class="absolute -right-8 -top-8 w-24 h-24 bg-teal-200/50 dark:bg-teal-500/10 rounded-full blur-2xl group-hover:scale-110 transition-transform duration-500"></div>
+        <i class="fa-solid fa-users absolute -bottom-4 -right-2 text-5xl sm:text-7xl text-teal-500 opacity-[0.05] dark:opacity-[0.03] group-hover:scale-110 group-hover:-rotate-12 transition-all duration-500"></i>
 
-                            <!-- COMPACT KPI 2: IT STAFF -->
-                            <div @click="haptic('light'); showStaffModal = true" 
-                                 class="relative p-3 sm:p-3.5 rounded-[1.25rem] cursor-pointer overflow-hidden transition-all duration-500 group bg-gradient-to-br from-teal-50 to-white dark:from-teal-900/20 dark:to-transparent border border-teal-100 dark:border-teal-800/30 hover:border-teal-300 dark:hover:border-teal-700 shadow-sm hover:shadow-[0_10px_20px_-5px_rgba(20,184,166,0.15)] flex flex-col justify-between">
-                                
-                                <div class="absolute -right-8 -top-8 w-24 h-24 bg-teal-200/50 dark:bg-teal-500/10 rounded-full blur-2xl group-hover:scale-110 transition-transform duration-500"></div>
+        <div class="flex items-center justify-between relative z-10 mb-1.5">
+            <div class="flex items-center gap-1.5 sm:gap-2">
+                <div class="w-6 h-6 rounded-lg bg-white dark:bg-black/20 shadow-sm border border-teal-100 dark:border-white/5 flex items-center justify-center text-teal-500 text-[9px] sm:text-[10px]">
+                    <i class="fa-solid fa-headset"></i>
+                </div>
+                <span class="text-[8.5px] sm:text-[10px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-widest truncate">IT Staff</span>
+            </div>
+            <div class="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-teal-100 dark:bg-teal-500/20 text-teal-500 flex items-center justify-center opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                <i class="fa-solid fa-arrow-right text-[7px] sm:text-[8px]"></i>
+            </div>
+        </div>
 
-                                <i class="fa-solid fa-users absolute -bottom-4 -right-2 text-6xl sm:text-7xl text-teal-500 opacity-[0.05] dark:opacity-[0.03] group-hover:scale-110 group-hover:-rotate-12 transition-all duration-500"></i>
+        <div class="relative z-10 mt-1">
+            <div class="flex items-baseline gap-1.5 drop-shadow-sm">
+                <h3 class="text-2xl sm:text-4xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none" x-text="onlineStaffCount">0</h3>
+                <span class="text-[10px] sm:text-sm font-mono font-bold text-slate-400" x-text="'/ ' + staffData.length"></span>
+            </div>
+            <div class="flex items-center gap-1 mt-1.5">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 border border-white dark:border-dark_surface"></span>
+                </span>
+                <p class="text-[7.5px] sm:text-[10px] font-bold text-emerald-600 dark:text-emerald-400 truncate">Active Now</p>
+            </div>
+        </div>
+    </div>
 
-                                <div class="flex items-center justify-between relative z-10 mb-1.5">
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-6 h-6 rounded-lg bg-white dark:bg-black/20 shadow-sm border border-teal-100 dark:border-white/5 flex items-center justify-center text-teal-500 text-[9px] sm:text-[10px]">
-                                            <i class="fa-solid fa-headset"></i>
-                                        </div>
-                                        <span class="text-[9px] sm:text-[10px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-widest">IT Staff</span>
-                                    </div>
-                                    <div class="w-5 h-5 rounded-full bg-teal-100 dark:bg-teal-500/20 text-teal-500 flex items-center justify-center opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
-                                        <i class="fa-solid fa-arrow-right text-[8px]"></i>
-                                    </div>
-                                </div>
+    <!-- COMPACT KPI 3: LEAVE HUB (NEW) -->
+    <a href="PBL_IT_Leave_Tracker.html" @click="haptic('light')" 
+       class="relative p-2.5 sm:p-3.5 rounded-[1.25rem] cursor-pointer overflow-hidden transition-all duration-500 group bg-gradient-to-br from-indigo-50 to-white dark:from-indigo-900/20 dark:to-transparent border border-indigo-100 dark:border-indigo-800/30 hover:border-indigo-300 dark:hover:border-indigo-700 shadow-sm hover:shadow-[0_10px_20px_-5px_rgba(99,102,241,0.15)] flex flex-col justify-between block">
+        
+        <div class="absolute -right-8 -top-8 w-24 h-24 bg-indigo-200/50 dark:bg-indigo-500/10 rounded-full blur-2xl group-hover:scale-110 transition-transform duration-500"></div>
+        <i class="fa-solid fa-umbrella-beach absolute -bottom-4 -right-2 text-5xl sm:text-7xl text-indigo-500 opacity-[0.05] dark:opacity-[0.03] group-hover:scale-110 group-hover:-rotate-12 transition-all duration-500"></i>
 
-                                <div class="relative z-10 mt-1">
-                                    <div class="flex items-baseline gap-1.5 drop-shadow-sm">
-                                        <h3 class="text-3xl sm:text-4xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none" x-text="onlineStaffCount">0</h3>
-                                        <!-- 📍 NAYA: Dynamic total staff count -->
-                                        <span class="text-xs sm:text-sm font-mono font-bold text-slate-400" x-text="'/ ' + staffData.length">/ 4</span>
-                                    </div>
-                                    
-                                    <div class="flex items-center gap-1.5 mt-1.5">
-                                        <span class="relative flex h-2 w-2">
-                                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 border border-white dark:border-dark_surface"></span>
-                                        </span>
-                                        <p class="text-[8px] sm:text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Active Now</p>
-                                    </div>
-                                </div>
-                            </div>
+        <div class="flex items-center justify-between relative z-10 mb-1.5">
+            <div class="flex items-center gap-1.5 sm:gap-2">
+                <div class="w-6 h-6 rounded-lg bg-white dark:bg-black/20 shadow-sm border border-indigo-100 dark:border-white/5 flex items-center justify-center text-indigo-500 text-[9px] sm:text-[10px]">
+                    <i class="fa-regular fa-calendar-check"></i>
+                </div>
+                <span class="text-[8.5px] sm:text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest truncate">Leave Hub</span>
+            </div>
+            <div class="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-indigo-100 dark:bg-indigo-500/20 text-indigo-500 flex items-center justify-center opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                <i class="fa-solid fa-arrow-right text-[7px] sm:text-[8px]"></i>
+            </div>
+        </div>
+
+        <div class="relative z-10 mt-1">
+            <div class="flex items-baseline gap-1.5 drop-shadow-sm">
+                <!-- Role-Based Contextual Data -->
+                <h3 class="text-2xl sm:text-4xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none" x-text="myLeaveAlertsCount"></h3>
+            </div>
+            <div class="flex items-center gap-1 mt-1.5">
+                <span class="relative flex h-2 w-2" x-show="myLeaveAlertsCount > 0">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500 border border-white dark:border-dark_surface"></span>
+                </span>
+                <p class="text-[7.5px] sm:text-[10px] font-bold transition-colors truncate" 
+                   :class="myLeaveAlertsCount > 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'"
+                   x-text="myLeaveAlertsCount > 0 ? (currentUser?.name.includes('Vikas') ? 'Pending Req.' : 'Leave Updates') : 'No Active Alerts'"></p>
+            </div>
+        </div>
+    </a>
+
+</div>
 
                         </div>
                     </div>
@@ -2671,6 +2700,27 @@
 
                     meta.styles = styleMap[meta.color];
                     return meta;
+                },
+				
+				// Naya Contextual Getter for Leave KPI Card
+                get myLeaveAlertsCount() {
+                    const myName = this.currentUser?.name || '';
+                    const isAdmin = myName.includes('Vikas');
+                    let count = 0;
+                    const now = new Date();
+
+                    this.leaveAlerts.forEach(la => {
+                        const diffDays = (now - new Date(la.rawDate)) / 86400000;
+                        if (isAdmin && la.status === 'Pending') {
+                            count++; // Vikas sees all pending approvals
+                        } else if (!isAdmin && la.empName === myName) {
+                            // Anil/Ashok see their OWN pending or recently processed leaves (last 3 days)
+                            if (la.status === 'Pending' || diffDays <= 3) {
+                                count++;
+                            }
+                        }
+                    });
+                    return count;
                 },
 
                 get notifications() { 
