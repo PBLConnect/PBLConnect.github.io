@@ -519,9 +519,9 @@
                     <!-- Profile Dropdown -->
                     <div x-show="showProfile" x-transition.origin.top.right class="absolute right-0 top-full mt-2 w-48 bg-white/95 dark:bg-dark_surface/95 backdrop-blur-xl rounded-2xl shadow-xl border border-slate-200 dark:border-dark_border z-[100] overflow-hidden" style="display: none;">
                         <div class="p-2 space-y-1">
-                            <a href="PBL_IT_Leave_Tracker.html" class="w-full text-left flex items-center gap-3 px-4 py-2.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-500/10 dark:hover:text-emerald-400 rounded-xl transition">
+                            <button @click="showLeaveAppModal = true; showProfile = false; haptic('light')" class="w-full text-left flex items-center gap-3 px-4 py-2.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-500/10 dark:hover:text-indigo-400 rounded-xl transition">
                                 <i class="fa-regular fa-calendar-check opacity-70"></i> My Leaves
-                            </a>
+                            </button>
                             
                             <div class="h-px bg-slate-100 dark:bg-white/10 my-1"></div>
                             
@@ -940,7 +940,7 @@
                             </div>
 
                             <!-- COMPACT KPI 3: LEAVE HUB (SMART BALANCE & ALERTS) -->
-                            <a href="PBL_IT_Leave_Tracker.html" @click="haptic('light')" 
+                            <div @click="haptic('light'); showLeaveAppModal = true" 
                                x-data="{
                                    localLeaves: null,
                                    get isHead() { return currentUser?.name.includes('Vikas'); },
@@ -1737,6 +1737,36 @@
 
         </div>
     </div>
+	
+	<!-- 🚀 LEAVE HUB APP MODAL (FULL SCREEN SPA OVERLAY) -->
+    <div x-show="showLeaveAppModal" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/80 backdrop-blur-md sm:p-4" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" @click.self="showLeaveAppModal = false">
+        
+        <div class="bg-slate-50 dark:bg-[#020617] w-full h-full sm:h-[95vh] sm:w-[95vw] max-w-[1920px] sm:rounded-[2rem] shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden flex flex-col relative">
+            
+            <!-- Iframe Container (Taking 100% Space) -->
+            <div class="flex-1 w-full h-full relative bg-slate-100 dark:bg-[#020617]">
+                
+                <!-- Loader Placeholder -->
+                <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-0" x-show="showLeaveAppModal">
+                    <i class="fa-solid fa-circle-notch fa-spin text-indigo-500 text-4xl mb-4"></i>
+                    <span class="text-xs font-black uppercase tracking-widest text-slate-400 animate-pulse">Launching Module...</span>
+                </div>
+                
+                <!-- The Actual App (No Borders, Full Bleed) -->
+                <template x-if="showLeaveAppModal">
+                    <iframe src="PBL_IT_Leave_Tracker.html" class="w-full h-full border-0 relative z-10 sm:rounded-[2rem]" title="Leave Tracker"></iframe>
+                </template>
+            </div>
+
+            <!-- 🚀 FLOATING CLOSE BUTTON (IOS STYLE) -->
+            <div class="absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-[10010]">
+                <button @click="showLeaveAppModal = false; haptic('light')" class="px-6 py-3 rounded-full bg-slate-900/90 dark:bg-white/90 text-white dark:text-slate-900 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] border border-slate-700 dark:border-white/20 text-[10px] sm:text-xs font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i> Return to Dashboard
+                </button>
+            </div>
+            
+        </div>
+    </div>
 
     <!-- PENDING TICKETS MODAL -->
     <div x-show="showOpenTicketsModal" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" @click.self="showOpenTicketsModal = false">
@@ -2254,7 +2284,7 @@
 
                 showNotifs: false, showProfile: false, highlightLog: false,
                 showLogoutModal: false, showProfileModal: false, showSettingsModal: false,
-                showGuide: false, showStaffModal: false, showOpenTicketsModal: false, showChangelogModal: false, showAuditModal: false,
+                showGuide: false, showStaffModal: false, showOpenTicketsModal: false, showChangelogModal: false, showAuditModal: false, showLeaveAppModal: false,
                 
                 // 🔥 NAYA: RESOLVE MODAL VARIABLES (CONTEXT AWARE)
                 showResolveModal: false,
@@ -3053,7 +3083,7 @@
                     this.showLogoutModal = false; this.showProfileModal = false; this.showSettingsModal = false; 
                     this.showGuide = false; this.showStaffModal = false; this.showOpenTicketsModal = false;
                     this.showNotifs = false; this.showProfile = false; this.showResolveModal = false;
-                    this.showAuditModal = false; // 🚀 Fix: Added Audit Modal to close list
+                    this.showAuditModal = false; this.showLeaveAppModal = false;
                     this.sysPopup.show = false; 
                 },
 
