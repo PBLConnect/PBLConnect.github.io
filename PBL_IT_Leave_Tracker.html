@@ -999,7 +999,7 @@
                         });
                     },
 
-                init() {
+                async init() {
                     this.setupCustomCursor();
                     this.isAdmin = !!(this.user && this.user.name && this.user.name.includes('Vikas'));
                     if (this.isDark) document.documentElement.classList.add('dark');
@@ -1011,24 +1011,43 @@
                     
                     setInterval(() => { this.currentTime = new Date().toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' }); }, 1000);
                     
-                    // ⚡ 1. SMART CACHE: Load instantly from LocalStorage
+                    let hasCache = false;
                     try {
                         const cachedLeaves = localStorage.getItem('pbl_leave_cache');
                         const cachedHolidays = localStorage.getItem('pbl_holidays_cache');
                         
                         if (cachedLeaves) this.allLeaves = JSON.parse(cachedLeaves);
+                        if (!Array.isArray(this.allLeaves)) this.allLeaves = [];
+                        
                         if (cachedHolidays) this.holidays = JSON.parse(cachedHolidays);
+                        if (!Array.isArray(this.holidays)) this.holidays = [];
                         
                         const pendingCount = this.allLeaves.filter(l => String(l.status).trim() === 'Pending').length;
                         this.activeTab = (this.isAdmin && pendingCount > 0) ? 'approvals' : 'myLeaves';
-                    } catch(e) {}
+                        
+                        if(this.allLeaves.length > 0 || this.holidays.length > 0) hasCache = true;
+                    } catch(e) {
+                        this.allLeaves = [];
+                        this.holidays = [];
+                    }
 
-                    // ⏱️ Exactly 1 second loader for professional visual effect
                     this.loading = true;
-                    setTimeout(() => { this.loading = false; }, 1000);
-
-                    // 🔄 2. BACKGROUND SYNC: Fetch silently without blocking UI
-                    this.fetchData(false);
+                    
+                    try {
+                        if (hasCache) {
+                            this.fetchData(false).catch(()=>{});
+                            setTimeout(() => { this.loading = false; }, 800);
+                        } else {
+                            await Promise.all([
+                                this.fetchData(false).catch(()=>{}),
+                                new Promise(r => setTimeout(r, 800))
+                            ]);
+                        }
+                    } catch (err) {
+                        console.error("Init Error:", err);
+                    } finally {
+                        this.loading = false;
+                    }
                     this.viewMode = 'calendar';
                 },
 
@@ -1063,8 +1082,11 @@
                 async fetchData(force = false) {
                     if (force) { this.haptic('light'); this.loading = true; }
                     try {
-                        const res = await fetch(API_URL + '?action=getLeaveData');
-                        const data = await res.json();
+                        const res = await fetch(API_URL + '?action=getLeaveData&_t=' + new Date().getTime(), {
+						method: 'GET',
+						cache: 'no-store'
+					});
+					const data = await res.json();
                         
                         if(data.leaves) {
                             if (JSON.stringify(this.allLeaves) !== JSON.stringify(data.leaves)) {
