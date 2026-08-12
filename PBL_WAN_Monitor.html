@@ -835,36 +835,47 @@
                             this.currentDate = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
                         }, 1000);
 
+                        let hasCache = false;
+                        try {
+                            const cached = localStorage.getItem('pbl_wan_cache');
+                            if (cached) {
+                                const parsed = JSON.parse(cached);
+                                this.logs = Array.isArray(parsed) ? parsed : [];
+                                if(this.logs.length > 0) hasCache = true;
+                            }
+                        } catch(e) { this.logs = []; }
+
                         this.loading = true;
-                        await Promise.all([ this.fetchLogs(false), new Promise(resolve => setTimeout(resolve, 800)) ]);
-                        this.loading = false; 
+                        
+                        try {
+                            if (hasCache) {
+                                this.fetchLogs(false).catch(()=>{});
+                                setTimeout(() => { this.loading = false; }, 800);
+                            } else {
+                                await Promise.all([
+                                    this.fetchLogs(false).catch(()=>{}),
+                                    new Promise(r => setTimeout(r, 800))
+                                ]);
+                            }
+                        } catch (err) {
+                            console.error("Init Error:", err);
+                        } finally {
+                            this.loading = false;
+                        }
                     },
 
                     async fetchLogs(force = false) {
                         if (force) { this.haptic('light'); this.loading = true; }
                         try {
-                            const cached = localStorage.getItem('pbl_wan_cache');
                             const url = API_URL + '?action=getWANLogs&t=' + new Date().getTime();
-
-                            if (cached && !force) {
-                                this.logs = JSON.parse(cached);
-                                fetch(url).then(res => res.json()).then(data => {
-                                    const freshLogs = data.logs || [];
-                                    this.logs = freshLogs.map(row => ({
-                                        id: row.id, date: row.date, isp: row.isp, type: row.type, faultParty: row.faultParty, caseId: row.caseId, start: row.start, endDate: row.endDate, end: row.end, duration: row.duration, actionTaken: row.actionTaken, rootCause: row.rootCause, remarks: row.remarks, status: row.status, location: row.location || 'Noida'
-                                    }));
-                                    localStorage.setItem('pbl_wan_cache', JSON.stringify(this.logs));
-                                });
-                            } else {
-                                const res = await fetch(url);
-                                const data = await res.json();
-                                const freshLogs = data.logs || [];
-                                this.logs = freshLogs.map(row => ({
-                                    id: row.id, date: row.date, isp: row.isp, type: row.type, faultParty: row.faultParty, caseId: row.caseId, start: row.start, endDate: row.endDate, end: row.end, duration: row.duration, actionTaken: row.actionTaken, rootCause: row.rootCause, remarks: row.remarks, status: row.status, location: row.location || 'Noida'
-                                }));
-                                localStorage.setItem('pbl_wan_cache', JSON.stringify(this.logs));
-                                if (force) this.haptic('success'); 
-                            }
+                            const res = await fetch(url);
+                            const data = await res.json();
+                            const freshLogs = data.logs || [];
+                            this.logs = freshLogs.map(row => ({
+                                id: row.id, date: row.date, isp: row.isp, type: row.type, faultParty: row.faultParty, caseId: row.caseId, start: row.start, endDate: row.endDate, end: row.end, duration: row.duration, actionTaken: row.actionTaken, rootCause: row.rootCause, remarks: row.remarks, status: row.status, location: row.location || 'Noida'
+                            }));
+                            localStorage.setItem('pbl_wan_cache', JSON.stringify(this.logs));
+                            if (force) this.haptic('success'); 
                         } catch (e) { 
                             console.error("Network Error", e); 
                             if (force) this.haptic('error'); 
