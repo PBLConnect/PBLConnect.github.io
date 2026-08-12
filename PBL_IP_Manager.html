@@ -986,25 +986,41 @@
                         if (this.isDark) document.documentElement.classList.add('dark');
                         document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
                         
-                        // ⚡ 1. SMART CACHE: Load instantly from LocalStorage
+                        let hasCache = false;
                         try {
                             const cachedIPs = localStorage.getItem('pbl_ip_cache');
-                            if (cachedIPs) this.ips = JSON.parse(cachedIPs);
+                            if (cachedIPs) { 
+                                const parsed = JSON.parse(cachedIPs);
+                                this.ips = Array.isArray(parsed) ? parsed : []; 
+                                if(this.ips.length > 0) hasCache = true; 
+                            }
                             
-                            const cachedInv = localStorage.getItem('pblData'); // Fetch local AssetDB cache
+                            const cachedInv = localStorage.getItem('pblData'); 
                             if (cachedInv) {
                                 const parsed = JSON.parse(cachedInv);
-                                this.inventoryList = (parsed.hardware || []).filter(h => h.Hostname && h.Hostname.trim() !== '');
+                                this.inventoryList = (Array.isArray(parsed.hardware) ? parsed.hardware : []).filter(h => h.Hostname && h.Hostname.trim() !== '');
                             }
                         } catch(e) {}
 
-                        // ⏱️ Exactly 1 second loader for professional visual effect
                         this.loading = true;
-                        setTimeout(() => { this.loading = false; }, 1000);
-
-                        // 🔄 2. BACKGROUND SYNC: Fetch silently without blocking UI
-                        this.fetchData(false);
-                        this.fetchInventoryMaster(); 
+                        
+                        try {
+                            if (hasCache) {
+                                this.fetchData(false).catch(()=>{});
+                                this.fetchInventoryMaster().catch(()=>{}); 
+                                setTimeout(() => { this.loading = false; }, 800);
+                            } else {
+                                await Promise.all([
+                                    this.fetchData(false).catch(()=>{}),
+                                    this.fetchInventoryMaster().catch(()=>{}),
+                                    new Promise(r => setTimeout(r, 800))
+                                ]);
+                            }
+                        } catch (err) {
+                            console.error("Init Error:", err);
+                        } finally {
+                            this.loading = false;
+                        }
                         
                         setInterval(() => { this.currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }); }, 1000);
                     },
@@ -1021,7 +1037,8 @@
                         if(force) { this.haptic('light'); this.loading = true; this.fetchInventoryMaster(); }
                         
                         try {
-                            const res = await fetch(API_URL + '?action=getIPs');
+                            const res = await fetch(API_URL + '?action=getIPs&_t=' + new Date().getTime(), { cache: 'no-store' });
+
                             const data = await res.json();
                             if (data.ips) {
                                 this.ips = data.ips;
@@ -1038,7 +1055,8 @@
                     async fetchHistory() {
                         this.haptic('light'); this.loadingHistory = true; this.showHistory = true;
                         try {
-                            const res = await fetch(API_URL + '?action=getIPHistory&compName=' + encodeURIComponent(this.form.compName));
+                            const res = await fetch(API_URL + '?action=getIPHistory&compName=' + encodeURIComponent(this.form.compName) + '&_t=' + new Date().getTime(), { cache: 'no-store' });
+
                             const data = await res.json();
                             this.historyList = data.history || [];
                         } catch(e) {} finally { this.loadingHistory = false; }
@@ -1047,7 +1065,8 @@
                     async fetchGlobalHistory() {
                         this.haptic('light'); this.showGlobalHistory = true; this.loadingGlobalHistory = true;
                         try {
-                            const res = await fetch(API_URL + '?action=getAllIPHistory');
+                            const res = await fetch(API_URL + '?action=getAllIPHistory&_t=' + new Date().getTime(), { cache: 'no-store' });
+
                             const data = await res.json();
                             // Filter Global History by Location Context
                             this.globalHistoryList = (data.history || []).filter(h => h.location === this.currentLocation);
