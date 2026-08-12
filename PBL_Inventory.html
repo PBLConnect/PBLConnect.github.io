@@ -1241,30 +1241,42 @@
                         
                         setInterval(() => { this.currentTime = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' }); }, 1000);
 
-                        // ⚡ 1. SMART CACHE: Load instantly from LocalStorage
-                        const cachedRaw = localStorage.getItem('pblData');
-                        if(cachedRaw) {
-                            try {
+                        let hasCache = false;
+                        try {
+                            const cachedRaw = localStorage.getItem('pblData');
+                            if(cachedRaw) {
                                 const parsed = JSON.parse(cachedRaw);
-                                this.hardwareList = Array.isArray(parsed) ? parsed : (parsed.hardware || []);
-                                // 🚀 Pass hardwareList so sorting evaluates usage immediately
-                                this.softwareList = this.sortSoftwareList(parsed.software || [], this.hardwareList);
-                            } catch(e) {}
-                        }
+                                this.hardwareList = Array.isArray(parsed.hardware) ? parsed.hardware : [];
+                                this.softwareList = this.sortSoftwareList(Array.isArray(parsed.software) ? parsed.software : [], this.hardwareList);
+                                if(this.hardwareList.length > 0 || this.softwareList.length > 0) hasCache = true;
+                            }
+                        } catch(e) {}
 
-                        // ⏱️ Exactly 1 second loader for professional visual effect
                         this.loading = true;
-                        setTimeout(() => { this.loading = false; }, 1000);
 
-                        // 🔄 2. BACKGROUND SYNC: Fetch silently without blocking UI
-                        this.fetchData(false); 
+                        try {
+                            if (hasCache) {
+                                this.fetchData(false).catch(()=>{}); 
+                                setTimeout(() => { this.loading = false; }, 800);
+                            } else {
+                                await Promise.all([
+                                    this.fetchData(false).catch(()=>{}),
+                                    new Promise(r => setTimeout(r, 800))
+                                ]);
+                            }
+                        } catch (err) {
+                            console.error("Init Error:", err);
+                        } finally {
+                            this.loading = false;
+                        }
                     },
 
                     async fetchData(force = false) {
                         if (force) { this.haptic('light'); this.loading = true; }
                         this.syncing = true; 
                         try {
-                            const res = await fetch(API_URL + '?action=getInventory');
+                            const res = await fetch(API_URL + '?action=getInventory&_t=' + new Date().getTime(), { cache: 'no-store' });
+
                             const json = await res.json();
                             
                             if (json.status === 'success') {
