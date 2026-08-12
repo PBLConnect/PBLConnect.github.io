@@ -843,7 +843,7 @@
                         if (force) { this.haptic('light'); this.loading = true; }
                         try {
                             const url = API_URL + '?action=getRMALogs&t=' + new Date().getTime();
-                            const res = await fetch(url);
+							const res = await fetch(url, { cache: 'no-store' }); // Added cache: 'no-store'
                             const data = await res.json();
                             
                             const mappedLogs = (data.logs || []).map(row => ({
