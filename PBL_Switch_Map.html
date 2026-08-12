@@ -720,31 +720,46 @@
                         this.setupCustomCursor();
                         if (this.isDark) document.documentElement.classList.add('dark');
                         
-                        // Initialize selected switch
                         if (this.branchSwitches.length > 0) {
                             this.selectedSwitch = this.branchSwitches[0];
                         }
                         
-                        // ⚡ 1. SMART CACHE: Load instantly from LocalStorage
+                        let hasCache = false;
                         try {
                             const cachedCloud = localStorage.getItem('pbl_cloud_data');
-                            if (cachedCloud) this.realPortData = JSON.parse(cachedCloud);
+                            if (cachedCloud) { 
+                                this.realPortData = JSON.parse(cachedCloud); 
+                                if(Object.keys(this.realPortData).length > 0) hasCache = true; 
+                            }
                             
-                            const cachedInv = localStorage.getItem('pblData'); // AssetDB inventory cache
+                            const cachedInv = localStorage.getItem('pblData');
                             if (cachedInv) {
                                 const parsed = JSON.parse(cachedInv);
-                                this.inventoryList = (parsed.hardware || []).filter(h => h.Hostname && h.Hostname.trim() !== '');
+                                this.inventoryList = (Array.isArray(parsed.hardware) ? parsed.hardware : []).filter(h => h.Hostname && h.Hostname.trim() !== '');
                             }
                         } catch(e) {}
 
-                        // Exactly 1 second loader for professional visual effect
                         this.loading = true; 
                         this.loadingText = "Loading Topology...";
-                        setTimeout(() => { this.loading = false; }, 1000);
-
-                        // 🔄 2. BACKGROUND SYNC: Fetch silently without blocking UI
-                        this.refreshData(false);
-                        this.fetchInventoryMaster();
+                        
+                        try {
+                            if (hasCache) {
+                                this.refreshData(false).catch(()=>{});
+                                this.fetchInventoryMaster().catch(()=>{});
+                                setTimeout(() => { this.loading = false; this.loadingText = ""; }, 800);
+                            } else {
+                                await Promise.all([
+                                    this.refreshData(false).catch(()=>{}),
+                                    this.fetchInventoryMaster().catch(()=>{}),
+                                    new Promise(r => setTimeout(r, 800))
+                                ]);
+                            }
+                        } catch (err) {
+                            console.error("Init Error:", err);
+                        } finally {
+                            this.loading = false;
+                            this.loadingText = "";
+                        }
                         
                         setInterval(() => {
                             const now = new Date();
@@ -763,7 +778,8 @@
 
                     async fetchInventoryMaster() {
                         try {
-                            const res = await fetch(API_URL + '?action=getInventory');
+                            const res = await fetch(API_URL + '?action=getInventory&_t=' + new Date().getTime(), { cache: 'no-store' });
+
                             const data = await res.json();
                             if(data.hardware) { 
                                 this.inventoryList = data.hardware.filter(h => h.Hostname && h.Hostname.trim() !== ''); 
@@ -794,7 +810,8 @@
                     async refreshData(force = false) {
                         if (force) { this.haptic('light'); this.loading = true; this.loadingText = "Force Syncing..."; }
                         try {
-                            const res = await fetch(API_URL + '?action=getSwitchData');
+                            const res = await fetch(API_URL + '?action=getSwitchData&_t=' + new Date().getTime(), { cache: 'no-store' });
+
                             const data = await res.json();
                             if (data && Object.keys(data).length > 0) { 
                                 this.realPortData = data; 
