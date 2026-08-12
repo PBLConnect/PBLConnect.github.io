@@ -786,25 +786,41 @@
                         const now = new Date();
                         this.form.date = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
                         
-                        // ⚡ 1. SMART CACHE: Load instantly from LocalStorage
+                        let hasCache = false;
                         try {
                             const cachedRMA = localStorage.getItem('pbl_rma_cache');
-                            if (cachedRMA) this.logs = JSON.parse(cachedRMA);
+                            if (cachedRMA) { 
+                                const parsed = JSON.parse(cachedRMA);
+                                this.logs = Array.isArray(parsed) ? parsed : []; 
+                                if(this.logs.length > 0) hasCache = true; 
+                            }
                             
-                            const cachedInv = localStorage.getItem('pblData'); // Fetch local AssetDB cache
+                            const cachedInv = localStorage.getItem('pblData');
                             if (cachedInv) {
                                 const parsed = JSON.parse(cachedInv);
-                                this.inventoryList = parsed.hardware || [];
+                                this.inventoryList = Array.isArray(parsed.hardware) ? parsed.hardware : [];
                             }
                         } catch(e) {}
 
-                        // ⏱️ Exactly 1 second loader for professional visual effect
                         this.loading = true;
-                        setTimeout(() => { this.loading = false; }, 1000);
-
-                        // 🔄 2. BACKGROUND SYNC: Fetch silently
-                        this.fetchLogs(false);
-                        this.fetchInventoryMaster();
+                        
+                        try {
+                            if (hasCache) {
+                                this.fetchLogs(false).catch(()=>{});
+                                this.fetchInventoryMaster().catch(()=>{});
+                                setTimeout(() => { this.loading = false; }, 800);
+                            } else {
+                                await Promise.all([
+                                    this.fetchLogs(false).catch(()=>{}),
+                                    this.fetchInventoryMaster().catch(()=>{}),
+                                    new Promise(r => setTimeout(r, 800))
+                                ]);
+                            }
+                        } catch (err) {
+                            console.error("Init Error:", err);
+                        } finally {
+                            this.loading = false;
+                        }
 
                         setInterval(() => {
                             const d = new Date();
