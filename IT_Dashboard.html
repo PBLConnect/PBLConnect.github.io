@@ -40,10 +40,12 @@
         [x-cloak] { display: none !important; }
         body { background-color: #f1f5f9; transition: background-color 0.2s; }
         .dark body { background-color: #020617; }
-        .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
-        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .dark .custom-scroll::-webkit-scrollbar-thumb { background: #334155; }
+        .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; margin: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 10px; border: 2px solid transparent; background-clip: padding-box; transition: all 0.3s ease; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background-color: rgba(148, 163, 184, 0.7); border: 1px solid transparent; }
+        .dark .custom-scroll::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.5); border: 2px solid transparent; background-clip: padding-box; }
+        .dark .custom-scroll::-webkit-scrollbar-thumb:hover { background-color: rgba(71, 85, 105, 0.8); }
         .ticket-open { border-left: 3px solid #ef4444 !important; }
         .ticket-resolved { border-left: 3px solid #10b981 !important; opacity: 0.75; }
         .cards-container > a { transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) !important; }
@@ -253,8 +255,9 @@
                     <div class="flex items-center gap-1.5 sm:gap-2 mb-0.5">
                         <!-- 🚀 Clickable Version Pill (Shrink-0) -->
                         <div class="relative group cursor-pointer shrink-0" @click="showChangelogModal = true; haptic('light')" title="View Release Notes">
-                            <button class="relative bg-blue-50 border border-blue-200 dark:bg-brand/10 dark:border-brand/30 px-1.5 sm:px-2 py-0.5 rounded-md font-mono font-black text-[9px] leading-none shadow-sm flex items-center gap-1.5 hover:bg-blue-100 dark:hover:bg-brand/20 transition-colors">
-                                <span class="text-brand dark:text-brand_glow" x-text="PBL_APP_VERSION"></span> 
+                            <button class="relative bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 dark:from-brand/10 dark:to-indigo-500/10 dark:border-brand/40 px-2 sm:px-2.5 py-1 rounded-md font-mono font-black text-[9px] leading-none shadow-[0_0_10px_rgba(59,130,246,0.15)] dark:shadow-[0_0_15px_rgba(59,130,246,0.25)] flex items-center gap-1.5 hover:scale-105 transition-all duration-300 group">
+                                <span class="w-1.5 h-1.5 rounded-full bg-brand animate-pulse"></span>
+                                <span class="text-brand dark:text-brand_glow group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors" x-text="PBL_APP_VERSION"></span> 
                             </button>
                         </div>
                         <span class="hidden sm:inline-block text-[9px] font-black text-slate-400 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-md truncate">IT Operations</span>
@@ -331,99 +334,92 @@
                         </span>
                     </button>
 
-                    <!-- 🚀 IT PORTALS / GATEWAYS DROPDOWN (10 LINKS, NO-SCROLL COMPACT UI) -->
+                    <!-- 🚀 IT PORTALS / GATEWAYS DROPDOWN (HIGH-CONTRAST MODERN UI) -->
                     <div class="relative" x-show="currentLocation !== 'Dehradun'" x-cloak x-data="{ showPortals: false }" @click.outside="showPortals = false">
-                        <button @click="showPortals = !showPortals" class="group relative w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors active:scale-95">
-                            <i class="fa-solid fa-layer-group text-[11px] sm:text-[13px]"></i>
+                        <button @click="showPortals = !showPortals" class="group relative w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors active:scale-95">
+                            <i class="fa-solid fa-layer-group text-[11px] sm:text-[13px]" :class="showPortals ? 'text-brand' : ''"></i>
                             <span class="hidden sm:block absolute top-full mt-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-white dark:bg-white dark:text-slate-800 text-[9px] font-black uppercase tracking-widest rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-[999]">
                                 IT Links
                             </span>
                         </button>
 
                         <div x-show="showPortals" x-transition.origin.top.right 
-                             class="absolute -right-6 sm:right-0 top-full mt-3 w-[320px] sm:w-[380px] max-w-[95vw] bg-white/95 dark:bg-dark_surface/95 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-slate-200 dark:border-dark_border z-[100] overflow-hidden" 
+                             class="absolute -right-6 sm:right-0 top-full mt-3 w-[320px] sm:w-[380px] max-w-[95vw] bg-white dark:bg-[#0f172a] rounded-[1.5rem] shadow-[0_20px_40px_-10px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)] border border-slate-200 dark:border-slate-700 z-[100] overflow-hidden" 
                              style="display: none;">
                             
-                            <div class="px-4 py-3 border-b border-slate-100 dark:border-dark_border bg-slate-50/50 dark:bg-white/5 flex items-center justify-between">
-                                <h4 class="font-heading font-black text-[13px] text-slate-800 dark:text-white flex items-center"><i class="fa-solid fa-link text-brand mr-2"></i> Quick Gateways</h4>
-                                <button @click="showPortals = false" class="sm:hidden w-6 h-6 rounded-full bg-slate-200 dark:bg-white/10 text-slate-500 flex items-center justify-center hover:bg-red-100 hover:text-red-500 transition"><i class="fa-solid fa-xmark text-[10px]"></i></button>
+                            <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/50 flex items-center justify-between shrink-0">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-[0.6rem] bg-brand/10 text-brand dark:bg-brand/20 dark:text-brand_glow flex items-center justify-center border border-brand/20">
+                                        <i class="fa-solid fa-link text-xs"></i>
+                                    </div>
+                                    <h4 class="font-heading font-black text-[15px] text-slate-800 dark:text-white tracking-tight">Quick Gateways</h4>
+                                </div>
+                                <button @click="showPortals = false" class="sm:hidden w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center hover:text-rose-500 transition active:scale-95"><i class="fa-solid fa-xmark text-[11px]"></i></button>
                             </div>
                             
-                            <!-- 📍 Removed custom-scroll and fixed heights to allow natural compact fitting -->
-                            <div class="p-3 sm:p-4 space-y-3.5 max-h-[85vh] overflow-y-auto">
+                            <div class="p-4 sm:p-5 space-y-4 max-h-[75vh] overflow-y-auto custom-scroll">
                                 
-                                <!-- 🌐 INTERNAL NETWORK (5 LINKS) -->
+                                <!-- 🌐 INTERNAL NETWORK -->
                                 <div>
-                                    <h5 class="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-2 pl-1">Internal Network</h5>
-                                    <div class="grid grid-cols-2 gap-2">
-                                        
+                                    <h5 class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2.5 pl-1 flex items-center gap-1.5"><i class="fa-solid fa-network-wired"></i> Internal Network</h5>
+                                    <div class="grid grid-cols-2 gap-2.5">
                                         <!-- SonicWall -->
-                                        <a href="http://192.168.231.1/sonicui/7/login/#/" target="_blank" class="flex items-center gap-2 p-1.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 hover:border-blue-300 dark:hover:border-blue-500/50 hover:shadow-sm transition active:scale-95 group">
-                                            <div class="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 group-hover:bg-blue-500 group-hover:text-white transition-colors"><i class="fa-solid fa-shield-virus text-[11px]"></i></div>
-                                            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 truncate">SonicWall</span>
+                                        <a href="http://192.168.231.1/sonicui/7/login/#/" target="_blank" class="flex items-center gap-2.5 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 hover:border-blue-300 dark:hover:border-blue-500/50 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 active:scale-95 group">
+                                            <div class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-200 dark:border-blue-500/30 group-hover:bg-blue-500 group-hover:text-white transition-colors"><i class="fa-solid fa-shield-virus text-[12px]"></i></div>
+                                            <span class="text-[11px] font-bold text-slate-700 dark:text-slate-200 truncate">SonicWall</span>
                                         </a>
-                                        
                                         <!-- Airtel Graph -->
-                                        <a href="https://smartnet4.bharti.com/VPortal/" target="_blank" class="flex items-center gap-2 p-1.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 hover:border-red-300 dark:hover:border-red-500/50 hover:shadow-sm transition active:scale-95 group">
-                                            <div class="w-7 h-7 rounded-lg bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0 group-hover:bg-red-500 group-hover:text-white transition-colors"><i class="fa-solid fa-chart-line text-[11px]"></i></div>
-                                            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 truncate">Airtel Graph</span>
+                                        <a href="https://smartnet4.bharti.com/VPortal/" target="_blank" class="flex items-center gap-2.5 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 hover:border-rose-300 dark:hover:border-rose-500/50 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 active:scale-95 group">
+                                            <div class="w-8 h-8 rounded-lg bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 border border-rose-200 dark:border-rose-500/30 group-hover:bg-rose-500 group-hover:text-white transition-colors"><i class="fa-solid fa-chart-line text-[12px]"></i></div>
+                                            <span class="text-[11px] font-bold text-slate-700 dark:text-slate-200 truncate">Airtel Graph</span>
                                         </a>
-
                                         <!-- ILO DC -->
-                                        <a href="https://192.168.0.250/" target="_blank" class="flex items-center gap-2 p-1.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 hover:border-emerald-300 dark:hover:border-emerald-500/50 hover:shadow-sm transition active:scale-95 group">
-                                            <div class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 group-hover:bg-emerald-500 group-hover:text-white transition-colors"><i class="fa-solid fa-server text-[11px]"></i></div>
-                                            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 truncate">ILO DC</span>
+                                        <a href="https://192.168.0.250/" target="_blank" class="flex items-center gap-2.5 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 hover:border-emerald-300 dark:hover:border-emerald-500/50 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 active:scale-95 group">
+                                            <div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-200 dark:border-emerald-500/30 group-hover:bg-emerald-500 group-hover:text-white transition-colors"><i class="fa-solid fa-server text-[12px]"></i></div>
+                                            <span class="text-[11px] font-bold text-slate-700 dark:text-slate-200 truncate">ILO DC</span>
                                         </a>
-
                                         <!-- ILO ADC -->
-                                        <a href="https://192.168.0.251/" target="_blank" class="flex items-center gap-2 p-1.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 hover:border-teal-300 dark:hover:border-teal-500/50 hover:shadow-sm transition active:scale-95 group">
-                                            <div class="w-7 h-7 rounded-lg bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0 group-hover:bg-teal-500 group-hover:text-white transition-colors"><i class="fa-solid fa-server text-[11px]"></i></div>
-                                            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 truncate">ILO ADC</span>
+                                        <a href="https://192.168.0.251/" target="_blank" class="flex items-center gap-2.5 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 hover:border-teal-300 dark:hover:border-teal-500/50 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 active:scale-95 group">
+                                            <div class="w-8 h-8 rounded-lg bg-teal-100 dark:bg-teal-500/20 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0 border border-teal-200 dark:border-teal-500/30 group-hover:bg-teal-500 group-hover:text-white transition-colors"><i class="fa-solid fa-server text-[12px]"></i></div>
+                                            <span class="text-[11px] font-bold text-slate-700 dark:text-slate-200 truncate">ILO ADC</span>
                                         </a>
-
-                                        <!-- PBL Server (Spans Full Width) -->
-                                        <a href="https://192.168.0.252/" target="_blank" class="flex items-center gap-2 p-1.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:shadow-sm transition active:scale-95 group col-span-2">
-                                            <div class="w-7 h-7 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 group-hover:bg-indigo-500 group-hover:text-white transition-colors"><i class="fa-solid fa-network-wired text-[11px]"></i></div>
-                                            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 truncate">PBL Server</span>
+                                        <!-- PBL Server -->
+                                        <a href="https://192.168.0.252/" target="_blank" class="col-span-2 flex items-center gap-2.5 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 hover:border-indigo-300 dark:hover:border-indigo-500/50 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 active:scale-95 group">
+                                            <div class="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 border border-indigo-200 dark:border-indigo-500/30 group-hover:bg-indigo-500 group-hover:text-white transition-colors"><i class="fa-solid fa-network-wired text-[12px]"></i></div>
+                                            <span class="text-[11px] font-bold text-slate-700 dark:text-slate-200 truncate">PBL Master Server</span>
                                         </a>
                                     </div>
                                 </div>
 
-                                <!-- 🏢 VENDOR PORTALS (5 LINKS) -->
+                                <!-- 🏢 VENDOR PORTALS -->
                                 <div>
-                                    <h5 class="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-2 pl-1">Vendor Portals</h5>
-                                    <div class="grid grid-cols-2 gap-2">
-                                        
+                                    <h5 class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2.5 pl-1 flex items-center gap-1.5"><i class="fa-solid fa-building-shield"></i> Vendor Portals</h5>
+                                    <div class="grid grid-cols-2 gap-2.5">
                                         <!-- Sophos -->
-                                        <a href="https://central.sophos.com/manage/login" target="_blank" class="flex items-center gap-2 p-1.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 hover:border-sky-300 dark:hover:border-sky-500/50 hover:shadow-sm transition active:scale-95 group">
-                                            <div class="w-7 h-7 rounded-lg bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 group-hover:bg-sky-500 group-hover:text-white transition-colors"><i class="fa-solid fa-shield-halved text-[11px]"></i></div>
-                                            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 truncate">Sophos</span>
+                                        <a href="https://central.sophos.com/manage/login" target="_blank" class="flex items-center gap-2.5 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 hover:border-sky-300 dark:hover:border-sky-500/50 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 active:scale-95 group">
+                                            <div class="w-8 h-8 rounded-lg bg-sky-100 dark:bg-sky-500/20 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 border border-sky-200 dark:border-sky-500/30 group-hover:bg-sky-500 group-hover:text-white transition-colors"><i class="fa-solid fa-shield-halved text-[12px]"></i></div>
+                                            <span class="text-[11px] font-bold text-slate-700 dark:text-slate-200 truncate">Sophos</span>
                                         </a>
-
-                                        <!-- HP Workstation -->
-                                        <a href="https://support.hp.com/in-en" target="_blank" class="flex items-center gap-2 p-1.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 hover:border-cyan-300 dark:hover:border-cyan-500/50 hover:shadow-sm transition active:scale-95 group">
-                                            <div class="w-7 h-7 rounded-lg bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0 group-hover:bg-cyan-500 group-hover:text-white transition-colors"><i class="fa-solid fa-laptop text-[11px]"></i></div>
-                                            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 truncate">HP Work.</span>
+                                        <!-- HP -->
+                                        <a href="https://support.hp.com/in-en" target="_blank" class="flex items-center gap-2.5 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 hover:border-cyan-300 dark:hover:border-cyan-500/50 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 active:scale-95 group">
+                                            <div class="w-8 h-8 rounded-lg bg-cyan-100 dark:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0 border border-cyan-200 dark:border-cyan-500/30 group-hover:bg-cyan-500 group-hover:text-white transition-colors"><i class="fa-solid fa-laptop text-[12px]"></i></div>
+                                            <span class="text-[11px] font-bold text-slate-700 dark:text-slate-200 truncate">HP Work.</span>
                                         </a>
-
                                         <!-- Lenovo -->
-                                        <a href="https://account.lenovo.com/in/en/signin?returnurl=https%3A%2F%2Fpcsupport.lenovo.com%2Fin%2Fen%2F&source=b2cuser&linkTrack=account:pcsupport:home" target="_blank" class="flex items-center gap-2 p-1.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 hover:border-rose-300 dark:hover:border-rose-500/50 hover:shadow-sm transition active:scale-95 group">
-                                            <div class="w-7 h-7 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 group-hover:bg-rose-500 group-hover:text-white transition-colors"><i class="fa-solid fa-laptop-code text-[11px]"></i></div>
-                                            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 truncate">Lenovo</span>
+                                        <a href="https://account.lenovo.com/in/en/signin" target="_blank" class="flex items-center gap-2.5 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 hover:border-rose-300 dark:hover:border-rose-500/50 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 active:scale-95 group">
+                                            <div class="w-8 h-8 rounded-lg bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 border border-rose-200 dark:border-rose-500/30 group-hover:bg-rose-500 group-hover:text-white transition-colors"><i class="fa-solid fa-laptop-code text-[12px]"></i></div>
+                                            <span class="text-[11px] font-bold text-slate-700 dark:text-slate-200 truncate">Lenovo</span>
                                         </a>
-
-                                        <!-- HPE Server -->
-                                        <a href="https://auth.hpe.com/hpe/cf/?fromURI=..." target="_blank" class="flex items-center gap-2 p-1.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 hover:border-emerald-300 dark:hover:border-emerald-500/50 hover:shadow-sm transition active:scale-95 group">
-                                            <div class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 group-hover:bg-emerald-500 group-hover:text-white transition-colors"><i class="fa-solid fa-server text-[11px]"></i></div>
-                                            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 truncate">HPE Server</span>
+                                        <!-- HPE -->
+                                        <a href="https://auth.hpe.com/hpe/cf/?fromURI=..." target="_blank" class="flex items-center gap-2.5 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 hover:border-emerald-300 dark:hover:border-emerald-500/50 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 active:scale-95 group">
+                                            <div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-200 dark:border-emerald-500/30 group-hover:bg-emerald-500 group-hover:text-white transition-colors"><i class="fa-solid fa-server text-[12px]"></i></div>
+                                            <span class="text-[11px] font-bold text-slate-700 dark:text-slate-200 truncate">HPE Server</span>
                                         </a>
-
-                                        <!-- Abbyy Fine Reader (Spans Full Width) -->
-                                        <a href="https://support.abbyy.com/auth/v3/signin?brand_id=5741727..." target="_blank" class="flex items-center gap-2 p-1.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 hover:border-orange-300 dark:hover:border-orange-500/50 hover:shadow-sm transition active:scale-95 group col-span-2">
-                                            <div class="w-7 h-7 rounded-lg bg-orange-500/10 text-orange-600 dark:text-orange-400 flex items-center justify-center shrink-0 group-hover:bg-orange-500 group-hover:text-white transition-colors"><i class="fa-solid fa-file-pdf text-[11px]"></i></div>
-                                            <span class="text-[10px] font-bold text-slate-700 dark:text-slate-300 truncate">Abbyy Fine Reader Portal</span>
+                                        <!-- Abbyy -->
+                                        <a href="https://support.abbyy.com" target="_blank" class="col-span-2 flex items-center gap-2.5 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 hover:border-orange-300 dark:hover:border-orange-500/50 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 active:scale-95 group">
+                                            <div class="w-8 h-8 rounded-lg bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 flex items-center justify-center shrink-0 border border-orange-200 dark:border-orange-500/30 group-hover:bg-orange-500 group-hover:text-white transition-colors"><i class="fa-solid fa-file-pdf text-[12px]"></i></div>
+                                            <span class="text-[11px] font-bold text-slate-700 dark:text-slate-200 truncate">Abbyy Fine Reader</span>
                                         </a>
-                                        
                                     </div>
                                 </div>
 
@@ -431,75 +427,95 @@
                         </div>
                     </div>
 
-                    <!-- Notifications -->
+                    <!-- 🚀 NOTIFICATIONS / PENDING REQUESTS DROPDOWN (HIGH-CONTRAST MODERN UI) -->
                     <div class="relative" @click.outside="showNotifs = false">
-                        <button @click="showNotifs = !showNotifs" class="group relative w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-white/5 text-slate-500 dark:text-slate-400 transition-colors">
-                            <i class="fa-regular fa-bell text-[12px] sm:text-[13px]"></i>
+                        <button @click="showNotifs = !showNotifs" class="group relative w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors">
+                            <i class="fa-regular fa-bell text-[12px] sm:text-[13px]" :class="showNotifs ? 'text-brand' : ''"></i>
                             <span x-show="openTicketCount > 0" class="absolute top-0 right-0 flex h-2.5 w-2.5">
                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500 border-2 border-white dark:border-dark_surface"></span>
-                            </span>
-                            <span class="hidden sm:block absolute top-full mt-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-slate-800 text-white dark:bg-white dark:text-slate-800 text-[9px] font-black uppercase tracking-widest rounded shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-[999]">
-                                Alerts
+                                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500 border-2 border-white dark:border-dark_surface shadow-sm"></span>
                             </span>
                         </button>
 
-                        <!-- Notification Dropdown -->
-                        <div x-show="showNotifs" x-transition.origin.top.right class="absolute right-0 top-full mt-3 w-[320px] sm:w-96 bg-white/95 dark:bg-dark_surface/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-200 dark:border-dark_border z-[100] overflow-hidden" style="display: none;">
-                            <div class="p-4 border-b border-slate-100 dark:border-dark_border flex justify-between items-center bg-slate-50/50 dark:bg-white/5">
-                                <h4 class="font-heading font-black text-sm text-slate-800 dark:text-white">Pending Requests</h4>
-                                <span class="text-[9px] bg-red-100 text-red-600 px-2.5 py-0.5 rounded-md font-black uppercase tracking-wider border border-red-200 dark:border-red-500/20 shadow-sm" x-text="openTicketCount + ' New'">0 New</span>
+                        <div x-show="showNotifs" x-transition.origin.top.right 
+                             class="absolute right-0 top-full mt-3 w-[320px] sm:w-[420px] max-w-[95vw] bg-white dark:bg-[#0f172a] rounded-[1.5rem] shadow-[0_20px_40px_-10px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)] border border-slate-200 dark:border-slate-700 z-[100] overflow-hidden" 
+                             style="display: none;">
+                            
+                            <div class="px-5 py-4 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/50 flex items-center justify-between shrink-0">
+                                <h4 class="font-heading font-black text-[16px] text-slate-800 dark:text-white tracking-tight">Pending Requests</h4>
+                                <span class="text-[9px] bg-rose-100 text-rose-600 dark:bg-rose-500/20 dark:text-rose-400 px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border border-rose-200 dark:border-rose-900/50 shadow-sm flex items-center gap-1.5">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
+                                    <span x-text="openTicketCount + ' New'">0 New</span>
+                                </span>
                             </div>
                             
-                            <div class="max-h-[380px] overflow-y-auto custom-scroll p-3 space-y-3">
+                            <!-- Custom Scroll Body -->
+                            <div class="p-4 space-y-3.5 max-h-[60vh] overflow-y-auto custom-scroll bg-slate-50/40 dark:bg-transparent">
+                                
                                 <template x-for="notif in notifications" :key="notif.id">
-                                    <div x-data="{ meta: processTicketMeta(notif) }" class="p-3 sm:p-4 border rounded-2xl shadow-sm hover:-translate-y-0.5 transition-all duration-300 group relative overflow-hidden flex items-start gap-3 cursor-pointer" :class="meta.styles.openBg" @click="if(meta.type === 'AUDIT') { showNotifs = false; openAuditModal(); } else if (meta.type === 'LEAVE') { window.location.href='PBL_IT_Leave_Tracker.html'; } else { scrollToLog(); }">
-                                        <i class="fa-solid absolute -bottom-3 -right-2 text-6xl opacity-[0.03] dark:opacity-[0.02] group-hover:scale-110 transition-transform duration-500 pointer-events-none" :class="meta.watermarkClass"></i>
-                                        <div class="absolute left-0 top-0 bottom-0 w-1.5 transition-all group-hover:w-2" :class="meta.styles.openBar"></div>
+                                    <div x-data="{ meta: processTicketMeta(notif) }" 
+                                         class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all duration-300 group relative overflow-hidden flex items-start gap-3.5 cursor-pointer bg-white dark:bg-slate-800 hover:-translate-y-0.5 hover:border-slate-300 dark:hover:border-slate-600" 
+                                         @click="if(meta.type === 'AUDIT') { showNotifs = false; openAuditModal(); } else if (meta.type === 'LEAVE') { window.location.href='PBL_IT_Leave_Tracker.html'; } else { scrollToLog(); }">
                                         
-                                        <div class="w-8 h-8 rounded-xl flex items-center justify-center text-sm shrink-0 shadow-sm border border-black/5 transition-transform group-hover:scale-105 relative z-10 hidden sm:flex" :class="getIssueConfig(notif.issue).color">
-                                            <i class="fa-solid" :class="meta.type === 'AUDIT' ? 'fa-shield-halved ' + meta.styles.iconColor : (meta.type === 'Helpdesk' ? getIssueConfig(notif.issue).icon + ' ' + meta.styles.iconColor : meta.icon + ' ' + meta.styles.iconColor)"></i>
+                                        <!-- Watermark Icon -->
+                                        <i class="fa-solid absolute -bottom-3 -right-2 text-[4.5rem] opacity-[0.03] dark:opacity-[0.04] group-hover:scale-110 transition-transform duration-500 pointer-events-none" :class="meta.watermarkClass"></i>
+                                        
+                                        <!-- Solid Left Border Accent (Dynamic) -->
+                                        <div class="absolute left-0 top-0 bottom-0 w-1.5 transition-all" :class="meta.styles.openBar.replace('shadow-[0_0_12px_rgba', 'shadow-none').replace('animate-pulse', '')"></div>
+                                        
+                                        <!-- Icon Box -->
+                                        <div class="w-10 h-10 rounded-lg flex items-center justify-center text-sm shrink-0 shadow-sm border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 transition-transform group-hover:scale-105 relative z-10 hidden sm:flex" :class="meta.styles.iconColor">
+                                            <i class="fa-solid" :class="meta.type === 'AUDIT' ? 'fa-shield-halved' : (meta.type === 'Helpdesk' ? getIssueConfig(notif.issue).icon : meta.icon)"></i>
                                         </div>
                                         
-                                        <div class="flex-1 min-w-0 relative z-10 flex flex-col h-full w-full pl-1.5 sm:pl-0">
-                                            <div class="flex justify-between items-start mb-1 gap-2">
+                                        <!-- Content -->
+                                        <div class="flex-1 min-w-0 relative z-10 flex flex-col w-full pl-1.5 sm:pl-0">
+                                            <div class="flex justify-between items-start mb-1.5 gap-2">
                                                 <div class="min-w-0 flex-1">
-                                                    <span x-show="meta.isSystem" class="inline-block mb-1.5 px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border shadow-sm" :class="meta.badgeClass" x-text="meta.badgeText"></span>
-                                                    <h4 class="font-bold text-[13px] sm:text-[14px] mb-0.5 transition leading-tight truncate" :class="meta.styles.textOpen" x-text="notif.issue" :title="notif.issue"></h4>
+                                                    <!-- Category Badge -->
+                                                    <span x-show="meta.isSystem" class="inline-block mb-1.5 px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest border shadow-sm" :class="meta.badgeClass" x-text="meta.badgeText"></span>
+                                                    <!-- Title -->
+                                                    <h4 class="font-bold text-[13px] sm:text-[14px] leading-tight truncate transition-colors text-slate-800 dark:text-white" x-text="notif.issue" :title="notif.issue"></h4>
                                                 </div>
-                                                <span class="text-[7px] sm:text-[8px] font-black tracking-widest px-1.5 py-0.5 rounded border shrink-0 mt-0.5 shadow-sm" :class="meta.styles.openPill" x-text="meta.statusTextOpen"></span>
+                                                <!-- Action Pill -->
+                                                <span class="text-[7.5px] sm:text-[8px] font-bold tracking-widest px-2 py-1 rounded-md border shrink-0 shadow-sm" :class="meta.styles.openPill" x-text="meta.statusTextOpen"></span>
                                             </div>
                                             
-                                            <p class="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 leading-snug whitespace-normal group-hover:text-slate-700 dark:group-hover:text-slate-300 transition-colors mt-0.5 line-clamp-2" x-text="meta.cleanDesc.replace(/\n/g, ' ')"></p>
+                                            <!-- Description -->
+                                            <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-snug whitespace-normal group-hover:text-slate-700 dark:group-hover:text-slate-300 transition-colors mt-0.5 line-clamp-2" x-text="meta.cleanDesc.replace(/\n/g, ' ')"></p>
                                             
-                                            <div class="mt-3 pt-2.5 border-t border-slate-100/60 dark:border-white/5 flex items-center justify-between relative z-20 mt-auto w-full gap-2">
-                                                <span class="flex items-center text-[9px] font-mono font-bold transition-colors text-red-400 shrink-0">
-                                                    <i class="fa-regular fa-clock mr-1"></i> <span x-text="notif.dateStr ? notif.dateStr : formatDisplayDate(notif.date)"></span>
+                                            <!-- Footer Row -->
+                                            <div class="mt-3 pt-3 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between w-full">
+                                                <span class="flex items-center text-[9.5px] font-mono font-bold text-slate-400">
+                                                    <i class="fa-regular fa-clock mr-1.5 text-rose-400"></i> <span x-text="notif.dateStr ? notif.dateStr : formatDisplayDate(notif.date)"></span>
                                                 </span>
                                                 
-                                                <div class="flex gap-1.5 shrink-0">
-                                                    <button x-show="canResolve(notif)" @click.stop="openResolveModal(notif, false)" class="text-[9px] px-2.5 py-1.5 rounded-lg font-black uppercase tracking-widest shadow-sm transition-colors flex items-center gap-1.5 active:scale-95 border" :class="meta.type === 'AUDIT' ? 'bg-rose-50 text-rose-600 border-rose-200 hover:bg-rose-500 hover:text-white dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/30' : 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-500 hover:text-white dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30'">
-                                                        <i class="fa-solid" :class="meta.type === 'AUDIT' ? 'fa-wrench' : 'fa-check-double'"></i> 
-                                                        <span x-text="meta.type === 'AUDIT' ? 'Fix' : 'Resolve'"></span>
-                                                    </button>
-                                                </div>
+                                                <button x-show="canResolve(notif)" @click.stop="openResolveModal(notif, false)" class="text-[9px] px-3 py-1.5 rounded-md font-black uppercase tracking-widest shadow-sm transition-all flex items-center gap-1.5 active:scale-95 text-white" :class="meta.type === 'AUDIT' ? 'bg-rose-500 hover:bg-rose-600' : 'bg-emerald-500 hover:bg-emerald-600'">
+                                                    <i class="fa-solid" :class="meta.type === 'AUDIT' ? 'fa-wrench' : 'fa-check-double'"></i> 
+                                                    <span x-text="meta.type === 'AUDIT' ? 'Fix' : 'Resolve'"></span>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
                                 </template>
                                 
-                                <div x-show="openTicketCount === 0" class="p-8 text-center text-slate-400">
-                                    <i class="fa-regular fa-circle-check text-4xl mb-3 text-emerald-500 opacity-50 drop-shadow-sm"></i>
-                                    <p class="text-[11px] font-black uppercase tracking-widest mt-1">All Clear!</p>
+                                <div x-show="openTicketCount === 0" class="py-8 flex flex-col items-center justify-center text-center">
+                                    <div class="w-14 h-14 bg-emerald-100 dark:bg-emerald-500/20 rounded-xl flex items-center justify-center mb-3 border border-emerald-200 dark:border-emerald-500/30">
+                                        <i class="fa-solid fa-check-double text-xl text-emerald-500"></i>
+                                    </div>
+                                    <p class="text-[12px] font-bold text-slate-500 dark:text-slate-400">No pending requests!</p>
                                 </div>
                             </div>
                             
-                            <div class="p-3 bg-slate-50/80 dark:bg-black/20 border-t border-slate-100 dark:border-white/5 text-center cursor-pointer hover:bg-slate-100 dark:hover:bg-white/5 transition" @click="scrollToLog(); showNotifs=false;">
-                                <span class="text-[10px] font-black uppercase tracking-widest text-brand hover:text-brand_dark transition">View All Logs &rarr;</span>
+                            <!-- Solid View All Button -->
+                            <div class="p-4 bg-slate-50 dark:bg-slate-900/80 border-t border-slate-200 dark:border-slate-700 shrink-0">
+                                <button @click="scrollToLog(); showNotifs=false;" class="w-full bg-white dark:bg-slate-800 p-2.5 rounded-xl border border-slate-200 dark:border-slate-600 shadow-sm flex items-center justify-center gap-2 group hover:bg-slate-50 dark:hover:bg-slate-700 transition-all active:scale-[0.98]">
+                                    <span class="text-[11px] font-bold text-slate-700 dark:text-slate-200 uppercase tracking-widest group-hover:text-brand transition-colors">View All Logs</span>
+                                    <i class="fa-solid fa-arrow-right-long text-slate-400 group-hover:text-brand transition-all group-hover:translate-x-1"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
-                </div>
 
                 <div class="hidden sm:block w-px h-6 bg-slate-200 dark:bg-white/10 mx-0.5 sm:mx-1"></div>
 
@@ -548,7 +564,7 @@
             <section class="shrink-0 relative z-20">
                 <div class="cards-container grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-5 mb-3 sm:mb-4">
                     
-                    <a href="PBL_Inventory.html" @click="haptic('light')" class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-indigo-50/80 to-white/80 border border-indigo-200/60 shadow-md hover:shadow-2xl hover:border-indigo-400/50 dark:from-indigo-900/10 dark:to-dark_surface/80 dark:border-indigo-800/30 dark:hover:border-indigo-400/50">
+                    <a href="PBL_Inventory.html" @click="haptic('light')" class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-500 ease-out group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-indigo-50/80 to-white/80 border border-indigo-200/60 shadow-[0_4px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_40px_-10px_rgba(99,102,241,0.25)] hover:-translate-y-1 hover:border-indigo-400/80 hover:ring-2 hover:ring-indigo-300/50 dark:from-indigo-900/10 dark:to-dark_surface/80 dark:border-indigo-800/30 dark:hover:border-indigo-400/80 dark:hover:ring-indigo-500/40 dark:hover:shadow-[0_20px_40px_-10px_rgba(99,102,241,0.15)]">
                         <i class="fa-solid fa-laptop absolute -bottom-4 -right-3 text-7xl sm:text-9xl text-indigo-500/20 dark:text-indigo-500/10 group-hover:scale-110 transition-transform duration-500"></i>
                         <div class="flex items-center justify-between relative z-10 mb-2">
                             <div class="flex items-center gap-2">
@@ -710,9 +726,17 @@
                     
                     <div class="p-4 sm:p-5 border-b border-slate-100 dark:border-dark_border flex justify-between items-center bg-slate-50/50 dark:bg-white/5 shrink-0">
                         <div>
-                            <h3 class="font-heading font-bold text-sm sm:text-base uppercase text-slate-800 dark:text-white flex items-center gap-2">
-                                <i class="fa-solid fa-list-check text-brand"></i> Ticket History
-                                <span class="bg-brand/10 text-brand px-2 py-0.5 rounded-md font-mono text-[10px]" x-text="filteredTickets.length"></span>
+                            <h3 class="font-heading font-black text-sm sm:text-[15px] uppercase text-slate-800 dark:text-white flex items-center gap-3 tracking-wide">
+                                <!-- Modern Icon Box -->
+                                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 flex items-center justify-center border border-blue-100/50 dark:border-blue-500/20 shadow-sm shrink-0">
+                                    <i class="fa-solid fa-chart-pie text-brand dark:text-brand_glow text-[11px] sm:text-xs"></i>
+                                </div>
+                                
+                                <!-- Sleek Text -->
+                                <span class="tracking-widest mt-px">Ticket History</span>
+                                
+                                <!-- Premium Glowing Badge -->
+                                <span class="ml-1 px-2.5 py-0.5 bg-gradient-to-br from-brand to-indigo-600 text-white rounded-full font-mono text-[10px] sm:text-[11px] font-black shadow-[0_4px_12px_-2px_rgba(59,130,246,0.6)] border border-white/20 dark:border-white/10 flex items-center justify-center min-w-[26px]" x-text="filteredTickets.length"></span>
                             </h3>
                         </div>
                         <button @click="fetchTickets(true)" class="text-[10px] sm:text-xs font-bold text-slate-500 hover:text-brand transition flex items-center gap-1.5 bg-white dark:bg-black/20 px-2 sm:px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 shadow-sm active:scale-95">
@@ -789,7 +813,7 @@
                     </button>
                     
                     <!-- 📍 NEW: Smart "View Details" / "Open Hub" Button -->
-                    <button x-show="!canResolve(ticket)" @click.stop="meta.type === 'LEAVE' ? window.location.href='PBL_IT_Leave_Tracker.html' : openResolveModal(ticket, true)" class="text-[9px] bg-slate-50 text-slate-600 border border-slate-200 dark:bg-white/5 dark:text-slate-400 dark:border-white/10 px-2.5 py-1.5 rounded-lg font-black uppercase tracking-widest shadow-sm hover:bg-slate-200 hover:text-slate-800 dark:hover:bg-white/10 dark:hover:text-white transition-colors flex items-center gap-1.5 active:scale-95">
+                    <button x-show="!canResolve(ticket)" @click.stop="meta.type === 'LEAVE' ? window.location.href='PBL_IT_Leave_Tracker.html' : openResolveModal(ticket, true)" class="text-[9px] bg-white dark:bg-[#1e293b] text-slate-600 dark:text-slate-300 border border-slate-300 dark:border-slate-600 px-3 py-1.5 rounded-lg font-black uppercase tracking-widest shadow-[0_2px_5px_rgba(0,0,0,0.05)] hover:bg-slate-50 dark:hover:bg-[#334155] hover:text-brand dark:hover:text-brand_glow hover:border-brand/50 dark:hover:border-brand/50 transition-all duration-300 flex items-center gap-1.5 active:scale-95">
                         <i class="fa-solid" :class="meta.type === 'LEAVE' ? 'fa-arrow-right' : 'fa-eye'"></i> 
                         <span x-text="meta.type === 'LEAVE' ? 'Open Hub' : 'View Details'"></span>
                     </button>
@@ -800,9 +824,12 @@
 </template>
                             
                             <template x-if="!loading && filteredTickets.length === 0">
-                                <div class="p-8 text-center text-slate-400 bg-white dark:bg-dark_surface rounded-3xl border border-slate-100 dark:border-white/5">
-                                    <i class="fa-solid fa-mug-hot text-3xl mb-2 opacity-50 text-brand animate-pulse"></i>
-                                    <p class="text-xs font-bold uppercase tracking-widest">No pending tickets.</p>
+                                <div class="p-10 flex flex-col items-center justify-center text-center bg-gradient-to-b from-transparent to-slate-50/50 dark:to-white/[0.02] rounded-3xl border border-dashed border-slate-200 dark:border-white/10 group">
+                                    <div class="w-16 h-16 bg-brand/10 dark:bg-brand/20 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-500">
+                                        <i class="fa-solid fa-mug-hot text-2xl text-brand drop-shadow-md"></i>
+                                    </div>
+                                    <p class="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 bg-clip-text">Inbox Zero Achieved</p>
+                                    <p class="text-[10px] font-medium text-slate-400 mt-1">Sip your coffee, everything is running smoothly.</p>
                                 </div>
                             </template>
                         </div>
@@ -814,39 +841,59 @@
                     
                     <div class="bento-blob delay-3 bg-[#a855f7]" style="width: 200px; height: 200px; filter: blur(70px); opacity: 0.2; top: -10%; left: 50%;"></div>
 
-                    <div class="p-4 sm:p-5 border-b border-white/60 dark:border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0 relative z-30">
+                    <div class="p-4 sm:p-5 border-b border-white/60 dark:border-white/10 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 shrink-0 relative z-30 bg-white/40 dark:bg-transparent backdrop-blur-md rounded-t-[2rem]">
+                        
+                        <!-- TITLE (Ticket History Style Sync - Aligned Perfectly) -->
                         <div>
-                            <h3 class="font-heading font-black text-sm sm:text-base uppercase text-slate-800 dark:text-white flex items-center gap-2 tracking-wide">
-                                <div class="w-8 h-8 rounded-full bg-white/80 dark:bg-purple-500/20 flex items-center justify-center text-purple-600 dark:text-purple-400 shadow-sm border border-white/50 dark:border-purple-500/30">
-                                    <i class="fa-solid fa-chart-pie"></i>
+                            <h3 class="font-heading font-black text-sm sm:text-[15px] uppercase flex items-center gap-3 tracking-wide">
+                                <!-- Modern Icon Box -->
+                                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 flex items-center justify-center border border-blue-100/50 dark:border-blue-500/20 shadow-sm shrink-0">
+                                    <i class="fa-solid fa-chart-pie text-brand dark:text-brand_glow text-[11px] sm:text-xs"></i>
                                 </div> 
-                                IT Analytics
+                                <!-- Sleek Text -->
+                                <span class="tracking-widest mt-px text-slate-800 dark:text-white">IT Analytics</span>
                             </h3>
                         </div>
                         
-                        <div class="flex items-center gap-2 w-full sm:w-auto bg-white/50 dark:bg-black/20 p-1.5 rounded-2xl border border-white/80 dark:border-white/5 shadow-sm backdrop-blur-md">
+                        <!-- MODERN GLASSY FILTERS (Crisp macOS Segmented Control Style - BRAND BLUE) -->
+                        <div class="flex items-center w-full xl:w-auto bg-slate-100/90 dark:bg-black/40 p-1 rounded-[1rem] border border-slate-200/80 dark:border-white/10 shadow-inner backdrop-blur-xl">
                             
-                            <div x-data="{ open: false }" class="relative flex-1 sm:w-32">
-                                <button @click="open = !open" @click.outside="open = false" class="w-full flex items-center justify-between gap-2 px-3 py-1.5 bg-white/70 hover:bg-white dark:bg-white/5 dark:hover:bg-white/10 rounded-xl shadow-sm text-[11px] font-bold text-slate-700 dark:text-slate-300 transition border border-white/50 dark:border-transparent">
-                                    <span x-text="chartConfig.type === 'status' ? '📊 Status' : '🔧 Category'"></span>
-                                    <i class="fa-solid fa-chevron-down text-[9px] text-slate-400 transition-transform duration-300" :class="open ? 'rotate-180' : ''"></i>
+                            <!-- Type Filter -->
+                            <div x-data="{ open: false }" class="relative flex-1 xl:w-32">
+                                <button @click="open = !open" @click.outside="open = false" 
+                                        class="w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded-[0.75rem] text-[11px] font-bold transition-all duration-300"
+                                        :class="open ? 'bg-white shadow-[0_1px_4px_rgba(0,0,0,0.08)] border border-slate-200/80 dark:bg-slate-800 dark:border-slate-700 text-brand dark:text-blue-400' : 'text-slate-500 dark:text-slate-400 border border-transparent hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-white/5'">
+                                    <div class="flex items-center gap-1.5">
+                                        <i class="fa-solid text-[10px]" :class="chartConfig.type === 'status' ? 'fa-chart-simple' : 'fa-layer-group'"></i>
+                                        <span x-text="chartConfig.type === 'status' ? 'Status View' : 'Category'"></span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-down text-[8px] transition-transform duration-300 opacity-50" :class="open ? 'rotate-180' : ''"></i>
                                 </button>
-                                <div x-show="open" x-transition.origin.top class="absolute z-[100] top-full left-0 mt-1 w-full bg-white/95 dark:bg-[#1e293b]/95 backdrop-blur-xl rounded-xl shadow-xl border border-slate-100 dark:border-slate-700 overflow-hidden py-1" style="display: none;">
-                                    <div @click="chartConfig.type = 'status'; renderChart(); open = false" class="px-3 py-2 text-[11px] font-bold hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer text-slate-700 dark:text-slate-300 transition">📊 Status View</div>
-                                    <div @click="chartConfig.type = 'category'; renderChart(); open = false" class="px-3 py-2 text-[11px] font-bold hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer text-slate-700 dark:text-slate-300 transition">🔧 Category</div>
+                                <!-- Popover -->
+                                <div x-show="open" x-transition.origin.top class="absolute z-[100] top-full left-0 mt-2 w-full bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-xl rounded-xl shadow-xl border border-slate-200 dark:border-white/10 overflow-hidden py-1.5" style="display: none;">
+                                    <div @click="chartConfig.type = 'status'; renderChart(); open = false" class="px-4 py-2.5 text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-2" :class="chartConfig.type === 'status' ? 'bg-blue-50 text-brand dark:bg-blue-500/10 dark:text-blue-400' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5'"><i class="fa-solid fa-chart-simple opacity-70 w-3"></i> Status</div>
+                                    <div @click="chartConfig.type = 'category'; renderChart(); open = false" class="px-4 py-2.5 text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-2" :class="chartConfig.type === 'category' ? 'bg-blue-50 text-brand dark:bg-blue-500/10 dark:text-blue-400' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5'"><i class="fa-solid fa-layer-group opacity-70 w-3"></i> Category</div>
                                 </div>
                             </div>
 
-                            <div class="w-px h-5 bg-slate-300/50 dark:bg-white/10"></div>
+                            <!-- Divider -->
+                            <div class="w-px h-4 bg-slate-300 dark:bg-slate-600 mx-1"></div>
 
-                            <div x-data="{ open: false }" class="relative flex-1 sm:w-32">
-                                <button @click="open = !open" @click.outside="open = false" class="w-full flex items-center justify-between gap-2 px-3 py-1.5 bg-white/70 hover:bg-white dark:bg-white/5 dark:hover:bg-white/10 rounded-xl shadow-sm text-[11px] font-bold text-slate-700 dark:text-slate-300 transition border border-white/50 dark:border-transparent">
-                                    <span x-text="chartConfig.time === 'all' ? '📅 All Time' : '📅 This Month'"></span>
-                                    <i class="fa-solid fa-chevron-down text-[9px] text-slate-400 transition-transform duration-300" :class="open ? 'rotate-180' : ''"></i>
+                            <!-- Time Filter -->
+                            <div x-data="{ open: false }" class="relative flex-1 xl:w-32">
+                                <button @click="open = !open" @click.outside="open = false" 
+                                        class="w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded-[0.75rem] text-[11px] font-bold transition-all duration-300"
+                                        :class="open ? 'bg-white shadow-[0_1px_4px_rgba(0,0,0,0.08)] border border-slate-200/80 dark:bg-slate-800 dark:border-slate-700 text-brand dark:text-blue-400' : 'text-slate-500 dark:text-slate-400 border border-transparent hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-white/5'">
+                                    <div class="flex items-center gap-1.5">
+                                        <i class="fa-solid text-[10px]" :class="chartConfig.time === 'all' ? 'fa-calendar-days' : 'fa-calendar-day'"></i>
+                                        <span x-text="chartConfig.time === 'all' ? 'All Time' : 'This Month'"></span>
+                                    </div>
+                                    <i class="fa-solid fa-chevron-down text-[8px] transition-transform duration-300 opacity-50" :class="open ? 'rotate-180' : ''"></i>
                                 </button>
-                                <div x-show="open" x-transition.origin.top class="absolute z-[100] top-full right-0 mt-1 w-full bg-white/95 dark:bg-[#1e293b]/95 backdrop-blur-xl rounded-xl shadow-xl border border-slate-100 dark:border-slate-700 overflow-hidden py-1" style="display: none;">
-                                    <div @click="chartConfig.time = 'all'; renderChart(); open = false" class="px-3 py-2 text-[11px] font-bold hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer text-slate-700 dark:text-slate-300 transition">📅 All Time</div>
-                                    <div @click="chartConfig.time = 'month'; renderChart(); open = false" class="px-3 py-2 text-[11px] font-bold hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer text-slate-700 dark:text-slate-300 transition">📅 This Month</div>
+                                <!-- Popover -->
+                                <div x-show="open" x-transition.origin.top class="absolute z-[100] top-full right-0 mt-2 w-full bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-xl rounded-xl shadow-xl border border-slate-200 dark:border-white/10 overflow-hidden py-1.5" style="display: none;">
+                                    <div @click="chartConfig.time = 'all'; renderChart(); open = false" class="px-4 py-2.5 text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-2" :class="chartConfig.time === 'all' ? 'bg-blue-50 text-brand dark:bg-blue-500/10 dark:text-blue-400' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5'"><i class="fa-solid fa-calendar-days opacity-70 w-3"></i> All Time</div>
+                                    <div @click="chartConfig.time = 'month'; renderChart(); open = false" class="px-4 py-2.5 text-[11px] font-bold cursor-pointer transition-colors flex items-center gap-2" :class="chartConfig.time === 'month' ? 'bg-blue-50 text-brand dark:bg-blue-500/10 dark:text-blue-400' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5'"><i class="fa-solid fa-calendar-day opacity-70 w-3"></i> This Month</div>
                                 </div>
                             </div>
                         </div>
@@ -1048,9 +1095,9 @@
                 <div class="md:hidden w-px h-3.5 bg-slate-300 dark:bg-white/10"></div>
 
                 <!-- Network Ping -->
-                <div class="flex items-center gap-1 sm:gap-1.5 hover:text-slate-700 dark:hover:text-slate-300 transition-colors" title="Network Latency">
-                    <i class="fa-solid fa-wifi text-[9px] sm:text-[10px] text-emerald-500"></i>
-                    <span>12ms</span>
+                <div class="flex items-center gap-1.5 bg-slate-100 dark:bg-white/5 px-2 py-1 rounded-md border border-slate-200 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors" title="Network Latency">
+                    <i class="fa-solid fa-wifi text-[9px] text-emerald-500"></i>
+                    <span class="text-[9px]">12ms</span>
                 </div>
                 
                 <div class="hidden sm:block w-px h-3.5 bg-slate-300 dark:bg-white/10"></div>
@@ -1532,178 +1579,240 @@
         </div>
     </div>
 	
-	<!-- RESOLVE TICKET & AUDIT MODAL (CONTEXT AWARE) -->
-<div x-show="showResolveModal" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4" x-transition.opacity @click.self="showResolveModal = false">
-    <div class="bg-white dark:bg-dark_surface w-full max-w-lg rounded-[2rem] shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden flex flex-col max-h-[90vh]">
+	<!-- RESOLVE TICKET & AUDIT MODAL (BRIGHT & CLEAN GLASSMORPHISM EDITION) -->
+<div x-show="showResolveModal" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center p-4 sm:p-6" x-transition:enter="transition ease-out duration-400" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" @click.self="showResolveModal = false">
+    
+    <!-- Deep Blurred Background Overlay -->
+    <div class="absolute inset-0 bg-slate-900/30 dark:bg-[#020617]/70 backdrop-blur-md"></div>
+    
+    <!-- Ultra-Glass Modal Container (Brighter & Cleaner) -->
+    <div class="w-full max-w-[540px] max-h-[90vh] bg-white/80 dark:bg-slate-900/60 backdrop-blur-3xl border border-white dark:border-white/10 rounded-[2.5rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,1)] dark:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.1)] flex flex-col relative overflow-hidden z-10">
         
-        <!-- HEADER (Changes color based on Audit vs Normal) -->
-        <div class="p-5 border-b border-slate-100 dark:border-white/10 flex justify-between items-center shrink-0"
-             :class="resolveForm.isAudit ? 'bg-rose-50 dark:bg-rose-900/10' : 'bg-emerald-50 dark:bg-emerald-900/10'">
-            <div>
-                <h3 class="font-heading font-black text-lg text-slate-800 dark:text-white flex items-center gap-2">
-                    <i class="fa-solid" :class="resolveForm.isAudit ? 'fa-shield-halved text-rose-500' : 'fa-clipboard-check text-emerald-500'"></i> 
-                    <span x-text="resolveForm.isAudit ? (resolveForm.viewOnly ? 'Audit Details' : 'Resolve Audit Findings') : (resolveForm.viewOnly ? 'Ticket Details' : 'Resolve Ticket')"></span>
-                </h3>
-                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-1" x-text="resolveForm.ticketId"></p>
+        <!-- Soft Ambient Orbs (Without Multiply Blend for Cleaner Look) -->
+        <div class="absolute -top-32 -left-32 w-80 h-80 rounded-full blur-[80px] pointer-events-none transition-colors duration-700 opacity-60 dark:opacity-30"
+             :class="resolveForm.isAudit ? 'bg-rose-300' : 'bg-emerald-300'"></div>
+        <div class="absolute top-1/3 -right-32 w-80 h-80 rounded-full blur-[80px] pointer-events-none transition-colors duration-700 opacity-60 dark:opacity-30"
+             :class="resolveForm.isAudit ? 'bg-orange-300' : 'bg-teal-300'"></div>
+
+        <!-- 📍 HEADER (Seamless & Bright) -->
+        <div class="px-6 py-5 flex justify-between items-center border-b border-white/60 dark:border-white/5 relative z-10 shrink-0 bg-white/40 dark:bg-transparent">
+            <div class="flex items-center gap-4">
+                <!-- Glowing Icon Box -->
+                <div class="w-12 h-12 rounded-[1.25rem] text-white flex items-center justify-center shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_8px_16px_-4px_rgba(0,0,0,0.1)] shrink-0 relative overflow-hidden transition-all duration-500"
+                     :class="resolveForm.isAudit ? 'bg-gradient-to-br from-rose-400 to-orange-500' : 'bg-gradient-to-br from-emerald-400 to-teal-500'">
+                    <div class="absolute inset-0 bg-white/20 mix-blend-overlay"></div>
+                    <i class="fa-solid text-xl drop-shadow-md relative z-10" :class="resolveForm.isAudit ? 'fa-shield-halved' : 'fa-clipboard-check'"></i>
+                </div>
+                
+                <!-- Title & Neumorphic Pill -->
+                <div class="flex flex-col justify-center pt-0.5">
+                    <h3 class="text-[20px] font-bold text-slate-800 dark:text-white tracking-tight leading-tight mb-1" 
+                        x-text="resolveForm.isAudit ? (resolveForm.viewOnly ? 'Audit Details' : 'Resolve Findings') : (resolveForm.viewOnly ? 'Ticket Details' : 'Resolve Ticket')"></h3>
+                    <div class="flex items-center gap-1.5">
+                        <span class="px-2.5 py-0.5 rounded-md text-[9px] font-mono font-bold tracking-widest border bg-white/60 dark:bg-black/20 shadow-sm transition-colors duration-500"
+                              :class="resolveForm.isAudit ? 'text-rose-600 border-rose-200 dark:text-rose-400 dark:border-rose-900/50' : 'text-emerald-600 border-emerald-200 dark:text-emerald-400 dark:border-emerald-900/50'">
+                            <i class="fa-solid fa-hashtag opacity-60"></i> <span x-text="resolveForm.ticketId"></span>
+                        </span>
+                    </div>
+                </div>
             </div>
-            <button @click="showResolveModal = false" class="w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-white/10 text-slate-400 hover:text-red-500 transition shadow-sm border border-slate-200 dark:border-transparent"><i class="fa-solid fa-xmark"></i></button>
+            <button @click="showResolveModal = false" class="w-9 h-9 rounded-full bg-white/80 dark:bg-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-white hover:text-slate-800 dark:hover:bg-white/20 transition-all active:scale-95 shadow-sm border border-white dark:border-white/5 shrink-0"><i class="fa-solid fa-xmark text-sm"></i></button>
         </div>
         
-        <!-- BODY (Scrollable Area) -->
-        <div class="p-5 space-y-4 overflow-y-auto custom-scroll flex-1">
+        <!-- 📍 BODY (Scrollable Bright Area) -->
+        <div class="p-5 sm:p-6 space-y-5 overflow-y-auto custom-scroll flex-1 relative z-10">
             
-            <div class="bg-slate-50 dark:bg-black/20 p-3 rounded-xl border border-slate-200 dark:border-white/5">
-                <span class="text-[9px] font-black uppercase tracking-widest text-slate-400 block mb-1">Issue Category</span>
-                <span class="text-sm font-bold text-slate-700 dark:text-slate-300" x-text="resolveForm.issue"></span>
-            </div>
-
-            <!-- 🔥 THE AUDITOR'S REMARKS / FULL DESCRIPTION -->
+            <!-- Issue Category (Clean Panel) -->
             <div>
-                <span class="text-[9px] font-black uppercase tracking-widest text-slate-400 block mb-1.5 ml-1" x-text="resolveForm.isAudit ? 'Failed Checkpoints & Remarks' : 'Problem Description'"></span>
-                <div class="bg-amber-50/50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/30 p-3.5 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-300 whitespace-pre-wrap leading-relaxed shadow-inner max-h-48 overflow-y-auto custom-scroll" x-text="resolveForm.desc"></div>
-            </div>
-            
-            <!-- ✅ VIEW ONLY: RESOLUTION REMARKS (Dikhega sirf tab jab ticket band ho) -->
-            <div x-show="resolveForm.viewOnly" x-cloak>
-                <span class="text-[9px] font-black uppercase tracking-widest text-emerald-500 block mb-1.5 ml-1">IT Resolution & Action Taken</span>
-                <div class="bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/30 p-3.5 rounded-xl text-xs font-bold text-emerald-700 dark:text-emerald-400 whitespace-pre-wrap leading-relaxed shadow-inner max-h-32 overflow-y-auto custom-scroll" x-text="resolveForm.resolution"></div>
+                <label class="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1.5 pl-1">
+                    <i class="fa-solid fa-layer-group"></i> Issue Category
+                </label>
+                <div class="flex items-center gap-3 bg-white/80 dark:bg-white/5 border border-white dark:border-white/10 px-4 py-3.5 rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.02)] backdrop-blur-xl">
+                    <div class="w-8 h-8 rounded-full bg-slate-100 dark:bg-black/20 flex items-center justify-center text-slate-500 border border-white dark:border-white/5 shadow-sm">
+                        <i class="fa-solid fa-tag text-xs"></i>
+                    </div>
+                    <span class="text-[14px] font-bold text-slate-800 dark:text-slate-200" x-text="resolveForm.issue"></span>
+                </div>
             </div>
 
-            <!-- RESOLUTION INPUT (Hidden if View Only) -->
-            <div x-show="!resolveForm.viewOnly">
-                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5 ml-1" x-text="resolveForm.isAudit ? 'Remediation Steps Taken *' : 'Resolution Remarks *'"></label>
-                <textarea x-model="resolveForm.remarks" rows="3" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2 text-xs font-medium outline-none focus:border-emerald-500 focus:ring-2 transition text-slate-800 dark:text-white shadow-inner resize-none" :class="resolveForm.isAudit ? 'focus:border-rose-500 focus:ring-rose-500/20' : 'focus:border-emerald-500 focus:ring-emerald-500/20'" placeholder="Explain how this was fixed/remediated..."></textarea>
+            <!-- Problem Description (Accent Clean Panel) -->
+            <div>
+                <label class="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1.5 pl-1">
+                    <i class="fa-solid fa-align-left"></i> <span x-text="resolveForm.isAudit ? 'Failed Checkpoints & Remarks' : 'Problem Description'"></span>
+                </label>
+                <div class="bg-gradient-to-r from-amber-50/90 to-white/50 dark:from-amber-900/10 dark:to-transparent border border-amber-200/80 dark:border-amber-500/20 border-l-[3px] border-l-amber-400 p-4 rounded-2xl shadow-sm backdrop-blur-md relative overflow-hidden max-h-48 custom-scroll">
+                    <i class="fa-solid fa-quote-right absolute -right-1 -bottom-2 text-4xl opacity-[0.07] text-amber-500 pointer-events-none"></i>
+                    <div class="text-[13px] font-medium text-slate-700 dark:text-slate-300 whitespace-pre-wrap leading-relaxed break-words relative z-10" x-text="resolveForm.desc"></div>
+                </div>
+            </div>
+            
+            <!-- VIEW ONLY: Resolution Remarks (Success Clean Panel) -->
+            <div x-show="resolveForm.viewOnly" x-cloak x-transition.opacity>
+                <label class="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-1.5 pl-1">
+                    <i class="fa-solid fa-check-double"></i> IT Resolution & Action Taken
+                </label>
+                <div class="bg-gradient-to-r from-emerald-50/90 to-white/50 dark:from-emerald-900/10 dark:to-transparent border border-emerald-200/80 dark:border-emerald-500/20 border-l-[3px] border-l-emerald-500 p-4 rounded-2xl shadow-sm backdrop-blur-md relative overflow-hidden max-h-40 custom-scroll">
+                    <i class="fa-solid fa-clipboard-check absolute top-2 right-2 text-3xl opacity-[0.07] text-emerald-500 pointer-events-none"></i>
+                    <div class="text-[13px] font-bold text-emerald-800 dark:text-emerald-400 whitespace-pre-wrap leading-relaxed break-words relative z-10" x-text="resolveForm.resolution"></div>
+                </div>
+            </div>
+
+            <!-- ACTIONABLE: Resolution Input Box -->
+            <div x-show="!resolveForm.viewOnly" x-transition.opacity>
+                <label class="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1.5 pl-1">
+                    <i class="fa-solid fa-pen-clip"></i> <span x-text="resolveForm.isAudit ? 'Remediation Steps Taken *' : 'Resolution Remarks *'"></span>
+                </label>
+                <textarea x-model="resolveForm.remarks" rows="4" 
+                    class="w-full bg-white/90 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-2xl px-4 py-3.5 text-[13px] font-medium outline-none focus:bg-white dark:focus:bg-black/40 focus:ring-4 transition-all duration-300 text-slate-800 dark:text-white shadow-sm resize-y min-h-[100px] leading-relaxed backdrop-blur-md" 
+                    :class="resolveForm.isAudit ? 'focus:border-rose-400 focus:ring-rose-500/10' : 'focus:border-emerald-400 focus:ring-emerald-500/10'" 
+                    placeholder="Document exactly how this was fixed or remediated..."></textarea>
             </div>
         </div>
 
-        <!-- FOOTER (Actionable) -->
-        <div x-show="!resolveForm.viewOnly" class="bg-slate-50/80 dark:bg-black/40 p-4 flex justify-between items-center gap-3 border-t border-slate-100 dark:border-white/5 shrink-0">
-            <div class="relative flex-1">
-                <i class="fa-solid fa-key absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]"></i>
-                <input type="password" x-model="resolveForm.secret" placeholder="Admin Key" class="w-full pl-8 pr-3 py-2.5 bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl text-[10px] font-mono font-bold outline-none transition shadow-sm" :class="resolveForm.isAudit ? 'focus:border-rose-500' : 'focus:border-emerald-500'">
+        <!-- 📍 FOOTER (Actionable - Premium Submit) -->
+        <div x-show="!resolveForm.viewOnly" class="bg-white/60 dark:bg-black/20 backdrop-blur-xl p-4 sm:p-5 flex flex-col sm:flex-row items-center gap-3.5 border-t border-white/80 dark:border-white/5 shrink-0 relative z-20">
+            <div class="relative w-full sm:flex-1">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <i class="fa-solid fa-key text-slate-400 text-[11px]"></i>
+                </div>
+                <input type="password" x-model="resolveForm.secret" placeholder="Admin Key" 
+                    class="w-full pl-10 pr-4 py-3 bg-white/90 dark:bg-black/40 border border-white dark:border-white/10 rounded-xl text-xs font-mono font-bold outline-none focus:bg-white dark:focus:bg-black/60 focus:ring-2 transition-all shadow-sm backdrop-blur-sm" 
+                    :class="resolveForm.isAudit ? 'focus:border-rose-400 focus:ring-rose-500/20' : 'focus:border-emerald-400 focus:ring-emerald-500/20'">
             </div>
-            <button @click="submitResolution()" class="text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition active:scale-95 flex items-center justify-center gap-2 shadow-sm" :class="resolveForm.isAudit ? 'bg-rose-500 hover:bg-rose-600 shadow-[0_5px_15px_-3px_rgba(244,63,94,0.4)]' : 'bg-emerald-500 hover:bg-emerald-600 shadow-[0_5px_15px_-3px_rgba(16,185,129,0.4)]'" :disabled="resolving">
-                <span x-show="!resolving">Submit</span>
-                <span x-show="resolving"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
+            <button @click="submitResolution()" 
+                class="w-full sm:w-auto text-white px-8 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 shadow-md" 
+                :class="resolveForm.isAudit ? 'bg-gradient-to-r from-rose-500 to-red-500 hover:shadow-lg hover:shadow-rose-500/30' : 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:shadow-lg hover:shadow-emerald-500/30'" 
+                :disabled="resolving">
+                <span x-show="!resolving"><i class="fa-solid fa-check-double mr-1.5 opacity-80"></i> Submit</span>
+                <span x-show="resolving" class="flex items-center gap-2"><i class="fa-solid fa-circle-notch fa-spin"></i> Saving</span>
             </button>
         </div>
 
-        <!-- FOOTER (View Only / Locked) -->
-        <div x-show="resolveForm.viewOnly" class="bg-slate-50/80 dark:bg-black/40 p-4 flex justify-end gap-3 border-t border-slate-100 dark:border-white/5 shrink-0">
-            <div class="text-[9px] font-bold text-slate-500 flex items-center gap-1.5 uppercase tracking-widest mr-auto pl-1">
-                <i class="fa-solid fa-lock text-slate-400"></i> Locked for remediation (Assigned: <span class="text-slate-700 dark:text-slate-300" x-text="resolveForm.assignedTo"></span>)
+        <!-- 📍 FOOTER (View Only) -->
+        <div x-show="resolveForm.viewOnly" class="bg-white/60 dark:bg-black/20 backdrop-blur-xl p-4 sm:p-5 flex flex-col sm:flex-row justify-between items-center gap-4 border-t border-white/80 dark:border-white/5 shrink-0 relative z-20">
+            <div class="flex items-center gap-2 px-3 py-1.5 bg-white/80 dark:bg-white/5 rounded-lg border border-white dark:border-white/5 text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest w-full sm:w-auto justify-center sm:justify-start backdrop-blur-sm shadow-sm">
+                <span class="relative flex h-2 w-2 shrink-0">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                </span>
+                <span class="truncate">Locked (By: <span class="text-slate-800 dark:text-slate-300" x-text="resolveForm.assignedTo"></span>)</span>
             </div>
-            <button @click="showResolveModal = false" class="bg-slate-800 hover:bg-slate-900 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition active:scale-95 shadow-sm">
-                Close
+            
+            <!-- Crisp Solid Close Button -->
+            <button @click="showResolveModal = false" class="w-full sm:w-auto bg-white hover:bg-slate-50 dark:bg-white/10 dark:hover:bg-white/20 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10 px-8 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all shadow-sm hover:shadow-md active:scale-95 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-arrow-right-from-bracket opacity-70"></i> Close
             </button>
         </div>
+
     </div>
 </div>
 
-<!-- IT STAFF MODAL (PREMIUM & ERGONOMIC) -->
-    <div x-show="showStaffModal" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/70 backdrop-blur-md p-4" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" @click.self="showStaffModal = false">
-        <div class="bg-slate-50 dark:bg-dark_surface w-full max-w-lg rounded-[2rem] shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden flex flex-col max-h-[95vh]">
-            
-            <!-- 📍 HEADER (Glassy & Clean) -->
-            <div class="relative p-5 sm:p-6 border-b border-slate-200/60 dark:border-white/5 bg-white/50 dark:bg-black/20 overflow-hidden shrink-0 flex justify-between items-center backdrop-blur-md">
-                <!-- Subtle Orb -->
-                <div class="absolute -right-6 -top-6 w-32 h-32 bg-teal-500/10 rounded-full blur-2xl pointer-events-none"></div>
-                
-                <div class="flex items-center gap-3 relative z-10">
-                    <div class="w-10 h-10 rounded-[1rem] bg-teal-50 text-teal-600 dark:bg-teal-500/10 dark:text-teal-400 flex items-center justify-center shadow-sm border border-teal-100 dark:border-teal-500/20 shrink-0">
-                        <i class="fa-solid fa-users-viewfinder text-lg"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-heading font-black text-slate-800 dark:text-white leading-tight">IT Team Status</h3>
-                        <div class="flex items-center gap-1.5 mt-1">
-                            <span class="relative flex h-1.5 w-1.5">
-                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-teal-500"></span>
-                            </span>
-                            <p class="text-[9px] text-teal-600 dark:text-teal-400 uppercase font-black tracking-widest leading-none">Live Availability</p>
-                        </div>
+<!-- IT STAFF MODAL (iOS GLASSMORPHIC - MOBILE OPTIMIZED) -->
+<div x-show="showStaffModal" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center p-4 sm:p-6" x-transition:enter="transition ease-out duration-400" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
+    
+    <!-- Deep Blurred Overlay -->
+    <div class="absolute inset-0 bg-slate-900/30 dark:bg-[#020617]/60 backdrop-blur-md" @click="showStaffModal = false"></div>
+    
+    <!-- Modal Container -->
+    <div class="w-full max-w-[540px] max-h-[90vh] bg-white/70 dark:bg-[#0f172a]/70 backdrop-blur-3xl border border-white/60 dark:border-white/10 rounded-[2.5rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.8)] dark:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.1)] flex flex-col relative overflow-hidden z-10">
+        
+        <!-- Ambient Mesh Gradients (Apple Style Background Glow) -->
+        <div class="absolute -top-24 -left-24 w-64 h-64 bg-teal-400/30 dark:bg-teal-500/20 rounded-full blur-[60px] pointer-events-none"></div>
+        <div class="absolute top-1/2 -right-24 w-64 h-64 bg-blue-400/20 dark:bg-indigo-500/20 rounded-full blur-[60px] pointer-events-none"></div>
+
+        <!-- 📍 HEADER (Seamless Glass) -->
+        <div class="px-5 sm:px-6 py-4 sm:py-5 flex justify-between items-center border-b border-black/5 dark:border-white/5 relative z-10 shrink-0">
+            <div class="flex items-center gap-3 sm:gap-4">
+                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-[1.1rem] bg-white/80 dark:bg-white/10 border border-white/50 dark:border-white/5 flex items-center justify-center shadow-[0_8px_16px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.8)] backdrop-blur-md shrink-0">
+                    <i class="fa-solid fa-users text-base sm:text-lg text-transparent bg-clip-text bg-gradient-to-br from-teal-500 to-blue-600 dark:from-teal-400 dark:to-indigo-400"></i>
+                </div>
+                <div>
+                    <h3 class="text-[16px] sm:text-[18px] font-bold text-slate-800 dark:text-white tracking-tight leading-tight">Team Roster</h3>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]"></span>
+                        <span class="text-[9px] sm:text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Live Sync</span>
                     </div>
                 </div>
-                <button @click="showStaffModal = false" class="relative z-10 w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 dark:bg-white/10 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition shadow-sm border border-slate-200 dark:border-transparent"><i class="fa-solid fa-xmark text-sm"></i></button>
             </div>
-            
-            <!-- 📍 LIST (Sleek Cards, No Left-Borders) -->
-            <div class="p-4 sm:p-5 space-y-3.5 bg-slate-50/30 dark:bg-transparent flex-1 overflow-y-auto custom-scroll relative">
-                <template x-for="staff in staffData" :key="staff.name">
-                    <div class="relative overflow-hidden p-3.5 rounded-2xl border transition-all duration-300 group hover:shadow-md" 
-                         :class="isStaffOnline(staff) ? 'bg-white dark:bg-black/40 border-teal-200 dark:border-teal-800/50 shadow-sm' : 'bg-slate-50/50 dark:bg-black/20 border-slate-200 dark:border-white/5 opacity-75 hover:opacity-100'">
-                        
-                        <div class="flex items-center justify-between mb-3.5">
-                            <div class="flex items-center gap-3 min-w-0">
-                                <div class="relative shrink-0">
-                                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-black text-white shadow-sm border-2 border-white dark:border-dark_surface transition-transform group-hover:scale-105" :class="staff.color" x-text="staff.avatar"></div>
-                                    <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-dark_surface flex items-center justify-center" :class="isStaffOnline(staff) ? 'bg-emerald-500' : 'bg-slate-400'">
-                                        <span x-show="isStaffOnline(staff)" class="absolute w-full h-full bg-emerald-500 rounded-full animate-ping opacity-75"></span>
-                                    </div>
-                                </div>
-                                <div class="flex flex-col min-w-0">
-                                    <div class="flex items-center gap-2">
-                                        <h4 class="text-[13px] font-black text-slate-800 dark:text-white leading-tight truncate group-hover:text-brand transition-colors" x-text="staff.name"></h4>
-                                        <span class="text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded shadow-sm border shrink-0" 
-                                              :class="staff.loc === 'Dehradun' ? 'bg-violet-50 text-violet-600 border-violet-200 dark:bg-violet-500/10 dark:text-violet-400' : (staff.loc === 'Global' ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400' : 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400')" 
-                                              x-text="staff.loc"></span>
-                                    </div>
-                                    <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1.5 mt-0.5 truncate"><i class="fa-solid fa-id-badge opacity-60"></i> <span x-text="staff.role"></span></p>
-                                </div>
-                            </div>
-                            <div class="px-2.5 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest shadow-sm flex items-center gap-1.5 border shrink-0" 
-                                 :class="isStaffOnline(staff) ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/30' : 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-white/5 dark:border-white/10'">
-                                 <span class="w-1.5 h-1.5 rounded-full" :class="isStaffOnline(staff) ? 'bg-emerald-500' : 'bg-slate-400'"></span>
-                                 <span x-text="isStaffOnline(staff) ? 'Active' : 'Offline'"></span>
-                            </div>
-                        </div>
-                        
-                        <!-- Shift details in a sleek inset box -->
-                        <div class="bg-slate-50 dark:bg-black/30 rounded-xl p-2.5 flex justify-between items-center border border-slate-100 dark:border-white/5 shadow-inner transition-colors" :class="isStaffOnline(staff) ? 'border-teal-100 dark:border-teal-900/30 bg-teal-50/50 dark:bg-teal-900/10' : ''">
-                            <div class="flex items-center gap-2.5">
-                                <i class="fa-regular fa-clock text-[11px]" :class="isStaffOnline(staff) ? 'text-teal-500' : 'text-slate-400'"></i>
-                                <div class="flex flex-col">
-                                    <span class="text-[7px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Shift Timing</span>
-                                    <span class="text-[10px] font-mono font-bold text-slate-700 dark:text-slate-300 leading-none"><span x-text="formatTimeAMPM(staff.start)"></span> - <span x-text="formatTimeAMPM(staff.end)"></span></span>
-                                </div>
-                            </div>
-                            <span class="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400" x-text="staff.shift"></span>
-                        </div>
-                    </div>
-                </template>
-            </div>
-            
-            <!-- 📍 FOOTER (Grid Clocks) -->
-            <div class="p-4 sm:p-5 bg-white/60 dark:bg-black/40 backdrop-blur-md border-t border-slate-200/60 dark:border-white/5 rounded-b-[2rem] shrink-0">
-                <div class="grid grid-cols-2 gap-3">
-                    
-                    <!-- Noida Clock Widget -->
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-white dark:bg-dark_surface border border-slate-200 dark:border-white/10 p-2.5 rounded-xl shadow-sm gap-2 sm:gap-0">
-                        <div class="flex items-center gap-2 min-w-0">
-                            <div class="w-6 h-6 rounded-full bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center border border-blue-100 dark:border-blue-500/20 shrink-0">
-                                <i class="fa-solid fa-location-dot text-blue-500 text-[10px]"></i>
-                            </div>
-                            <span class="text-[8px] font-black tracking-widest uppercase text-slate-400 truncate">Noida, IND</span>
-                        </div>
-                        <span class="text-[10px] sm:text-[11px] font-mono font-black text-blue-600 dark:text-blue-400 tracking-tight text-right" x-text="currentTime"></span>
-                    </div>
-
-                    <!-- Berlin Clock Widget -->
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-white dark:bg-dark_surface border border-slate-200 dark:border-white/10 p-2.5 rounded-xl shadow-sm gap-2 sm:gap-0">
-                        <div class="flex items-center gap-2 min-w-0">
-                            <div class="w-6 h-6 rounded-full bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center border border-amber-100 dark:border-amber-500/20 shrink-0">
-                                <i class="fa-solid fa-location-dot text-amber-500 text-[10px]"></i>
-                            </div>
-                            <span class="text-[8px] font-black tracking-widest uppercase text-slate-400 truncate">Berlin, GER</span>
-                        </div>
-                        <span class="text-[10px] sm:text-[11px] font-mono font-black text-amber-600 dark:text-amber-400 tracking-tight text-right" x-text="germanTime"></span>
-                    </div>
-
-                </div>
-            </div>
-
+            <button @click="showStaffModal = false" class="w-8 h-8 rounded-full bg-black/5 dark:bg-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-black/10 dark:hover:bg-white/20 transition-all active:scale-95 shadow-sm shrink-0"><i class="fa-solid fa-xmark text-sm"></i></button>
         </div>
+        
+        <!-- 📍 BODY (Smart Wrap & Mobile Optimized) -->
+        <div class="px-4 sm:px-5 py-4 space-y-3 flex-1 relative z-10 overflow-y-auto custom-scroll">
+            <template x-for="staff in staffData" :key="staff.name">
+                
+                <!-- Glassmorphic Card -->
+                <div class="p-3 sm:p-3.5 rounded-[1.25rem] border flex items-center justify-between gap-2 transition-all duration-300 group"
+                     :class="isStaffOnline(staff) ? 'bg-white/80 dark:bg-white/10 border-white dark:border-white/10 shadow-[0_8px_20px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,1)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.05)] hover:scale-[1.01]' : 'bg-white/40 dark:bg-white/5 border-white/50 dark:border-white/5 opacity-80 hover:opacity-100 grayscale-[0.2] hover:grayscale-0'">
+                    
+                    <div class="flex items-center gap-3 sm:gap-3.5 min-w-0 flex-1">
+                        <!-- Avatar -->
+                        <div class="relative shrink-0">
+                            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-[11px] sm:text-[13px] font-bold text-white shadow-sm border border-black/5" :class="staff.color" x-text="staff.avatar"></div>
+                            <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-slate-800 flex items-center justify-center" :class="isStaffOnline(staff) ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-600'">
+                                <span x-show="isStaffOnline(staff)" class="absolute w-full h-full bg-emerald-500 rounded-full animate-ping opacity-60"></span>
+                            </div>
+                        </div>
+                        
+                        <!-- Info (Smart Wrap ensures it doesn't truncate on small screens) -->
+                        <div class="flex flex-col min-w-0 flex-1">
+                            <div class="flex items-center gap-1.5 sm:gap-2 mb-0.5">
+                                <h4 class="text-[13px] sm:text-[14px] font-bold text-slate-800 dark:text-white leading-tight truncate" x-text="staff.name"></h4>
+                                <!-- Location Pill -->
+                                <span class="text-[6.5px] sm:text-[7.5px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full shadow-sm shrink-0" 
+                                      :class="staff.loc === 'Dehradun' ? 'bg-violet-100 text-violet-600 dark:bg-violet-500/20 dark:text-violet-300' : (staff.loc === 'Global' ? 'bg-rose-100 text-rose-600 dark:bg-rose-500/20 dark:text-rose-300' : 'bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-300')" 
+                                      x-text="staff.loc"></span>
+                            </div>
+                            
+                            <!-- 🔥 FIX: flex-wrap allows Role & Time to stack naturally on mobile if space is tight -->
+                            <div class="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[9.5px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                                <span class="shrink-0" x-text="staff.role"></span>
+                                <span class="hidden sm:block w-1 h-1 rounded-full bg-black/20 dark:bg-white/20 shrink-0"></span>
+                                <div class="flex items-center gap-1 shrink-0 whitespace-nowrap">
+                                    <i class="fa-regular fa-clock text-[9px] sm:text-[10px] opacity-70"></i>
+                                    <span x-text="formatTimeAMPM(staff.start) + ' - ' + formatTimeAMPM(staff.end)"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Status Pill -->
+                    <div class="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-[8.5px] sm:text-[9.5px] font-bold uppercase tracking-wider shadow-sm flex items-center justify-center gap-1.5 shrink-0" 
+                         :class="isStaffOnline(staff) ? 'bg-emerald-50/80 text-emerald-600 border border-emerald-200/50 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20' : 'bg-slate-100/80 text-slate-500 border border-slate-200/50 dark:bg-white/5 dark:text-slate-400 dark:border-white/10'">
+                         <span x-text="isStaffOnline(staff) ? 'Online' : 'Offline'"></span>
+                    </div>
+
+                </div>
+            </template>
+        </div>
+        
+        <!-- 📍 FOOTER (Mobile Stacked, Desktop Inline) -->
+        <div class="px-4 sm:px-6 pb-5 pt-1 relative z-10 shrink-0">
+            <div class="bg-black/5 dark:bg-black/40 p-1.5 rounded-[1.5rem] border border-black/5 dark:border-white/5 shadow-inner grid grid-cols-2 gap-2">
+                
+                <!-- Noida Widget -->
+                <div class="bg-white/90 dark:bg-white/10 p-2 sm:p-3 rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.8)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.05)] flex flex-col sm:flex-row items-center justify-center sm:justify-between border border-white/50 dark:border-white/5 backdrop-blur-md gap-0.5 sm:gap-0">
+                    <div class="flex items-center justify-center sm:justify-start gap-1.5">
+                        <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-blue-500 shadow-[0_0_8px_#3b82f6] animate-pulse shrink-0"></div>
+                        <span class="text-[8px] sm:text-[9px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 whitespace-nowrap">Noida, IN</span>
+                    </div>
+                    <span class="text-[10px] sm:text-[12px] font-mono font-bold text-slate-800 dark:text-slate-200 whitespace-nowrap" x-text="currentTime"></span>
+                </div>
+
+                <!-- Berlin Widget -->
+                <div class="bg-white/90 dark:bg-white/10 p-2 sm:p-3 rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.8)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.05)] flex flex-col sm:flex-row items-center justify-center sm:justify-between border border-white/50 dark:border-white/5 backdrop-blur-md gap-0.5 sm:gap-0">
+                    <div class="flex items-center justify-center sm:justify-start gap-1.5">
+                        <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-amber-500 shadow-[0_0_8px_#f59e0b] shrink-0"></div>
+                        <span class="text-[8px] sm:text-[9px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 whitespace-nowrap">Berlin, DE</span>
+                    </div>
+                    <span class="text-[10px] sm:text-[12px] font-mono font-bold text-slate-800 dark:text-slate-200 whitespace-nowrap" x-text="germanTime"></span>
+                </div>
+                
+            </div>
+        </div>
+
     </div>
+</div>
 	
 	<!-- 🚀 LEAVE HUB APP MODAL (FULL SCREEN SPA OVERLAY) -->
     <div x-show="showLeaveAppModal" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/80 backdrop-blur-md sm:p-4" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" @click.self="showLeaveAppModal = false">
@@ -1735,100 +1844,218 @@
         </div>
     </div>
 
-    <!-- PENDING TICKETS MODAL -->
-    <div x-show="showOpenTicketsModal" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" @click.self="showOpenTicketsModal = false">
-        <div class="bg-white dark:bg-dark_surface w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden flex flex-col max-h-[80vh]">
-            <div class="p-6 border-b border-slate-100 dark:border-white/10 flex justify-between items-center bg-red-50 dark:bg-red-900/10"><div class="flex items-center gap-4"><div class="w-10 h-10 rounded-xl bg-red-500 text-white flex items-center justify-center shadow-lg shadow-red-500/30 text-lg"><i class="fa-solid fa-clipboard-list"></i></div><div><h3 class="text-lg font-heading font-black text-slate-800 dark:text-white leading-tight">Pending Requests</h3><p class="text-[9px] text-red-600 dark:text-red-400 uppercase font-bold tracking-widest">Action Required</p></div></div><button @click="showOpenTicketsModal = false" class="w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-white/10 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition shadow-sm"><i class="fa-solid fa-xmark"></i></button></div>
-            <div class="p-4 overflow-y-auto custom-scroll">
-                <template x-if="openTickets.length === 0">
-                    <div class="p-12 text-center flex flex-col items-center gap-3"><div class="w-16 h-16 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500 rounded-full flex items-center justify-center text-3xl mb-1 shadow-inner"><i class="fa-solid fa-check"></i></div><h4 class="font-heading font-black text-xl text-slate-700 dark:text-white">All Clear!</h4><p class="text-xs text-slate-500 font-medium">No pending tickets at the moment.</p></div>
-                </template>
-                <template x-for="ticket in openTickets" :key="ticket.id">
-                    <!-- THEMED TICKET CARD INSIDE MODAL (COMPACT & SMART) -->
-                    <div x-data="{ meta: processTicketMeta(ticket) }" class="p-3 sm:p-4 mb-3 border rounded-2xl shadow-sm hover:-translate-y-0.5 transition-all duration-300 group relative overflow-hidden flex flex-col sm:flex-row items-start gap-3"
-                         :class="meta.styles.openBg">
-                        
-                        <i class="fa-solid absolute -bottom-3 -right-2 text-7xl opacity-[0.03] dark:opacity-[0.02] group-hover:scale-110 transition-transform duration-500 pointer-events-none" :class="meta.watermarkClass"></i>
-                        <div class="absolute left-0 top-0 bottom-0 w-1.5 transition-all group-hover:w-2" :class="meta.styles.openBar"></div>
+    <!-- PENDING TICKETS MODAL (TRUE GLASSMORPHISM - COMPACT EDITION) -->
+<div x-show="showOpenTicketsModal" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center p-4 sm:p-5" x-transition:enter="transition ease-out duration-400" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
+    
+    <!-- Deep Blurred Background Overlay -->
+    <div class="absolute inset-0 bg-slate-900/40 dark:bg-[#020617]/70 backdrop-blur-md" @click.self="showOpenTicketsModal = false"></div>
+    
+    <!-- Ultra-Glass Modal Container -->
+    <div class="w-full max-w-[580px] max-h-[92vh] bg-white/40 dark:bg-slate-900/50 backdrop-blur-3xl border border-white/60 dark:border-white/10 rounded-[2rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.7)] dark:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.1)] flex flex-col relative overflow-hidden z-10">
+        
+        <!-- Vibrant Ambient Mesh Gradients -->
+        <div class="absolute -top-32 -left-32 w-80 h-80 bg-rose-400/30 dark:bg-rose-500/20 rounded-full blur-[80px] pointer-events-none mix-blend-multiply dark:mix-blend-screen"></div>
+        <div class="absolute top-1/4 -right-32 w-80 h-80 bg-blue-400/30 dark:bg-indigo-500/20 rounded-full blur-[80px] pointer-events-none mix-blend-multiply dark:mix-blend-screen"></div>
+        <div class="absolute -bottom-32 left-1/4 w-80 h-80 bg-amber-400/20 dark:bg-orange-500/10 rounded-full blur-[80px] pointer-events-none mix-blend-multiply dark:mix-blend-screen"></div>
 
-                        <div class="ml-1.5 w-9 h-9 rounded-xl flex items-center justify-center text-base shrink-0 shadow-sm border border-black/5 transition-transform group-hover:scale-105 relative z-10 hidden sm:flex" :class="getIssueConfig(ticket.issue).color">
-                            <i class="fa-solid" :class="meta.type === 'AUDIT' ? 'fa-shield-halved ' + meta.styles.iconColor : (meta.type === 'Helpdesk' ? getIssueConfig(ticket.issue).icon + ' ' + meta.styles.iconColor : meta.icon + ' ' + meta.styles.iconColor)"></i>
+        <!-- 📍 HEADER (Compact & Seamless) -->
+        <div class="px-5 py-3.5 flex justify-between items-center border-b border-white/40 dark:border-white/5 relative z-10 shrink-0">
+            <div class="flex items-center gap-3.5">
+                <!-- Glowing Icon Container (Shrunk) -->
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-400 to-orange-500 text-white flex items-center justify-center shadow-[0_4px_15px_-3px_rgba(244,63,94,0.5),inset_0_1px_0_rgba(255,255,255,0.6)] shrink-0 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-white/20 mix-blend-overlay"></div>
+                    <i class="fa-solid fa-list-check text-lg drop-shadow-md relative z-10"></i>
+                </div>
+                <div class="flex flex-col justify-center">
+                    <h3 class="text-[18px] font-bold text-slate-800 dark:text-white tracking-tight leading-tight">Pending Requests</h3>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <span class="relative flex h-1.5 w-1.5 shrink-0">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-rose-500 shadow-[0_0_8px_#f43f5e]"></span>
+                        </span>
+                        <span class="text-[9px] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-widest bg-rose-500/10 px-1.5 py-0.5 rounded-md leading-none">Action Required</span>
+                    </div>
+                </div>
+            </div>
+            <button @click="showOpenTicketsModal = false" class="w-8 h-8 rounded-full bg-white/50 dark:bg-white/10 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-white/80 dark:hover:bg-white/20 transition-all active:scale-95 shadow-sm border border-white/50 dark:border-white/5 shrink-0"><i class="fa-solid fa-xmark text-sm"></i></button>
+        </div>
+        
+        <!-- 📍 BODY (Tighter Spacing to fit 2 tickets) -->
+        <div class="px-4 sm:px-5 py-3.5 space-y-3 flex-1 relative z-10 overflow-y-auto custom-scroll">
+            
+            <!-- Empty State -->
+            <template x-if="openTickets.length === 0">
+                <div class="py-10 flex flex-col items-center justify-center text-center group">
+                    <div class="w-16 h-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-4 border border-emerald-500/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.5)] group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+                        <i class="fa-solid fa-check-double text-2xl text-emerald-500 drop-shadow-md"></i>
+                    </div>
+                    <h4 class="font-heading font-black text-[20px] text-slate-800 dark:text-white leading-tight">Inbox Zero!</h4>
+                    <p class="text-[11px] text-slate-500 font-medium mt-1">Grab a coffee, no pending tickets require attention.</p>
+                </div>
+            </template>
+            
+            <!-- Tickets Loop -->
+            <template x-for="ticket in openTickets" :key="ticket.id">
+                <div x-data="{ meta: processTicketMeta(ticket) }" 
+                     class="p-3.5 sm:p-4 rounded-[1.5rem] border border-white/60 dark:border-white/10 transition-all duration-300 group relative overflow-hidden flex flex-col items-start hover:scale-[1.01] bg-white/50 dark:bg-white/5 backdrop-blur-xl shadow-[0_4px_15px_rgba(0,0,0,0.02),inset_0_1px_0_rgba(255,255,255,0.8)] dark:shadow-[0_8px_20px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.05)]">
+                    
+                    <!-- Top Row: Icons & Status Pills -->
+                    <div class="flex justify-between items-center w-full mb-2.5">
+                        <div class="flex items-center gap-2">
+                            <!-- Premium Icon Box -->
+                            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-[13px] shrink-0 shadow-sm border border-white/80 dark:border-white/10 bg-white/80 dark:bg-black/20" :class="meta.styles.iconColor">
+                                <i class="fa-solid" :class="meta.type === 'AUDIT' ? 'fa-shield-halved' : (meta.type === 'Helpdesk' ? getIssueConfig(ticket.issue).icon : meta.icon)"></i>
+                            </div>
+                            <!-- Dynamic System Badge -->
+                            <span x-show="meta.isSystem" class="px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest border shadow-sm backdrop-blur-md" :class="meta.badgeClass" x-text="meta.badgeText"></span>
                         </div>
                         
-                        <div class="flex-1 min-w-0 relative z-10 flex flex-col h-full w-full pl-2 sm:pl-0">
-                            <div class="flex justify-between items-start mb-1">
-                                <div>
-                                    <span x-show="meta.isSystem" class="inline-block mb-1.5 px-2 py-0.5 rounded-[6px] text-[9px] font-black uppercase tracking-widest border shadow-sm" :class="meta.badgeClass" x-text="meta.badgeText"></span>
-                                    <h4 class="font-bold text-[13px] sm:text-sm mb-0.5 transition pr-4 leading-tight" :class="meta.styles.textOpen" x-text="ticket.issue"></h4>
-                                </div>
-                                <span class="text-[8px] font-black tracking-widest px-2 py-0.5 rounded-md border shrink-0 mt-1" :class="meta.styles.openPill" x-text="meta.statusTextOpen"></span>
-                            </div>
-                            
-                            <p class="text-[11px] sm:text-xs text-slate-600 dark:text-slate-400 leading-snug whitespace-pre-wrap group-hover:text-slate-800 dark:group-hover:text-slate-300 transition-colors mt-0.5" 
-                               :class="meta.type === 'AUDIT' ? 'line-clamp-none' : 'line-clamp-3'" 
-                               x-text="meta.cleanDesc"></p>
-                            
-                            <div class="flex flex-col gap-2 mt-2.5">
-                                <div class="flex items-center gap-2 flex-wrap">
-                                    <span class="flex items-center text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm bg-white/80 dark:bg-black/20" :class="meta.styles.textOpen">
-                                        <i class="fa-solid text-[8px] mr-1" :class="meta.icon + ' ' + meta.styles.iconColor"></i> <span x-text="ticket.name"></span>
-                                    </span>
-                                    <span class="flex items-center text-[9px] text-slate-500 font-mono bg-white dark:bg-dark_bg px-1.5 py-0.5 rounded border border-slate-200 dark:border-white/10 shadow-sm" title="Asset Tag">
-                                        <span x-text="meta.shortAsset"></span>
-                                    </span>
-                                    <template x-if="meta.refId || meta.caseId">
-                                        <span class="flex items-center text-[9px] font-mono font-black px-2 py-0.5 rounded border shadow-sm" :class="meta.styles.refBg">
-                                            <i class="fa-solid fa-hashtag mr-1 opacity-60"></i><span x-text="meta.refId || meta.caseId"></span>
-                                        </span>
-                                    </template>
-                                </div>
-                            </div>
-
-                            <div class="mt-3 pt-2.5 border-t border-slate-100 dark:border-white/5 flex items-center justify-between relative z-20 mt-auto w-full">
-                                <span class="flex items-center text-[9px] font-mono font-bold transition-colors text-red-400">
-                                    <i class="fa-regular fa-clock mr-1"></i> <span x-text="formatDisplayDate(ticket.date)"></span>
+                        <!-- Pulsing Status Pill -->
+                        <span class="px-2.5 py-1 rounded-full text-[8px] font-bold uppercase tracking-wider shadow-sm border shrink-0 backdrop-blur-md" :class="meta.styles.openPill" x-text="meta.statusTextOpen"></span>
+                    </div>
+                    
+                    <!-- Content Area -->
+                    <div class="w-full relative z-10 flex flex-col flex-1">
+                        <h4 class="font-bold text-[14px] sm:text-[15px] leading-tight mb-2 text-slate-800 dark:text-white" x-text="ticket.issue"></h4>
+                        
+                        <!-- Inner Neumorphic Description Box (Slimmed Down) -->
+                        <div class="bg-white/40 dark:bg-black/20 border border-white/50 dark:border-white/5 p-2.5 rounded-xl shadow-inner mb-2.5 relative overflow-hidden">
+                            <i class="fa-solid fa-quote-right absolute -right-2 -bottom-1 text-3xl opacity-5 pointer-events-none" :class="meta.styles.iconColor"></i>
+                            <p class="text-[11px] text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap relative z-10" x-text="meta.cleanDesc"></p>
+                        </div>
+                        
+                        <!-- Metadata Pills -->
+                        <div class="flex flex-wrap items-center gap-1.5 mb-3">
+                            <span class="flex items-center text-[9px] font-bold px-2 py-0.5 rounded-full shadow-sm bg-white/60 dark:bg-white/10 border border-white/60 dark:border-white/5" :class="meta.styles.textOpen">
+                                <i class="fa-solid mr-1.5 opacity-70 text-[8px]" :class="meta.icon"></i> <span x-text="ticket.name"></span>
+                            </span>
+                            <span class="flex items-center text-[9px] font-mono font-bold px-2 py-0.5 rounded-full shadow-sm bg-white/60 dark:bg-white/5 border border-white/60 dark:border-white/5 text-slate-600 dark:text-slate-300">
+                                <span x-text="meta.shortAsset"></span>
+                            </span>
+                            <template x-if="meta.refId || meta.caseId">
+                                <span class="flex items-center text-[9px] font-mono font-black px-2 py-0.5 rounded-full shadow-sm border backdrop-blur-md" :class="meta.styles.refBg">
+                                    <i class="fa-solid fa-hashtag mr-1 opacity-60"></i><span x-text="meta.refId || meta.caseId"></span>
                                 </span>
+                            </template>
+                        </div>
 
-                                <div class="flex gap-2">
-                                    <button x-show="canResolve(ticket)" @click.stop="openResolveModal(ticket, false)" class="text-[10px] px-3 py-1.5 rounded-lg font-black uppercase tracking-widest shadow-sm transition-colors flex items-center gap-1.5 active:scale-95 border" :class="meta.type === 'AUDIT' ? 'bg-rose-50 text-rose-600 border-rose-200 hover:bg-rose-500 hover:text-white dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/30' : 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-500 hover:text-white dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30'">
-                                        <i class="fa-solid" :class="meta.type === 'AUDIT' ? 'fa-wrench' : 'fa-check-double'"></i> 
-                                        <span x-text="meta.type === 'AUDIT' ? 'Fix Findings' : 'Mark Resolved'"></span>
-                                    </button>
-                                    <button x-show="!canResolve(ticket)" @click.stop="openResolveModal(ticket, true)" class="text-[10px] bg-slate-50 text-slate-600 border border-slate-200 dark:bg-white/5 dark:text-slate-400 dark:border-white/10 px-3 py-1.5 rounded-lg font-black uppercase tracking-widest shadow-sm hover:bg-slate-200 hover:text-slate-800 dark:hover:bg-white/10 dark:hover:text-white transition-colors flex items-center gap-1.5 active:scale-95">
-                                        <i class="fa-solid fa-eye"></i> View Details
-                                    </button>
-                                </div>
+                        <!-- Card Footer (Date & Actions) -->
+                        <div class="pt-2.5 border-t border-black/5 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-0 mt-auto">
+                            <span class="flex items-center text-[9.5px] font-mono font-bold text-slate-500 dark:text-slate-400 bg-white/40 dark:bg-white/5 px-2 py-1 rounded-md border border-white/50 dark:border-white/5">
+                                <i class="fa-regular fa-clock mr-1 text-rose-400"></i> <span x-text="formatDisplayDate(ticket.date)"></span>
+                            </span>
+
+                            <div class="flex gap-2 w-full sm:w-auto">
+                                <!-- Solid Gradient Action Button -->
+                                <button x-show="canResolve(ticket)" @click.stop="openResolveModal(ticket, false)" 
+                                        class="w-full sm:w-auto text-[9.5px] px-4 py-2 rounded-full font-black uppercase tracking-widest shadow-sm transition-all flex items-center justify-center gap-1.5 active:scale-95 text-white" 
+                                        :class="meta.type === 'AUDIT' ? 'bg-gradient-to-r from-rose-500 to-red-500 shadow-rose-500/20 hover:shadow-rose-500/40' : 'bg-gradient-to-r from-emerald-500 to-teal-500 shadow-emerald-500/20 hover:shadow-emerald-500/40'">
+                                    <i class="fa-solid" :class="meta.type === 'AUDIT' ? 'fa-wrench' : 'fa-check-double'"></i> 
+                                    <span x-text="meta.type === 'AUDIT' ? 'Fix Findings' : 'Mark Resolved'"></span>
+                                </button>
+                                <!-- View Details Action -->
+                                <button x-show="!canResolve(ticket)" @click.stop="openResolveModal(ticket, true)" 
+                                        class="w-full sm:w-auto text-[9.5px] bg-white/80 dark:bg-white/10 text-slate-600 dark:text-slate-300 border border-white dark:border-white/20 px-4 py-2 rounded-full font-black uppercase tracking-widest shadow-sm hover:bg-white hover:text-brand dark:hover:bg-white/20 transition-all flex items-center justify-center gap-1.5 active:scale-95 backdrop-blur-md">
+                                    <i class="fa-solid fa-eye text-[9px] opacity-70"></i> View Details
+                                </button>
                             </div>
                         </div>
                     </div>
-                </template>
-            </div>
-            <div class="p-4 bg-slate-50 dark:bg-black/20 text-center border-t border-slate-100 dark:border-white/10"><button @click="scrollToLog(); showOpenTicketsModal = false" class="text-xs font-bold text-brand hover:text-brand_dark transition tracking-wide uppercase">Go to Full Log &rarr;</button></div>
+                </div>
+            </template>
         </div>
+        
+        <!-- 📍 FOOTER (Compact Neumorphic App-like Button) -->
+        <div class="px-5 sm:px-6 pb-4 pt-1 relative z-10 shrink-0">
+            <button @click="scrollToLog(); showOpenTicketsModal = false" class="w-full bg-white/50 dark:bg-black/30 p-3 rounded-xl border border-white/60 dark:border-white/5 shadow-[0_2px_8px_rgba(0,0,0,0.02),inset_0_1px_0_rgba(255,255,255,0.7)] dark:shadow-inner flex items-center justify-center gap-2 group hover:bg-white/80 dark:hover:bg-black/50 transition-all duration-300 active:scale-[0.98] backdrop-blur-xl">
+                <span class="text-[10px] sm:text-[11px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-widest group-hover:text-brand dark:group-hover:text-brand_glow transition-colors">Go to Full Ticket Log</span>
+                <i class="fa-solid fa-arrow-right-long text-slate-400 group-hover:text-brand dark:group-hover:text-brand_glow transition-all group-hover:translate-x-1.5"></i>
+            </button>
+        </div>
+
     </div>
+</div>
 	
-	<!-- MEGA CHANGELOG MODAL (RELEASE NOTES v2.3) -->
+	<!-- MEGA CHANGELOG MODAL (RELEASE NOTES v2.3.5) -->
     <div x-show="showChangelogModal" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/70 backdrop-blur-md p-4" x-transition.opacity @click.self="showChangelogModal = false">
         <div class="bg-white dark:bg-dark_surface w-full max-w-4xl rounded-[2rem] shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden flex flex-col max-h-[85vh] sm:max-h-[90vh] transform transition-all scale-100">
             
-            <!-- Hero Header (Blue/Indigo Theme for v2.3) -->
-            <div class="p-6 sm:p-8 border-b border-slate-100 dark:border-white/10 bg-gradient-to-br from-blue-600 to-indigo-800 text-white shrink-0 relative overflow-hidden">
-                <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+            <!-- Hero Header (Teal/Emerald Theme for v2.3.5) -->
+            <div class="p-6 sm:p-8 border-b border-slate-100 dark:border-white/10 bg-gradient-to-br from-teal-600 to-emerald-800 text-white shrink-0 relative overflow-hidden">
+                <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
                 <div class="relative z-10 flex justify-between items-start">
                     <div>
-                        <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest bg-white/20 border border-white/20 shadow-sm px-2.5 py-1 rounded-md mb-3 inline-block flex items-center gap-1.5 w-max"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Official Release Notes</span>
-                        <h3 class="text-2xl sm:text-3xl font-heading font-black leading-tight drop-shadow-md">What's New in v2.3 🚀</h3>
-                        <p class="text-xs font-medium opacity-80 mt-1.5 font-mono">Premium UI Overhaul & Micro-interactions • Aug 10, 2026</p>
+                        <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest bg-white/20 border border-white/20 shadow-sm px-2.5 py-1 rounded-md mb-3 inline-block flex items-center gap-1.5 w-max"><span class="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse"></span> Official Release Notes</span>
+                        <h3 class="text-2xl sm:text-3xl font-heading font-black leading-tight drop-shadow-md">What's New in v2.3.5 ✨</h3>
+                        <p class="text-[11px] font-medium opacity-80 mt-1.5 font-mono">Apple visionOS Glass UI & Layout Polish • Aug 25, 2026</p>
                     </div>
                     <button @click="showChangelogModal = false" class="w-8 h-8 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/40 text-white transition shadow-sm active:scale-95"><i class="fa-solid fa-xmark text-sm"></i></button>
                 </div>
             </div>
 
             <!-- Scrollable Content -->
-            <div class="p-5 sm:p-6 overflow-y-auto custom-scroll flex-1 bg-slate-50/50 dark:bg-transparent space-y-6">
+            <div class="p-5 sm:p-6 overflow-y-auto custom-scroll flex-1 bg-slate-50/50 dark:bg-transparent space-y-6 relative z-10">
 
-                <!-- === VERSION 2.3 (LATEST MAJOR UPDATE) === -->
+                <!-- === VERSION 2.3.5 (LATEST MINOR UPDATE) === -->
                 <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="px-2.5 py-0.5 rounded bg-teal-500 text-white font-black text-[10px] uppercase tracking-widest shadow-sm">v2.3.5</span>
+                        <h4 class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-widest">True Glassmorphism & Layout Engine</h4>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                        
+                        <!-- Block 1: Modals & Glass UI -->
+                        <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition md:col-span-2">
+                            <h4 class="text-[11px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-brands fa-apple"></i> visionOS Ecosystem</h4>
+                            <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium grid grid-cols-1 sm:grid-cols-2 gap-x-4">
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-teal-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Pure Frosted Modals:</strong> Completely rebuilt the 'IT Team' and 'Resolve Ticket' modals using heavy backdrop-blurs, nested floating cards, and pure white inner borders.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-teal-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Ambient Mesh Glow:</strong> Embedded vibrant, color-shifting mesh gradients (Orbs) behind modals that subtly refract through the glass UI based on ticket type.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-teal-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>macOS Segmented Controls:</strong> Replaced clunky analytics dropdowns with a sleek, inset floating pill track matching the main brand color.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-teal-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>High-Contrast Dropdowns:</strong> Upgraded the Gateways and Notifications popups with sharp borders and inset shadow styling for a layered 3D depth effect.</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Block 2: Layout & Alignment Fixes -->
+                        <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition md:col-span-2">
+                            <h4 class="text-[11px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-compress"></i> Compact Layout Engine</h4>
+                            <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium grid grid-cols-1 sm:grid-cols-2 gap-x-4">
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-indigo-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>No-Scroll Staff Roster:</strong> Merged 'Role' and 'Shift Timings' into a single sleek line to ensure all team members fit gracefully without requiring vertical scroll.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-indigo-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Smart Ticket Wrap:</strong> Removed harsh truncation (`...`) on descriptions and optimized modal paddings to comfortably fit multiple tickets side-by-side.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-indigo-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Inbox Zero Aesthetics:</strong> Added gorgeous, interactive "All Clear" states with floating coffee cups and badges for moments when no tickets are pending.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-indigo-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Pixel-Perfect Alignment:</strong> Re-aligned the IT Analytics filters to be flawlessly symmetrical with the Ticket History counter box.</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- === VERSION 2.3 (OLDER) === -->
+                <div class="pt-5 border-t border-slate-200 dark:border-white/10">
                     <div class="flex items-center gap-2 mb-4">
                         <span class="px-2 py-0.5 rounded bg-blue-500 text-white font-black text-[10px] uppercase tracking-widest shadow-sm">v2.3</span>
                         <h4 class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-widest">Enterprise UX & Smart Analytics</h4>
