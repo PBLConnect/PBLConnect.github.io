@@ -494,56 +494,116 @@
                             </div>
                         </div>
 
-                        <!-- TAB 2: APPROVALS (Ultra-Compact Redesign) -->
-                        <div x-show="activeTab === 'approvals' && isAdmin" class="space-y-2.5" x-transition.opacity x-cloak>
-                            <template x-for="req in pendingRequests" :key="req.id">
-                                <div class="relative bg-gradient-to-br from-white to-amber-50/40 dark:from-dark_surface dark:to-amber-900/10 p-3 rounded-[1.25rem] border border-amber-100 dark:border-amber-900/30 shadow-sm hover:shadow-md transition-all group overflow-hidden">
-                                    
-                                    <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-amber-400 dark:bg-amber-500 shadow-[0_0_10px_rgba(251,191,36,0.6)]"></div>
-                                    
-                                    <div class="flex justify-between items-start pl-2 gap-2">
-                                        <div class="flex items-center gap-2.5 min-w-0">
-                                            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-300 to-orange-400 text-white flex items-center justify-center font-black text-xs shrink-0 shadow-inner group-hover:scale-105 transition-transform duration-300 border border-amber-200 dark:border-amber-600">
-                                                <span x-text="req.empName.substring(0,2).toUpperCase()" class="drop-shadow-sm"></span>
+                        <!-- TAB 2: APPROVALS & HISTORY (Split View Redesign) -->
+                        <div x-show="activeTab === 'approvals' && isAdmin" class="space-y-5" x-transition.opacity x-cloak>
+                            
+                            <!-- 🚀 SECTION 1: PENDING ACTION -->
+                            <div>
+                                <h4 class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2.5 flex items-center gap-1.5"><i class="fa-solid fa-hourglass-half"></i> Pending Action</h4>
+                                
+                                <div class="space-y-2.5">
+                                    <template x-for="req in pendingRequests" :key="req.id">
+                                        <div class="relative bg-gradient-to-br from-white to-amber-50/40 dark:from-dark_surface dark:to-amber-900/10 p-3 rounded-[1.25rem] border border-amber-100 dark:border-amber-900/30 shadow-sm hover:shadow-md transition-all group overflow-hidden">
+                                            
+                                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-amber-400 dark:bg-amber-500 shadow-[0_0_10px_rgba(251,191,36,0.6)]"></div>
+                                            
+                                            <div class="flex justify-between items-start pl-2 gap-2">
+                                                <div class="flex items-center gap-2.5 min-w-0">
+                                                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-300 to-orange-400 text-white flex items-center justify-center font-black text-xs shrink-0 shadow-inner group-hover:scale-105 transition-transform duration-300 border border-amber-200 dark:border-amber-600">
+                                                        <span x-text="req.empName.substring(0,2).toUpperCase()" class="drop-shadow-sm"></span>
+                                                    </div>
+                                                    <div class="flex flex-col min-w-0">
+                                                        <h4 class="text-[13px] font-black text-slate-800 dark:text-white leading-none truncate group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors" x-text="req.empName"></h4>
+                                                        <div class="flex items-center gap-1.5 mt-1">
+                                                            <span class="px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border shadow-sm leading-none"
+                                                                  :class="req.leaveType === 'ML' ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/30' : (req.leaveType === 'PL' ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/30' : (req.leaveType === 'LWP' ? 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-white/10 dark:text-slate-300 dark:border-white/20' : 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30'))"
+                                                                  x-text="req.leaveType"></span>
+                                                            <span class="text-[9px] font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap" x-text="'• ' + req.calcDays + ' Day(s)'"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="flex flex-col items-end shrink-0">
+                                                    <span class="text-[8px] font-mono font-bold text-slate-500 dark:text-slate-400 bg-white dark:bg-black/30 border border-slate-200 dark:border-white/10 px-1.5 py-0.5 rounded shadow-sm flex items-center gap-1">
+                                                        <i class="fa-regular fa-calendar text-amber-500"></i>
+                                                        <span x-text="formatDateShort(req.startDate) + (req.startDate !== req.endDate ? ' - ' + formatDateShort(req.endDate) : '')"></span>
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <div class="flex flex-col min-w-0">
-                                                <h4 class="text-[13px] font-black text-slate-800 dark:text-white leading-none truncate group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors" x-text="req.empName"></h4>
-                                                <div class="flex items-center gap-1.5 mt-1">
-                                                    <span class="px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border shadow-sm leading-none"
-                                                          :class="req.leaveType === 'ML' ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/30' : (req.leaveType === 'PL' ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/30' : (req.leaveType === 'LWP' ? 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-white/10 dark:text-slate-300 dark:border-white/20' : 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30'))"
-                                                          x-text="req.leaveType"></span>
-                                                    <span class="text-[9px] font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap" x-text="'• ' + req.calcDays + ' Day(s)'"></span>
+                                            
+                                            <div class="ml-2 mt-2.5 bg-white/60 dark:bg-black/20 px-2.5 py-1.5 rounded-lg border border-slate-100 dark:border-white/5 flex gap-1.5 items-center shadow-inner">
+                                                <i class="fa-solid fa-quote-left text-amber-300 dark:text-amber-700 text-[9px] shrink-0"></i>
+                                                <p class="text-[10px] text-slate-600 dark:text-slate-300 font-medium leading-tight truncate" :title="req.reason" x-text="req.reason"></p>
+                                            </div>
+
+                                            <div class="ml-2 mt-2 flex gap-2 items-stretch">
+                                                <button @click="updateStatus(req.id, 'Approved')" class="flex-[3] bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest py-2 rounded-lg active:scale-95 transition-all shadow-sm hover:shadow-[0_4px_10px_-2px_rgba(16,185,129,0.5)] flex items-center justify-center gap-1.5">
+                                                    <i class="fa-solid fa-check-double"></i> Approve
+                                                </button>
+                                                <button @click="updateStatus(req.id, 'Rejected')" class="flex-[2] bg-white dark:bg-dark_surface text-rose-500 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/10 border border-slate-200 dark:border-white/10 hover:border-rose-200 dark:hover:border-rose-500/30 text-[10px] font-black uppercase tracking-widest py-2 rounded-lg active:scale-95 transition-all shadow-sm flex items-center justify-center gap-1.5">
+                                                    <i class="fa-solid fa-xmark"></i> Deny
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </template>
+                                    
+                                    <!-- Smaller Empty State for Queue to save space -->
+                                    <div x-show="pendingRequests.length === 0" class="text-center text-amber-500/60 py-6 bg-amber-50/50 dark:bg-amber-900/10 rounded-[1.25rem] border border-dashed border-amber-200 dark:border-amber-900/30">
+                                        <i class="fa-regular fa-face-smile-wink text-2xl mb-1.5 opacity-60"></i>
+                                        <p class="text-[10px] font-black uppercase tracking-widest">Queue is Clear!</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 🚀 SECTION 2: PROCESSED HISTORY -->
+                            <div>
+                                <h4 class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2.5 flex items-center gap-1.5"><i class="fa-solid fa-clock-rotate-left"></i> Approval History</h4>
+                                
+                                <div class="space-y-2">
+                                    <template x-for="req in allLeaves.filter(l => l.status !== 'Pending' && l.empName !== user.name)" :key="'hist-'+req.id">
+                                        
+                                        <!-- Sleek History Card (Clickable to open Details Modal) -->
+                                        <div @click="haptic('light'); selectedLeave = req; showLeaveDetailsModal = true" 
+                                             class="relative bg-slate-50 dark:bg-black/20 p-2.5 rounded-[1rem] border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition-all group overflow-hidden cursor-pointer hover:-translate-y-[1px]">
+                                            
+                                            <!-- Dynamic Left Border -->
+                                            <div class="absolute left-0 top-0 bottom-0 w-1 transition-colors duration-300" :class="req.status === 'Approved' ? 'bg-emerald-500' : 'bg-rose-500'"></div>
+                                            
+                                            <div class="flex justify-between items-center pl-1.5 gap-2">
+                                                <div class="flex items-center gap-2.5 min-w-0">
+                                                    <!-- Small Avatar -->
+                                                    <div class="w-7 h-7 rounded-full bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center font-black text-[9px] shrink-0 border border-slate-200 dark:border-slate-700 shadow-sm group-hover:scale-105 transition-transform">
+                                                        <span x-text="req.empName.substring(0,2).toUpperCase()"></span>
+                                                    </div>
+                                                    
+                                                    <div class="flex flex-col min-w-0">
+                                                        <h4 class="text-[11.5px] font-bold text-slate-800 dark:text-slate-200 leading-none truncate group-hover:text-brand transition-colors" x-text="req.empName"></h4>
+                                                        <div class="flex items-center gap-1.5 mt-1">
+                                                            <span class="text-[7.5px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 flex items-center gap-1"><i class="fa-regular fa-calendar opacity-70"></i> <span x-text="formatDateShort(req.startDate)"></span></span>
+                                                            <span class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
+                                                            <span class="text-[8px] font-bold text-slate-500 dark:text-slate-400" x-text="req.calcDays + ' Day(s)'"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="flex flex-col items-end shrink-0 gap-1">
+                                                    <!-- Status Badge -->
+                                                    <span class="px-2 py-0.5 rounded text-[7.5px] font-black uppercase tracking-widest border shadow-sm"
+                                                          :class="req.status === 'Approved' ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30' : 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/30'"
+                                                          x-text="req.status"></span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="flex flex-col items-end shrink-0">
-                                            <span class="text-[8px] font-mono font-bold text-slate-500 dark:text-slate-400 bg-white dark:bg-black/30 border border-slate-200 dark:border-white/10 px-1.5 py-0.5 rounded shadow-sm flex items-center gap-1">
-                                                <i class="fa-regular fa-calendar text-amber-500"></i>
-                                                <span x-text="formatDateShort(req.startDate) + (req.startDate !== req.endDate ? ' - ' + formatDateShort(req.endDate) : '')"></span>
-                                            </span>
-                                        </div>
-                                    </div>
+                                    </template>
                                     
-                                    <div class="ml-2 mt-2.5 bg-white/60 dark:bg-black/20 px-2.5 py-1.5 rounded-lg border border-slate-100 dark:border-white/5 flex gap-1.5 items-center shadow-inner">
-                                        <i class="fa-solid fa-quote-left text-amber-300 dark:text-amber-700 text-[9px] shrink-0"></i>
-                                        <p class="text-[10px] text-slate-600 dark:text-slate-300 font-medium leading-tight truncate" :title="req.reason" x-text="req.reason"></p>
-                                    </div>
-
-                                    <div class="ml-2 mt-2 flex gap-2 items-stretch">
-                                        <button @click="updateStatus(req.id, 'Approved')" class="flex-[3] bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest py-2 rounded-lg active:scale-95 transition-all shadow-sm hover:shadow-[0_4px_10px_-2px_rgba(16,185,129,0.5)] flex items-center justify-center gap-1.5">
-                                            <i class="fa-solid fa-check-double"></i> Approve
-                                        </button>
-                                        <button @click="updateStatus(req.id, 'Rejected')" class="flex-[2] bg-white dark:bg-dark_surface text-rose-500 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/10 border border-slate-200 dark:border-white/10 hover:border-rose-200 dark:hover:border-rose-500/30 text-[10px] font-black uppercase tracking-widest py-2 rounded-lg active:scale-95 transition-all shadow-sm flex items-center justify-center gap-1.5">
-                                            <i class="fa-solid fa-xmark"></i> Deny
-                                        </button>
+                                    <!-- History Empty State -->
+                                    <div x-show="allLeaves.filter(l => l.status !== 'Pending' && l.empName !== user.name).length === 0" 
+                                         class="text-center text-slate-400 py-6 bg-slate-50/50 dark:bg-black/10 rounded-2xl border border-dashed border-slate-200 dark:border-white/5">
+                                        <i class="fa-solid fa-clock-rotate-left text-xl mb-1.5 opacity-40"></i>
+                                        <p class="text-[9px] font-bold uppercase tracking-widest">No past approvals</p>
                                     </div>
                                 </div>
-                            </template>
-                            
-                            <div x-show="pendingRequests.length === 0" class="text-center text-amber-500/50 py-12 bg-white/50 dark:bg-black/20 rounded-3xl border border-dashed border-amber-200 dark:border-amber-900/30">
-                                <i class="fa-regular fa-face-smile-wink text-4xl mb-3 opacity-60"></i>
-                                <p class="text-[11px] font-black uppercase tracking-widest">Approval Queue is Clear!</p>
                             </div>
+
                         </div>
                     </div>
                 </div>
