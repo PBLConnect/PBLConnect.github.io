@@ -2300,6 +2300,10 @@
                                     <span class="text-indigo-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
                                     <span><strong>Live Inventory Export:</strong> Added a new "HW/SW Inventory" button in the IT Sec Audit modal to instantly download a multi-tab Excel snapshot. It hides smartly on submitted audits but remains permanently accessible to the Head of IT.</span>
                                 </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-indigo-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Dynamic Filter Counter:</strong> AssetDB now features a pulsating result counter pill that instantly displays the exact number of hardware/software records matching your active filters.</span>
+                                </li>
                             </ul>
                         </div>
 
@@ -2315,48 +2319,47 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
                         
-                        <!-- Block 1: UI & Aesthetics -->
-                        <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition md:col-span-2">
-                            <h4 class="text-[11px] font-black text-indigo-500 dark:text-indigo-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-wand-magic-sparkles"></i> Visual Aesthetics & Depth</h4>
-                            <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium grid grid-cols-1 sm:grid-cols-2 gap-x-4">
+                        <!-- Block 1: UI & Animations -->
+                        <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition">
+                            <h4 class="text-[11px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-brands fa-apple"></i> Interactive Ecosystem</h4>
+                            <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
                                 <li class="flex items-start gap-1.5">
-                                    <span class="text-brand shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
-                                    <span><strong>Premium Glass UI:</strong> Upgraded the main KPI cards with pure frosted glass, glowing background orbs, and clean inset borders for a modern, tactile feel.</span>
+                                    <span class="text-teal-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>visionOS Glassmorphism:</strong> Dropdowns, Modals, and Cards now feature true frosted glass (`backdrop-blur-3xl`), Neumorphic inset borders, and ambient colored glowing Orbs.</span>
                                 </li>
                                 <li class="flex items-start gap-1.5">
-                                    <span class="text-brand shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
-                                    <span><strong>Gradient Data Typography:</strong> Big KPI numbers now use a digital light text-gradient, ensuring critical data points seamlessly pop out from the background.</span>
-                                </li>
-                                <li class="flex items-start gap-1.5">
-                                    <span class="text-brand shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
-                                    <span><strong>Interactive 3D Chart:</strong> The Analytics Donut Chart now features subtle 3D drop-shadows. Hovering over slices dynamically reveals exact segment data in the center.</span>
-                                </li>
-                                <li class="flex items-start gap-1.5">
-                                    <span class="text-brand shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
-                                    <span><strong>Contextual Intelligence:</strong> Replaced static header text with time-aware greetings (e.g., Good Morning) and live weather information mapped to your location.</span>
+                                    <span class="text-teal-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Alive Animations:</strong> Added shimmering skeleton loaders, fluid text scaling via `clamp()`, and reactive Neon-Ripple bursts on every click.</span>
                                 </li>
                             </ul>
                         </div>
 
-                        <!-- Block 2: Data Architecture & Layouts -->
+                        <!-- Block 2: Navigation & Mobile -->
+                        <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition">
+                            <h4 class="text-[11px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-mobile-screen"></i> Mobile & Navigation</h4>
+                            <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-indigo-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Floating App Dock:</strong> The footer is now an ultra-slim iOS-style floating dock. Included a fully integrated <em>Network Popover</em> to check Ping, IP, and Internet Speed instantly.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-indigo-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Semantic Tickets:</strong> Ticket History is 100% visually semantic. RMA/Network issues natively force Purple/Sky colors across avatars, pills, and watermarks. Truncation (`...`) is eliminated.</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Block 3: Smart Tools & Data -->
                         <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition md:col-span-2">
-                            <h4 class="text-[11px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-layer-group"></i> Smart Data & UX Architecture</h4>
+                            <h4 class="text-[11px] font-black text-brand dark:text-blue-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-database"></i> Smart Data & Admin Tools</h4>
                             <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium grid grid-cols-1 sm:grid-cols-2 gap-x-4">
                                 <li class="flex items-start gap-1.5">
                                     <span class="text-brand shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
-                                    <span><strong>Live Leave Analytics:</strong> The Leave Hub KPI now auto-fetches and calculates your exact remaining CL, ML, and PL balances in real-time, eliminating dummy data.</span>
+                                    <span><strong>Live Inventory Export:</strong> Added a new "HW/SW Inventory" button in the IT Sec Audit modal to instantly download a multi-tab Excel snapshot. It hides smartly on submitted audits but remains permanently accessible to the Head of IT.</span>
                                 </li>
                                 <li class="flex items-start gap-1.5">
                                     <span class="text-brand shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
-                                    <span><strong>Role-Aware Badges:</strong> The Leave Hub intelligently detects roles, flashing an alert badge for the Head of IT on pending approvals, while staying minimal for regular staff.</span>
-                                </li>
-                                <li class="flex items-start gap-1.5">
-                                    <span class="text-brand shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
-                                    <span><strong>Flawless Mobile Grid:</strong> Re-engineered KPI cards with strict flex-wraps and `whitespace-nowrap` to completely prevent text truncation and badge overlapping on small screens.</span>
-                                </li>
-                                <li class="flex items-start gap-1.5">
-                                    <span class="text-brand shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
-                                    <span><strong>Sequential Pulsing:</strong> IT Staff active dots no longer blink uniformly. They now pulse sequentially in a wave pattern alongside an upgraded timezone footer.</span>
+                                    <span><strong>Dynamic Filter Counter:</strong> AssetDB now features a pulsating result counter pill that instantly displays the exact number of hardware/software records matching your active filters.</span>
                                 </li>
                             </ul>
                         </div>
