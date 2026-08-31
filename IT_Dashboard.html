@@ -3735,7 +3735,10 @@
                 },
                 get openTicketCount() { return this.notifications.length; },
                 get userInitials() { return this.currentUser.name ? this.currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase() : '??'; },
-                get onlineStaffCount() { return this.staffData.filter(s => this.isStaffOnline(s)).length; },
+                get onlineStaffCount() { 
+                    let tick = this.currentTime; // 🚀 FIX: Alpine reactivity trigger
+                    return this.staffData.filter(s => this.isStaffOnline(s)).length; 
+                },
 
                 formatTimeAMPM(timeStr) {
                     if (!timeStr) return '-';
@@ -3789,6 +3792,7 @@
                 },
 
                 isStaffOnline(staff) {
+                    let tick = this.currentTime; // 🚀 FIX: Alpine reactivity trigger
                     const now = new Date(); const currentMins = now.getHours() * 60 + now.getMinutes();
                     const [sH, sM] = staff.start.split(':').map(Number); const [eH, eM] = staff.end.split(':').map(Number);
                     return currentMins >= (sH * 60 + sM) && currentMins <= (eH * 60 + eM);
