@@ -1790,33 +1790,17 @@
                         <input type="password" x-model="auditSecret" placeholder="Admin Key" class="w-full pl-8 pr-3 py-2.5 sm:py-3 bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl text-xs font-mono font-bold outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition shadow-sm" :disabled="isAuditLocked">
                     </div>
                     
-                    <!-- 🚀 Fix: Added flex-wrap and adjusted gap for safe responsive flow -->
-                    <div class="flex flex-wrap items-center gap-2 w-full" :class="!viewAuditHistory ? 'justify-end sm:w-auto' : 'justify-start sm:w-full'">
+                    <div class="flex items-center gap-2.5 w-full" :class="!viewAuditHistory ? 'justify-end sm:w-auto' : 'justify-start sm:w-full'">
                         
                         <!-- 🚀 IT HEAD EXCLUSIVE BUTTON -->
                         <button x-show="(currentUser?.name || '').toLowerCase().includes('vikas')" @click="viewAuditHistory = !viewAuditHistory; haptic('light')" class="flex-1 sm:flex-none px-4 py-2.5 sm:py-3 rounded-xl text-xs font-bold transition shadow-sm border flex items-center justify-center gap-1.5 active:scale-95" :class="viewAuditHistory ? 'bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-500/20 dark:text-indigo-400 dark:border-indigo-500/40 mr-auto' : 'bg-slate-100 text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 border-slate-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-indigo-500/10 dark:hover:text-indigo-400 dark:border-white/10'">
                             <i class="fa-solid" :class="viewAuditHistory ? 'fa-arrow-left' : 'fa-clock-rotate-left'"></i> <span x-text="viewAuditHistory ? 'Back to Audit' : 'Audit History'"></span>
                         </button>
-                        
-                        <!-- 📥 EXPORT INVENTORY BUTTON (Clean Outline Design) -->
-                        <button x-show="!viewAuditHistory && (auditMeta.status !== 'Submitted' || (currentUser?.name || '').toLowerCase().includes('vikas'))" 
-                                @click="exportAuditInventory()" 
-                                class="flex-1 sm:flex-none px-3.5 py-2.5 sm:py-3 rounded-xl text-xs font-bold text-emerald-600 bg-white hover:bg-emerald-50 border border-emerald-200 transition shadow-sm dark:bg-transparent dark:text-emerald-400 dark:border-emerald-500/40 dark:hover:bg-emerald-500/10 flex items-center justify-center gap-1.5 active:scale-95" 
-                                :disabled="exportLoading">
-                            <span x-show="!exportLoading" class="flex items-center gap-1.5">
-                                <i class="fa-solid fa-file-excel opacity-80"></i> 
-                                <span class="hidden sm:inline">HW/SW Inventory</span>
-                                <span class="sm:hidden">Export HW/SW</span>
-                            </span>
-                            <span x-show="exportLoading" class="flex items-center gap-1.5 text-slate-500">
-                                <i class="fa-solid fa-circle-notch fa-spin"></i> <span class="hidden sm:inline">Fetching...</span>
-                            </span>
-                        </button>
 
-                        <button x-show="!viewAuditHistory" @click="submitAudit('Draft')" class="flex-1 sm:flex-none px-4 py-2.5 sm:py-3 rounded-xl text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition shadow-sm dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10" :disabled="auditLoading || isAuditLocked">
-                            <i class="fa-solid fa-save mr-1 opacity-70"></i> Draft
+                        <button x-show="!viewAuditHistory" @click="submitAudit('Draft')" class="flex-1 sm:flex-none px-5 py-2.5 sm:py-3 rounded-xl text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition shadow-sm dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10" :disabled="auditLoading || isAuditLocked">
+                            <i class="fa-solid fa-save mr-1 opacity-70"></i> Save Draft
                         </button>
-                        <button x-show="!viewAuditHistory" @click="submitAudit('Submitted')" class="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 sm:py-3 rounded-xl text-xs font-black uppercase tracking-wider shadow-[0_5px_15px_-3px_rgba(79,70,229,0.4)] transition active:scale-95 flex items-center justify-center gap-2" :disabled="auditLoading || isAuditLocked">
+                        <button x-show="!viewAuditHistory" @click="submitAudit('Submitted')" class="flex-1 sm:flex-none bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 sm:py-3 rounded-xl text-xs font-black uppercase tracking-wider shadow-[0_5px_15px_-3px_rgba(79,70,229,0.4)] transition active:scale-95 flex items-center justify-center gap-2" :disabled="auditLoading || isAuditLocked">
                             <span x-show="!auditLoading">Final Submit</span>
                             <span x-show="auditLoading"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
                         </button>
@@ -2240,18 +2224,18 @@
     </div>
 </div>
 	
-	<!-- MEGA CHANGELOG MODAL (RELEASE NOTES v2.3.5) -->
+	<!-- MEGA CHANGELOG MODAL (RELEASE NOTES v2.5) -->
     <div x-show="showChangelogModal" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/70 backdrop-blur-md p-4" x-transition.opacity @click.self="showChangelogModal = false">
         <div class="bg-white dark:bg-dark_surface w-full max-w-4xl rounded-[2rem] shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden flex flex-col max-h-[85vh] sm:max-h-[90vh] transform transition-all scale-100">
             
-            <!-- Hero Header (Teal/Emerald Theme for v2.3.5) -->
+            <!-- Hero Header (Teal/Emerald Theme for v2.5) -->
             <div class="p-6 sm:p-8 border-b border-slate-100 dark:border-white/10 bg-gradient-to-br from-teal-600 to-emerald-800 text-white shrink-0 relative overflow-hidden">
                 <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
                 <div class="relative z-10 flex justify-between items-start">
                     <div>
                         <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest bg-white/20 border border-white/20 shadow-sm px-2.5 py-1 rounded-md mb-3 inline-block flex items-center gap-1.5 w-max"><span class="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse"></span> Official Release Notes</span>
-                        <h3 class="text-2xl sm:text-3xl font-heading font-black leading-tight drop-shadow-md">What's New in v2.3.5 ✨</h3>
-                        <p class="text-[11px] font-medium opacity-80 mt-1.5 font-mono">Apple visionOS Glass UI & Layout Polish • Aug 25, 2026</p>
+                        <h3 class="text-2xl sm:text-3xl font-heading font-black leading-tight drop-shadow-md">What's New in v2.5 🚀</h3>
+                        <p class="text-[11px] font-medium opacity-80 mt-1.5 font-mono">Unified Master Exports & Streamlined Operations • Sep 01, 2026</p>
                     </div>
                     <button @click="showChangelogModal = false" class="w-8 h-8 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/40 text-white transition shadow-sm active:scale-95"><i class="fa-solid fa-xmark text-sm"></i></button>
                 </div>
@@ -2260,8 +2244,50 @@
             <!-- Scrollable Content -->
             <div class="p-5 sm:p-6 overflow-y-auto custom-scroll flex-1 bg-slate-50/50 dark:bg-transparent space-y-6 relative z-10">
 
-                <!-- === VERSION 2.3.5 (LATEST MINOR UPDATE) === -->
+                <!-- === VERSION 2.5 (LATEST MAJOR RELEASE) === -->
                 <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="px-2.5 py-0.5 rounded bg-emerald-500 text-white font-black text-[10px] uppercase tracking-widest shadow-sm">v2.5</span>
+                        <h4 class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-widest">Unified Master Exports & Ecosystem Polish</h4>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                        
+                        <!-- Block 1: Master Export Engine -->
+                        <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition">
+                            <h4 class="text-[11px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-file-export"></i> Master Export Suite</h4>
+                            <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Platform-Wide Unified Exports:</strong> Added high-fidelity XLSX & PDF exports across all modules—AssetDB (26-column), IP Manager (10-column allocation dump), Switch Map, WAN Logs, and RMA Tracker with dynamic branding.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Streamlined Audit Protocol:</strong> Removed the redundant inventory export button from the IT Sec Audit modal to maintain a clean, dedicated compliance workflow.</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Block 2: Real-time Sync & UI Refinements -->
+                        <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition">
+                            <h4 class="text-[11px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-bolt"></i> Real-time Sync & Mobile UX</h4>
+                            <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-indigo-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Live Roster Reactivity:</strong> Resolved state caching in Team Roster; online/offline status and shift active counts now recalculate dynamically every second without page refreshes.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-indigo-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>2-Row Mobile Toolbars:</strong> Re-engineered toolbars across both AssetDB and IP Manager into balanced 2-row mobile layouts with unified Export dropdowns and frosted visionOS popovers.</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- === VERSION 2.3.5 (OLDER) === -->
+                <div class="pt-5 border-t border-slate-200 dark:border-white/10">
                     <div class="flex items-center gap-2 mb-4">
                         <span class="px-2.5 py-0.5 rounded bg-teal-500 text-white font-black text-[10px] uppercase tracking-widest shadow-sm">v2.3.5</span>
                         <h4 class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-widest">Neo-SaaS Experience & Network Core</h4>
@@ -2961,77 +2987,6 @@
                         // Data refresh in UI
                         this.processAuditData(data);
                     } catch(e) { console.error(e); }
-                },
-
-                // 📥 EXPORT AUDIT INVENTORY LOGIC
-                async exportAuditInventory() {
-                    this.haptic('light');
-                    this.exportLoading = true;
-                    try {
-                        // 1. Fetch live data
-                        const res = await fetch(API_URL + '?action=getInventory&_t=' + new Date().getTime(), { cache: 'no-store' });
-                        const data = await res.json();
-                        
-                        if (data.status === 'success' && data.hardware && data.software) {
-                            
-                            // 🚀 FIX: Format ISO dates cleanly before throwing into Excel
-                            const formatExcelDate = (dStr) => {
-                                if (!dStr || dStr.toString().trim() === '') return '';
-                                const d = new Date(dStr);
-                                if (isNaN(d.getTime())) return dStr;
-                                return String(d.getDate()).padStart(2, '0') + '-' + 
-                                       String(d.getMonth() + 1).padStart(2, '0') + '-' + 
-                                       d.getFullYear();
-                            };
-
-                            const cleanHardware = data.hardware.map(h => {
-                                // 🚀 FIX: Convert Software IDs (SFT001) to Readable Names
-                                let readableSoftware = '';
-                                if (h.InstalledSoftware && String(h.InstalledSoftware).trim() !== '') {
-                                    const swIds = String(h.InstalledSoftware).split(',').map(id => id.trim());
-                                    const swNames = swIds.map(id => {
-                                        const foundSw = data.software.find(s => s.SoftwareID === id);
-                                        return foundSw ? foundSw.SoftwareName : id; // Agar naam na mile toh ID fallback
-                                    });
-                                    readableSoftware = swNames.join(', ');
-                                }
-
-                                return {
-                                    ...h,
-                                    PurchaseDate: formatExcelDate(h.PurchaseDate),
-                                    WarrantyEnd: formatExcelDate(h.WarrantyEnd),
-                                    InstalledSoftware: readableSoftware // Overwrite IDs with Names
-                                };
-                            });
-
-                            const cleanSoftware = data.software.map(s => ({
-                                ...s,
-                                ExpiryDate: formatExcelDate(s.ExpiryDate)
-                            }));
-
-                            // 2. Convert Cleaned JSON arrays to Worksheets
-                            const hwSheet = XLSX.utils.json_to_sheet(cleanHardware);
-                            const swSheet = XLSX.utils.json_to_sheet(cleanSoftware);
-                            
-                            // 3. Create Workbook & Append Sheets
-                            const wb = XLSX.utils.book_new();
-                            XLSX.utils.book_append_sheet(wb, hwSheet, "Hardware_Assets");
-                            XLSX.utils.book_append_sheet(wb, swSheet, "Software_Licenses");
-                            
-                            // 4. Generate Filename & Trigger Download
-                            const dateStr = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
-                            const fileName = `PBL_Audit_Inventory_${this.currentLocation}_${dateStr}.xlsx`;
-                            
-                            XLSX.writeFile(wb, fileName);
-                        } else {
-                            alert("⚠️ Failed to fetch complete inventory data.");
-                        }
-                    } catch(e) {
-                        console.error("Export Error:", e);
-                        alert("❌ Network error occurred while exporting inventory.");
-                    } finally {
-                        this.exportLoading = false;
-                    }
                 },
 
                 // 🔓 Open Modal Logic
