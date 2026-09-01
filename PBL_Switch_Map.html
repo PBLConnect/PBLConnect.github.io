@@ -25,6 +25,8 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <!-- 🚀 ADDED: SheetJS for Multi-Tab Excel Export -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <script>
         tailwind.config = {
@@ -494,13 +496,42 @@
                 </div>
 
                 <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl border border-slate-200 dark:border-dark_border rounded-2xl md:rounded-3xl shadow-sm flex flex-col h-[450px] md:h-[500px] shrink-0 relative z-10 overflow-hidden mb-6 lg:mb-0">
-                    <div class="px-3 py-2.5 sm:px-5 sm:py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-black/20 flex justify-between items-center shrink-0">
+                    <div class="px-3 py-2.5 sm:px-5 sm:py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-black/20 flex justify-between items-center shrink-0 overflow-visible">
                         <h3 class="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-widest">Active Connection Matrix</h3> 
-                        <div class="flex items-center gap-1.5 sm:gap-2"> 
-                            <button @click="refreshData(true)" class="flex items-center justify-center w-7 h-7 sm:w-auto sm:px-3 sm:py-1.5 bg-white dark:bg-white/5 text-slate-500 hover:text-brand rounded-md sm:rounded-lg text-[10px] sm:text-xs font-bold border border-slate-200 dark:border-white/10 shadow-sm transition active:scale-95"> <i class="fa-solid fa-rotate" :class="loading ? 'fa-spin' : ''"></i> <span class="hidden sm:inline ml-1.5">Sync</span> </button> 
-                            <button @click="haptic('light'); exportToPDF()" class="flex items-center justify-center w-7 h-7 sm:w-auto sm:px-3 sm:py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-500/10 dark:text-rose-400 dark:hover:bg-rose-500/20 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-black uppercase tracking-wider border border-rose-200 dark:border-rose-500/20 shadow-sm transition active:scale-95"> <i class="fa-solid fa-file-pdf"></i> <span class="hidden sm:inline ml-1.5">PDF</span> </button> 
+                        <div class="flex items-center gap-2"> 
+                            
+                            <!-- 🚀 SMART EXPORT DROPDOWN -->
+                            <div class="relative" x-data="{ showExport: false }" @click.away="showExport = false">
+                                <!-- 🚀 FIX: Removed uppercase, font-black, and tracking-wider to match the sleek Sync button -->
+                                <button @click="showExport = !showExport; haptic('light')" class="flex items-center justify-center h-8 px-2.5 sm:px-3 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:hover:bg-emerald-500/20 rounded-lg text-[10px] sm:text-xs font-bold border border-emerald-200 dark:border-emerald-500/30 shadow-sm transition active:scale-95 gap-1.5">
+                                    <i class="fa-solid fa-download text-[11px] sm:text-sm"></i> <span class="hidden sm:inline">Export</span> <i class="fa-solid fa-chevron-down text-[9px] opacity-70 transition-transform" :class="showExport ? 'rotate-180' : ''"></i>
+                                </button>
+                                
+                                <div x-show="showExport" x-transition.origin.top.right class="absolute right-0 top-full mt-2 w-48 bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-xl rounded-xl shadow-xl border border-slate-200 dark:border-white/10 z-[100] overflow-hidden p-1" style="display: none;" x-cloak>
+                                    <div class="px-3 py-1.5 text-[9px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 dark:border-white/5 mb-1">Current Switch</div>
+                                    <button @click="exportExcel('current'); showExport = false" class="w-full text-left px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-500/10 dark:hover:text-emerald-400 rounded-lg transition flex items-center gap-2">
+                                        <i class="fa-solid fa-file-excel opacity-70 text-emerald-500"></i> Excel (XLSX)
+                                    </button>
+                                    <button @click="exportPDF('current'); showExport = false" class="w-full text-left px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/10 dark:hover:text-rose-400 rounded-lg transition flex items-center gap-2">
+                                        <i class="fa-solid fa-file-pdf opacity-70 text-rose-500"></i> PDF Document
+                                    </button>
+                                    
+                                    <div class="px-3 py-1.5 text-[9px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 dark:border-white/5 mb-1 mt-1">All Switches (Branch)</div>
+                                    <button @click="exportExcel('all'); showExport = false" class="w-full text-left px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-500/10 dark:hover:text-emerald-400 rounded-lg transition flex items-center gap-2">
+                                        <i class="fa-solid fa-file-excel opacity-70 text-emerald-500"></i> Master Excel
+                                    </button>
+                                    <button @click="exportPDF('all'); showExport = false" class="w-full text-left px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/10 dark:hover:text-rose-400 rounded-lg transition flex items-center gap-2">
+                                        <i class="fa-solid fa-file-pdf opacity-70 text-rose-500"></i> Master PDF
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <button @click="refreshData(true)" class="flex items-center justify-center w-8 h-8 sm:w-auto sm:px-3 sm:h-8 bg-white dark:bg-white/5 text-slate-500 hover:text-brand rounded-lg text-xs font-bold border border-slate-200 dark:border-white/10 shadow-sm transition active:scale-95"> 
+                                <i class="fa-solid fa-rotate" :class="loading ? 'fa-spin' : ''"></i> 
+                                <span class="hidden sm:inline ml-1.5">Sync</span> 
+                            </button> 
                         </div> 
-                    </div> 
+                    </div>
                     
                     <div class="w-full flex-1 overflow-y-auto overflow-x-hidden custom-scroll relative bg-white/50 dark:bg-transparent"> 
                         <div x-show="loading" class="flex flex-col items-center justify-center h-64 mt-4" x-cloak>
@@ -982,18 +1013,119 @@
                         return 'status-empty';
                     },
 
-                    exportToPDF() {
-                        this.haptic('light'); const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4');
-                        doc.setFillColor(59, 130, 246); doc.rect(0, 0, 297, 20, 'F');
-                        doc.setTextColor(255, 255, 255); doc.setFontSize(14); doc.text("PBL Network Report", 14, 13);
-                        doc.setFontSize(10); doc.text("Generated: " + new Date().toLocaleString(), 280, 13, { align: 'right' });
-                        doc.setTextColor(40, 40, 40); doc.setFontSize(12); doc.text(`Switch: ${this.selectedSwitch.id}`, 14, 30);
-                        doc.setFontSize(10); doc.text(`Location: ${this.selectedSwitch.location}`, 14, 36); doc.text(`Model: ${this.selectedSwitch.model_name}`, 14, 42);
-                        const headers = [['Port', 'Status', 'Description', 'IP Address', 'Cable ID']];
-                        const activePorts = this.generatePortList().filter(p => p.status !== 'empty');
-                        const data = activePorts.map(p => [String(p.num).padStart(2, '0'), p.status.toUpperCase(), p.desc, p.vlan || '-', p.cable]);
-                        doc.autoTable({ startY: 50, head: headers, body: data, theme: 'grid', headStyles: { fillColor: [59, 130, 246] }, styles: { fontSize: 8 }, alternateRowStyles: { fillColor: [241, 245, 249] } });
-                        doc.save(`PBL_Switch_${this.selectedSwitch.id}.pdf`);
+                    // 🚀 EXCEL EXPORT LOGIC
+                    exportExcel(type) {
+                        this.haptic('light');
+                        const wb = XLSX.utils.book_new();
+                        
+                        const addSheet = (swId) => {
+                            const swMeta = this.switches.find(s => s.id === swId);
+                            const total = swMeta ? swMeta.ports : 52;
+                            const sData = this.realPortData[swId] || [];
+                            let printData = [];
+                            
+                            for(let i=1; i<=total; i++) {
+                                const p = sData.find(x => x.num === i);
+                                if(p && p.status !== 'empty') {
+                                    printData.push({
+                                        "Port": String(i).padStart(2, '0'),
+                                        "Status": String(p.status).toUpperCase(),
+                                        "Device / Description": p.desc || '-',
+                                        "Network IP": p.vlan || p.ip || '-',
+                                        "Cable ID": p.cable || '-'
+                                    });
+                                }
+                            }
+                            
+                            if(printData.length > 0) {
+                                const ws = XLSX.utils.json_to_sheet(printData);
+                                // Clean name for Excel Tab limit (max 31 chars)
+                                let sheetName = String(swId).replace('PBL-', '').substring(0, 31);
+                                XLSX.utils.book_append_sheet(wb, ws, sheetName);
+                            }
+                        };
+
+                        if (type === 'current' && this.selectedSwitch) {
+                            addSheet(this.selectedSwitch.id);
+                            XLSX.writeFile(wb, `PBL_Switch_${this.selectedSwitch.id}.xlsx`);
+                        } else {
+                            this.branchSwitches.forEach(sw => addSheet(sw.id));
+                            XLSX.writeFile(wb, `PBL_Network_Audit_${this.currentLocation}.xlsx`);
+                        }
+                        setTimeout(() => this.haptic('success'), 500);
+                    },
+
+                    // 🚀 PDF EXPORT LOGIC (MULTI-TABLE SUPPORT)
+                    exportPDF(type) {
+                        this.haptic('light'); 
+                        const { jsPDF } = window.jspdf; 
+                        const doc = new jsPDF('l', 'mm', 'a4');
+                        
+                        const generatedBy = this.currentUser?.name || 'IT Department';
+                        const loc = this.currentLocation;
+                        let startY = 30;
+
+                        const printHeader = () => {
+                            doc.setFillColor(20, 184, 166); // Brand Teal
+                            doc.rect(0, 0, 297, 20, 'F');
+                            doc.setTextColor(255, 255, 255); 
+                            doc.setFontSize(14); doc.setFont("helvetica", "bold");
+                            doc.text("PBL Network Infrastructure Report", 14, 13);
+                            doc.setFontSize(9); doc.setFont("helvetica", "normal");
+                            doc.text(`Generated: ${new Date().toLocaleString()} | By: ${generatedBy} | Branch: ${loc}`, 283, 13, { align: 'right' });
+                            doc.setTextColor(40, 40, 40);
+                            startY = 30;
+                        };
+
+                        const addTable = (swId) => {
+                            const swMeta = this.switches.find(s => s.id === swId);
+                            const total = swMeta ? swMeta.ports : 52;
+                            const sData = this.realPortData[swId] || [];
+                            let rows = [];
+                            
+                            for(let i=1; i<=total; i++) {
+                                const p = sData.find(x => x.num === i);
+                                if(p && p.status !== 'empty') {
+                                    rows.push([String(i).padStart(2, '0'), String(p.status).toUpperCase(), p.desc || '-', p.vlan || p.ip || '-', p.cable || '-']);
+                                }
+                            }
+                            
+                            if(rows.length > 0) {
+                                doc.setFontSize(12); doc.setFont("helvetica", "bold");
+                                doc.text(`Switch: ${swId}`, 14, startY);
+                                doc.setFontSize(9); doc.setFont("helvetica", "normal");
+                                doc.text(`Location: ${swMeta?.location || '-'}   |   Model: ${swMeta?.model_name || '-'}`, 14, startY + 5);
+                                
+                                doc.autoTable({ 
+                                    startY: startY + 8, 
+                                    head: [['Port', 'Status', 'Device / Description', 'Network IP', 'Cable ID']], 
+                                    body: rows, 
+                                    theme: 'grid', 
+                                    headStyles: { fillColor: [20, 184, 166] }, // Teal brand
+                                    styles: { fontSize: 8 }, 
+                                    alternateRowStyles: { fillColor: [248, 250, 252] },
+                                    margin: { bottom: 20 }
+                                });
+                                startY = doc.lastAutoTable.finalY + 15; // Space for next table
+                            }
+                        };
+
+                        if (type === 'current' && this.selectedSwitch) {
+                            printHeader();
+                            addTable(this.selectedSwitch.id);
+                            doc.save(`PBL_Switch_${this.selectedSwitch.id}.pdf`);
+                        } else {
+                            printHeader();
+                            this.branchSwitches.forEach((sw, index) => {
+                                // Add page break if running out of space
+                                if (startY > 150 && index > 0) {
+                                    doc.addPage();
+                                    printHeader();
+                                }
+                                addTable(sw.id);
+                            });
+                            doc.save(`PBL_Network_Audit_${loc}.pdf`);
+                        }
                         setTimeout(() => this.haptic('success'), 500);
                     }
                 };
