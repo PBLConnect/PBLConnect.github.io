@@ -57,12 +57,57 @@
         @media (hover: hover) { .port-box:hover { transform: scale(1.15); z-index: 50 !important; border-color: #3b82f6; box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3); cursor: pointer; } }
         .dark .port-box { background-color: #1e293b; border-color: #334155; }
 
-        .status-up { background: #f0fdf4 !important; border-color: #22c55e !important; color: #15803d !important; }
-        .dark .status-up { background: rgba(21, 128, 61, 0.2) !important; border-color: #15803d !important; color: #4ade80 !important; }
-        .status-empty { background: #f8fafc; border-color: #e2e8f0; color: #94a3b8; }
-        .dark .status-empty { background: #0f172a; border-color: #1e293b; color: #64748b; }
-        .status-uplink { background: #eff6ff !important; border-color: #3b82f6 !important; color: #1d4ed8 !important; }
-        .dark .status-uplink { background: rgba(59, 130, 246, 0.2) !important; border-color: #2563eb !important; color: #60a5fa !important; }
+        /* 🔌 ENTERPRISE SWITCH CHASSIS & RJ45 FACEPLATE */
+        .switch-chassis {
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.6), 0 10px 30px -5px rgba(0,0,0,0.3);
+            border: 2px solid #334155;
+        }
+        .dark .switch-chassis {
+            background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
+            border-color: #1e293b;
+        }
+        .port-jack {
+            position: relative;
+            background: #090d16;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.9), 0 1px 0 rgba(255,255,255,0.05);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .port-jack:hover, .port-jack.is-hovered {
+            transform: translateY(-2px) scale(1.15);
+            box-shadow: 0 0 18px rgba(45,212,191,0.7), inset 0 1px 1px rgba(255,255,255,0.3);
+            border-color: #2dd4bf !important;
+            z-index: 80 !important;
+        }
+        .port-led {
+            width: 3.5px; height: 3.5px; border-radius: 50%; display: block;
+        }
+        .led-active {
+            background-color: #10b981;
+            box-shadow: 0 0 6px #10b981, 0 0 10px rgba(16,185,129,0.9);
+            animation: led-flicker 2.5s infinite;
+        }
+        .led-uplink {
+            background-color: #3b82f6;
+            box-shadow: 0 0 6px #3b82f6, 0 0 10px rgba(59,130,246,0.9);
+            animation: led-flicker 1.8s infinite;
+        }
+        .led-empty { background-color: #334155; opacity: 0.3; }
+
+        @keyframes led-flicker {
+            0%, 100% { opacity: 1; }
+            45% { opacity: 0.85; }
+            48% { opacity: 0.2; }
+            52% { opacity: 1; }
+            80% { opacity: 0.9; }
+            83% { opacity: 0.4; }
+            86% { opacity: 1; }
+        }
+
+        .status-up { background: rgba(16,185,129,0.1) !important; border-color: rgba(16,185,129,0.4) !important; color: #34d399 !important; }
+        .status-empty { background: rgba(15,23,42,0.6); border-color: rgba(255,255,255,0.05); color: #64748b; }
+        .status-uplink { background: rgba(59,130,246,0.15) !important; border-color: rgba(59,130,246,0.5) !important; color: #60a5fa !important; }
 
         .spinnerContainer { display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .spinner { width: 50px; height: 50px; display: grid; border: 4px solid #0000; border-radius: 50%; border-right-color: #3b82f6; animation: tri-spinner 1s infinite linear; }
@@ -107,33 +152,60 @@
         </div>
     </div>
 
-    <!-- EDIT PORT MODAL -->
-    <div x-show="editModalOpen" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4" x-transition.opacity>
-        <div class="bg-white/95 dark:bg-dark_surface/95 backdrop-blur-xl w-full max-w-md rounded-3xl shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden transform transition-all scale-100" @click.away="editModalOpen = false; haptic('light')">
-            <div class="px-6 py-5 border-b border-slate-100 dark:border-white/5 flex justify-between items-center bg-slate-50/50 dark:bg-black/20">
-                <div>
-                    <h3 class="font-heading font-black text-lg text-slate-800 dark:text-white">Edit Port <span x-text="editForm.num" class="text-brand"></span></h3>
-                    <p class="text-[10px] text-slate-500 uppercase font-bold tracking-widest" x-text="selectedSwitch.id"></p>
+    <!-- 🎛️ EDIT PORT MODAL (Interactive RJ45 Patch Console) -->
+    <div x-show="editModalOpen" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4" x-transition.opacity>
+        <div class="bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-2xl w-full max-w-md rounded-[2rem] shadow-2xl border border-slate-200/90 dark:border-white/10 overflow-hidden transform transition-all scale-100" @click.away="editModalOpen = false; haptic('light')">
+            
+            <!-- Modern Header with Live Port LED -->
+            <div class="px-6 py-5 border-b border-slate-100 dark:border-white/5 flex justify-between items-center bg-slate-50/60 dark:bg-black/20">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-teal-500 to-teal-700 text-white flex items-center justify-center shadow-lg shadow-teal-500/30 text-lg font-black font-mono shrink-0">
+                        <span x-text="editForm.num"></span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="font-heading font-black text-lg text-slate-800 dark:text-white leading-tight">Port Configuration</h3>
+                            <span class="port-led led-active"></span>
+                        </div>
+                        <p class="text-[9.5px] text-teal-600 dark:text-teal-400 font-mono font-bold uppercase tracking-widest mt-0.5" x-text="selectedSwitch?.id"></p>
+                    </div>
                 </div>
-                <button @click="editModalOpen = false; haptic('light')" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/20 transition"><i class="fa-solid fa-xmark"></i></button>
+                <button @click="editModalOpen = false; haptic('light')" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/20 transition shadow-sm active:scale-95"><i class="fa-solid fa-xmark"></i></button>
             </div>
+            
             <div class="p-6 space-y-4">
+                
+                <!-- 🚀 Segmented 3-Way Status Slider -->
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Status</label>
-                    <select x-model="editForm.status" @change="assetSearchQuery = ''; editForm.desc = ''; editForm.vlan = ''; haptic('light')" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition cursor-pointer">
-                        <option value="empty">⚪ Empty (Available)</option>
-                        <option value="active">🟢 Active (Device)</option>
-                        <option value="uplink">🔵 Uplink (Backbone)</option>
-                    </select>
+                    <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 pl-1">Interface State</label>
+                    <div class="grid grid-cols-3 gap-1 bg-slate-100 dark:bg-black/40 p-1 rounded-xl border border-slate-200/80 dark:border-white/5 shadow-inner">
+                        <button type="button" @click="editForm.status = 'empty'; assetSearchQuery = ''; editForm.desc = ''; editForm.vlan = ''; haptic('light')"
+                                class="py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+                                :class="editForm.status === 'empty' ? 'bg-white dark:bg-dark_surface text-slate-800 dark:text-white shadow-sm border border-slate-200/80 dark:border-white/10 font-black' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'">
+                            <span class="w-2 h-2 rounded-full bg-slate-400"></span> Free
+                        </button>
+                        <button type="button" @click="editForm.status = 'active'; haptic('light')"
+                                class="py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+                                :class="editForm.status === 'active' ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/30 font-black' : 'text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400'">
+                            <span class="w-2 h-2 rounded-full bg-white shadow-[0_0_5px_#fff]"></span> Device
+                        </button>
+                        <button type="button" @click="editForm.status = 'uplink'; assetSearchQuery = ''; haptic('light')"
+                                class="py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+                                :class="editForm.status === 'uplink' ? 'bg-blue-500 text-white shadow-md shadow-blue-500/30 font-black' : 'text-slate-500 hover:text-blue-600 dark:hover:text-blue-400'">
+                            <span class="w-2 h-2 rounded-full bg-white shadow-[0_0_5px_#fff]"></span> Uplink
+                        </button>
+                    </div>
                 </div>
                 
+                <!-- Connected Asset Dropdown for Active Devices -->
                 <div x-show="editForm.status === 'active'" class="relative" @click.away="showAssetDropdown = false" x-cloak>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Connected Asset *</label>
-                    <input type="text" x-model="assetSearchQuery" @focus="showAssetDropdown = true" @input="showAssetDropdown = true" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition shadow-sm" placeholder="Search Hostname...">
+                    <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5 pl-1">Connected Asset *</label>
+                    <input type="text" x-model="assetSearchQuery" @focus="showAssetDropdown = true" @input="showAssetDropdown = true" 
+                           class="w-full bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-slate-700/60 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-bold outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition shadow-sm text-slate-800 dark:text-white" placeholder="Search Hostname...">
                     
-                    <div x-show="showAssetDropdown" x-transition class="absolute z-[100] top-[100%] left-0 w-full mt-1 bg-white dark:bg-dark_surface border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl max-h-48 overflow-y-auto custom-scroll">
+                    <div x-show="showAssetDropdown" x-transition class="absolute z-[100] top-[100%] left-0 w-full mt-1 bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-2xl border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl max-h-48 overflow-y-auto custom-scroll p-1">
                         <template x-for="asset in filteredAssets" :key="asset.AssetID">
-                            <div @click="selectAsset(asset)" class="px-4 py-2.5 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-brand hover:text-white cursor-pointer transition border-b border-slate-100 dark:border-white/5 last:border-0 flex justify-between items-center group">
+                            <div @click="selectAsset(asset)" class="px-3.5 py-2 rounded-lg text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-teal-50 hover:text-teal-600 dark:hover:bg-teal-500/10 dark:hover:text-teal-400 cursor-pointer transition flex justify-between items-center group">
                                 <span x-text="asset.Hostname"></span>
                                 <span class="text-[9px] font-mono opacity-50 group-hover:opacity-100" x-text="asset.Live_IP || 'No IP'"></span>
                             </div>
@@ -142,83 +214,124 @@
                     </div>
                 </div>
 
+                <!-- Route / Custom Description for Uplinks or Free -->
                 <div x-show="editForm.status === 'uplink' || editForm.status === 'empty'">
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Description / Route</label>
-                    <input type="text" x-model="editForm.desc" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition disabled:opacity-50" :disabled="editForm.status === 'empty'" placeholder="e.g. Core Switch To Floor 2">
+                    <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5 pl-1">Description / Backbone Route</label>
+                    <input type="text" x-model="editForm.desc" 
+                           class="w-full bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-slate-700/60 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-medium outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition disabled:opacity-40 text-slate-800 dark:text-white shadow-sm" :disabled="editForm.status === 'empty'" placeholder="e.g. Backbone01 To Floor 2">
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
+                <!-- Cybernetic IP & Cable ID Row -->
+                <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1 flex justify-between items-center">
-                            Network IP <span x-show="editForm.status === 'active'" class="text-[8px] bg-brand/10 text-brand px-1.5 py-0.5 rounded">Auto</span>
+                        <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5 pl-1 flex justify-between items-center">
+                            Network IP <span x-show="editForm.status === 'active'" class="text-[7.5px] font-mono bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-500/30 px-1.5 py-0.5 rounded leading-none">AUTO</span>
                         </label>
-                        <input type="text" x-model="editForm.vlan" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-mono outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition disabled:opacity-50" :readonly="editForm.status === 'active'" :disabled="editForm.status === 'empty'" :class="editForm.status === 'active' ? 'cursor-not-allowed opacity-70 border-transparent bg-slate-100 dark:bg-black/60 shadow-inner' : ''" placeholder="192.168...">
+                        <input type="text" x-model="editForm.vlan" 
+                               class="w-full bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-slate-700/60 rounded-xl px-3 py-2.5 text-xs font-mono font-bold outline-none transition disabled:opacity-40 shadow-sm" 
+                               :readonly="editForm.status === 'active'" :disabled="editForm.status === 'empty'" 
+                               :class="editForm.status === 'active' ? 'cursor-not-allowed bg-teal-50/40 text-teal-700 dark:bg-black/50 dark:text-teal-400 border-teal-200 dark:border-teal-500/20 shadow-inner' : 'text-slate-800 dark:text-white'" placeholder="192.168.0.X">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Cable Tag</label>
-                        <input type="text" x-model="editForm.cable" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm font-mono outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition disabled:opacity-50" :disabled="editForm.status === 'empty'" placeholder="e.g. A-01">
+                        <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5 pl-1">Cable Tag</label>
+                        <input type="text" x-model="editForm.cable" 
+                               class="w-full bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-slate-700/60 rounded-xl px-3 py-2.5 text-xs font-mono font-bold outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition disabled:opacity-40 text-slate-800 dark:text-white shadow-sm" :disabled="editForm.status === 'empty'" placeholder="e.g. A-01">
                     </div>
                 </div>
             </div>
-            <div class="bg-slate-50/50 dark:bg-black/20 px-6 py-4 flex justify-end gap-3 border-t border-slate-100 dark:border-white/5">
-                <button @click="editModalOpen = false; haptic('light')" class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 transition">Cancel</button>
-                <button @click="savePortChanges(); haptic('success')" class="px-6 py-2.5 rounded-xl text-sm font-black text-white bg-brand hover:bg-blue-600 shadow-[0_5px_15px_-3px_rgba(59,130,246,0.4)] transition active:scale-95">Save Port</button>
+            
+            <div class="bg-slate-50/60 dark:bg-black/20 px-6 py-4 flex justify-end gap-2.5 border-t border-slate-100 dark:border-white/5">
+                <button @click="editModalOpen = false; haptic('light')" class="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 transition">Cancel</button>
+                <button @click="savePortChanges(); haptic('success')" class="px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider text-white bg-teal-600 hover:bg-teal-700 shadow-md shadow-teal-500/30 transition active:scale-95 flex items-center gap-1.5">
+                    <i class="fa-solid fa-save opacity-80"></i> Save Port
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- KPI MODAL -->
-    <div x-show="kpiModalOpen" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4" x-transition.opacity @click.self="kpiModalOpen = false; haptic('light')">
-        <div class="bg-white dark:bg-dark_surface w-full max-w-lg rounded-[2rem] shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden flex flex-col max-h-[85vh]">
-            <div class="px-5 py-4 border-b border-slate-100 dark:border-white/10 flex justify-between items-center shrink-0 transition-colors duration-300"
-                 :class="kpiType === 'active' ? 'bg-emerald-50 dark:bg-emerald-900/10' : (kpiType === 'uplink' ? 'bg-blue-50 dark:bg-blue-900/10' : (kpiType === 'empty' ? 'bg-amber-50 dark:bg-amber-900/10' : 'bg-slate-50 dark:bg-black/20'))">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl text-white flex items-center justify-center shadow-lg text-xl shrink-0 transition-colors duration-300"
-                         :class="kpiType === 'active' ? 'bg-emerald-500 shadow-emerald-500/30' : (kpiType === 'uplink' ? 'bg-blue-500 shadow-blue-500/30' : (kpiType === 'empty' ? 'bg-amber-500 shadow-amber-500/30' : 'bg-brand shadow-brand/30'))">
-                        <i class="fa-solid" :class="kpiType === 'active' ? 'fa-network-wired' : (kpiType === 'uplink' ? 'fa-arrow-up-right-from-square' : (kpiType === 'empty' ? 'fa-plug' : 'fa-layer-group'))"></i>
+    <!-- 🪟 MODERN VISIONOS KPI DRILLDOWN MODAL -->
+    <div x-show="kpiModalOpen" x-cloak 
+         class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-3 sm:p-4" 
+         x-transition.opacity 
+         @click.self="kpiModalOpen = false; haptic('light')">
+        
+        <div class="bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-2xl w-full max-w-xl rounded-[2.2rem] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] border border-slate-200/90 dark:border-white/10 overflow-hidden flex flex-col max-h-[85vh] transform transition-all">
+            
+            <!-- Modern Header with Dynamic Aura Banner -->
+            <div class="p-5 border-b border-slate-100 dark:border-white/5 flex justify-between items-center shrink-0 relative overflow-hidden"
+                 :class="kpiType === 'active' ? 'bg-gradient-to-r from-emerald-500/10 via-emerald-500/5 to-transparent' : (kpiType === 'uplink' ? 'bg-gradient-to-r from-blue-500/10 via-blue-500/5 to-transparent' : 'bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent')">
+                
+                <div class="flex items-center gap-3.5 relative z-10">
+                    <div class="w-12 h-12 rounded-2xl text-white flex items-center justify-center shadow-lg text-xl shrink-0"
+                         :class="kpiType === 'active' ? 'bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-emerald-500/30' : (kpiType === 'uplink' ? 'bg-gradient-to-br from-blue-400 to-blue-600 shadow-blue-500/30' : 'bg-gradient-to-br from-amber-400 to-amber-600 shadow-amber-500/30')">
+                        <i class="fa-solid" :class="kpiType === 'active' ? 'fa-network-wired' : (kpiType === 'uplink' ? 'fa-arrow-up-right-from-square' : 'fa-plug')"></i>
                     </div>
                     <div>
-                        <h3 class="font-heading font-black text-xl text-slate-800 dark:text-white capitalize leading-tight" x-text="kpiType === 'all' ? 'All Ports' : kpiType + ' Ports'"></h3>
-                        <p class="text-[10px] uppercase font-bold tracking-widest mt-0.5"
-                           :class="kpiType === 'active' ? 'text-emerald-600 dark:text-emerald-400' : (kpiType === 'uplink' ? 'text-blue-600 dark:text-blue-400' : (kpiType === 'empty' ? 'text-amber-600 dark:text-amber-400' : 'text-brand dark:text-brand_glow'))"
-                           x-text="kpiList.length + ' Items found'"></p>
+                        <h3 class="font-heading font-black text-xl text-slate-800 dark:text-white capitalize leading-tight" x-text="kpiType === 'all' ? 'All Interfaces' : kpiType + ' Ports'"></h3>
+                        <p class="text-[10px] uppercase font-mono font-bold tracking-widest mt-0.5 flex items-center gap-1.5"
+                           :class="kpiType === 'active' ? 'text-emerald-600 dark:text-emerald-400' : (kpiType === 'uplink' ? 'text-blue-600 dark:text-blue-400' : 'text-amber-600 dark:text-amber-400')">
+                            <span class="w-1.5 h-1.5 rounded-full" :class="kpiType === 'active' ? 'bg-emerald-500 animate-pulse' : (kpiType === 'uplink' ? 'bg-blue-500 animate-pulse' : 'bg-amber-500')"></span>
+                            <span x-text="kpiList.length + ' Ports Mapped'"></span>
+                        </p>
                     </div>
                 </div>
-                <button @click="kpiModalOpen = false; haptic('light')" class="w-8 h-8 rounded-full bg-white dark:bg-white/10 flex items-center justify-center text-slate-400 hover:text-red-500 transition shadow-sm border border-slate-200 dark:border-transparent"><i class="fa-solid fa-xmark"></i></button>
+
+                <button @click="kpiModalOpen = false; haptic('light')" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-400 hover:text-red-500 transition shadow-sm active:scale-95 relative z-10"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
-            <div class="overflow-y-auto p-4 sm:p-5 custom-scroll bg-slate-50/30 dark:bg-transparent">
-                <div class="space-y-3">
-                    <template x-for="p in kpiList" :key="p.num">
-                        <div class="relative overflow-hidden flex items-center justify-between p-3 rounded-2xl border transition-all duration-300 group hover:shadow-md hover:-translate-y-0.5 cursor-pointer bg-white dark:bg-black/20"
-                             :class="p.status === 'uplink' ? 'border-blue-100 hover:border-blue-300 dark:border-blue-900/30 dark:hover:border-blue-500/50' : (p.status === 'active' ? 'border-emerald-100 hover:border-emerald-300 dark:border-emerald-900/30 dark:hover:border-emerald-500/50' : 'border-amber-100 hover:border-amber-300 dark:border-amber-900/30 dark:hover:border-amber-500/50')"
-                             @click="kpiModalOpen = false; openEditModal(p)">
-                            <div class="absolute left-0 top-0 bottom-0 w-1.5 transition-all group-hover:w-2" :class="p.status === 'uplink' ? 'bg-blue-500' : (p.status === 'active' ? 'bg-emerald-500' : 'bg-amber-500')"></div>
-                            <div class="flex items-center gap-3 pl-2 w-full pr-1">
-                                <div class="w-10 h-10 rounded-xl flex items-center justify-center font-mono font-black text-sm shadow-inner border transition-colors shrink-0"
-                                     :class="p.status === 'uplink' ? 'bg-blue-500/10 text-blue-600 border-blue-500/30 dark:text-blue-400' : (p.status === 'active' ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/30 dark:text-emerald-400' : 'bg-amber-500/10 text-amber-600 border-amber-500/30 dark:text-amber-400')"
-                                     x-text="p.num"></div>
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex items-center justify-between w-full mb-0.5">
-                                        <h4 class="text-sm font-bold text-slate-800 dark:text-white group-hover:text-brand transition-colors truncate pr-2" x-text="p.desc || 'Available Port'"></h4>
-                                        <span class="text-[8px] uppercase font-black px-1.5 py-0.5 rounded-md tracking-widest border shrink-0 shadow-sm"
-                                              :class="p.status === 'active' ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30' : (p.status === 'uplink' ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/30' : 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/30')"
-                                              x-text="p.status"></span>
-                                    </div>
-                                    <div class="flex items-center justify-between w-full mt-1">
-                                        <span class="text-[10px] font-mono font-bold truncate pr-2"
-                                              :class="p.status === 'empty' ? 'text-slate-400' : (p.status === 'uplink' ? 'text-blue-500 dark:text-blue-400' : 'text-emerald-500 dark:text-emerald-400')"
-                                              x-text="p.vlan || '-'"></span>
-                                        <span class="text-[9px] font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-white/5 px-1.5 py-0.5 rounded border border-slate-200 dark:border-white/10 shrink-0 shadow-sm">Cable: <span class="font-bold text-slate-700 dark:text-slate-300" x-text="p.cable || 'N/A'"></span></span>
-                                    </div>
+            <!-- Scrollable Hardware Interface List -->
+            <div class="overflow-y-auto p-4 sm:p-5 custom-scroll bg-slate-50/50 dark:bg-[#020617]/50 flex-1 space-y-2.5">
+                <template x-for="p in kpiList" :key="p.num">
+                    <div @click="kpiModalOpen = false; openEditModal(p)"
+                         class="group relative bg-white dark:bg-[#090d16] p-3.5 rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-pointer flex items-center justify-between gap-3 overflow-hidden active:scale-[0.99]"
+                         :class="p.status === 'active' ? 'border-emerald-200/70 dark:border-emerald-500/20 hover:border-emerald-400' : (p.status === 'uplink' ? 'border-blue-200/70 dark:border-blue-500/20 hover:border-blue-400' : 'border-slate-200/80 dark:border-white/5 hover:border-amber-400/50')">
+                        
+                        <div class="flex items-center gap-3.5 min-w-0 flex-1">
+                            
+                            <!-- 🔌 Light & Crisp Frosted Port Badge with Live Status LED -->
+                            <div class="w-11 h-11 rounded-xl border flex flex-col justify-between items-center py-1 font-mono shrink-0 shadow-sm transition-all duration-200"
+                                 :class="p.status === 'active' ? 'bg-emerald-50 text-emerald-700 border-emerald-200/90 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30' : (p.status === 'uplink' ? 'bg-blue-50 text-blue-700 border-blue-200/90 dark:bg-blue-500/15 dark:text-blue-300 dark:border-blue-500/30' : 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-white/5 dark:text-slate-400 dark:border-white/10')">
+                                <span class="port-led" :class="p.status === 'active' ? 'led-active' : (p.status === 'uplink' ? 'led-uplink' : 'led-empty')"></span>
+                                <span class="text-xs font-black" x-text="String(p.num).padStart(2, '0')"></span>
+                            </div>
+
+                            <!-- Device Details & Semantic Icon -->
+                            <div class="flex flex-col min-w-0 flex-1 justify-center">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="text-xs shrink-0" :class="getDeviceTypeIcon(p.desc).color.split(' ')[0]">
+                                        <i class="fa-solid" :class="getDeviceTypeIcon(p.desc).icon"></i>
+                                    </span>
+                                    <h4 class="text-[13.5px] font-bold text-slate-800 dark:text-white truncate leading-tight group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors" x-text="p.desc || 'Available Interface'"></h4>
+                                </div>
+
+                                <!-- Terminal IP Badge & Yellow Patch Tag -->
+                                <div class="flex items-center flex-wrap gap-2 mt-0.5">
+                                    <!-- Monospace IP Terminal -->
+                                    <span class="font-mono text-[10px] font-bold px-2 py-0.5 rounded shadow-inner"
+                                          :class="p.status === 'active' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20' : (p.status === 'uplink' ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20' : 'bg-slate-100 dark:bg-white/5 text-slate-400')">
+                                        <i class="fa-solid fa-network-wired text-[8px] mr-1 opacity-70"></i>
+                                        <span x-text="p.vlan || 'No IP Mapped'"></span>
+                                    </span>
+
+                                    <!-- Patch Cord Tag -->
+                                    <span class="font-mono text-[9.5px] font-bold bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-200/80 dark:border-amber-500/20 px-2 py-0.5 rounded shadow-sm">
+                                        <i class="fa-solid fa-tag text-[8px] mr-1 opacity-70"></i>
+                                        <span x-text="p.cable || 'N/A'"></span>
+                                    </span>
                                 </div>
                             </div>
-                            <div class="absolute right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0 hidden sm:block">
-                                <i class="fa-solid fa-chevron-right text-slate-300 dark:text-slate-600"></i>
-                            </div>
                         </div>
-                    </template>
-                </div>
+
+                        <!-- Right Status Action Badge -->
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span class="px-2.5 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest border shadow-sm"
+                                  :class="p.status === 'active' ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30' : (p.status === 'uplink' ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/30' : 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-white/5 dark:text-slate-400 dark:border-white/10')"
+                                  x-text="p.status"></span>
+                            <i class="fa-solid fa-chevron-right text-[10px] text-slate-300 dark:text-slate-600 group-hover:text-teal-500 group-hover:translate-x-0.5 transition-all"></i>
+                        </div>
+
+                    </div>
+                </template>
             </div>
         </div>
     </div>
@@ -390,23 +503,37 @@
             <div class="hidden lg:block text-[10px] font-black text-slate-400 uppercase tracking-widest px-2">Inventory Roster</div>
             
             <div class="flex lg:flex-col gap-2.5 sm:gap-3 overflow-x-auto lg:overflow-y-auto hide-scroll px-1 lg:px-1 pb-2 lg:pb-0">
-                <!-- 📍 DYNAMIC SWITCH LIST BASED ON BRANCH -->
+                
+				<!-- 📍 DYNAMIC SWITCH LIST (35% Slimmer & Compact View) -->
                 <template x-for="sw in branchSwitches" :key="sw.id">
                     <button @click="haptic('light'); switchSwitch(sw)" 
-                         class="cursor-pointer shrink-0 min-w-[200px] lg:min-w-0 px-4 py-3 sm:py-3.5 rounded-2xl border transition-all duration-300 flex items-center justify-between relative overflow-hidden group shadow-sm hover:shadow-md whitespace-nowrap lg:whitespace-normal text-left"
-                         :class="selectedSwitch?.id === sw.id ? 'bg-brand text-white border-brand shadow-[0_8px_20px_-6px_rgba(59,130,246,0.5)] dark:bg-brand/20 dark:border-brand/50' : 'bg-white border-slate-200/80 hover:border-slate-300 text-slate-700 dark:bg-dark_surface dark:border-white/10 dark:hover:bg-white/5 dark:text-slate-300'">
-                        <div class="flex flex-col gap-1 z-10 w-full pr-2">
-                            <div class="font-heading font-black text-[13px] sm:text-[15px] tracking-tight" :class="sw.type === 'backup' ? 'line-through opacity-70' : ''" x-text="sw.id"></div>
-                            <div class="text-[9px] sm:text-[10px] font-bold flex items-center gap-1.5" :class="selectedSwitch?.id === sw.id ? 'text-white/90' : 'text-slate-500'">
-                                <i class="fa-solid fa-server opacity-80 text-[10px]"></i> <span x-text="sw.location"></span>
+                         class="cursor-pointer shrink-0 min-w-[200px] lg:min-w-0 p-2.5 sm:px-3 sm:py-2.5 rounded-xl sm:rounded-2xl border transition-all duration-200 flex flex-col justify-between relative overflow-hidden group shadow-sm hover:shadow-md text-left active:scale-[0.98]"
+                         :class="selectedSwitch?.id === sw.id ? 'bg-gradient-to-r from-teal-600 to-teal-700 text-white border-teal-500 shadow-[0_6px_18px_-4px_rgba(20,184,166,0.4)]' : 'bg-white border-slate-200/80 hover:border-teal-300 text-slate-700 dark:bg-dark_surface dark:border-white/10 dark:hover:bg-white/5 dark:text-slate-300'">
+                        
+                        <!-- Top Row: Switch ID + Location Pill -->
+                        <div class="flex items-center justify-between w-full z-10 mb-1.5">
+                            <div class="font-heading font-black text-[12px] sm:text-[13px] tracking-tight truncate pr-1" :class="sw.type === 'backup' ? 'line-through opacity-70' : ''" x-text="sw.id"></div>
+                            <span class="text-[8px] font-mono font-bold px-1.5 py-0.5 rounded leading-none shrink-0" 
+                                  :class="selectedSwitch?.id === sw.id ? 'bg-white/20 text-white border border-white/30' : 'bg-slate-100 dark:bg-black/40 text-slate-500 dark:text-slate-400 border border-slate-200/60 dark:border-white/5'"
+                                  x-text="getSwitchLoad(sw.id).used + '/' + sw.ports"></span>
+                        </div>
+
+                        <!-- Sub-row: Location -->
+                        <div class="text-[9px] font-bold flex items-center gap-1.5 z-10 mb-2 truncate" :class="selectedSwitch?.id === sw.id ? 'text-teal-100' : 'text-slate-400'">
+                            <i class="fa-solid fa-server text-[8px] opacity-70 shrink-0"></i> <span class="truncate" x-text="sw.location"></span>
+                        </div>
+
+                        <!-- 🚀 Ultra-Slim Glow Load Bar -->
+                        <div class="w-full z-10 mt-auto">
+                            <div class="w-full h-1 rounded-full overflow-hidden" :class="selectedSwitch?.id === sw.id ? 'bg-black/30' : 'bg-slate-100 dark:bg-black/40'">
+                                <div class="h-full rounded-full transition-all duration-500" 
+                                     :class="selectedSwitch?.id === sw.id ? 'bg-white shadow-[0_0_6px_#fff]' : (getSwitchLoad(sw.id).percent > 80 ? 'bg-rose-500' : 'bg-teal-500')"
+                                     :style="'width: ' + getSwitchLoad(sw.id).percent + '%'"></div>
                             </div>
                         </div>
-                        <div x-show="selectedSwitch?.id === sw.id" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white flex items-center justify-center shadow-sm z-10 shrink-0 ml-1" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-50" x-transition:enter-end="opacity-100 scale-100">
-                            <i class="fa-solid fa-check text-brand text-[10px] sm:text-xs"></i>
-                        </div>
-                        <div x-show="selectedSwitch?.id === sw.id" class="absolute inset-0 bg-gradient-to-r from-transparent to-white/10 pointer-events-none"></div>
                     </button>
                 </template>
+				
                 <div x-show="branchSwitches.length === 0" class="text-[10px] font-bold text-slate-400 p-4 text-center border border-dashed border-slate-300 dark:border-slate-700 rounded-2xl">
                     No switches configured for this location.
                 </div>
@@ -415,78 +542,143 @@
 
         <div class="flex-1 flex flex-col gap-4 sm:gap-6 min-w-0 h-full overflow-y-auto custom-scroll relative z-30 pr-1 pb-4">
             
-            <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl rounded-2xl md:rounded-3xl border border-slate-200 dark:border-dark_border shadow-sm p-4 sm:p-5 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 sm:gap-6 transition-all relative z-10 shrink-0" x-show="selectedSwitch">
-                <div class="w-full xl:w-auto shrink-0 flex flex-col justify-center">
+            <!-- 🪟 CLEAN VISIONOS GLASS SWITCH HEADER & GAUGES (LIGHT & CRISP) -->
+            <div class="relative bg-white/90 dark:bg-dark_surface/90 backdrop-blur-2xl rounded-2xl md:rounded-[2rem] border border-slate-200/90 dark:border-dark_border shadow-[0_8px_25px_rgba(0,0,0,0.03)] p-4 sm:p-6 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-5 sm:gap-6 transition-all z-10 shrink-0 overflow-hidden" x-show="selectedSwitch">
+                
+                <!-- Soft Ambient Luminescence -->
+                <div class="absolute -right-20 -top-20 w-72 h-72 bg-teal-400/10 dark:bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -left-20 -bottom-20 w-72 h-72 bg-indigo-400/10 dark:bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="w-full xl:w-auto shrink-0 flex flex-col justify-center relative z-10">
                     <div class="flex items-center gap-2 mb-2">
-                        <span class="text-[9px] sm:text-[10px] font-mono font-bold text-brand bg-blue-50 dark:bg-brand/10 px-2.5 py-1 rounded-md border border-blue-200 dark:border-brand/20 shadow-sm leading-none" x-text="(selectedSwitch?.ports || 0) + ' PORTS CAPACITY'"></span>
+                        <span class="px-3 py-1 rounded-full text-[9px] sm:text-[9.5px] font-mono font-black tracking-widest bg-teal-50 text-teal-700 border border-teal-200/90 dark:bg-teal-500/15 dark:text-teal-300 dark:border-teal-500/30 shadow-sm flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-teal-500 animate-ping"></span>
+                            <span x-text="(selectedSwitch?.ports || 0) + ' PORTS CAPACITY'"></span>
+                        </span>
+                        <span class="text-[9px] font-mono font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-white/5 px-2.5 py-1 rounded-full border border-slate-200/80 dark:border-white/10 uppercase tracking-widest" x-text="selectedSwitch?.branch"></span>
                     </div>
-                    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-heading font-black tracking-tight text-slate-800 dark:text-white leading-none mb-3" :class="selectedSwitch?.type === 'backup' ? 'text-slate-400 line-through decoration-slate-300' : ''" x-text="selectedSwitch?.id || 'No Switch Selected'"></h2>
-                    <div class="grid grid-cols-2 sm:flex sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
-                        <div class="flex items-center gap-1.5 sm:gap-2 text-[9px] sm:text-[11px] font-bold text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 px-2 sm:px-2.5 py-1.5 rounded-lg border border-rose-100 dark:border-rose-500/20 shadow-sm w-full sm:w-auto overflow-hidden">
-                            <i class="fa-solid fa-map-pin text-rose-500 shrink-0"></i> <span class="truncate sm:break-words leading-tight" x-text="selectedSwitch?.location || '-'"></span>
+
+                    <!-- Clean High-Contrast Switch Title -->
+                    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-heading font-black tracking-tight text-slate-800 dark:text-white leading-none mb-3 drop-shadow-sm" 
+                        :class="selectedSwitch?.type === 'backup' ? 'text-slate-400 line-through decoration-slate-300' : ''" 
+                        x-text="selectedSwitch?.id || 'No Switch Selected'"></h2>
+                    
+                    <!-- Tactile White Nameplate Pills -->
+                    <div class="grid grid-cols-2 sm:flex sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2.5 w-full sm:w-auto">
+                        <div class="flex items-center gap-2 text-[10px] sm:text-[11px] font-bold text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-black/30 px-3.5 py-1.5 rounded-xl border border-slate-200/80 dark:border-white/10 shadow-sm">
+                            <i class="fa-solid fa-map-pin text-rose-500 text-xs shrink-0"></i> <span class="truncate" x-text="selectedSwitch?.location || '-'"></span>
                         </div>
-                        <div class="flex items-center gap-1.5 sm:gap-2 text-[9px] sm:text-[11px] font-bold text-indigo-700 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-2 sm:px-2.5 py-1.5 rounded-lg border border-indigo-100 dark:border-indigo-500/20 shadow-sm w-full sm:w-auto overflow-hidden">
-                            <i class="fa-solid fa-microchip text-indigo-500 shrink-0"></i> <span class="truncate sm:break-words leading-tight" x-text="selectedSwitch?.model_name || '-'"></span>
+                        <div class="flex items-center gap-2 text-[10px] sm:text-[11px] font-bold text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-black/30 px-3.5 py-1.5 rounded-xl border border-slate-200/80 dark:border-white/10 shadow-sm">
+                            <i class="fa-solid fa-microchip text-indigo-500 text-xs shrink-0"></i> <span class="truncate" x-text="selectedSwitch?.model_name || '-'"></span>
                         </div>
                     </div>
                 </div>
                 
-                <div class="w-full xl:w-auto grid grid-cols-3 gap-2 sm:gap-4 shrink-0">
-                    <div @click="haptic('light'); openKpiModal('active')" class="relative p-2.5 sm:p-3.5 rounded-[1.25rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between bg-emerald-50/80 border border-emerald-200/70 shadow-sm hover:shadow-md hover:border-emerald-300 dark:bg-emerald-900/10 dark:border-emerald-800/50 dark:hover:border-emerald-700/50 w-full xl:w-[150px]">
-                        <i class="fa-solid fa-network-wired absolute -bottom-3 -right-2 text-5xl sm:text-6xl text-emerald-500 opacity-20 dark:opacity-10 group-hover:scale-110 transition-transform duration-500"></i>
-                        <div class="flex items-center gap-1.5 sm:gap-2 relative z-10 mb-1 sm:mb-2">
-                            <div class="w-6 h-6 sm:w-6 sm:h-6 rounded-full bg-white dark:bg-dark_surface shadow-sm flex items-center justify-center text-emerald-500 text-[12px] sm:text-[15px] shrink-0"><i class="fa-solid fa-network-wired"></i></div>
-                            <span class="text-[10px] sm:text-[15px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest leading-none truncate">Active</span>
+                <!-- 🚀 Tactile Frosted Glass KPI Meters -->
+                <div class="w-full xl:w-auto grid grid-cols-3 gap-2.5 sm:gap-3.5 shrink-0 relative z-10">
+                    
+                    <!-- 1. Active Gauge (Emerald) -->
+                    <div @click="haptic('light'); openKpiModal('active')" 
+                         class="relative p-3.5 sm:p-4 rounded-[1.35rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between bg-gradient-to-br from-emerald-50/90 to-white dark:from-emerald-950/20 dark:to-dark_surface border border-emerald-200/80 dark:border-emerald-800/40 shadow-sm hover:shadow-md hover:border-emerald-400 w-full xl:w-[145px] active:scale-[0.98]">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <div class="w-7 h-7 rounded-xl bg-white dark:bg-black/30 shadow-sm flex items-center justify-center text-emerald-500 text-xs border border-emerald-100 dark:border-emerald-500/20"><i class="fa-solid fa-network-wired"></i></div>
+                            <span class="text-[9.5px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Active</span>
                         </div>
-                        <h3 class="text-3xl sm:text-5xl font-black font-heading tracking-tight text-emerald-600 dark:text-emerald-400 relative z-10 leading-none mt-0.5" x-text="getStats().active">0</h3>
-                        <p class="text-[10px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 mt-1 sm:mt-1.5 relative z-10 truncate">Devices 🟢</p>
-                    </div>
-                    <div @click="haptic('light'); openKpiModal('uplink')" class="relative p-2.5 sm:p-3.5 rounded-[1.25rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between bg-blue-50/80 border border-blue-200/70 shadow-sm hover:shadow-md hover:border-blue-300 dark:bg-blue-900/10 dark:border-blue-800/50 dark:hover:border-blue-700/50 w-full xl:w-[150px]">
-                        <i class="fa-solid fa-arrow-up-right-from-square absolute -bottom-3 -right-2 text-5xl sm:text-6xl text-brand opacity-20 dark:opacity-10 group-hover:scale-110 transition-transform duration-500"></i>
-                        <div class="flex items-center gap-1.5 sm:gap-2 relative z-10 mb-1 sm:mb-2">
-                            <div class="w-6 h-6 sm:w-6 sm:h-6 rounded-full bg-white dark:bg-dark_surface shadow-sm flex items-center justify-center text-brand text-[12px] sm:text-[15px] shrink-0"><i class="fa-solid fa-arrow-up-right-from-square"></i></div>
-                            <span class="text-[10px] sm:text-[15px] font-black text-brand dark:text-blue-400 uppercase tracking-widest leading-none truncate">Uplinks</span>
+                        <div class="flex items-baseline gap-1 my-1">
+                            <h3 class="text-3xl sm:text-4xl font-black font-heading text-emerald-600 dark:text-emerald-400 tracking-tight leading-none" x-text="getStats().active">0</h3>
+                            <span class="text-[10px] font-mono font-bold text-slate-400" x-text="'/' + (selectedSwitch?.ports || 0)"></span>
                         </div>
-                        <h3 class="text-3xl sm:text-5xl font-black font-heading tracking-tight text-blue-600 dark:text-blue-400 relative z-10 leading-none mt-0.5" x-text="getStats().uplink">0</h3>
-                        <p class="text-[10px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 mt-1 sm:mt-1.5 relative z-10 truncate">Backbone 🔵</p>
-                    </div>
-                    <div @click="haptic('light'); openKpiModal('empty')" class="relative p-2.5 sm:p-3.5 rounded-[1.25rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between bg-amber-50/80 border border-amber-200/70 shadow-sm hover:shadow-md hover:border-amber-300 dark:bg-amber-900/10 dark:border-amber-800/50 dark:hover:border-amber-700/50 w-full xl:w-[150px]">
-                        <i class="fa-solid fa-plug absolute -bottom-3 -right-2 text-5xl sm:text-6xl text-amber-500 opacity-20 dark:opacity-10 group-hover:scale-110 transition-transform duration-500"></i>
-                        <div class="flex items-center gap-1.5 sm:gap-2 relative z-10 mb-1 sm:mb-2">
-                            <div class="w-6 h-6 sm:w-6 sm:h-6 rounded-full bg-white dark:bg-dark_surface shadow-sm flex items-center justify-center text-amber-500 text-[12px] sm:text-[15px] shrink-0"><i class="fa-solid fa-plug"></i></div>
-                            <span class="text-[10px] sm:text-[15px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest leading-none truncate">Free</span>
+                        <!-- Mini Progress Line -->
+                        <div class="w-full h-1.5 bg-emerald-100/70 dark:bg-black/40 rounded-full overflow-hidden mt-1">
+                            <div class="h-full bg-emerald-500 rounded-full shadow-[0_0_6px_rgba(16,185,129,0.5)] transition-all duration-500" :style="'width: ' + ((getStats().active / (selectedSwitch?.ports || 1)) * 100) + '%'"></div>
                         </div>
-                        <h3 class="text-3xl sm:text-5xl font-black font-heading tracking-tight text-amber-600 dark:text-amber-400 relative z-10 leading-none mt-0.5" x-text="getStats().empty">0</h3>
-                        <p class="text-[10px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 mt-1 sm:mt-1.5 relative z-10 truncate">Available 🟡</p>
                     </div>
+
+                    <!-- 2. Uplink Gauge (Blue) -->
+                    <div @click="haptic('light'); openKpiModal('uplink')" 
+                         class="relative p-3.5 sm:p-4 rounded-[1.35rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between bg-gradient-to-br from-blue-50/90 to-white dark:from-blue-950/20 dark:to-dark_surface border border-blue-200/80 dark:border-blue-800/40 shadow-sm hover:shadow-md hover:border-blue-400 w-full xl:w-[145px] active:scale-[0.98]">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <div class="w-7 h-7 rounded-xl bg-white dark:bg-black/30 shadow-sm flex items-center justify-center text-blue-500 text-xs border border-blue-100 dark:border-blue-500/20"><i class="fa-solid fa-arrow-up-right-from-square"></i></div>
+                            <span class="text-[9.5px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400">Uplink</span>
+                        </div>
+                        <div class="flex items-baseline gap-1 my-1">
+                            <h3 class="text-3xl sm:text-4xl font-black font-heading text-blue-600 dark:text-blue-400 tracking-tight leading-none" x-text="getStats().uplink">0</h3>
+                            <span class="text-[10px] font-mono font-bold text-slate-400" x-text="'/' + (selectedSwitch?.ports || 0)"></span>
+                        </div>
+                        <div class="w-full h-1.5 bg-blue-100/70 dark:bg-black/40 rounded-full overflow-hidden mt-1">
+                            <div class="h-full bg-blue-500 rounded-full shadow-[0_0_6px_rgba(59,130,246,0.5)] transition-all duration-500" :style="'width: ' + ((getStats().uplink / (selectedSwitch?.ports || 1)) * 100) + '%'"></div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Free Gauge (Amber) -->
+                    <div @click="haptic('light'); openKpiModal('empty')" 
+                         class="relative p-3.5 sm:p-4 rounded-[1.35rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between bg-gradient-to-br from-amber-50/90 to-white dark:from-amber-950/20 dark:to-dark_surface border border-amber-200/80 dark:border-amber-800/40 shadow-sm hover:shadow-md hover:border-amber-400 w-full xl:w-[145px] active:scale-[0.98]">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <div class="w-7 h-7 rounded-xl bg-white dark:bg-black/30 shadow-sm flex items-center justify-center text-amber-500 text-xs border border-amber-100 dark:border-amber-500/20"><i class="fa-solid fa-plug"></i></div>
+                            <span class="text-[9.5px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400">Free</span>
+                        </div>
+                        <div class="flex items-baseline gap-1 my-1">
+                            <h3 class="text-3xl sm:text-4xl font-black font-heading text-amber-600 dark:text-amber-400 tracking-tight leading-none" x-text="getStats().empty">0</h3>
+                            <span class="text-[10px] font-mono font-bold text-slate-400" x-text="'/' + (selectedSwitch?.ports || 0)"></span>
+                        </div>
+                        <div class="w-full h-1.5 bg-amber-100/70 dark:bg-black/40 rounded-full overflow-hidden mt-1">
+                            <div class="h-full bg-amber-500 rounded-full shadow-[0_0_6px_rgba(245,158,11,0.5)] transition-all duration-500" :style="'width: ' + ((getStats().empty / (selectedSwitch?.ports || 1)) * 100) + '%'"></div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
             <div class="flex flex-col gap-4 sm:gap-6 relative z-10 flex-1" x-show="selectedSwitch">
-                <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl px-3 py-2 sm:px-4 sm:py-2.5 rounded-2xl md:rounded-3xl border border-slate-200 dark:border-dark_border shadow-sm shrink-0 relative z-30 transition-opacity duration-300" x-show="!loading" x-cloak> 
-                    <div class="flex justify-between items-center mb-1.5"> 
-                        <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Physical Interfaces Map</h3> 
+                <!-- 🗄️ ENTERPRISE CHASSIS FACEPLATE VIEW -->
+                <div class="switch-chassis p-3.5 sm:p-4 rounded-2xl md:rounded-3xl shrink-0 relative z-30 transition-all duration-300" x-show="!loading" x-cloak> 
+                    <div class="flex justify-between items-center mb-2.5 px-1"> 
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-teal-400 animate-ping"></span>
+                            <h3 class="text-[10px] font-black text-slate-300 dark:text-slate-400 uppercase tracking-widest font-mono">Hardware Port Chassis Map</h3> 
+                        </div>
+                        <div class="flex items-center gap-3 text-[9px] font-mono text-slate-400">
+                            <span class="flex items-center gap-1.5"><span class="port-led led-active"></span> Active</span>
+                            <span class="flex items-center gap-1.5"><span class="port-led led-uplink"></span> Uplink</span>
+                            <span class="flex items-center gap-1.5"><span class="port-led led-empty"></span> Free</span>
+                        </div>
                     </div> 
-                    <div class="w-full"> 
-                        <div class="grid grid-cols-6 sm:grid-cols-12 xl:grid-cols-24 gap-1 sm:gap-1.5"> 
+                    
+                    <div class="w-full bg-[#040711] p-2 sm:p-2.5 rounded-xl sm:rounded-2xl border border-white/5 shadow-inner"> 
+                        <div class="grid grid-cols-6 sm:grid-cols-12 xl:grid-cols-24 gap-1.5"> 
                             <template x-for="(port, idx) in generatePortList()" :key="port.num"> 
-                                <div @click.stop="handlePortClick(port)" class="port-box border rounded h-6 sm:h-7 flex items-center justify-center font-mono text-[9px] sm:text-[10px] font-bold cursor-pointer group relative transition-all duration-300 hover:z-[9999]" :class="[getPortClass(port.status), (searchQuery && !isMatch(port)) ? 'opacity-20 grayscale scale-95 pointer-events-none' : '', (mobileSelectedPort && mobileSelectedPort.num === port.num) ? 'ring-2 ring-brand scale-110 shadow-lg z-40' : '']">
-                                    <span x-text="port.num" :class="port.status === 'empty' ? 'opacity-40' : 'opacity-100'"></span> 
+                                <div @click.stop="handlePortClick(port)" 
+                                     @mouseenter="hoveredPortNum = port.num" 
+                                     @mouseleave="hoveredPortNum = null"
+                                     class="port-jack rounded-lg h-7 sm:h-8 flex flex-col justify-between items-center py-1 font-mono text-[9px] sm:text-[10px] font-bold cursor-pointer group relative transition-all duration-200" 
+                                     :class="[
+                                         getPortClass(port.status), 
+                                         (searchQuery && !isMatch(port)) ? 'opacity-20 grayscale scale-95 pointer-events-none' : '', 
+                                         (mobileSelectedPort && mobileSelectedPort.num === port.num) ? 'ring-2 ring-brand scale-110 shadow-lg z-40' : '',
+                                         hoveredPortNum === port.num ? 'is-hovered' : ''
+                                     ]">
                                     
-                                    <div class="hidden sm:flex absolute w-[250px] bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl text-slate-800 dark:text-white rounded-[1.25rem] shadow-[0_20px_40px_-10px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)] opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none flex-col border z-[9999]" style="bottom: calc(100% + 12px); top: auto;" :class="[getTooltipPosition(idx), port.status === 'uplink' ? 'border-blue-200 dark:border-blue-500/30' : (port.status === 'active' ? 'border-emerald-200 dark:border-emerald-500/30' : 'border-amber-200 dark:border-amber-500/30')]"> 
-                                        <div class="absolute w-3.5 h-3.5 bg-white dark:bg-slate-800 border-b border-r rotate-45 z-0" style="bottom: -7.5px; top: auto;" :class="[getArrowPosition(idx), port.status === 'uplink' ? 'border-blue-200 dark:border-blue-500/30' : (port.status === 'active' ? 'border-emerald-200 dark:border-emerald-500/30' : 'border-amber-200 dark:border-amber-500/30')]"></div> 
-                                        <div class="flex items-start gap-3 w-full p-3 rounded-t-[1.15rem] relative z-10" :class="port.status === 'uplink' ? 'bg-blue-50/80 dark:bg-blue-900/20' : (port.status === 'active' ? 'bg-emerald-50/80 dark:bg-emerald-900/20' : 'bg-amber-50/80 dark:bg-amber-900/20')">
-                                            <div class="w-10 h-10 rounded-[10px] flex items-center justify-center font-mono font-black text-lg shadow-sm border shrink-0 bg-white dark:bg-slate-900" :class="port.status === 'uplink' ? 'text-blue-600 border-blue-200 dark:text-blue-400 dark:border-blue-500/30' : (port.status === 'active' ? 'text-emerald-600 border-emerald-200 dark:text-emerald-400 dark:border-emerald-500/30' : 'text-amber-600 border-amber-200 dark:text-amber-400 dark:border-amber-500/30')" x-text="port.num"></div>
+                                    <!-- Mini Link LED Indicator -->
+                                    <span class="port-led" :class="port.status === 'active' ? 'led-active' : (port.status === 'uplink' ? 'led-uplink' : 'led-empty')"></span>
+
+                                    <!-- Port Number -->
+                                    <span x-text="port.num" :class="port.status === 'empty' ? 'text-slate-600' : 'text-slate-200'"></span> 
+                                    
+                                    <!-- Tooltip Popover -->
+                                    <div class="hidden sm:flex absolute w-[250px] bg-slate-900/95 backdrop-blur-xl text-white rounded-[1.25rem] shadow-[0_20px_45px_rgba(0,0,0,0.6)] opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none flex-col border z-[9999]" style="bottom: calc(100% + 12px); top: auto;" :class="[getTooltipPosition(idx), port.status === 'uplink' ? 'border-blue-500/40' : (port.status === 'active' ? 'border-emerald-500/40' : 'border-amber-500/40')]"> 
+                                        <div class="absolute w-3.5 h-3.5 bg-slate-900 border-b border-r rotate-45 z-0" style="bottom: -7.5px; top: auto;" :class="[getArrowPosition(idx), port.status === 'uplink' ? 'border-blue-500/40' : (port.status === 'active' ? 'border-emerald-500/40' : 'border-amber-500/40')]"></div> 
+                                        <div class="flex items-start gap-3 w-full p-3 rounded-t-[1.15rem] relative z-10" :class="port.status === 'uplink' ? 'bg-blue-500/15' : (port.status === 'active' ? 'bg-emerald-500/15' : 'bg-amber-500/15')">
+                                            <div class="w-10 h-10 rounded-[10px] flex items-center justify-center font-mono font-black text-lg shadow-sm border shrink-0 bg-slate-900" :class="port.status === 'uplink' ? 'text-blue-400 border-blue-500/30' : (port.status === 'active' ? 'text-emerald-400 border-emerald-500/30' : 'text-amber-400 border-amber-500/30')" x-text="port.num"></div>
                                             <div class="flex-1 min-w-0 pt-0.5">
                                                 <div class="flex items-center gap-2 mb-1">
-                                                    <span class="px-1.5 py-0.5 rounded-[4px] text-[8px] font-black uppercase tracking-widest border shadow-sm shrink-0 text-white" :class="port.status === 'uplink' ? 'bg-blue-500 border-blue-600 dark:border-blue-400' : (port.status === 'active' ? 'bg-emerald-500 border-emerald-600 dark:border-emerald-400' : 'bg-amber-500 border-amber-600 dark:border-amber-400')" x-text="port.status || 'Empty'"></span>
+                                                    <span class="px-1.5 py-0.5 rounded-[4px] text-[8px] font-black uppercase tracking-widest border shadow-sm shrink-0 text-white" :class="port.status === 'uplink' ? 'bg-blue-500 border-blue-400' : (port.status === 'active' ? 'bg-emerald-500 border-emerald-400' : 'bg-amber-500 border-amber-400')" x-text="port.status || 'Empty'"></span>
                                                 </div>
-                                                <h4 class="font-bold text-[13px] text-slate-800 dark:text-white leading-tight line-clamp-2" x-text="port.desc || 'Available Port'"></h4>
+                                                <h4 class="font-bold text-[13px] text-white leading-tight line-clamp-2" x-text="port.desc || 'Available Port'"></h4>
                                             </div>
                                         </div> 
-                                        <div class="grid grid-cols-2 gap-2 p-3 relative z-10 bg-white dark:bg-transparent rounded-b-[1.25rem]">
-                                            <div class="flex flex-col gap-0.5"><span class="text-[8px] font-black uppercase tracking-widest text-slate-400">Cable ID</span><span class="font-mono font-bold text-[11px] text-slate-700 dark:text-slate-300 truncate" x-text="port.cable || 'N/A'"></span></div>
-                                            <div class="flex flex-col gap-0.5 border-l border-slate-100 dark:border-slate-700 pl-2"><span class="text-[8px] font-black uppercase tracking-widest text-slate-400">Network IP</span><span class="font-mono font-bold text-[11px] truncate" :class="port.status === 'empty' ? 'text-slate-400 dark:text-slate-500' : (port.status === 'uplink' ? 'text-blue-600 dark:text-blue-400' : 'text-emerald-600 dark:text-emerald-400')" x-text="port.vlan || '-'"></span></div>
+                                        <div class="grid grid-cols-2 gap-2 p-3 relative z-10 bg-slate-900 rounded-b-[1.25rem]">
+                                            <div class="flex flex-col gap-0.5"><span class="text-[8px] font-black uppercase tracking-widest text-slate-400">Cable ID</span><span class="font-mono font-bold text-[11px] text-slate-200 truncate" x-text="port.cable || 'N/A'"></span></div>
+                                            <div class="flex flex-col gap-0.5 border-l border-slate-700 pl-2"><span class="text-[8px] font-black uppercase tracking-widest text-slate-400">Network IP</span><span class="font-mono font-bold text-[11px] truncate" :class="port.status === 'empty' ? 'text-slate-500' : (port.status === 'uplink' ? 'text-blue-400' : 'text-emerald-400')" x-text="port.vlan || '-'"></span></div>
                                         </div>
                                     </div> 
                                 </div>
@@ -577,17 +769,42 @@
                             </thead> 
                             <tbody class="divide-y divide-slate-100 dark:divide-white/5 text-sm"> 
                                 <template x-for="port in filteredTablePorts" :key="'desk-'+port.num"> 
-                                    <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition duration-150 cursor-pointer group border-b border-slate-100 dark:border-white/5" @click="openEditModal(port)"> 
-                                        <td class="px-3 py-3 text-center align-middle"> <div class="w-7 h-7 rounded bg-slate-50 dark:bg-black/30 flex items-center justify-center font-mono font-black text-slate-600 dark:text-slate-300 mx-auto shadow-inner border border-slate-100 dark:border-white/5" x-text="String(port.num).padStart(2, '0')"></div> </td> 
+                                    <tr @mouseenter="hoveredPortNum = port.num" 
+                                        @mouseleave="hoveredPortNum = null"
+                                        @click="openEditModal(port)" 
+                                        class="hover:bg-teal-50/60 dark:hover:bg-teal-900/15 transition-all duration-150 cursor-pointer group border-b border-slate-100 dark:border-white/5"
+                                        :class="hoveredPortNum === port.num ? 'bg-teal-50 dark:bg-teal-900/20 border-l-4 border-l-teal-500' : ''"> 
+                                        
+                                        <td class="px-3 py-3 text-center align-middle"> 
+                                            <div class="w-7 h-7 rounded-lg bg-slate-50 dark:bg-black/30 flex items-center justify-center font-mono font-black text-slate-600 dark:text-slate-300 mx-auto shadow-inner border border-slate-100 dark:border-white/5 group-hover:border-teal-400 group-hover:text-teal-600 transition-colors" x-text="String(port.num).padStart(2, '0')"></div> 
+                                        </td> 
+                                        
                                         <td class="px-3 py-3 align-middle"> 
-                                            <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-wider border shadow-sm truncate max-w-full" :class="port.status === 'uplink' ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-brand/10 dark:text-brand dark:border-brand/20' : 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'"> 
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-wider border shadow-sm truncate max-w-full" :class="port.status === 'uplink' ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20' : 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'"> 
                                                 <i class="fa-solid text-[8px]" :class="port.status === 'uplink' ? 'fa-arrow-up' : 'fa-check'"></i> <span class="truncate" x-text="port.status"></span> 
                                             </span> 
                                         </td> 
-                                        <td class="px-3 py-3 font-bold text-slate-800 dark:text-white text-[13px] align-middle truncate" :title="port.desc" x-text="port.desc"></td> 
+                                        
+                                        <!-- 🚀 Smart Device-Type Icon Mapping -->
+                                        <td class="px-3 py-3 align-middle truncate" :title="port.desc">
+                                            <div class="flex items-center gap-2.5">
+                                                <div class="w-7 h-7 rounded-lg flex items-center justify-center text-xs shrink-0 shadow-sm border border-black/5 dark:border-white/5" 
+                                                     :class="getDeviceTypeIcon(port.desc).color">
+                                                    <i class="fa-solid" :class="getDeviceTypeIcon(port.desc).icon"></i>
+                                                </div>
+                                                <span class="font-bold text-slate-800 dark:text-white text-[13px] truncate group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors" x-text="port.desc"></span>
+                                            </div>
+                                        </td> 
+
                                         <td class="px-3 py-3 font-mono font-bold text-slate-500 dark:text-slate-400 text-[11px] align-middle truncate" x-text="port.vlan || '-'"></td> 
-                                        <td class="px-3 py-3 align-middle truncate"> <span class="font-mono text-[10px] font-bold text-slate-600 bg-slate-100 border border-slate-200 dark:bg-black/30 dark:text-slate-300 dark:border-white/10 px-2 py-0.5 rounded shadow-sm" x-text="port.cable || 'N/A'"></span> </td> 
-                                        <td class="px-3 py-3 text-center align-middle sticky-col bg-transparent"> <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-white dark:bg-black/20 hover:bg-brand hover:text-white text-slate-400 transition shadow-sm border border-slate-200 dark:border-white/5 hover:border-brand/50 mx-auto"><i class="fa-solid fa-pen text-[10px]"></i></button> </td> 
+                                        
+                                        <td class="px-3 py-3 align-middle truncate"> 
+                                            <span class="font-mono text-[10px] font-bold text-slate-600 bg-slate-100 border border-slate-200 dark:bg-black/30 dark:text-slate-300 dark:border-white/10 px-2 py-0.5 rounded shadow-sm" x-text="port.cable || 'N/A'"></span> 
+                                        </td> 
+                                        
+                                        <td class="px-3 py-3 text-center align-middle sticky-col bg-transparent"> 
+                                            <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-white dark:bg-black/20 hover:bg-teal-500 hover:text-white text-slate-400 transition shadow-sm border border-slate-200 dark:border-white/5 hover:border-teal-500 mx-auto"><i class="fa-solid fa-pen text-[10px]"></i></button> 
+                                        </td> 
                                     </tr> 
                                 </template>
                                 <tr x-show="!loading && filteredTablePorts.length === 0"> <td colspan="6" class="px-5 py-12 text-center text-slate-400"> <i class="fa-solid fa-plug-circle-xmark text-3xl mb-2 opacity-50"></i> <p class="font-medium text-xs">No active connections found on this switch.</p> </td> </tr> 
@@ -727,6 +944,28 @@
                     loading: false, saving: false, loadingText: 'Initializing...',
                     editModalOpen: false, kpiModalOpen: false, kpiType: 'all', kpiList: [],
                     currentTime: '', currentDate: '', realPortData: {},
+                    hoveredPortNum: null, // 🚀 NEW: State for Bidirectional Neon Hover
+
+                    // 🚀 NEW: Calculate Load % for Sidebar Switches
+                    getSwitchLoad(swId) {
+                        const swMeta = this.switches.find(s => s.id === swId);
+                        const total = swMeta ? swMeta.ports : 52;
+                        const ports = this.realPortData[swId] || [];
+                        const used = ports.filter(p => p.status === 'active' || p.status === 'uplink').length;
+                        const percent = Math.round((used / total) * 100) || 0;
+                        return { used, total, percent };
+                    },
+
+                    // 🚀 NEW: Smart Semantic Icons for Connected Devices
+                    getDeviceTypeIcon(desc) {
+                        const d = String(desc || '').toLowerCase();
+                        if (d.includes('backbone') || d.includes('swt') || d.includes('switch') || d.includes('uplink')) return { icon: 'fa-network-wired', color: 'text-blue-500 bg-blue-50 dark:bg-blue-500/10' };
+                        if (d.includes('server') || d.includes('dc') || d.includes('pbl') || d.includes('winsvr')) return { icon: 'fa-server', color: 'text-purple-500 bg-purple-50 dark:bg-purple-500/10' };
+                        if (d.includes('printer') || d.includes('xerox') || d.includes('canon')) return { icon: 'fa-print', color: 'text-amber-500 bg-amber-50 dark:bg-amber-500/10' };
+                        if (d.includes('wifi') || d.includes('ap') || d.includes('router')) return { icon: 'fa-tower-broadcast', color: 'text-sky-500 bg-sky-50 dark:bg-sky-500/10' };
+                        if (d.includes('cctv') || d.includes('cam')) return { icon: 'fa-video', color: 'text-rose-500 bg-rose-50 dark:bg-rose-500/10' };
+                        return { icon: 'fa-desktop', color: 'text-teal-500 bg-teal-50 dark:bg-teal-500/10' };
+                    },
                     
                     editForm: { num: 0, status: 'empty', desc: '', vlan: '', cable: '' },
                     searchQuery: '', mobileSearchOpen: false,
