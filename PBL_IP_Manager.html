@@ -21,9 +21,11 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
-    <!-- PDF Libs -->
+    <!-- PDF & Excel Export Libs -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <!-- 🚀 ADDED: SheetJS for Clean Excel Export -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <!-- Modern Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -342,20 +344,19 @@
 			
             <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl rounded-2xl md:rounded-3xl border border-slate-200 dark:border-dark_border shadow-sm lg:overflow-hidden flex flex-col flex-1 mb-6 lg:mb-0">
                 
-                <div class="px-4 py-3 sm:px-5 sm:py-4 border-b border-slate-100 dark:border-dark_border flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-slate-50/50 dark:bg-black/20 shrink-0">
+                <div class="px-3 py-2.5 sm:px-5 sm:py-3.5 border-b border-slate-100 dark:border-dark_border flex flex-col md:flex-row justify-between items-stretch md:items-center gap-2.5 sm:gap-3 bg-slate-50/50 dark:bg-black/20 shrink-0 overflow-visible">
                     
+                    <!-- 🚀 ROW 1 (MOBILE): Dropdown Filters -->
                     <div class="flex items-center gap-2 w-full md:w-auto">
-                        <!-- 📍 DYNAMIC ISP DROPDOWN FILTER (Fixed Anomaly with Dummy Values & Autocomplete off) -->
-                        <select x-model="filterConn" autocomplete="off" @change="haptic('light'); activeFilter = null" class="flex-1 md:w-40 pl-3 pr-8 py-2 bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl text-[11px] sm:text-xs font-bold focus:ring-2 focus:ring-brand/30 outline-none cursor-pointer appearance-none dark:text-white shadow-sm">
+                        <select x-model="filterConn" autocomplete="off" @change="haptic('light'); activeFilter = null" class="flex-1 md:w-40 pl-3 pr-7 py-2 bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl text-[10px] sm:text-xs font-bold focus:ring-2 focus:ring-brand/30 outline-none cursor-pointer appearance-none dark:text-white shadow-sm transition">
                             <option value="">📶 All Connections</option>
-                            <!-- Dummy value added so browser doesn't confuse it with empty string -->
                             <option value="primary_temp" :value="isps.primary.id" x-text="'🔴 ' + isps.primary.short">🔴 Primary</option>
                             <option value="secondary_temp" :value="isps.secondary.id" x-text="'📡 ' + isps.secondary.short">📡 Backup</option>
                             <option value="broadband_temp" :value="isps.broadband.id" x-text="'🟢 ' + isps.broadband.short">🟢 Broadband</option>
                             <option value="Local Lan">🔌 LAN Only</option>
                         </select>
 
-                        <select x-model="filterLoc" @change="haptic('light')" class="flex-1 md:w-40 pl-3 pr-8 py-2 bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl text-[11px] sm:text-xs font-bold focus:ring-2 focus:ring-brand/30 outline-none cursor-pointer appearance-none dark:text-white shadow-sm">
+                        <select x-model="filterLoc" @change="haptic('light')" class="flex-1 md:w-40 pl-3 pr-7 py-2 bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl text-[10px] sm:text-xs font-bold focus:ring-2 focus:ring-brand/30 outline-none cursor-pointer appearance-none dark:text-white shadow-sm transition truncate">
                             <option value="">📍 All Locations</option>
                             <template x-for="loc in uniqueLocations" :key="loc">
                                 <option :value="loc" x-text="getLocationEmoji(loc) + ' ' + loc"></option>
@@ -363,18 +364,35 @@
                         </select>
                     </div>
                     
+                    <!-- 🚀 ROW 2 (MOBILE): Unified Actions (History + Export Dropdown + Sync) -->
                     <div class="flex items-center gap-2 w-full md:w-auto justify-end shrink-0">
-                        <button @click="fetchGlobalHistory()" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/20 w-9 h-9 sm:w-[36px] sm:h-[36px] rounded-xl border border-indigo-200 dark:border-indigo-500/20 transition flex items-center justify-center shadow-sm shrink-0 active:scale-95" title="Recent Changes">
-                            <i class="fa-solid fa-clock-rotate-left text-[13px] sm:text-[15px]"></i>
+                        
+                        <!-- History Button -->
+                        <button @click="fetchGlobalHistory()" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/20 w-8 h-8 sm:w-9 sm:h-9 rounded-xl border border-indigo-200 dark:border-indigo-500/20 transition flex items-center justify-center shadow-sm shrink-0 active:scale-95" title="Routing History">
+                            <i class="fa-solid fa-clock-rotate-left text-xs sm:text-sm"></i>
                         </button>
-                        <button @click="exportCSV()" class="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-300 w-9 h-9 sm:w-auto sm:px-3 sm:py-2 rounded-xl border border-emerald-200 dark:border-emerald-500/20 transition flex items-center justify-center gap-1.5 shadow-sm shrink-0" title="Export CSV">
-                            <i class="fa-solid fa-file-csv text-emerald-500 dark:text-emerald-400 text-[13px] sm:text-[15px]"></i><span class="hidden sm:inline text-[10px] sm:text-xs font-black uppercase tracking-widest">CSV</span>
-                        </button>
-                        <button @click="exportPDF()" class="bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-500/10 dark:text-rose-400 w-9 h-9 sm:w-auto sm:px-3 sm:py-2 rounded-xl border border-rose-200 dark:border-rose-500/20 transition flex items-center justify-center gap-1.5 shadow-sm shrink-0" title="Export PDF">
-                            <i class="fa-solid fa-file-pdf text-[13px] sm:text-[15px]"></i><span class="hidden sm:inline text-[10px] sm:text-xs font-black uppercase tracking-widest">PDF</span>
-                        </button>
-                        <button @click="fetchData(true)" class="flex items-center justify-center w-9 h-9 sm:w-auto sm:px-3 sm:py-2 bg-white dark:bg-white/5 text-slate-500 hover:text-brand rounded-xl text-[10px] sm:text-xs font-bold border border-slate-200 dark:border-white/10 shadow-sm transition active:scale-95 shrink-0" title="Force Sync">
-                            <i class="fa-solid fa-rotate text-[13px] sm:text-[15px]" :class="loading ? 'fa-spin' : ''"></i> <span class="hidden sm:inline ml-1.5">Sync</span>
+                        
+                        <!-- 🚀 COMBINED EXPORT DROPDOWN (ROSE THEME) -->
+                        <div class="relative flex-1 sm:flex-none" x-data="{ showExport: false }" @click.away="showExport = false">
+                            <button @click="showExport = !showExport; haptic('light')" class="w-full sm:w-auto flex items-center justify-center h-8 sm:h-9 px-3 bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-500/10 dark:text-rose-400 dark:hover:bg-rose-500/20 rounded-xl text-[10px] sm:text-xs font-bold border border-rose-200 dark:border-rose-500/30 shadow-sm transition active:scale-95 gap-1.5">
+                                <i class="fa-solid fa-download text-xs sm:text-sm"></i> <span>Export</span> <i class="fa-solid fa-chevron-down text-[9px] opacity-70 transition-transform" :class="showExport ? 'rotate-180' : ''"></i>
+                            </button>
+                            
+                            <div x-show="showExport" x-transition.origin.top.right class="absolute right-0 top-full mt-2 w-44 bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-xl rounded-xl shadow-xl border border-slate-200 dark:border-white/10 z-[100] overflow-hidden p-1" style="display: none;" x-cloak>
+                                <div class="px-3 py-1.5 text-[9px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 dark:border-white/5 mb-1">Download As</div>
+                                <button @click="exportExcel(); showExport = false" class="w-full text-left px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/10 dark:hover:text-rose-400 rounded-lg transition flex items-center gap-2">
+                                    <i class="fa-solid fa-file-excel opacity-70 text-emerald-500"></i> Excel (XLSX)
+                                </button>
+                                <button @click="exportPDF(); showExport = false" class="w-full text-left px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/10 dark:hover:text-rose-400 rounded-lg transition flex items-center gap-2">
+                                    <i class="fa-solid fa-file-pdf opacity-70 text-rose-500"></i> PDF Document
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Sync Button -->
+                        <button @click="fetchData(true)" class="flex items-center justify-center w-8 h-8 sm:w-auto sm:px-3 sm:h-9 bg-white dark:bg-white/5 text-slate-500 hover:text-brand rounded-xl text-xs font-bold border border-slate-200 dark:border-white/10 shadow-sm transition active:scale-95 shrink-0" title="Force Sync">
+                            <i class="fa-solid fa-rotate text-xs sm:text-sm" :class="loading ? 'fa-spin' : ''"></i> 
+                            <span class="hidden sm:inline ml-1.5">Sync</span>
                         </button>
                     </div>
                 </div>
@@ -1194,24 +1212,89 @@
                         return isLine ? 'bg-slate-400' : 'bg-slate-50 text-slate-500 border-slate-200 dark:bg-white/5 dark:text-slate-400 dark:border-white/10';
                     },
                     
-                    exportCSV() {
-                        this.haptic('light'); if (this.filteredList.length === 0) return;
-                        const headers = ['Computer Name', 'Location', 'Connection Type', 'LAN IP', this.isps.primary.short, this.isps.secondary.short, this.isps.broadband.short, 'Gateway', 'Switch Name', 'Switch Port'];
-                        let csv = headers.join(',') + '\n';
-                        this.filteredList.forEach(row => { 
-                            const data = [row.compName, row.location, row.connType, row.lan, row.airtelLL, row.stpi, row.airtelBB, row.gateway, row.switchName, row.switchPort].map(field => `"${(field || '').toString().replace(/"/g, '""')}"`); 
-                            csv += data.join(',') + '\n'; 
-                        });
-                        const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = `PBL_IP_Master_${this.currentLocation}.csv`; a.click();
+                    // 🚀 FULL 10-COLUMN EXCEL (XLSX) EXPORT FOR IP MASTER
+                    exportExcel() {
+                        this.haptic('light');
+                        if (this.filteredList.length === 0) return;
+
+                        const data = this.filteredList.map(row => ({
+                            "Computer Name": row.compName || '-',
+                            "Location": row.location || this.currentLocation,
+                            "Active Connection": row.connType || 'Unassigned',
+                            "LAN IP (DC)": row.lan || '-',
+                            [this.isps.primary.short]: row.airtelLL || '-',
+                            [this.isps.secondary.short]: row.stpi || '-',
+                            [this.isps.broadband.short]: row.airtelBB || '-',
+                            "Gateway": row.gateway || '-',
+                            "Switch Name": row.switchName || '-',
+                            "Switch Port": row.switchPort || '-'
+                        }));
+
+                        const wb = XLSX.utils.book_new();
+                        const ws = XLSX.utils.json_to_sheet(data);
+                        XLSX.utils.book_append_sheet(wb, ws, "IP_Master_Allocation");
+
+                        const dateStr = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
+                        XLSX.writeFile(wb, `PBL_IP_Master_${this.currentLocation}_${dateStr}.xlsx`);
+                        setTimeout(() => this.haptic('success'), 500);
                     },
 
+                    // 🚀 BRANDED FULL 10-COLUMN PDF EXPORT (ROSE THEME)
                     exportPDF() {
-                        this.haptic('light'); if (this.filteredList.length === 0) return;
-                        const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4'); 
-                        doc.text(`PBL IP Allocation Master (${this.currentLocation})`, 14, 15); doc.setFontSize(10); doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 20);
-                        const rows = this.filteredList.map(r => [r.compName, r.connType, r.lan, r.airtelLL, r.stpi, r.airtelBB, r.switchName]);
-                        doc.autoTable({ head: [['Computer Name', 'Active Connection', 'LAN IP', this.isps.primary.short, this.isps.secondary.short, this.isps.broadband.short, 'Switch']], body: rows, startY: 25, theme: 'grid', styles: { fontSize: 8 }, headStyles: { fillColor: [59, 130, 246] } });
-                        doc.save(`PBL_IP_Master_${this.currentLocation}.pdf`);
+                        this.haptic('light'); 
+                        if (this.filteredList.length === 0) return;
+
+                        const { jsPDF } = window.jspdf; 
+                        const doc = new jsPDF('l', 'mm', 'a4');
+                        const generatedBy = this.currentUser?.name || 'Network Ops';
+                        const loc = this.currentLocation;
+
+                        // Clean Emojis & Unsupported Unicode
+                        const clean = (txt) => {
+                            if (!txt) return '-';
+                            return String(txt)
+                                .replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '')
+                                .replace(/[^\x20-\x7E\n]/g, '')
+                                .trim() || '-';
+                        };
+
+                        // Branded Rose Header
+                        doc.setFillColor(244, 63, 94); // Brand Rose Color
+                        doc.rect(0, 0, 297, 20, 'F');
+                        doc.setTextColor(255, 255, 255);
+                        doc.setFontSize(14); doc.setFont("helvetica", "bold");
+                        doc.text(`PBL IP Allocation Master (${loc})`, 14, 13);
+                        doc.setFontSize(9); doc.setFont("helvetica", "normal");
+                        doc.text(`Generated: ${new Date().toLocaleString()} | By: ${generatedBy}`, 283, 13, { align: 'right' });
+
+                        const headers = [['Computer Name', 'Location', 'Connection', 'LAN (DC)', this.isps.primary.short, this.isps.secondary.short, this.isps.broadband.short, 'Gateway', 'Switch', 'Port']];
+
+                        const rows = this.filteredList.map(r => [
+                            clean(r.compName),
+                            clean(r.location),
+                            clean(r.connType),
+                            clean(r.lan),
+                            clean(r.airtelLL),
+                            clean(r.stpi),
+                            clean(r.airtelBB),
+                            clean(r.gateway),
+                            clean(r.switchName),
+                            clean(r.switchPort)
+                        ]);
+
+                        doc.autoTable({
+                            head: headers,
+                            body: rows,
+                            startY: 25,
+                            theme: 'grid',
+                            styles: { fontSize: 7.5, cellPadding: 2, overflow: 'linebreak' },
+                            headStyles: { fillColor: [244, 63, 94], halign: 'center', fontStyle: 'bold' },
+                            alternateRowStyles: { fillColor: [255, 241, 242] } // Soft Rose tint
+                        });
+
+                        const dateStr = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
+                        doc.save(`PBL_IP_Master_${loc}_${dateStr}.pdf`);
+                        setTimeout(() => this.haptic('success'), 500);
                     },
 
                     toggleTheme() {
