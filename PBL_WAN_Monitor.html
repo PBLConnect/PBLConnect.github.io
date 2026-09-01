@@ -26,6 +26,11 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
+    <!-- 🚀 ADDED: PDF & Excel Export Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    
     <!-- Modern Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
@@ -319,7 +324,7 @@
             <div class="flex-1 flex flex-col relative z-10">
                 <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl rounded-3xl border border-slate-200 dark:border-dark_border shadow-sm flex flex-col flex-1 h-[450px] md:h-[500px] overflow-hidden relative mb-6 lg:mb-0">
                     
-                    <div class="px-3 py-2.5 sm:px-5 sm:py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-black/20 flex justify-between items-center shrink-0">
+                    <div class="px-3 py-2.5 sm:px-5 sm:py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-black/20 flex justify-between items-center shrink-0 overflow-visible">
                         <div class="flex items-center gap-3">
                             <h3 class="font-heading font-black text-xs sm:text-base text-slate-800 dark:text-white flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-brand opacity-80"></i> Event Logs</h3>
                             <div x-show="activeFilter" class="hidden sm:flex items-center gap-2 px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-widest cursor-pointer transition border shadow-sm" :class="getBadgeClass()" @click="filterBy(activeFilter)">
@@ -328,6 +333,23 @@
                         </div>
                         
                         <div class="flex items-center gap-1.5 sm:gap-2"> 
+                            <!-- 🚀 SMART EXPORT DROPDOWN (XLSX & PDF) -->
+                            <div class="relative" x-data="{ showExport: false }" @click.away="showExport = false">
+                                <button @click="showExport = !showExport; haptic('light')" class="flex items-center justify-center h-7 sm:h-8 px-2.5 sm:px-3 bg-amber-50 text-amber-600 hover:bg-amber-100 dark:bg-amber-500/10 dark:text-amber-400 dark:hover:bg-amber-500/20 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-bold border border-amber-200 dark:border-amber-500/30 shadow-sm transition active:scale-95 gap-1.5">
+                                    <i class="fa-solid fa-download text-[11px] sm:text-xs"></i> <span class="hidden sm:inline">Export</span> <i class="fa-solid fa-chevron-down text-[9px] opacity-70 transition-transform" :class="showExport ? 'rotate-180' : ''"></i>
+                                </button>
+                                
+                                <div x-show="showExport" x-transition.origin.top.right class="absolute right-0 top-full mt-2 w-44 bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-xl rounded-xl shadow-xl border border-slate-200 dark:border-white/10 z-[100] overflow-hidden p-1" style="display: none;" x-cloak>
+                                    <div class="px-3 py-1.5 text-[9px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 dark:border-white/5 mb-1">Download Log</div>
+                                    <button @click="exportExcel(); showExport = false" class="w-full text-left px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-amber-50 hover:text-amber-600 dark:hover:bg-amber-500/10 dark:hover:text-amber-400 rounded-lg transition flex items-center gap-2">
+                                        <i class="fa-solid fa-file-excel opacity-70 text-emerald-500"></i> Excel (XLSX)
+                                    </button>
+                                    <button @click="exportPDF(); showExport = false" class="w-full text-left px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/10 dark:hover:text-rose-400 rounded-lg transition flex items-center gap-2">
+                                        <i class="fa-solid fa-file-pdf opacity-70 text-rose-500"></i> PDF Document
+                                    </button>
+                                </div>
+                            </div>
+
                             <button @click="fetchLogs(true)" class="flex items-center justify-center w-7 h-7 sm:w-auto sm:px-3 sm:py-1.5 bg-white dark:bg-white/5 text-slate-500 hover:text-brand rounded-md sm:rounded-lg text-[10px] sm:text-xs font-bold border border-slate-200 dark:border-white/10 shadow-sm transition active:scale-95"> 
                                 <i class="fa-solid fa-rotate" :class="loading ? 'fa-spin' : ''"></i> 
                                 <span class="hidden sm:inline ml-1.5">Sync</span> 
@@ -1019,6 +1041,92 @@
                     formatDate(dateStr) { 
                         if (!dateStr || dateStr === 'N/A' || dateStr.includes('1899') || dateStr.includes('1970')) return '-';
                         return dateStr; 
+                    },
+
+                    // 🚀 EXCEL (XLSX) EXPORT FOR WAN LOGS
+                    exportExcel() {
+                        this.haptic('light');
+                        if (this.filteredList.length === 0) return;
+
+                        const data = this.filteredList.map(row => ({
+                            "Log ID": row.id || '-',
+                            "Event Date": this.formatDate(row.date),
+                            "ISP Link": row.isp || '-',
+                            "ISP Case ID": row.caseId || '-',
+                            "Event Category": row.type || '-',
+                            "Fault Party": row.faultParty || '-',
+                            "Start Time": row.start || '-',
+                            "Restored Time": row.end || '-',
+                            "Total Duration": row.duration || '-',
+                            "Reported Root Cause": row.rootCause || '-',
+                            "Remediation Action": row.actionTaken || '-',
+                            "Remarks": row.remarks || '-',
+                            "Status": row.status || '-',
+                            "Location": row.location || this.currentLocation
+                        }));
+
+                        const wb = XLSX.utils.book_new();
+                        const ws = XLSX.utils.json_to_sheet(data);
+                        XLSX.utils.book_append_sheet(wb, ws, "WAN_Downtime_Logs");
+                        
+                        const dateStr = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
+                        XLSX.writeFile(wb, `PBL_WAN_Logs_${this.currentLocation}_${dateStr}.xlsx`);
+                        setTimeout(() => this.haptic('success'), 500);
+                    },
+
+                    // 🚀 BRANDED PDF EXPORT FOR WAN LOGS (Emoji & Encoding Glitch Fixed)
+                    exportPDF() {
+                        this.haptic('light');
+                        if (this.filteredList.length === 0) return;
+
+                        const { jsPDF } = window.jspdf;
+                        const doc = new jsPDF('l', 'mm', 'a4');
+                        const generatedBy = this.currentUser?.name || 'Network Ops';
+                        const loc = this.currentLocation;
+
+                        // 🛡️ FIX: Strips emojis and non-standard symbols that corrupt jsPDF fonts
+                        const clean = (txt) => {
+                            if (!txt) return '-';
+                            return String(txt)
+                                .replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '')
+                                .replace(/[^\x20-\x7E\n]/g, '') // Keep clean ASCII text + newlines only
+                                .trim() || '-';
+                        };
+
+                        // Branded Amber Header
+                        doc.setFillColor(245, 158, 11); // Amber Brand Color
+                        doc.rect(0, 0, 297, 20, 'F');
+                        doc.setTextColor(255, 255, 255);
+                        doc.setFontSize(14); doc.setFont("helvetica", "bold");
+                        doc.text("PBL Network & WAN Downtime Report", 14, 13);
+                        doc.setFontSize(9); doc.setFont("helvetica", "normal");
+                        doc.text(`Generated: ${new Date().toLocaleString()} | By: ${generatedBy} | Branch: ${loc}`, 283, 13, { align: 'right' });
+
+                        const headers = [['Date', 'ISP / Case ID', 'Event / Fault Party', 'Timing & Duration', 'Root Cause & Action Taken', 'Remarks', 'Status']];
+                        
+                        const rows = this.filteredList.map(r => [
+                            this.formatDate(r.date),
+                            `${clean(r.isp)}\nCase: ${clean(r.caseId)}`,
+                            `${clean(r.type)}\nFault: ${clean(r.faultParty)}`,
+                            `${r.start || '-'} to ${r.end || '-'}\n(${clean(r.duration)})`,
+                            `Cause: ${clean(r.rootCause)}\nAction: ${clean(r.actionTaken)}`,
+                            clean(r.remarks),
+                            clean(r.status)
+                        ]);
+
+                        doc.autoTable({
+                            head: headers,
+                            body: rows,
+                            startY: 25,
+                            theme: 'grid',
+                            styles: { fontSize: 7.5, cellPadding: 2, overflow: 'linebreak' },
+                            headStyles: { fillColor: [245, 158, 11], halign: 'left', fontStyle: 'bold' },
+                            alternateRowStyles: { fillColor: [254, 252, 232] } // Soft amber tint for alternate rows
+                        });
+
+                        const dateStr = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
+                        doc.save(`PBL_WAN_Logs_${loc}_${dateStr}.pdf`);
+                        setTimeout(() => this.haptic('success'), 500);
                     },
 
                     parseDateForInput(dateStr) { 
