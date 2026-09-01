@@ -24,6 +24,8 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <!-- 🚀 ADDED: SheetJS for Premium Excel Export -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
@@ -381,96 +383,212 @@
             <!-- MAIN DATA AREA -->
             <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl border border-slate-200 dark:border-dark_border rounded-3xl shadow-sm lg:overflow-hidden flex flex-col flex-1 mb-6 lg:mb-0 relative">
                 
-                <div class="px-4 py-3 sm:px-5 sm:py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-black/20 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 shrink-0">
+                <div class="px-3 py-2.5 sm:px-5 sm:py-3.5 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-black/20 flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-2.5 sm:gap-3 shrink-0">
                     
-                    <div class="flex w-full lg:w-auto p-1 bg-slate-100/80 dark:bg-black/40 rounded-xl border border-slate-200/50 dark:border-white/5 shadow-inner backdrop-blur-sm shrink-0">
-                        <button @click="currentTab = 'hardware'; haptic('light')" :class="currentTab === 'hardware' ? 'bg-white dark:bg-dark_surface text-brand shadow-sm font-bold' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-medium'" class="flex-1 lg:flex-none px-4 py-2 rounded-lg text-xs transition flex items-center justify-center gap-2"><i class="fa-solid fa-computer"></i> Hardware</button>
-                        <button @click="currentTab = 'software'; haptic('light')" :class="currentTab === 'software' ? 'bg-white dark:bg-dark_surface text-purple-600 dark:text-purple-400 shadow-sm font-bold' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-medium'" class="flex-1 lg:flex-none px-4 py-2 rounded-lg text-xs transition flex items-center justify-center gap-2"><i class="fa-solid fa-compact-disc"></i> Software</button>
+                    <!-- 🚀 ROW 1 (MOBILE): Tabs on Left + Compact Quick Actions on Right -->
+                    <div class="flex items-center justify-between gap-2 w-full lg:w-auto shrink-0">
+                        
+                        <!-- Hardware / Software Tabs Switcher -->
+                        <div class="flex p-0.5 sm:p-1 bg-slate-100/80 dark:bg-black/40 rounded-xl border border-slate-200/50 dark:border-white/5 shadow-inner backdrop-blur-sm">
+                            <button @click="currentTab = 'hardware'; haptic('light')" :class="currentTab === 'hardware' ? 'bg-white dark:bg-dark_surface text-brand shadow-sm font-bold' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-medium'" class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-xs transition flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-computer text-[10px] sm:text-xs"></i> Hardware
+                            </button>
+                            <button @click="currentTab = 'software'; haptic('light')" :class="currentTab === 'software' ? 'bg-white dark:bg-dark_surface text-purple-600 dark:text-purple-400 shadow-sm font-bold' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-medium'" class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-[11px] sm:text-xs transition flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-compact-disc text-[10px] sm:text-xs"></i> Software
+                            </button>
+                        </div>
+
+                        <!-- Mobile Action Pills (Matched Dot + Export + Sync) -->
+                        <div class="flex lg:hidden items-center gap-1.5">
+                            <div class="flex items-center gap-1.5 px-2.5 py-1 bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-lg shadow-sm">
+                                <span class="w-1.5 h-1.5 rounded-full" :class="currentTab === 'hardware' ? 'bg-brand' : 'bg-purple-500'"></span>
+                                <span class="text-[11px] font-mono font-black text-slate-800 dark:text-white" x-text="currentTab === 'hardware' ? filteredHardware.length : filteredSoftware.length"></span>
+                            </div>
+
+                            <button @click="exportExcel()" class="w-8 h-8 rounded-lg flex items-center justify-center bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30 shadow-sm active:scale-95 transition" title="Export to Excel">
+                                <i class="fa-solid fa-file-excel text-xs"></i>
+                            </button>
+
+                            <button @click="fetchData(true)" class="w-8 h-8 rounded-lg flex items-center justify-center bg-white dark:bg-white/5 text-slate-500 hover:text-brand border border-slate-200 dark:border-white/10 shadow-sm active:scale-95 transition" title="Sync">
+                                <i class="fa-solid fa-rotate text-xs" :class="syncing ? 'fa-spin' : ''"></i>
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- HARDWARE FILTERS -->
-                    <div class="flex items-center flex-wrap gap-2 w-full lg:w-auto" x-show="currentTab === 'hardware'" x-cloak>
-                        <div class="relative flex-1 min-w-[130px] sm:w-36" x-data="{ typeOpen: false }" @click.away="typeOpen = false">
-                            <button @click="typeOpen = !typeOpen; haptic('light')" type="button" class="w-full pl-3 pr-3 py-2 bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl text-xs font-bold outline-none cursor-pointer flex items-center justify-between shadow-sm dark:text-white transition-all" :class="filterType.length > 0 ? 'ring-2 ring-brand/50 border-brand bg-blue-50/50 dark:bg-brand/10' : ''">
-                                <span class="truncate" x-text="filterType.length === 0 ? '🖥️ All Types' : '🖥️ ' + filterType.length + ' Selected'"></span>
-                                <i class="fa-solid fa-chevron-down text-slate-400 text-[10px] transition-transform duration-300" :class="typeOpen ? 'rotate-180' : ''"></i>
+                    <!-- 🚀 ROW 2 (MOBILE): Equal 3-Column Filters + Hygiene Icon Button (Ultra-Modern Popovers) -->
+                    <div class="flex items-center gap-1.5 sm:gap-2 w-full lg:w-auto" x-show="currentTab === 'hardware'" x-cloak>
+                        
+                        <!-- 1. Device Types Dropdown -->
+                        <div class="relative flex-1 lg:w-36 min-w-0" x-data="{ typeOpen: false }" @click.away="typeOpen = false">
+                            <button @click="typeOpen = !typeOpen; haptic('light')" type="button" 
+                                    class="w-full px-2.5 py-1.5 sm:py-2 bg-white dark:bg-black/40 border rounded-xl text-[10px] sm:text-xs font-bold outline-none cursor-pointer flex items-center justify-between shadow-sm transition-all active:scale-[0.98]" 
+                                    :class="filterType.length > 0 ? 'border-brand ring-2 ring-brand/20 bg-indigo-50/70 dark:bg-brand/15 text-brand dark:text-brand_glow' : 'border-slate-200/90 dark:border-slate-700/60 hover:border-slate-300 dark:hover:border-slate-600 text-slate-700 dark:text-slate-200'">
+                                <div class="flex items-center gap-1.5 truncate">
+                                    <span>🖥️</span>
+                                    <span class="truncate" x-text="filterType.length === 0 ? 'Types' : filterType.length + ' Active'"></span>
+                                </div>
+                                <i class="fa-solid fa-chevron-down text-slate-400 text-[8px] sm:text-[9px] transition-transform duration-300 ml-1" :class="typeOpen ? 'rotate-180 text-brand' : ''"></i>
                             </button>
-                            <div x-show="typeOpen" x-transition.opacity.duration.200ms class="absolute z-[100] top-full left-0 mt-1.5 w-48 max-h-64 overflow-y-auto custom-scroll bg-white dark:bg-dark_surface border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl p-2" x-cloak>
-                                <div class="flex items-center justify-between mb-2 pb-2 border-b border-slate-100 dark:border-white/10 px-1"><span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Device Types</span><button @click="filterType = []; haptic('light')" x-show="filterType.length > 0" class="text-[9px] font-bold text-rose-500 hover:text-rose-600 uppercase tracking-wider transition">Clear</button></div>
-                                <div class="flex flex-col gap-1">
+
+                            <!-- Modern Frosted Popover -->
+                            <div x-show="typeOpen" 
+                                 x-transition:enter="transition ease-out duration-200"
+                                 x-transition:enter-start="opacity-0 scale-95 -translate-y-2"
+                                 x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                                 x-transition:leave="transition ease-in duration-150"
+                                 x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                                 x-transition:leave-end="opacity-0 scale-95 -translate-y-2"
+                                 class="absolute z-[100] top-full left-0 mt-2 w-52 bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-2xl border border-slate-200/90 dark:border-slate-700/80 rounded-2xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.15),0_0_0_1px_rgba(0,0,0,0.05)] dark:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.7),inset_0_1px_0_rgba(255,255,255,0.1)] p-2.5 overflow-hidden" 
+                                 style="display: none;" x-cloak>
+                                
+                                <div class="flex items-center justify-between pb-2 mb-1.5 border-b border-slate-100 dark:border-white/5 px-1">
+                                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Device Types</span>
+                                    <button @click="filterType = []; haptic('light')" x-show="filterType.length > 0" class="text-[8.5px] font-black text-rose-500 hover:text-rose-600 bg-rose-50 dark:bg-rose-500/10 px-2 py-0.5 rounded-md border border-rose-200/60 dark:border-rose-500/20 uppercase tracking-wider transition active:scale-95">Clear</button>
+                                </div>
+                                <div class="flex flex-col gap-1 max-h-56 overflow-y-auto custom-scroll pr-1">
                                     <template x-for="type in uniqueTypes" :key="type">
-                                        <label class="flex items-start gap-2.5 px-2 py-2 hover:bg-slate-50 dark:hover:bg-white/5 rounded-lg cursor-pointer transition-colors group"><input type="checkbox" :value="type" x-model="filterType" @change="haptic('light')" class="custom-checkbox shrink-0 mt-0.5"><span class="text-xs font-bold text-slate-700 dark:text-slate-300 whitespace-normal break-words leading-snug group-hover:text-brand transition-colors" x-text="getDeviceEmoji(type) + ' ' + type"></span></label>
+                                        <label class="flex items-center justify-between px-2.5 py-2 rounded-xl cursor-pointer transition-all duration-150 select-none group"
+                                               :class="filterType.includes(type) ? 'bg-indigo-50/80 text-brand font-black dark:bg-brand/15 dark:text-brand_glow' : 'hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 font-semibold'">
+                                            <div class="flex items-center gap-2 min-w-0 pr-2">
+                                                <span class="text-sm shrink-0" x-text="getDeviceEmoji(type)"></span>
+                                                <span class="text-[11.5px] truncate" x-text="type"></span>
+                                            </div>
+                                            <input type="checkbox" :value="type" x-model="filterType" @change="haptic('light')" class="custom-checkbox shrink-0">
+                                        </label>
                                     </template>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="relative flex-1 min-w-[120px] sm:w-36" x-data="{ statusOpen: false }" @click.away="statusOpen = false">
-                            <button @click="statusOpen = !statusOpen; haptic('light')" type="button" class="w-full pl-3 pr-3 py-2 bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl text-xs font-bold outline-none cursor-pointer flex items-center justify-between shadow-sm dark:text-white transition-all" :class="filterStatus.length > 0 ? 'ring-2 ring-brand/50 border-brand bg-blue-50/50 dark:bg-brand/10' : ''">
-                                <span class="truncate" x-text="filterStatus.length === 0 ? '📊 Status' : '📊 ' + filterStatus.length + ' Selected'"></span>
-                                <i class="fa-solid fa-chevron-down text-slate-400 text-[10px] transition-transform duration-300" :class="statusOpen ? 'rotate-180' : ''"></i>
+                        <!-- 2. Status Dropdown -->
+                        <div class="relative flex-1 lg:w-36 min-w-0" x-data="{ statusOpen: false }" @click.away="statusOpen = false">
+                            <button @click="statusOpen = !statusOpen; haptic('light')" type="button" 
+                                    class="w-full px-2.5 py-1.5 sm:py-2 bg-white dark:bg-black/40 border rounded-xl text-[10px] sm:text-xs font-bold outline-none cursor-pointer flex items-center justify-between shadow-sm transition-all active:scale-[0.98]" 
+                                    :class="filterStatus.length > 0 ? 'border-brand ring-2 ring-brand/20 bg-indigo-50/70 dark:bg-brand/15 text-brand dark:text-brand_glow' : 'border-slate-200/90 dark:border-slate-700/60 hover:border-slate-300 dark:hover:border-slate-600 text-slate-700 dark:text-slate-200'">
+                                <div class="flex items-center gap-1.5 truncate">
+                                    <span>📊</span>
+                                    <span class="truncate" x-text="filterStatus.length === 0 ? 'Status' : filterStatus.length + ' Active'"></span>
+                                </div>
+                                <i class="fa-solid fa-chevron-down text-slate-400 text-[8px] sm:text-[9px] transition-transform duration-300 ml-1" :class="statusOpen ? 'rotate-180 text-brand' : ''"></i>
                             </button>
-                            <div x-show="statusOpen" x-transition.opacity.duration.200ms class="absolute z-[100] top-full left-0 mt-1.5 w-44 max-h-64 overflow-y-auto custom-scroll bg-white dark:bg-dark_surface border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl p-2" x-cloak>
-                                <div class="flex items-center justify-between mb-2 pb-2 border-b border-slate-100 dark:border-white/10 px-1"><span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Statuses</span><button @click="filterStatus = []; haptic('light')" x-show="filterStatus.length > 0" class="text-[9px] font-bold text-rose-500 hover:text-rose-600 uppercase tracking-wider transition">Clear</button></div>
-                                <div class="flex flex-col gap-1">
+
+                            <!-- Modern Frosted Popover -->
+                            <div x-show="statusOpen" 
+                                 x-transition:enter="transition ease-out duration-200"
+                                 x-transition:enter-start="opacity-0 scale-95 -translate-y-2"
+                                 x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                                 x-transition:leave="transition ease-in duration-150"
+                                 x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                                 x-transition:leave-end="opacity-0 scale-95 -translate-y-2"
+                                 class="absolute z-[100] top-full left-0 mt-2 w-48 bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-2xl border border-slate-200/90 dark:border-slate-700/80 rounded-2xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.15),0_0_0_1px_rgba(0,0,0,0.05)] dark:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.7),inset_0_1px_0_rgba(255,255,255,0.1)] p-2.5 overflow-hidden" 
+                                 style="display: none;" x-cloak>
+                                
+                                <div class="flex items-center justify-between pb-2 mb-1.5 border-b border-slate-100 dark:border-white/5 px-1">
+                                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Statuses</span>
+                                    <button @click="filterStatus = []; haptic('light')" x-show="filterStatus.length > 0" class="text-[8.5px] font-black text-rose-500 hover:text-rose-600 bg-rose-50 dark:bg-rose-500/10 px-2 py-0.5 rounded-md border border-rose-200/60 dark:border-rose-500/20 uppercase tracking-wider transition active:scale-95">Clear</button>
+                                </div>
+                                <div class="flex flex-col gap-1 max-h-56 overflow-y-auto custom-scroll pr-1">
                                     <template x-for="stat in statusList" :key="stat.id">
-                                        <label class="flex items-start gap-2.5 px-2 py-2 hover:bg-slate-50 dark:hover:bg-white/5 rounded-lg cursor-pointer transition-colors group"><input type="checkbox" :value="stat.id" x-model="filterStatus" @change="haptic('light')" class="custom-checkbox shrink-0 mt-0.5"><span class="text-xs font-bold text-slate-700 dark:text-slate-300 whitespace-normal break-words leading-snug group-hover:text-brand transition-colors" x-text="stat.emoji + ' ' + stat.label"></span></label>
+                                        <label class="flex items-center justify-between px-2.5 py-2 rounded-xl cursor-pointer transition-all duration-150 select-none group"
+                                               :class="filterStatus.includes(stat.id) ? 'bg-indigo-50/80 text-brand font-black dark:bg-brand/15 dark:text-brand_glow' : 'hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 font-semibold'">
+                                            <div class="flex items-center gap-2 min-w-0 pr-2">
+                                                <span class="text-sm shrink-0" x-text="stat.emoji"></span>
+                                                <span class="text-[11.5px] truncate" x-text="stat.label"></span>
+                                            </div>
+                                            <input type="checkbox" :value="stat.id" x-model="filterStatus" @change="haptic('light')" class="custom-checkbox shrink-0">
+                                        </label>
                                     </template>
                                 </div>
                             </div>
                         </div>
                                                 
-                        <div class="relative flex-1 min-w-[140px] sm:w-44" x-data="{ locOpen: false }" @click.away="locOpen = false">
-                            <button @click="locOpen = !locOpen; haptic('light')" type="button" class="w-full pl-3 pr-3 py-2 bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl text-xs font-bold outline-none cursor-pointer flex items-center justify-between shadow-sm dark:text-white transition-all" :class="filterLoc.length > 0 ? 'ring-2 ring-brand/50 border-brand bg-blue-50/50 dark:bg-brand/10' : ''">
-                                <span class="truncate" x-text="filterLoc.length === 0 ? '📍 All Locations' : '📍 ' + filterLoc.length + ' Selected'"></span>
-                                <i class="fa-solid fa-chevron-down text-slate-400 text-[10px] transition-transform duration-300" :class="locOpen ? 'rotate-180' : ''"></i>
+                        <!-- 3. Locations Dropdown -->
+                        <div class="relative flex-1 lg:w-44 min-w-0" x-data="{ locOpen: false }" @click.away="locOpen = false">
+                            <button @click="locOpen = !locOpen; haptic('light')" type="button" 
+                                    class="w-full px-2.5 py-1.5 sm:py-2 bg-white dark:bg-black/40 border rounded-xl text-[10px] sm:text-xs font-bold outline-none cursor-pointer flex items-center justify-between shadow-sm transition-all active:scale-[0.98]" 
+                                    :class="filterLoc.length > 0 ? 'border-brand ring-2 ring-brand/20 bg-indigo-50/70 dark:bg-brand/15 text-brand dark:text-brand_glow' : 'border-slate-200/90 dark:border-slate-700/60 hover:border-slate-300 dark:hover:border-slate-600 text-slate-700 dark:text-slate-200'">
+                                <div class="flex items-center gap-1.5 truncate">
+                                    <span>📍</span>
+                                    <span class="truncate" x-text="filterLoc.length === 0 ? 'Location' : filterLoc.length + ' Active'"></span>
+                                </div>
+                                <i class="fa-solid fa-chevron-down text-slate-400 text-[8px] sm:text-[9px] transition-transform duration-300 ml-1" :class="locOpen ? 'rotate-180 text-brand' : ''"></i>
                             </button>
-                            <div x-show="locOpen" x-transition.opacity.duration.200ms class="absolute z-[100] top-full left-0 mt-1.5 w-64 max-h-64 overflow-y-auto custom-scroll bg-white dark:bg-dark_surface border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl p-2" x-cloak>
-                                <div class="flex items-center justify-between mb-2 pb-2 border-b border-slate-100 dark:border-white/10 px-1"><span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Select Locations</span><button @click="filterLoc = []; haptic('light')" x-show="filterLoc.length > 0" class="text-[9px] font-bold text-rose-500 hover:text-rose-600 uppercase tracking-wider transition">Clear All</button></div>
-                                <div class="flex flex-col gap-1">
-                                    <!-- 🚀 Virtual Location for Developer PCs -->
-                                    <label class="flex items-start gap-2.5 px-2 py-2 hover:bg-slate-50 dark:hover:bg-white/5 rounded-lg cursor-pointer transition-colors group">
-                                        <input type="checkbox" value="Developer PC" x-model="filterLoc" @change="haptic('light')" class="custom-checkbox shrink-0 mt-0.5">
-                                        <span class="text-xs font-bold text-slate-700 dark:text-slate-300 whitespace-normal break-words leading-snug group-hover:text-brand transition-colors">👨‍💻 Developer PCs</span>
+
+                            <!-- Modern Frosted Popover -->
+                            <div x-show="locOpen" 
+                                 x-transition:enter="transition ease-out duration-200"
+                                 x-transition:enter-start="opacity-0 scale-95 -translate-y-2"
+                                 x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                                 x-transition:leave="transition ease-in duration-150"
+                                 x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                                 x-transition:leave-end="opacity-0 scale-95 -translate-y-2"
+                                 class="absolute z-[100] top-full right-0 sm:left-0 mt-2 w-64 bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-2xl border border-slate-200/90 dark:border-slate-700/80 rounded-2xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.15),0_0_0_1px_rgba(0,0,0,0.05)] dark:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.7),inset_0_1px_0_rgba(255,255,255,0.1)] p-2.5 overflow-hidden" 
+                                 style="display: none;" x-cloak>
+                                
+                                <div class="flex items-center justify-between pb-2 mb-1.5 border-b border-slate-100 dark:border-white/5 px-1">
+                                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Select Locations</span>
+                                    <button @click="filterLoc = []; haptic('light')" x-show="filterLoc.length > 0" class="text-[8.5px] font-black text-rose-500 hover:text-rose-600 bg-rose-50 dark:bg-rose-500/10 px-2 py-0.5 rounded-md border border-rose-200/60 dark:border-rose-500/20 uppercase tracking-wider transition active:scale-95">Clear All</button>
+                                </div>
+                                <div class="flex flex-col gap-1 max-h-56 overflow-y-auto custom-scroll pr-1">
+                                    <!-- Virtual Developer PC Toggle -->
+                                    <label class="flex items-center justify-between px-2.5 py-2 rounded-xl cursor-pointer transition-all duration-150 select-none group"
+                                           :class="filterLoc.includes('Developer PC') ? 'bg-indigo-50/80 text-brand font-black dark:bg-brand/15 dark:text-brand_glow' : 'hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 font-semibold'">
+                                        <div class="flex items-center gap-2 min-w-0 pr-2">
+                                            <span class="text-sm shrink-0">👨‍💻</span>
+                                            <span class="text-[11.5px] truncate">Developer PCs</span>
+                                        </div>
+                                        <input type="checkbox" value="Developer PC" x-model="filterLoc" @change="haptic('light')" class="custom-checkbox shrink-0">
                                     </label>
-                                    <div class="border-t border-slate-100 dark:border-white/10 my-1"></div>
                                     
-                                    <!-- Dynamic Physical Locations -->
+                                    <div class="border-t border-slate-100 dark:border-white/5 my-1"></div>
+                                    
+                                    <!-- Dynamic Locations -->
                                     <template x-for="loc in uniqueLocations" :key="loc">
-                                        <label class="flex items-start gap-2.5 px-2 py-2 hover:bg-slate-50 dark:hover:bg-white/5 rounded-lg cursor-pointer transition-colors group"><input type="checkbox" :value="loc" x-model="filterLoc" @change="haptic('light')" class="custom-checkbox shrink-0 mt-0.5"><span class="text-xs font-bold text-slate-700 dark:text-slate-300 whitespace-normal break-words leading-snug group-hover:text-brand transition-colors" x-text="getLocationEmoji(loc) + ' ' + loc"></span></label>
+                                        <label class="flex items-center justify-between px-2.5 py-2 rounded-xl cursor-pointer transition-all duration-150 select-none group"
+                                               :class="filterLoc.includes(loc) ? 'bg-indigo-50/80 text-brand font-black dark:bg-brand/15 dark:text-brand_glow' : 'hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 font-semibold'">
+                                            <div class="flex items-center gap-2 min-w-0 pr-2">
+                                                <span class="text-sm shrink-0" x-text="getLocationEmoji(loc)"></span>
+                                                <span class="text-[11.5px] truncate" x-text="loc"></span>
+                                            </div>
+                                            <input type="checkbox" :value="loc" x-model="filterLoc" @change="haptic('light')" class="custom-checkbox shrink-0">
+                                        </label>
                                     </template>
                                 </div>
                             </div>
                         </div>
-                        <button @click="filterHygiene = !filterHygiene" :class="filterHygiene ? 'bg-amber-100 text-amber-700 border-amber-300 dark:bg-amber-500/20 dark:text-amber-400 dark:border-amber-500/50' : 'bg-white text-slate-500 border-slate-200 dark:bg-white/5 dark:text-slate-400 dark:border-white/10'" class="w-9 h-9 sm:w-auto sm:px-3 sm:py-2 rounded-xl border transition flex items-center justify-center shadow-sm shrink-0" title="Show Incomplete Data">
-                            <i class="fa-solid fa-filter-circle-xmark text-sm sm:text-xs"></i><span class="hidden sm:inline ml-1.5 text-xs font-bold">Hygiene</span>
+
+                        <!-- 4. Hygiene Check Icon Button -->
+                        <button @click="filterHygiene = !filterHygiene" 
+                                :class="filterHygiene ? 'bg-amber-100 text-amber-700 border-amber-300 dark:bg-amber-500/20 dark:text-amber-400 dark:border-amber-500/50 ring-2 ring-amber-400/20' : 'bg-white text-slate-500 border-slate-200/90 dark:bg-black/40 dark:text-slate-400 dark:border-slate-700/60 hover:border-slate-300'" 
+                                class="w-8 h-8 sm:w-auto sm:px-3 sm:py-2 rounded-xl border transition-all flex items-center justify-center shadow-sm shrink-0 active:scale-95" title="Toggle Hygiene Check">
+                            <i class="fa-solid fa-filter-circle-xmark text-xs"></i><span class="hidden sm:inline ml-1.5 text-xs font-bold">Hygiene</span>
                         </button>
                     </div>
 
-                    <!-- EXPORT & SYNC -->
-                    <div class="flex items-center gap-2 ml-auto w-full lg:w-auto justify-end">
-                        
-                        <!-- 🚀 ADDED: Live Filter Result Counter Pill -->
-                        <div class="flex items-center gap-1.5 px-3 py-1.5 sm:py-2 bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl shadow-sm mr-auto lg:mr-2 transition-all">
+                    <!-- 3. DESKTOP-ONLY ACTIONS (Counter + Export + Sync) -->
+                    <div class="hidden lg:flex items-center gap-2 shrink-0">
+                        <!-- Matched Pill -->
+                        <div class="flex items-center gap-1.5 px-3 h-9 bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl shadow-sm">
                             <span class="relative flex h-2 w-2 shrink-0">
                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" :class="currentTab === 'hardware' ? 'bg-brand' : 'bg-purple-400'"></span>
                                 <span class="relative inline-flex rounded-full h-2 w-2" :class="currentTab === 'hardware' ? 'bg-brand' : 'bg-purple-500'"></span>
                             </span>
-                            <span class="text-[11px] sm:text-xs font-black text-slate-800 dark:text-white leading-none mt-px" x-text="currentTab === 'hardware' ? filteredHardware.length : filteredSoftware.length"></span>
-                            <span class="text-[8px] sm:text-[9px] font-bold text-slate-500 uppercase tracking-widest leading-none mt-px">Matched</span>
+                            <span class="text-xs font-black text-slate-800 dark:text-white leading-none mt-px" x-text="currentTab === 'hardware' ? filteredHardware.length : filteredSoftware.length"></span>
+                            <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest leading-none mt-px">Matched</span>
                         </div>
 
-                        <button @click="exportCSV()" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:hover:bg-emerald-500/20 w-9 h-9 sm:w-auto sm:px-3 sm:py-2 rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-widest shadow-sm transition flex items-center justify-center gap-1.5 border border-emerald-200 dark:border-emerald-500/20" title="Export to CSV">
-                            <i class="fa-solid fa-file-csv"></i><span class="hidden sm:inline">CSV</span>
+                        <!-- 🚀 Compact & Balanced Excel Button (1-word clean label) -->
+                        <button @click="exportExcel()" class="flex items-center justify-center h-9 px-3 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:hover:bg-emerald-500/20 rounded-xl text-xs font-bold border border-emerald-200 dark:border-emerald-500/30 shadow-sm transition active:scale-95 gap-1.5" title="Export to Excel">
+                            <i class="fa-solid fa-file-excel text-[13px]"></i> <span>Excel</span>
                         </button>
-                        <button @click="exportPDF()" class="bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-500/10 dark:text-rose-400 dark:hover:bg-rose-500/20 w-9 h-9 sm:w-auto sm:px-3 sm:py-2 rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-widest shadow-sm transition flex items-center justify-center gap-1.5 border border-rose-200 dark:border-rose-500/20" title="Export to PDF">
-                            <i class="fa-solid fa-file-pdf"></i><span class="hidden sm:inline">PDF</span>
-                        </button>
-                        <button @click="fetchData(true)" class="flex items-center justify-center w-9 h-9 sm:w-auto sm:px-3 sm:py-2 bg-white dark:bg-white/5 text-slate-500 hover:text-brand rounded-xl text-[10px] sm:text-xs font-bold border border-slate-200 dark:border-white/10 shadow-sm transition active:scale-95" title="Force Sync"> 
+
+                        <!-- Sync Button -->
+                        <button @click="fetchData(true)" class="flex items-center justify-center h-9 px-3 bg-white dark:bg-white/5 text-slate-500 hover:text-brand rounded-xl text-xs font-bold border border-slate-200 dark:border-white/10 shadow-sm transition active:scale-95" title="Force Sync"> 
                             <i class="fa-solid fa-rotate" :class="syncing ? 'fa-spin' : ''"></i> 
-                            <span class="hidden sm:inline ml-1.5">Sync</span> 
+                            <span class="ml-1.5">Sync</span> 
                         </button>
                     </div>
+
                 </div>
 
                 <!-- 🚀 Fixed: Let container expand naturally on mobile to push KPIs up -->
@@ -536,11 +654,10 @@
                         <div x-show="currentTab === 'software' && filteredSoftware.length === 0" class="p-8 text-center text-slate-400 bg-white dark:bg-dark_surface rounded-xl border border-slate-200 dark:border-white/10 shadow-sm"><i class="fa-solid fa-compact-disc text-4xl mb-3 opacity-30 text-brand"></i><p class="text-xs font-bold uppercase tracking-widest">No software found.</p></div>
                     </div>
 
-                    <!-- 💻 DESKTOP VIEW -->
-                    <div class="hidden md:block w-full overflow-x-auto" x-show="!loading" x-cloak>
+                    <!-- 💻 DESKTOP VIEW: HARDWARE TABLE -->
+                    <div class="hidden md:block w-full overflow-x-auto" x-show="!loading && currentTab === 'hardware'" x-cloak>
                         <table class="w-full text-left border-collapse text-xs whitespace-nowrap min-w-[1200px]">
-                            
-                            <thead x-show="currentTab === 'hardware'" class="bg-white/50 dark:bg-white/5 text-[9px] text-slate-400 uppercase font-black tracking-widest sticky top-0 z-20 shadow-sm backdrop-blur-md border-b border-slate-200 dark:border-white/10">
+                            <thead class="bg-white/50 dark:bg-white/5 text-[9px] text-slate-400 uppercase font-black tracking-widest sticky top-0 z-20 shadow-sm backdrop-blur-md border-b border-slate-200 dark:border-white/10">
                                 <tr>
                                     <th class="px-4 py-3">Asset Tag</th>
                                     <th class="px-4 py-3">Device Info</th>
@@ -550,24 +667,12 @@
                                     <th class="px-4 py-3 text-center pr-5">Status</th>
                                 </tr>
                             </thead>
-
-                            <thead x-show="currentTab === 'software'" class="bg-purple-50/50 dark:bg-purple-900/10 text-[9px] text-slate-400 uppercase font-black tracking-widest sticky top-0 z-20 shadow-sm backdrop-blur-md border-b border-slate-200 dark:border-white/10">
-                                <tr>
-                                    <th class="px-5 py-3">Software Name</th>
-                                    <th class="px-5 py-3 text-center">License Type</th>
-                                    <th class="px-5 py-3">Usage Stats (Noida / DDN)</th>
-                                    <th class="px-5 py-3">Utilization</th>
-                                    <th class="px-5 py-3 text-center pr-5">Balance</th>
-                                </tr>
-                            </thead>
-
                             <tbody class="divide-y divide-slate-100 dark:divide-white/5 text-sm">
-                                
                                 <template x-for="(item, index) in filteredHardware" :key="'desk-hw-'+index">
-                                    <tr x-show="currentTab === 'hardware'" :class="{'row-focused': focusedIndex === index}" class="hover:bg-slate-50 dark:hover:bg-white/5 transition cursor-pointer group border-b border-slate-100 dark:border-white/5" @click="openModal('view', item)">
+                                    <tr :class="{'row-focused': focusedIndex === index}" class="hover:bg-slate-50 dark:hover:bg-white/5 transition cursor-pointer group border-b border-slate-100 dark:border-white/5" @click="openModal('view', item)">
                                         <td class="px-4 py-3 align-middle">
                                             <div class="font-bold text-brand text-[13px]" x-text="item.AssetID"></div>
-                                            <div class="text-[9px] text-slate-400 font-mono mt-0.5 tracking-widest uppercase truncate" x-text="'SN: '+(item.SerialNo || '-')"></div>
+                                            <div class="text-[9px] text-slate-400 font-mono mt-0.5 tracking-widest uppercase truncate max-w-[150px]" x-text="'SN: '+(item.SerialNo || '-')"></div>
                                         </td>
                                         <td class="px-4 py-3 align-middle max-w-[200px]">
                                             <div class="flex items-center gap-3">
@@ -591,7 +696,7 @@
                                         </td>
                                         <td class="px-4 py-3 align-middle">
                                             <div class="flex items-center gap-1.5 mb-1 text-xs font-bold text-slate-700 dark:text-slate-300"><span x-text="getOSEmoji(item.OS)"></span> <span x-text="item.OS"></span></div>
-                                            <div class="text-[10px] text-slate-500 font-medium truncate" x-show="item.RAM_GB" x-text="item.RAM_GB + 'GB RAM • ' + item.Storage_GB + 'GB Disk'"></div>
+                                            <div class="text-[10px] text-slate-500 font-medium truncate max-w-[180px]" x-show="item.RAM_GB" x-text="item.RAM_GB + 'GB RAM • ' + item.Storage_GB + 'GB Disk'"></div>
                                         </td>
                                         <td class="px-4 py-3 align-middle text-center pr-5">
                                             <span class="inline-flex items-center px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-wider border shadow-sm" :class="getStatusClass(item.Status)">
@@ -601,11 +706,28 @@
                                         </td>
                                     </tr>
                                 </template>
+                                <tr x-show="filteredHardware.length === 0"><td colspan="6" class="p-16 text-center text-slate-400"><i class="fa-solid fa-box-open text-4xl mb-3 opacity-30 text-brand"></i><p class="text-xs font-bold uppercase tracking-widest">No hardware found.</p></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
 
+                    <!-- 💻 DESKTOP VIEW: SOFTWARE TABLE -->
+                    <div class="hidden md:block w-full overflow-x-auto" x-show="!loading && currentTab === 'software'" x-cloak>
+                        <table class="w-full text-left border-collapse text-xs whitespace-nowrap min-w-[1000px]">
+                            <thead class="bg-purple-50/50 dark:bg-purple-900/10 text-[9px] text-slate-400 uppercase font-black tracking-widest sticky top-0 z-20 shadow-sm backdrop-blur-md border-b border-slate-200 dark:border-white/10">
+                                <tr>
+                                    <th class="px-5 py-3">Software Name</th>
+                                    <th class="px-5 py-3 text-center">License Type</th>
+                                    <th class="px-5 py-3">Usage Stats (Noida / DDN)</th>
+                                    <th class="px-5 py-3">Utilization</th>
+                                    <th class="px-5 py-3 text-center pr-5">Balance</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 dark:divide-white/5 text-sm">
                                 <template x-for="sw in filteredSoftware" :key="'desk-sw-'+sw.SoftwareID">
-                                    <tr x-show="currentTab === 'software'" class="hover:bg-purple-50/50 dark:hover:bg-white/5 transition cursor-pointer group" @click="openModal('view', sw)">
-                                        <td class="px-5 py-3 align-middle w-1/3 min-w-[280px] whitespace-normal break-words">
-                                            <div class="font-heading font-black text-sm text-slate-800 dark:text-white leading-snug" x-text="sw.SoftwareName"></div>
+                                    <tr class="hover:bg-purple-50/50 dark:hover:bg-white/5 transition cursor-pointer group border-b border-slate-100 dark:border-white/5" @click="openModal('view', sw)">
+                                        <td class="px-5 py-3 align-middle max-w-[280px]">
+                                            <div class="font-heading font-black text-sm text-slate-800 dark:text-white leading-snug truncate" x-text="sw.SoftwareName"></div>
                                             <div x-show="sw.ExpiryDate" class="text-[9px] font-bold uppercase tracking-wider mt-1.5" :class="isExpiring(sw.ExpiryDate) ? 'text-red-500 animate-pulse' : 'text-slate-400'"><i class="fa-regular fa-clock"></i> Exp: <span x-text="formatDate(sw.ExpiryDate)"></span></div>
                                         </td>
                                         <td class="px-5 py-3 text-center align-middle">
@@ -620,7 +742,7 @@
                                                 <div class="flex flex-col"><span class="text-[9px] text-brand uppercase font-black tracking-widest">Total Used</span><span class="font-mono font-black text-brand text-[13px]" x-text="getTotalUsed(sw)"></span></div>
                                             </div>
                                         </td>
-                                        <td class="px-5 py-3 align-middle w-32">
+                                        <td class="px-5 py-3 align-middle w-48">
                                             <div>
                                                 <div class="flex justify-between text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5"><span x-text="getUsagePercent(sw) + '%'"></span><span x-text="'Of ' + sw.TotalLicense"></span></div>
                                                 <div class="w-full bg-slate-100 dark:bg-black/30 rounded-full h-1.5 overflow-hidden shadow-inner border border-slate-200 dark:border-white/5"><div class="h-full rounded-full transition-all" :style="'width: ' + Math.min(100, getUsagePercent(sw)) + '%'" :class="getTotalUsed(sw) > sw.TotalLicense ? 'bg-red-500' : 'bg-purple-500'"></div></div>
@@ -632,9 +754,7 @@
                                         </td>
                                     </tr>
                                 </template>
-
-                                <tr x-show="currentTab === 'hardware' && filteredHardware.length === 0"><td colspan="6" class="p-16 text-center text-slate-400"><i class="fa-solid fa-box-open text-4xl mb-3 opacity-30 text-blue-500"></i><p>No matching hardware records.</p></td></tr>
-                                <tr x-show="currentTab === 'software' && filteredSoftware.length === 0"><td colspan="5" class="p-16 text-center text-slate-400"><i class="fa-solid fa-compact-disc text-4xl mb-3 opacity-30 text-purple-500"></i><p>No matching software records.</p></td></tr>
+                                <tr x-show="filteredSoftware.length === 0"><td colspan="5" class="p-16 text-center text-slate-400"><i class="fa-solid fa-compact-disc text-4xl mb-3 opacity-30 text-brand"></i><p class="text-xs font-bold uppercase tracking-widest">No software found.</p></td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -1671,30 +1791,78 @@ Expiry Date: ${this.formatDisplayDate(item.ExpiryDate) || 'Lifetime / N/A'}`;
                         } catch(e) { this.showToast('Error', 'Delete Failed', 'error'); this.haptic('error');} 
                     },
                     
-                    exportCSV() {
+                    // 🚀 TRUE EXCEL (XLSX) EXPORT LOGIC (Smart Tab & Proper File Naming)
+                    exportExcel() {
                         this.haptic('light');
-                        if (this.currentTab === 'hardware' && this.filteredHardware.length > 0) {
-                            const headers = ['Asset Tag', 'Type', 'Make', 'Model', 'Serial', 'User', 'Location', 'Status'];
-                            let csv = headers.join(',') + '\n';
-                            this.filteredHardware.forEach(row => { const data = [row.AssetID, row.DeviceType, row.Make, row.Model, row.SerialNo, row.AssignedTo, row.Location, row.Status].map(field => `"${(field || '').toString().replace(/"/g, '""')}"`); csv += data.join(',') + '\n'; });
-                            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = `PBL_Hardware_${this.currentLocation}.csv`; a.click();
-                        }
-                        setTimeout(() => this.haptic('success'), 500);
-                    },
+                        if (this.currentTab === 'hardware' && this.filteredHardware.length === 0) return;
+                        if (this.currentTab === 'software' && this.filteredSoftware.length === 0) return;
 
-                    exportPDF() {
-                        this.haptic('light');
-                        const { jsPDF } = window.jspdf; const doc = new jsPDF('l', 'mm', 'a4'); 
+                        const wb = XLSX.utils.book_new();
+                        const dateStr = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
+                        
+                        // 🖥️ HARDWARE TAB EXPORT
                         if (this.currentTab === 'hardware') {
-                            doc.text(`PBL Hardware Report (${this.currentLocation})`, 14, 15); doc.setFontSize(10); doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 20);
-                            const rows = this.filteredHardware.map(r => [r.AssetID || '-', r.DeviceType || '-', r.Model || '-', r.SerialNo || '-', r.AssignedTo || 'Unassigned', r.Location || '-', r.Status || '-']);
-                            doc.autoTable({ head: [['Asset Tag', 'Type', 'Model', 'Serial', 'User', 'Location', 'Status']], body: rows, startY: 25, theme: 'grid', styles: { fontSize: 8 }, headStyles: { fillColor: [59, 130, 246] } });
-                            doc.save(`PBL_Hardware_${this.currentLocation}.pdf`);
-                        } else {
-                            doc.text("PBL Software Compliance Report", 14, 15); doc.setFontSize(10); doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 20);
-                            const rows = this.filteredSoftware.map(s => [s.SoftwareName, s.Type, s.TotalLicense, s.Used_Noida, s.Used_DDN, (s.TotalLicense - (s.Used_Noida + s.Used_DDN))]);
-                            doc.autoTable({ head: [['Software Name', 'Type', 'Total Lic', 'Used Noida', 'Used DDN', 'Balance']], body: rows, startY: 25, theme: 'grid', styles: { fontSize: 8 }, headStyles: { fillColor: [124, 58, 237] } });
-                            doc.save(`PBL_Software.pdf`);
+                            const data = this.filteredHardware.map(row => {
+                                // Convert Software IDs to Readable Names
+                                let readableSoftware = '-';
+                                if (row.InstalledSoftware && String(row.InstalledSoftware).trim() !== '') {
+                                    const swIds = String(row.InstalledSoftware).split(',').map(id => id.trim());
+                                    readableSoftware = swIds.map(id => {
+                                        const foundSw = this.softwareList.find(s => s.SoftwareID === id);
+                                        return foundSw ? foundSw.SoftwareName : id;
+                                    }).join(', ');
+                                }
+
+                                return {
+                                    "ParentAssetID": row.ParentAssetID || '-',
+                                    "AssetID": row.AssetID || '-',
+                                    "DeviceType": row.DeviceType || '-',
+                                    "Status": row.Status || '-',
+                                    "Hostname": row.Hostname || '-',
+                                    "Make": row.Make || '-',
+                                    "Model": row.Model || '-',
+                                    "SerialNo": row.SerialNo || '-',
+                                    "CPU": row.CPU || '-',
+                                    "RAM_GB": row.RAM_GB || '-',
+                                    "Storage_GB": row.Storage_GB || '-',
+                                    "OS": row.OS || '-',
+                                    "DataClass": row.DataClass || '-',
+                                    "Encryption": row.Encryption || '-',
+                                    "IP_Address (Live)": row.Live_IP || 'Not Allocated',
+                                    "BackupStatus": row.BackupStatus || '-',
+                                    "Location": row.Location || '-',
+                                    "AssignedTo": row.AssignedTo || 'Unassigned',
+                                    "PurchaseDate": this.formatDisplayDate(row.PurchaseDate) === 'N/A' ? '' : this.formatDisplayDate(row.PurchaseDate),
+                                    "Vendor": row.Vendor || '-',
+                                    "Cost_INR": row.Cost_INR || '-',
+                                    "WarrantyEnd": this.formatDisplayDate(row.WarrantyEnd) === 'N/A' ? '' : this.formatDisplayDate(row.WarrantyEnd),
+                                    "AntivirusStatus": row.AntivirusStatus || '-',
+                                    "Notes": row.Notes || '-',
+                                    "AssetOwner": row.AssetOwner || '-',
+                                    "InstalledSoftware": readableSoftware
+                                };
+                            });
+                            const ws = XLSX.utils.json_to_sheet(data);
+                            XLSX.utils.book_append_sheet(wb, ws, "Hardware_Assets");
+                            XLSX.writeFile(wb, `PBL_Hardware_Inventory_${this.currentLocation}_${dateStr}.xlsx`);
+                        } 
+                        // 💿 SOFTWARE TAB EXPORT
+                        else {
+                            const data = this.filteredSoftware.map(s => ({
+                                "SoftwareID": s.SoftwareID || '-',
+                                "Software Name": s.SoftwareName || '-',
+                                "License Type": s.Type || '-',
+                                "Total Licenses": s.TotalLicense || 0,
+                                "Used (Noida)": this.getSoftwareUsage(s.SoftwareID).noida,
+                                "Used (DDN)": this.getSoftwareUsage(s.SoftwareID).ddn,
+                                "Total Used": this.getTotalUsed(s),
+                                "Balance": s.TotalLicense - this.getTotalUsed(s),
+                                "Status": s.Status || 'Active',
+                                "Expiry Date": this.formatDisplayDate(s.ExpiryDate) === 'N/A' ? 'Lifetime / N/A' : this.formatDisplayDate(s.ExpiryDate)
+                            }));
+                            const ws = XLSX.utils.json_to_sheet(data);
+                            XLSX.utils.book_append_sheet(wb, ws, "Software_Licenses");
+                            XLSX.writeFile(wb, `PBL_Software_Licenses_${dateStr}.xlsx`);
                         }
                         setTimeout(() => this.haptic('success'), 500);
                     },
