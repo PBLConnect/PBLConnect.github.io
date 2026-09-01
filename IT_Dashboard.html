@@ -751,28 +751,35 @@
                         </div>
                         
                         <div class="relative z-10 mt-auto w-full">
-                            <h3 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">IT Sec Audit</h3>
+                            <h3 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate mb-1">IT Sec Audit</h3>
                             
-                            <!-- 🚀 Fixed: Wrapped text logic to ensure dates are never cut off on mobile -->
-                            <div class="mt-1 h-[28px] sm:h-[34px] flex flex-col justify-start w-full">
+                            <!-- 🚀 PROPER ALIGNMENT: High-Contrast 2-Line Hierarchy -->
+                            <div class="h-[28px] sm:h-[34px] flex flex-col justify-center w-full">
                                 
-                                <!-- State: Pending / Draft -->
-                                <div x-show="auditMeta.status !== 'Submitted'" class="flex flex-col w-full justify-start mt-0.5">
-                                    <div class="flex items-center gap-1.5 text-[10px] sm:text-[12px] font-bold truncate transition-colors duration-300 text-slate-500 dark:text-slate-400 leading-none mb-0.5">
-                                        <span x-text="auditMeta.status === 'Overdue' ? 'Action Required' : (auditMeta.status === 'Draft' ? 'In Progress' : 'Audit Open')"></span>
-                                        <i class="fa-solid" :class="auditMeta.status === 'Overdue' ? 'fa-triangle-exclamation text-red-500 animate-pulse' : (auditMeta.status === 'Draft' ? 'fa-pen text-amber-500' : 'fa-shield text-indigo-500')"></i>
+                                <!-- State: Open / Draft / Overdue -->
+                                <div x-show="auditMeta.status !== 'Submitted'" class="flex flex-col w-full justify-center leading-none">
+                                    <div class="flex items-center gap-1 text-[11px] sm:text-[12px] font-bold truncate mb-1">
+                                        <!-- 🚀 HIGH CONTRAST: Deep Amber / Orange for crisp readability -->
+                                        <span :class="auditMeta.status === 'Overdue' ? 'text-red-600 dark:text-red-400 font-black animate-pulse' : (auditMeta.status === 'Draft' ? 'text-amber-700 dark:text-amber-400 font-black' : 'text-indigo-700 dark:text-indigo-300 font-black')" 
+                                              x-text="auditMeta.status === 'Overdue' ? 'Action Required 🚨' : (auditMeta.status === 'Draft' ? 'In Progress 📝' : 'Audit Open 🛡️')"></span>
                                     </div>
-                                    <div class="w-full text-[7.5px] sm:text-[9.5px] font-black text-slate-800 dark:text-white drop-shadow-md leading-tight whitespace-normal break-words line-clamp-2" x-text="auditMeta.cycle"></div>
+                                    <div class="flex items-center gap-1.5 text-[9.5px] sm:text-[10.5px] font-bold text-slate-700 dark:text-slate-200 truncate leading-none">
+                                        <span x-text="auditMeta.cycle.includes('(') ? auditMeta.cycle.split('(')[0].replace('Noida Audit - ', '').trim() : 'Monthly'"></span>
+                                        <span class="text-slate-300 dark:text-slate-600 font-normal">•</span>
+                                        <span class="font-bold text-indigo-700 dark:text-indigo-300 truncate" x-text="auditMeta.cycle.includes('(') ? auditMeta.cycle.split('(')[1].replace(')', '').replace('1st to 7th', '1st-7th').replace('15th to 21st', '15th-21st') : auditMeta.cycle"></span>
+                                    </div>
                                 </div>
 
-                                <!-- State: Submitted -->
-                                <div x-show="auditMeta.status === 'Submitted'" x-cloak class="flex flex-col w-full justify-start mt-0.5">
-                                    <div class="text-[10px] sm:text-[12px] font-black text-emerald-600 dark:text-emerald-500 leading-none mb-0.5 truncate">
-                                        ✅ Submitted by <span x-text="auditMeta.auditor ? auditMeta.auditor.split(' ')[0] : 'IT'"></span>
+                                <!-- State: Submitted (Proper Alignment & High-Contrast Timestamp) -->
+                                <div x-show="auditMeta.status === 'Submitted'" x-cloak class="flex flex-col w-full justify-center leading-none">
+                                    <div class="flex items-center gap-1 text-[11px] sm:text-[12px] font-black text-emerald-600 dark:text-emerald-400 truncate mb-1">
+                                        <span>✅ Submitted by</span>
+                                        <span class="text-slate-800 dark:text-white" x-text="auditMeta.auditor ? auditMeta.auditor.split(' ')[0] : 'IT'"></span>
                                     </div>
-                                    <div class="w-full text-[7.5px] sm:text-[9px] font-bold text-slate-500 dark:text-slate-400 leading-tight whitespace-normal break-words line-clamp-2">
-                                        <span class="font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest" x-text="auditMeta.cycle.includes('(') ? auditMeta.cycle.split('(')[0].trim() : auditMeta.cycle"></span>
-                                        <span class="font-mono whitespace-nowrap" x-text="'' + auditMeta.date"></span>
+                                    <div class="flex items-center gap-1.5 text-[9.5px] sm:text-[10.5px] font-bold text-slate-700 dark:text-slate-200 truncate leading-none">
+                                        <span x-text="auditMeta.cycle.includes('(') ? auditMeta.cycle.split('(')[0].replace('Noida Audit - ', '').trim() : 'Monthly'"></span>
+                                        <span class="text-slate-300 dark:text-slate-600 font-normal">•</span>
+                                        <span class="font-mono font-bold text-slate-600 dark:text-slate-300 truncate" x-text="auditMeta.date || ''"></span>
                                     </div>
                                 </div>
                                 
