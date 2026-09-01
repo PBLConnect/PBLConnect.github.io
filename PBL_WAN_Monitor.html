@@ -951,6 +951,12 @@
                         if (this.form.date && this.form.start && this.form.endDate && this.form.end) {
                             const s = new Date(`${this.form.date}T${this.form.start}`); 
                             const e = new Date(`${this.form.endDate}T${this.form.end}`);
+                            
+                            if (isNaN(s.getTime()) || isNaN(e.getTime())) {
+                                this.form.duration = '--';
+                                return;
+                            }
+                            
                             let diffMs = e - s;
                             if (diffMs >= 0) {
                                 let days = Math.floor(diffMs / 86400000);
@@ -960,6 +966,8 @@
                             } else {
                                 this.form.duration = 'Invalid Time';
                             }
+                        } else {
+                            this.form.duration = '--';
                         }
                     },
 
@@ -967,6 +975,14 @@
                         if (!this.form.secret || this.form.secret.trim() !== 'PBL2026') { 
                             this.haptic('error'); alert("❌ Invalid Admin Key!"); return; 
                         }
+                        
+                        // 🛑 PREVENT SAVING INVALID TIME INTO DATABASE
+                        if (this.form.status.includes('Resolved') && this.form.duration === 'Invalid Time') {
+                            this.haptic('error');
+                            alert("❌ Time Mismatch Error:\n\n'Link Restored' time is earlier than 'Downtime Started' time.\n\n• Agar outage raat bhar chala tha, toh kripya 'Link Restored' ki Date ko agle din (Next Date) par set karein!\n• Agar time galat fill hua hai, toh Start/End time check karein.");
+                            return;
+                        }
+
                         this.saving = true; 
                         try { 
                             // 📍 Passing locationContext to Backend
@@ -1131,6 +1147,22 @@
 
                     parseDateForInput(dateStr) { 
                         if(!dateStr || dateStr === 'Pending' || dateStr === 'N/A' || dateStr.includes('1970') || dateStr.includes('1899')) return ''; 
+                        
+                        // 🛡️ Handles '11-Aug-2026', '11-08-2026', '2026-08-11' across all browsers
+                        if (typeof dateStr === 'string') {
+                            const parts = dateStr.trim().split(/[-/]/);
+                            if (parts.length === 3) {
+                                const months = { jan:1, feb:2, mar:3, apr:4, may:5, jun:6, jul:7, aug:8, sep:9, oct:10, nov:11, dec:12 };
+                                const mKey = parts[1].toLowerCase().substring(0,3);
+                                if (months[mKey]) {
+                                    const day = String(parts[0]).padStart(2, '0');
+                                    const month = String(months[mKey]).padStart(2, '0');
+                                    const year = parts[2].length === 2 ? '20' + parts[2] : parts[2];
+                                    return `${year}-${month}-${day}`;
+                                }
+                            }
+                        }
+
                         const date = new Date(dateStr); 
                         if(isNaN(date.getTime())) return ''; 
                         return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0'); 
