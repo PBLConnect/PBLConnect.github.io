@@ -759,9 +759,9 @@
                                 <!-- State: Open / Draft / Overdue -->
                                 <div x-show="auditMeta.status !== 'Submitted'" class="flex flex-col w-full justify-center leading-none">
                                     <div class="flex items-center gap-1 text-[11px] sm:text-[12px] font-bold truncate mb-1">
-                                        <!-- 🚀 HIGH CONTRAST: Deep Amber / Orange for crisp readability -->
+                                        <!-- 🚀 DYNAMIC IN-PROGRESS PERCENTAGE DISPLAY -->
                                         <span :class="auditMeta.status === 'Overdue' ? 'text-red-600 dark:text-red-400 font-black animate-pulse' : (auditMeta.status === 'Draft' ? 'text-amber-700 dark:text-amber-400 font-black' : 'text-indigo-700 dark:text-indigo-300 font-black')" 
-                                              x-text="auditMeta.status === 'Overdue' ? 'Action Required 🚨' : (auditMeta.status === 'Draft' ? 'In Progress 📝' : 'Audit Open 🛡️')"></span>
+                                              x-text="auditMeta.status === 'Overdue' ? 'Action Required 🚨' : (auditMeta.status === 'Draft' ? ('In Progress (' + auditProgress.percent + '%) 📝') : 'Audit Open 🛡️')"></span>
                                     </div>
                                     <div class="flex items-center gap-1.5 text-[9.5px] sm:text-[10.5px] font-bold text-slate-700 dark:text-slate-200 truncate leading-none">
                                         <span x-text="auditMeta.cycle.includes('(') ? auditMeta.cycle.split('(')[0].replace('Noida Audit - ', '').trim() : 'Monthly'"></span>
@@ -1199,6 +1199,15 @@
                             <i class="fa-solid fa-globe text-orange-500 text-[11px] sm:text-[12px] transition-transform drop-shadow-sm"></i>
                             <span class="absolute -top-9 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-slate-800 dark:bg-white text-white dark:text-slate-800 text-[9px] font-black tracking-widest uppercase rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-300 translate-y-2 group-hover:translate-y-0 whitespace-nowrap">
                                 PBL Global
+                                <span class="absolute top-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-t-slate-800 dark:border-t-white"></span>
+                            </span>
+                        </a>
+
+                        <!-- 🚀 3RD BUTTON: Webmail Portal (RediffmailPro) -->
+                        <a href="https://webmail.rediffmailpro.com/action/login/panbusiness.net" target="_blank" class="relative w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-full bg-white dark:bg-dark_surface shadow-[0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,1)] border border-slate-200/90 dark:border-slate-700/80 hover:text-rose-500 transition-all active:scale-95 active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] active:translate-y-[1px] group z-10 hover:z-20">
+                            <i class="fa-solid fa-envelope text-rose-500 text-[11px] sm:text-[12px] transition-transform drop-shadow-sm"></i>
+                            <span class="absolute -top-9 left-1/2 -translate-x-1/2 px-2.5 py-1 bg-slate-800 dark:bg-white text-white dark:text-slate-800 text-[9px] font-black tracking-widest uppercase rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-300 translate-y-2 group-hover:translate-y-0 whitespace-nowrap">
+                                PBL Rediffmail
                                 <span class="absolute top-full left-1/2 -translate-x-1/2 border-[4px] border-transparent border-t-slate-800 dark:border-t-white"></span>
                             </span>
                         </a>
@@ -2231,18 +2240,20 @@
     </div>
 </div>
 	
-	<!-- MEGA CHANGELOG MODAL (RELEASE NOTES v2.5) -->
+	<!-- MEGA CHANGELOG MODAL (RELEASE NOTES v3.0) -->
     <div x-show="showChangelogModal" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/70 backdrop-blur-md p-4" x-transition.opacity @click.self="showChangelogModal = false">
         <div class="bg-white dark:bg-dark_surface w-full max-w-4xl rounded-[2rem] shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden flex flex-col max-h-[85vh] sm:max-h-[90vh] transform transition-all scale-100">
             
-            <!-- Hero Header (Teal/Emerald Theme for v2.5) -->
-            <div class="p-6 sm:p-8 border-b border-slate-100 dark:border-white/10 bg-gradient-to-br from-teal-600 to-emerald-800 text-white shrink-0 relative overflow-hidden">
-                <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+            <!-- Hero Header (Next-Gen Indigo/Violet Theme for v3.0) -->
+            <div class="p-6 sm:p-8 border-b border-slate-100 dark:border-white/10 bg-gradient-to-br from-indigo-700 via-indigo-900 to-slate-950 text-white shrink-0 relative overflow-hidden">
+                <div class="absolute -right-10 -top-10 w-48 h-48 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -left-10 -bottom-10 w-48 h-48 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
+                
                 <div class="relative z-10 flex justify-between items-start">
                     <div>
-                        <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest bg-white/20 border border-white/20 shadow-sm px-2.5 py-1 rounded-md mb-3 inline-block flex items-center gap-1.5 w-max"><span class="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse"></span> Official Release Notes</span>
-                        <h3 class="text-2xl sm:text-3xl font-heading font-black leading-tight drop-shadow-md">What's New in v2.5 🚀</h3>
-                        <p class="text-[11px] font-medium opacity-80 mt-1.5 font-mono">Unified Master Exports & Streamlined Operations • Sep 01, 2026</p>
+                        <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest bg-white/20 border border-white/20 shadow-sm px-2.5 py-1 rounded-md mb-3 inline-block flex items-center gap-1.5 w-max"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Official Release Notes</span>
+                        <h3 class="text-2xl sm:text-3xl font-heading font-black leading-tight drop-shadow-md">What's New in v3.0 💎</h3>
+                        <p class="text-[11px] font-medium opacity-80 mt-1.5 font-mono">Enterprise Telemetry & Silicon Asset Intelligence • Sep 04, 2026</p>
                     </div>
                     <button @click="showChangelogModal = false" class="w-8 h-8 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/40 text-white transition shadow-sm active:scale-95"><i class="fa-solid fa-xmark text-sm"></i></button>
                 </div>
@@ -2251,8 +2262,81 @@
             <!-- Scrollable Content -->
             <div class="p-5 sm:p-6 overflow-y-auto custom-scroll flex-1 bg-slate-50/50 dark:bg-transparent space-y-6 relative z-10">
 
-                <!-- === VERSION 2.5 (LATEST MAJOR RELEASE) === -->
+                <!-- === VERSION 3.0 (LATEST MAJOR RELEASE) === -->
                 <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="px-2.5 py-0.5 rounded bg-indigo-600 text-white font-black text-[10px] uppercase tracking-widest shadow-sm">v3.0</span>
+                        <h4 class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-widest">Next-Gen Telemetry & Hardware Intelligence Console</h4>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                        
+                        <!-- Block 1: Network & Hardware Telemetry -->
+                        <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition">
+                            <h4 class="text-[11px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-network-wired"></i> Network Telemetry & Infrastructure</h4>
+                            <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-teal-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>RJ45 Chassis & Live Status LEDs:</strong> Replaced flat port grids in SwitchManager with authentic hardware RJ45 faceplates, flickering activity LEDs, and 35% slimmer sidebar load cards (`24/52 Ports`).</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-teal-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Bidirectional Neon Hover Sync:</strong> Hovering table rows highlights corresponding switch ports in neon teal and vice-versa for effortless physical patching audits.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-teal-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Telecom Carrier Terminal Cards (WAN):</strong> Upgraded WAN logs with official Circuit IDs (`#9202902`, `#PAN-STP-01`), carrier wave telemetry, and severity-coded Downtime Heat-Pills.</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Block 2: Silicon Asset Vault & Routing Matrix -->
+                        <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition">
+                            <h4 class="text-[11px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-microchip"></i> Silicon Asset Vault & Routing</h4>
+                            <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-indigo-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Modular Hardware Silicon Pods:</strong> AssetDB now displays RAM (`📟 16G RAM`), Storage (`⚡ 1000G DISK`), and OS chips as modular color-coded badges with anodized barcode tags.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-indigo-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Interactive Software Matrix:</strong> Revamped 30+ software checkboxes into interactive selectable silicon cards with live search and dual-node deployment tracking.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-indigo-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Illuminated IPv4 Routing Terminal:</strong> Active gateway routes glow in neon monospace terminal badges with dimmed standby IPs and anti-wrap hardware patch tags (`🗄️ SWT-025 [Pt:6]`).</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Block 3: Real-Time Governance & Master Exports -->
+                        <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition md:col-span-2">
+                            <h4 class="text-[11px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Real-Time Governance & Full-Dump Suite</h4>
+                            <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium grid grid-cols-1 sm:grid-cols-2 gap-x-4">
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Zero-Refresh Roster Reactivity:</strong> Team Roster online states and shift timers recalculate dynamically every second without page refreshes.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Month-Locked Bi-Monthly Cycle Engine:</strong> Fixed audit assignment logic (`Anil 1-7`, `Ashok 15-21`, `Deependra 1-7`) with high-contrast 2-line KPI card alignment.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Complete 26-Column Multi-Tab XLSX Suite:</strong> Full dataset exports with automatic Software ID-to-Name resolution, sanitized dates, and branded PDF generation.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-emerald-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>2-Row Mobile Toolbars:</strong> Re-engineered mobile action headers into clean 2-row layouts with live matched-result counter pills.</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- === VERSION 2.5 (OLDER) === -->
+                <div class="pt-5 border-t border-slate-200 dark:border-white/10">
                     <div class="flex items-center gap-2 mb-4">
                         <span class="px-2.5 py-0.5 rounded bg-emerald-500 text-white font-black text-[10px] uppercase tracking-widest shadow-sm">v2.5</span>
                         <h4 class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-widest">Unified Master Exports & Ecosystem Polish</h4>
@@ -2805,6 +2889,15 @@
                 auditSecret: '',
                 auditMeta: { cycle: 'Loading...', auditor: '-', status: 'Pending', date: '' },
                 auditForm: { points: [], summary: '' },
+
+                // 🚀 LIVE AUDIT PROGRESS CALCULATOR (e.g. 11/15 = 73%)
+                get auditProgress() {
+                    if (!this.auditForm || !this.auditForm.points || this.auditForm.points.length === 0) return { completed: 0, total: 15, percent: 0 };
+                    const completed = this.auditForm.points.filter(p => p.status && p.status !== '').length;
+                    const total = this.auditForm.points.length || 15;
+                    const percent = Math.round((completed / total) * 100) || 0;
+                    return { completed, total, percent };
+                },
 
                 get isAuditLocked() {
                     if (this.auditMeta.status === 'Submitted') return true;
