@@ -5,22 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="pbl-config.js"></script>
     <title>IT Dashboard | Secure Zero-Trust Access</title>
-    <script>document.title += " " + PBL_APP_VERSION;</script>
+    <script>
+        const appVer = typeof PBL_APP_VERSION !== 'undefined' ? PBL_APP_VERSION : 'v2.6.4';
+        document.title += " " + appVer;
+    </script>
     <link rel="icon" type="image/x-icon" href="Assets/images/pbl-logo.ico">
+    
     <!-- PWA Setup -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" id="meta-theme-color" content="#f1f5f9">
+    <meta name="theme-color" id="meta-theme-color" content="#020617">
     <link rel="apple-touch-icon" href="app-icon.png">
     
     <!-- Dependencies -->
     <script src="https://cdn.tailwindcss.com"></script>
-		
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 
     <!-- Configuration -->
     <script>
-        // Normal session check
         if (sessionStorage.getItem('isLoggedIn')) {
             window.location.href = 'IT_Dashboard.html';
         }
@@ -34,10 +36,11 @@
                         mono: ['JetBrains Mono', 'monospace']
                     },
                     colors: { 
-                        brand: '#3b82f6', 
-                        brand_glow: '#60a5fa',
-                        dark_bg: '#020617', 
-                        dark_surface: '#0f172a' 
+                        brand: {
+                            DEFAULT: '#3b82f6',
+                            glow: '#60a5fa',
+                            dark: '#1d4ed8'
+                        }
                     }
                 }
             }
@@ -45,31 +48,170 @@
     </script>
 
     <style>
-        body { margin: 0; padding: 0; overflow: hidden; background-color: #f1f5f9; }
-        .dark body { background-color: #020617; }
+        /* Smooth Global Transition */
+        * {
+            transition: background-color 0.35s ease, border-color 0.35s ease;
+        }
+
+        body { 
+            margin: 0; 
+            padding: 0; 
+            background-color: #f1f5f9; 
+            font-family: 'Outfit', sans-serif;
+            overflow: hidden;
+        }
+        .dark body { 
+            background-color: #020617; 
+        }
         
-        /* Premium Glass Panel */
+        /* High-Tech Dot Matrix */
+        .dot-matrix {
+            background-image: radial-gradient(rgba(59, 130, 246, 0.15) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .dark .dot-matrix {
+            background-image: radial-gradient(rgba(96, 165, 250, 0.09) 1px, transparent 1px);
+        }
+
+        /* Ambient Cyber Aura Spheres */
+        .aurora-1 {
+            position: absolute;
+            width: 380px;
+            height: 380px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+            top: -60px;
+            left: -60px;
+            filter: blur(65px);
+            pointer-events: none;
+            z-index: 1;
+        }
+        .aurora-2 {
+            position: absolute;
+            width: 420px;
+            height: 420px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, transparent 70%);
+            bottom: -80px;
+            right: -80px;
+            filter: blur(75px);
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        /* Saturated Dual-Layer Glass HUD Panel */
         .glass-panel {
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            background: rgba(255, 255, 255, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(26px) saturate(180%);
+            -webkit-backdrop-filter: blur(26px) saturate(180%);
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 20px 45px -12px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
         }
         .dark .glass-panel {
-            background: rgba(15, 23, 42, 0.75);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.82);
+            border: 1px solid rgba(59, 130, 246, 0.22);
+            box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.08);
         }
-        
-        canvas { display: block; position: absolute; top: 0; left: 0; z-index: 0; pointer-events: none; }
 
-        /* Smooth Inputs */
+        /* 1. Moving Border-Beam Effect */
+        .border-beam::after {
+            content: '';
+            position: absolute;
+            inset: -150%;
+            background: conic-gradient(from 0deg, transparent 0%, transparent 75%, #3b82f6 90%, #60a5fa 95%, transparent 100%);
+            animation: rotateBeam 7s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.45;
+        }
+        .dark .border-beam::after {
+            opacity: 0.7;
+        }
+        @keyframes rotateBeam {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .panel-inner {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 2. Dynamic Input Inset Glow */
+        .modern-input {
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .modern-input:focus {
+            box-shadow: 0 0 18px rgba(59, 130, 246, 0.35), inset 0 1px 2px rgba(0, 0, 0, 0.05);
+            border-color: #3b82f6 !important;
+        }
+
+        /* 3. Biometric Sonar Radar Waves */
+        .bio-btn {
+            position: relative;
+        }
+        .bio-btn::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 14px;
+            border: 2px solid rgba(59, 130, 246, 0.4);
+            animation: radarPulse 2.2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+            pointer-events: none;
+            opacity: 0;
+        }
+        @keyframes radarPulse {
+            0% { transform: scale(0.9); opacity: 0.8; }
+            70% { transform: scale(1.22); opacity: 0; }
+            100% { transform: scale(1.25); opacity: 0; }
+        }
+
+        /* 4. Logo Backlight Halo */
+        .logo-halo {
+            filter: drop-shadow(0 0 16px rgba(59, 130, 246, 0.45));
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .logo-halo:hover {
+            transform: scale(1.05);
+        }
+
+        /* 6. Button Radiant Shimmer */
+        .btn-shimmer {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-shimmer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -120%;
+            width: 80%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: skewX(-20deg);
+            animation: btnSweep 4.5s ease-in-out infinite;
+        }
+        @keyframes btnSweep {
+            0%, 65% { left: -120%; }
+            100% { left: 180%; }
+        }
+
+        canvas { 
+            display: block; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            z-index: 2; 
+            pointer-events: none; 
+        }
+
+        /* AutoFill Smooth Background */
         input:-webkit-autofill {
             -webkit-box-shadow: 0 0 0 30px transparent inset !important;
             transition: background-color 5000s ease-in-out 0s;
         }
 
-        /* 🫧 SMOOTH LAGGING BUBBLE CURSOR CSS (HARDWARE ACCELERATED) */
+        /* Hardware Accelerated Smooth Cursor */
         @media (hover: hover) and (pointer: fine) { 
             body, html { 
                 cursor: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24'%3e%3cpath d='M4.5.79v22.42l6.56-6.57h9.29L4.5.79z' fill='%233b82f6' stroke='%23ffffff' stroke-width='1.5' stroke-linejoin='round'/%3e%3c/svg%3e") 2 2, default !important; 
@@ -79,114 +221,163 @@
             }
         }
         .custom-ring { 
-            position: fixed; left: 0; top: 0; width: 30px; height: 30px; border: 2px solid rgba(59, 130, 246, 0.5); border-radius: 50%; 
-            z-index: 100000; pointer-events: none; 
-            transition: transform 0.35s ease-out; 
+            position: fixed; 
+            left: 0; 
+            top: 0; 
+            width: 30px; 
+            height: 30px; 
+            border: 2px solid rgba(59, 130, 246, 0.5); 
+            border-radius: 50%; 
+            z-index: 100000; 
+            pointer-events: none; 
+            transition: transform 0.26s cubic-bezier(0.2, 0, 0, 1); 
             will-change: transform; 
         }
-        /* Extra scale transitions aur cursor-grow class hata di gayi hai */
         @media (prefers-reduced-motion: reduce), (max-width: 768px) { 
             .custom-ring { display: none !important; } 
         }
     </style>
 </head>
-<body class="h-[100dvh] w-full flex items-center justify-center relative selection:bg-brand selection:text-white p-4">
+<body class="min-h-[100dvh] w-full flex items-center justify-center relative selection:bg-brand selection:text-white p-3 sm:p-4 dot-matrix overflow-hidden">
 
-    <!-- CANVAS BACKGROUND -->
+    <!-- Ambient Lights -->
+    <div class="aurora-1"></div>
+    <div class="aurora-2"></div>
+
+    <!-- Canvas Interactive Particles Field -->
     <canvas id="techCanvas"></canvas>
 
-    <!-- LIVE DIGITAL CLOCK -->
-    <div class="absolute top-6 right-6 z-20 hidden md:flex items-center gap-4">
-        <div class="glass-panel px-4 py-2 rounded-xl shadow-sm">
-            <p id="liveTime" class="text-sm font-mono font-bold text-slate-800 dark:text-white tracking-tight">--:--:--</p>
+    <!-- Top Telemetry Capsule Status Pill -->
+    <div class="absolute top-5 left-6 z-20 hidden md:flex items-center gap-2">
+        <div class="glass-panel px-3.5 py-1.5 rounded-full flex items-center gap-2 shadow-sm border border-slate-200/50 dark:border-blue-500/20">
+            <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span class="text-[10px] font-mono tracking-wider font-bold text-slate-600 dark:text-slate-300 uppercase">
+                TLS 1.3 // ZERO-TRUST ACTIVE
+            </span>
         </div>
-        <button onclick="toggleTheme()" class="w-10 h-10 rounded-xl glass-panel flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-brand dark:hover:text-brand transition shadow-sm">
-            <i class="fa-solid fa-moon text-lg" id="themeIcon"></i>
+    </div>
+
+    <!-- Desktop Live Digital Clock & Theme -->
+    <div class="absolute top-5 right-6 z-20 hidden md:flex items-center gap-3">
+        <div class="glass-panel px-4 py-2 rounded-xl shadow-sm flex items-center gap-2 border border-slate-200/50 dark:border-blue-500/20">
+            <i class="fa-solid fa-signal text-[11px] text-brand"></i>
+            <p id="liveTime" class="text-xs font-mono font-bold text-slate-800 dark:text-white tracking-wider">--:--:--</p>
+        </div>
+        <button onclick="toggleTheme()" class="w-10 h-10 rounded-xl glass-panel flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-brand dark:hover:text-brand transition shadow-sm hover:scale-105 active:scale-95" aria-label="Toggle Theme">
+            <i class="fa-solid fa-moon text-base" id="themeIcon"></i>
         </button>
     </div>
 
-    <!-- MAIN LOGIN CARD -->
-    <div class="relative z-10 w-full max-w-sm sm:max-w-md p-6 sm:p-10 glass-panel rounded-3xl transform transition-all duration-300">
-        
-        <!-- Header -->
-        <div class="text-center mb-8">
-            <div class="h-16 w-auto flex justify-center mb-5 relative">
-                <img src="pbl-logo.png" alt="PBL Logo" class="h-full object-contain drop-shadow-md" 
-                     onerror="this.style.display='none'; document.getElementById('fallback-logo').style.display='flex'">
-                <div id="fallback-logo" style="display:none;" class="w-16 h-16 bg-gradient-to-tr from-brand to-indigo-600 text-white rounded-2xl items-center justify-center font-black text-3xl shadow-[0_0_20px_rgba(59,130,246,0.5)]">P</div>
-            </div>
-            <h1 class="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white tracking-tight">IT<span class="text-brand">Dashboard</span></h1>
-            <p class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mt-1.5">Secure Operations Portal</p>
-        </div>
+    <!-- Mobile Top Bar: Sync Toggle -->
+    <div class="md:hidden absolute top-4 right-4 z-20 flex items-center gap-2">
+        <button onclick="toggleTheme()" class="w-9 h-9 rounded-xl glass-panel flex items-center justify-center text-slate-600 dark:text-slate-300 shadow-sm active:scale-90" aria-label="Toggle Theme Mobile">
+            <i class="fa-solid fa-moon text-sm" id="themeIconMobile"></i>
+        </button>
+    </div>
 
-        <!-- Form -->
-        <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-6" autocomplete="off">
+    <!-- MAIN LOGIN CARD WITH BORDER-BEAM -->
+    <div class="relative z-10 w-full max-w-sm sm:max-w-md p-1 border-beam rounded-3xl sm:rounded-[2.2rem]">
+        <div class="glass-panel rounded-3xl sm:rounded-[2.1rem] p-6 sm:p-9 panel-inner shadow-2xl">
             
-            <!-- ADMIN ID -->
-            <div class="space-y-2 group">
-                <label class="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1 group-focus-within:text-brand transition">Admin ID</label>
-                <div class="relative">
-                    <i class="fa-solid fa-shield-halved absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-brand transition"></i>
+            <!-- Header -->
+            <div class="text-center mb-6 sm:mb-7">
+                <div class="h-14 sm:h-16 w-auto flex justify-center mb-3 sm:mb-4 relative">
+                    <img src="pbl-logo.png" alt="PBL Logo" class="h-full object-contain logo-halo" 
+                         onerror="this.style.display='none'; document.getElementById('fallback-logo').style.display='flex'">
+                    <div id="fallback-logo" style="display:none;" class="w-14 h-14 bg-gradient-to-tr from-brand to-indigo-600 text-white rounded-2xl items-center justify-center font-black text-2xl shadow-[0_0_22px_rgba(59,130,246,0.6)]">
+                        P
+                    </div>
+                </div>
+                
+                <h1 class="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white tracking-tight">
+                    IT<span class="text-brand">Dashboard</span>
+                </h1>
+                <p class="text-[11px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mt-1">
+                    Secure Operations Portal
+                </p>
+            </div>
+
+            <!-- Form -->
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4 sm:space-y-5" autocomplete="off">
+                
+                <!-- ADMIN ID -->
+            <div class="space-y-1.5 group">
+                <label class="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1 group-focus-within:text-brand transition-colors">Admin ID</label>
+                <div class="relative flex items-center">
+                    <!-- z-10 & pointer-events-none se icon input ke upar aayega -->
+                    <i class="fa-solid fa-shield-halved absolute left-4 z-10 pointer-events-none text-slate-500 dark:text-slate-400 group-focus-within:text-brand dark:group-focus-within:text-blue-400 transition-colors text-[15px]"></i>
                     <input type="text" id="userid" tabindex="1" autocomplete="off" autofocus 
-                           class="w-full pl-11 pr-4 py-3.5 sm:py-4 bg-white/50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl text-sm font-bold text-slate-800 dark:text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition backdrop-blur-sm" 
+                           class="w-full pl-11 pr-4 py-3 sm:py-3.5 bg-white/80 dark:bg-black/50 border border-slate-200/90 dark:border-slate-700/70 rounded-xl text-sm font-bold text-slate-800 dark:text-white outline-none modern-input backdrop-blur-md shadow-inner relative z-0" 
                            placeholder="Enter Username" required>
                 </div>
             </div>
 
             <!-- PASSWORD -->
-            <div class="space-y-2 group">
+            <div class="space-y-1.5 group">
                 <div class="flex justify-between items-center ml-1">
-                    <label class="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest group-focus-within:text-brand transition">Access Key</label>
+                    <label class="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest group-focus-within:text-brand transition-colors">Access Key</label>
                 </div>
-                <div class="relative">
-                    <i class="fa-solid fa-fingerprint absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-brand transition"></i>
+                <div class="relative flex items-center">
+                    <!-- z-10 & pointer-events-none se fingerprint icon bilkul sharp dikhega -->
+                    <i class="fa-solid fa-fingerprint absolute left-4 z-10 pointer-events-none text-slate-500 dark:text-slate-400 group-focus-within:text-brand dark:group-focus-within:text-blue-400 transition-colors text-[16px]"></i>
                     <input type="password" id="password" tabindex="2" autocomplete="new-password"
-                           class="w-full pl-11 pr-12 py-3.5 sm:py-4 bg-white/50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl text-sm font-mono font-bold text-slate-800 dark:text-white outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition backdrop-blur-sm" 
+                           class="w-full pl-11 pr-11 py-3 sm:py-3.5 bg-white/80 dark:bg-black/50 border border-slate-200/90 dark:border-slate-700/70 rounded-xl text-sm font-mono font-bold text-slate-800 dark:text-white outline-none modern-input backdrop-blur-md shadow-inner relative z-0" 
                            placeholder="••••••••" required>
-                    <button type="button" tabindex="-1" onclick="togglePassword()" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-brand transition outline-none">
-                        <i class="fa-solid fa-eye" id="eyeIcon"></i>
+                    <button type="button" tabindex="-1" onclick="togglePassword()" class="absolute right-4 z-10 text-slate-400 hover:text-brand transition outline-none" aria-label="Toggle Password">
+                        <i class="fa-solid fa-eye text-sm" id="eyeIcon"></i>
                     </button>
                 </div>
             </div>
 
-            <!-- Error Message -->
-            <div id="errorMsg" class="hidden flex items-center justify-center gap-2 text-xs font-bold text-red-500 bg-red-50 dark:bg-red-900/20 p-3 rounded-xl border border-red-200 dark:border-red-900/50">
-                <i class="fa-solid fa-triangle-exclamation"></i> <span>Authentication Failed.</span>
-            </div>
+                <!-- Error Message -->
+                <div id="errorMsg" class="hidden flex items-center justify-center gap-2 text-xs font-bold text-red-500 bg-red-50 dark:bg-red-950/40 p-2.5 sm:p-3 rounded-xl border border-red-200 dark:border-red-900/50 animate-pulse">
+                    <i class="fa-solid fa-triangle-exclamation"></i> <span>Authentication Failed.</span>
+                </div>
 
-            <!-- Submit & Biometric Button Wrapper 🧬 -->
-            <div class="flex gap-3">
-                <button type="submit" tabindex="3" class="flex-1 py-4 bg-brand hover:bg-blue-600 text-white font-black rounded-xl shadow-[0_10px_25px_-5px_rgba(59,130,246,0.4)] hover:shadow-[0_15px_35px_-5px_rgba(59,130,246,0.6)] transition-all transform active:scale-95 flex items-center justify-center gap-3 group tracking-wide">
+                <!-- Submit & Hardware Sensor Biometric Button Wrapper 🧬 -->
+            <div class="flex gap-2.5 pt-1">
+                <!-- Premium Inset Gradient Button with Dynamic Bevel -->
+                <button type="submit" tabindex="3" class="flex-1 py-3.5 sm:py-4 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold rounded-xl shadow-[0_10px_25px_-5px_rgba(37,99,235,0.45),inset_0_1px_0_rgba(255,255,255,0.3)] hover:shadow-[0_15px_30px_-5px_rgba(37,99,235,0.6)] transition-all duration-300 transform active:scale-[0.98] flex items-center justify-center gap-2.5 group tracking-[0.12em] text-[12px] sm:text-[13px]">
                     <span id="btnText">INITIATE SESSION</span>
-                    <i class="fa-solid fa-arrow-right group-hover:translate-x-1.5 transition-transform"></i>
+                    <i class="fa-solid fa-arrow-right-long text-xs group-hover:translate-x-1.5 transition-transform duration-300"></i>
                 </button>
                 
-                <!-- Naya Biometric Button -->
-                <button type="button" id="bioLoginBtn" onclick="triggerBiometric()" class="w-14 h-[56px] flex items-center justify-center rounded-xl bg-white/50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 text-slate-500 dark:text-slate-400 hover:text-brand dark:hover:text-brand hover:border-brand/30 transition-all backdrop-blur-sm shadow-sm active:scale-95 group" title="Biometric Login">
-                    <i class="fa-solid fa-fingerprint text-2xl group-hover:scale-110 transition-transform"></i>
+                <!-- Authentic Hardware Biometric Sensor Pad with Active Status LED -->
+                <button type="button" id="bioLoginBtn" onclick="triggerBiometric()" class="relative w-14 h-[50px] sm:h-[54px] flex items-center justify-center rounded-xl bg-gradient-to-b from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 border border-slate-200/90 dark:border-slate-700 shadow-[0_4px_12px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,1)] dark:shadow-[0_4px_12px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.05)] hover:border-blue-400 dark:hover:border-blue-500/50 hover:shadow-[0_0_15px_rgba(59,130,246,0.3)] transition-all duration-300 active:scale-95 group" title="Biometric Security Key">
+                    <!-- Sensor Ready Green Micro LED -->
+                    <span class="absolute top-2 right-2 flex h-1.5 w-1.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500 shadow-[0_0_4px_#10b981]"></span>
+                    </span>
+                    <i class="fa-solid fa-fingerprint text-[22px] text-slate-600 dark:text-slate-300 group-hover:text-blue-500 dark:group-hover:text-blue-400 group-hover:scale-110 transition-all duration-300"></i>
                 </button>
             </div>
         </form>
 
-        <!-- Footer -->
-        <div class="mt-8 text-center pt-5 border-t border-slate-200 dark:border-slate-700/50 flex flex-col gap-1.5">
-            <p class="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-lock text-[8px]"></i> Encrypted Session
+        <!-- Zero-Trust Live Security Badge Footer -->
+        <div class="mt-7 text-center pt-5 border-t border-slate-100 dark:border-slate-800/80 flex flex-col items-center gap-1.5">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-50 dark:bg-black/30 border border-slate-200/70 dark:border-white/5 shadow-inner">
+                <span class="relative flex h-1.5 w-1.5">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500 shadow-[0_0_6px_#10b981]"></span>
+                </span>
+                <span class="text-[9.5px] font-mono font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+                    AES-256 // Zero-Trust Enforced
+                </span>
+            </div>
+            <p class="text-[9px] font-mono text-slate-400 dark:text-slate-500 tracking-tight">
+                <span id="login-version"></span> • Role-Based Authentication
             </p>
-            <p class="text-[9px] font-mono text-slate-400 dark:text-slate-500"><span id="login-version"></span> (Role-Based Mode)</p>
         </div>
-    </div>
-
-    <!-- Mobile Theme Toggle -->
-    <button onclick="toggleTheme()" class="md:hidden absolute top-6 right-6 w-10 h-10 rounded-full glass-panel flex items-center justify-center text-slate-600 dark:text-slate-300 shadow-sm z-20">
-        <i class="fa-solid fa-moon text-lg" id="themeIconMobile"></i>
-    </button>
 
     <script>
-        // ⏱️ 30-MINUTE SESSION VALIDITY CHECK (App khulte hi chalega)
+        // ⏱️ 30-MINUTE SESSION VALIDITY CHECK
         const SESSION_TIMEOUT = 30 * 60 * 1000; 
 
-        // 🫧 SMOOTH LAGGING BUBBLE CURSOR ENGINE (DASHBOARD MATCHED - NO ZOOM)
+        // 🫧 HARDWARE ACCELERATED LAGGING CURSOR
         function setupCustomCursor() { 
             if(!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
             if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -196,34 +387,37 @@
             document.body.appendChild(ring);
 
             document.addEventListener('mousemove', (e) => {
-                // Scale parameter hata diya hai
                 ring.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%)`;
             });
-            
-            // Hover logic removed to maintain 100% uniformity with IT_Dashboard.html
         }
 
         window.addEventListener('DOMContentLoaded', () => {
             setupCustomCursor();
+            
+            const vElem = document.getElementById('login-version');
+            if (vElem) {
+                vElem.innerText = typeof PBL_APP_VERSION !== 'undefined' ? PBL_APP_VERSION : 'v2.6.4';
+            }
+
             const lastActive = localStorage.getItem('it_last_active');
             const userData = localStorage.getItem('it_bio_user_data');
             const now = new Date().getTime();
 
-            // Agar 30 minutes ke andar wapas aaya hai toh auto-login kar do 🛡️
-            if (lastActive && userData && (now - lastActive < SESSION_TIMEOUT)) {
+            // Auto-login if session is fresh
+            if (lastActive && userData && (now - Number(lastActive) < SESSION_TIMEOUT)) {
                 sessionStorage.setItem('isLoggedIn', 'true');
                 sessionStorage.setItem('userData', userData);
-                localStorage.setItem('it_last_active', new Date().getTime()); // Renew timer
+                localStorage.setItem('it_last_active', String(new Date().getTime()));
                 window.location.href = 'IT_Dashboard.html';
             }
         });
 
-        // 🚀 Haptic Feedback
+        // 🚀 Haptic Feedback Engine
         function haptic(type = 'light') {
             if (!window.navigator || !window.navigator.vibrate) return;
             if (type === 'light') navigator.vibrate(15); 
-            else if (type === 'success') navigator.vibrate([30, 50, 30]); 
-            else if (type === 'error') navigator.vibrate([50, 50, 50, 50]); 
+            else if (type === 'success') navigator.vibrate([25, 45, 25]); 
+            else if (type === 'error') navigator.vibrate([40, 50, 40, 50]); 
         }
 
         // --- SALTED BASE64 ENCODING ---
@@ -231,19 +425,15 @@
             return btoa('PBL_' + password + '_2026');
         }
 
-        // --- PRE-COMPUTED SALTED HASHES FOR YOUR USERS ---
-        const HASH_VIKAS = "UEJMX05vb3JpMTQzXzIwMjY=";
-        const HASH_ANIL = "UEJMXzI2MTJfMjAyNg==";
-        const HASH_ASHOK = "UEJMXzE5MDlfMjAyNg==";
-        const HASH_DEEPENDRA = "UEJMX2RlZXBlbmRyYV8yMDI2"; // Hash for "deependra"
-
-        // --- THEME LOGIC ---
+        // --- THEME ENGINE ---
         function applyThemeIcons() {
             const isDark = document.documentElement.classList.contains('dark');
             const icon1 = document.getElementById('themeIcon');
             const icon2 = document.getElementById('themeIconMobile');
-            if(icon1) icon1.className = isDark ? "fa-solid fa-sun text-yellow-400 text-lg" : "fa-solid fa-moon text-lg";
-            if(icon2) icon2.className = isDark ? "fa-solid fa-sun text-yellow-400 text-lg" : "fa-solid fa-moon text-lg";
+            
+            const iconClass = isDark ? "fa-solid fa-sun text-amber-400 text-sm sm:text-base" : "fa-solid fa-moon text-sm sm:text-base";
+            if (icon1) icon1.className = iconClass;
+            if (icon2) icon2.className = iconClass;
             
             const metaTheme = document.getElementById('meta-theme-color');
             if (metaTheme) metaTheme.setAttribute("content", isDark ? "#020617" : "#f1f5f9");
@@ -263,26 +453,33 @@
             applyThemeIcons();
         }
 
-        // --- UI LOGIC ---
+        // --- UI CLOCK LOGIC ---
         function updateClock() {
             const timeEl = document.getElementById('liveTime');
-            if(timeEl) timeEl.textContent = new Date().toLocaleTimeString('en-US', { hour12: true, hour:'2-digit', minute:'2-digit', second:'2-digit' });
+            if (timeEl) {
+                timeEl.textContent = new Date().toLocaleTimeString('en-US', { hour12: true, hour:'2-digit', minute:'2-digit', second:'2-digit' });
+            }
         }
-        setInterval(updateClock, 1000); updateClock();
+        setInterval(updateClock, 1000); 
+        updateClock();
 
         function togglePassword() {
             haptic('light');
             const passInput = document.getElementById('password');
             const icon = document.getElementById('eyeIcon');
             if (passInput.type === 'password') { 
-                passInput.type = 'text'; icon.classList.replace('fa-eye', 'fa-eye-slash'); icon.classList.add('text-brand');
+                passInput.type = 'text'; 
+                icon.classList.replace('fa-eye', 'fa-eye-slash'); 
+                icon.classList.add('text-brand');
             } else { 
-                passInput.type = 'password'; icon.classList.replace('fa-eye-slash', 'fa-eye'); icon.classList.remove('text-brand');
+                passInput.type = 'password'; 
+                icon.classList.replace('fa-eye-slash', 'fa-eye'); 
+                icon.classList.remove('text-brand');
             }
         }
 
         // ==========================================
-        // 🧬 FINGERPRINT / FACE ID ENGINE (WEBAUTHN)
+        // 🧬 BIOMETRIC / WEBAUTHN CONTROLLER
         // ==========================================
 
         async function triggerBiometric() {
@@ -294,13 +491,14 @@
             if (!savedCredId || !savedUserData) {
                 haptic('error');
                 error.classList.remove('hidden');
-                error.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> <span>No Biometric Saved. Login via Password first.</span>';
+                error.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> <span>No Biometric Profile. Use Password first.</span>';
                 return;
             }
 
             try {
                 let domain = window.location.hostname || "localhost";
-                const challenge = new Uint8Array(32); crypto.getRandomValues(challenge);
+                const challenge = new Uint8Array(32); 
+                crypto.getRandomValues(challenge);
                 const credIdArray = Uint8Array.from(JSON.parse(savedCredId));
 
                 const publicKey = {
@@ -311,39 +509,33 @@
                     timeout: 60000
                 };
 
-                // Scanner popup aayega
                 await navigator.credentials.get({ publicKey });
                 
-                // 🎉 MATCH HO GAYA!
                 haptic('success');
                 sessionStorage.setItem('isLoggedIn', 'true');
                 sessionStorage.setItem('userData', savedUserData);
-                
-                localStorage.setItem('it_last_active', new Date().getTime());
+                localStorage.setItem('it_last_active', String(new Date().getTime()));
                 
                 const btn = document.getElementById('bioLoginBtn');
-                btn.innerHTML = '<i class="fa-solid fa-fingerprint text-emerald-500 animate-pulse"></i>';
-                btn.classList.add('border-emerald-500', 'bg-emerald-50', 'dark:bg-emerald-900/20');
+                btn.innerHTML = '<i class="fa-solid fa-fingerprint text-emerald-500 animate-pulse text-xl"></i>';
+                btn.classList.add('border-emerald-500', 'bg-emerald-500/10');
                 error.classList.add('hidden');
 
                 setTimeout(() => {
                     const params = new URLSearchParams(window.location.search);
                     window.location.href = params.get('returnUrl') || 'IT_Dashboard.html';
-                }, 600);
+                }, 500);
 
             } catch (e) {
                 console.error(e);
                 haptic('error');
                 error.classList.remove('hidden');
-                error.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> <span>Biometric Cancelled/Failed.</span>';
+                error.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> <span>Biometric Handshake Failed.</span>';
             }
         }
 
         async function setupBiometric(userDataString) {
-            if (!window.PublicKeyCredential) {
-                console.warn("WebAuthn not supported by this browser.");
-                return;
-            }
+            if (!window.PublicKeyCredential) return;
             
             if (localStorage.getItem('it_bio_cred_id')) {
                 localStorage.setItem('it_bio_user_data', userDataString);
@@ -352,43 +544,39 @@
 
             try {
                 let domain = window.location.hostname || "localhost";
-                const challenge = new Uint8Array(32); crypto.getRandomValues(challenge);
-                const userId = new Uint8Array(16); crypto.getRandomValues(userId);
+                const challenge = new Uint8Array(32); 
+                crypto.getRandomValues(challenge);
+                const userId = new Uint8Array(16); 
+                crypto.getRandomValues(userId);
 
                 const publicKey = {
                     challenge: challenge,
-                    rp: { name: "IT Operations Vault", id: domain },
+                    rp: { name: "IT Dashboard Vault", id: domain },
                     user: { id: userId, name: "admin", displayName: "Admin User" },
                     pubKeyCredParams: [{ type: "public-key", alg: -7 }],
                     authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required" },
                     timeout: 60000
                 };
 
-                // Native Face ID / Fingerprint creation trigger
                 const credential = await navigator.credentials.create({ publicKey });
                 const rawIdArray = Array.from(new Uint8Array(credential.rawId));
                 
                 localStorage.setItem('it_bio_cred_id', JSON.stringify(rawIdArray));
                 localStorage.setItem('it_bio_user_data', userDataString);
-                
-                alert("Biometric Lock Setup Successful! 🧬✅"); 
             } catch (e) {
-                console.warn("Biometric setup skipped/cancelled by user.");
+                console.warn("Biometric enrollment skipped.");
             }
         }
 
-        // --- AUTHENTICATION LOGIC ---
+        // --- AUTHENTICATION PIPELINE ---
         function handleLogin(e) {
             e.preventDefault();
             const uid = document.getElementById('userid').value.toLowerCase().trim();
             const pass = document.getElementById('password').value;
             const btn = document.querySelector('button[type="submit"]');
             const error = document.getElementById('errorMsg');
-            const card = document.querySelector('.glass-panel');
+            const card = document.querySelector('.panel-inner');
 
-
-            // 📂 ROLE-BASED USER DATABASE (WITH SECURE SALTED HASHES)
-            // Hashes: btoa('PBL_password_2026')
             const users = {
                 'vikas': { name: 'Vikas Rawat', role: 'Head of IT & Super Admin', empId: 'DL/25629/143', email: 'vik24x7@gmail.com', location: 'Noida', allowedLocation: 'Global', expectedHash: "UEJMX05vb3JpMTQzXzIwMjY=" },
                 'anil':  { name: 'Anil Singh', role: 'Senior Network Engineer', empId: 'DL/25629/485', email: 'kaintura.singh22@gmail.com', location: 'Noida', allowedLocation: 'Noida', expectedHash: "UEJMXzI2MTJfMjAyNg==" },
@@ -397,8 +585,8 @@
             };
 
             error.classList.add('hidden');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> AUTHENTICATING...';
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin text-sm"></i> AUTHENTICATING...';
             btn.classList.add('opacity-80', 'cursor-not-allowed', 'pointer-events-none');
 
             const inputHash = encodePassword(pass);
@@ -407,7 +595,6 @@
                 let validUser = users[uid];
 
                 if (validUser && validUser.expectedHash === inputHash) {
-                    // Success Logic
                     haptic('success'); 
                     
                     const userDataString = JSON.stringify({
@@ -416,45 +603,57 @@
                         empId: validUser.empId, 
                         email: validUser.email, 
                         location: validUser.location,
-                        allowedLocation: validUser.allowedLocation // 🚀 YAHAN NAYA ROLE ENGINE ADD KIYA
+                        allowedLocation: validUser.allowedLocation
                     });
 
                     sessionStorage.setItem('isLoggedIn', 'true');
                     sessionStorage.setItem('userData', userDataString); 
                     
-                    // ⏱️ Start 30-min valid session timer
-                    localStorage.setItem('it_last_active', new Date().getTime());
+                    localStorage.setItem('it_last_active', String(new Date().getTime()));
                     localStorage.setItem('it_user_data', userDataString);
 
-                    btn.className = "flex-1 py-4 bg-emerald-500 text-white font-black rounded-xl shadow-[0_10px_25px_-5px_rgba(16,185,129,0.4)] transition flex items-center justify-center gap-2 tracking-wide";
-                    btn.innerHTML = '<i class="fa-solid fa-shield-check text-lg"></i> ACCESS GRANTED';
+                    btn.className = "flex-1 py-3.5 sm:py-4 bg-emerald-500 text-white font-black rounded-xl shadow-[0_10px_25px_-5px_rgba(16,185,129,0.5)] transition flex items-center justify-center gap-2 text-xs sm:text-sm tracking-wide";
+                    btn.innerHTML = '<i class="fa-solid fa-shield-check text-base"></i> ACCESS GRANTED';
                     
-                    // 🧬 Prompt for Biometric Setup
                     await setupBiometric(userDataString);
                     
                     setTimeout(() => {
                         const params = new URLSearchParams(window.location.search);
                         window.location.href = params.get('returnUrl') || 'IT_Dashboard.html';
-                    }, 600);
+                    }, 500);
                 } else {
-                    // Error Logic
                     haptic('error'); 
                     error.classList.remove('hidden');
-                    btn.innerHTML = originalText;
+                    btn.innerHTML = originalHTML;
                     btn.classList.remove('opacity-80', 'cursor-not-allowed', 'pointer-events-none');
                     
                     card.animate([
-                        { transform: 'translateX(0)' }, { transform: 'translateX(10px)' }, { transform: 'translateX(-10px)' }, { transform: 'translateX(5px)' }, { transform: 'translateX(0)' }
-                    ], { duration: 300, easing: 'ease-in-out' });
+                        { transform: 'translateX(0)' }, 
+                        { transform: 'translateX(8px)' }, 
+                        { transform: 'translateX(-8px)' }, 
+                        { transform: 'translateX(4px)' }, 
+                        { transform: 'translateX(0)' }
+                    ], { duration: 250, easing: 'ease-out' });
                 }
-            }, 800);
+            }, 600);
         }
 
-        // --- PERFORMANCE OPTIMIZED CANVAS (MOBILE FRIENDLY) ---
+        // --- 8. CURSOR-REACTIVE MAGNETIC PARTICLES FIELD ---
         const canvas = document.getElementById("techCanvas");
         const ctx = canvas.getContext("2d");
         let particles = [];
         let animationFrameId;
+        const mouse = { x: null, y: null, radius: 90 };
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+
+        window.addEventListener('mouseleave', () => {
+            mouse.x = null;
+            mouse.y = null;
+        });
 
         function resize() {
             canvas.width = window.innerWidth;
@@ -467,54 +666,76 @@
             constructor() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.vx = (Math.random() - 0.5) * 0.5;
-                this.vy = (Math.random() - 0.5) * 0.5;
-                this.size = Math.random() * 2 + 1; 
+                this.vx = (Math.random() - 0.5) * 0.45;
+                this.vy = (Math.random() - 0.5) * 0.45;
+                this.size = Math.random() * 1.8 + 0.8; 
+                this.baseX = this.x;
+                this.baseY = this.y;
             }
             update() {
-                this.x += this.vx; this.y += this.vy;
+                // Interactive gentle cursor repulsion
+                if (mouse.x != null && mouse.y != null) {
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < mouse.radius) {
+                        const forceDirectionX = dx / distance;
+                        const forceDirectionY = dy / distance;
+                        const force = (mouse.radius - distance) / mouse.radius;
+                        this.x -= forceDirectionX * force * 1.5;
+                        this.y -= forceDirectionY * force * 1.5;
+                    }
+                }
+
+                this.x += this.vx; 
+                this.y += this.vy;
                 if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
                 if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
             }
             draw() {
                 const isDark = document.documentElement.classList.contains('dark');
-                ctx.fillStyle = isDark ? "rgba(96, 165, 250, 0.8)" : "rgba(37, 99, 235, 0.6)"; 
-                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = isDark ? "rgba(96, 165, 250, 0.75)" : "rgba(37, 99, 235, 0.55)"; 
+                ctx.beginPath(); 
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); 
+                ctx.fill();
             }
         }
 
         function initParticles() {
             particles = [];
             const isMobile = window.innerWidth < 768;
-            const divisor = isMobile ? 18000 : 12000; 
+            const divisor = isMobile ? 20000 : 13000; 
             const count = Math.floor((canvas.width * canvas.height) / divisor); 
             for (let i = 0; i < count; i++) { particles.push(new Particle()); }
         }
 
-         function animate() {
+        function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             const isDark = document.documentElement.classList.contains('dark');
             const lineColor = isDark ? "96, 165, 250" : "37, 99, 235"; 
             
             for (let i = 0; i < particles.length; i++) {
-                particles[i].update(); particles[i].draw();
-                for (let j = i; j < particles.length; j++) {
+                particles[i].update(); 
+                particles[i].draw();
+                for (let j = i + 1; j < particles.length; j++) {
                     const dx = particles[i].x - particles[j].x;
                     const dy = particles[i].y - particles[j].y;
                     const distance = Math.sqrt(dx * dx + dy * dy);
-                    if (distance < 120) {
+                    if (distance < 115) {
                         ctx.beginPath(); 
-                        ctx.strokeStyle = `rgba(${lineColor}, ${(1 - distance / 120) * 0.7})`;
-                        ctx.lineWidth = 1; 
+                        ctx.strokeStyle = `rgba(${lineColor}, ${(1 - distance / 115) * 0.52})`;
+                        ctx.lineWidth = 0.8; 
                         ctx.moveTo(particles[i].x, particles[i].y);
-                        ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
+                        ctx.lineTo(particles[j].x, particles[j].y); 
+                        ctx.stroke();
                     }
                 }
             }
             animationFrameId = requestAnimationFrame(animate);
         }
         
-        resize(); animate();
+        resize(); 
+        animate();
 
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) cancelAnimationFrame(animationFrameId);
@@ -523,14 +744,9 @@
         
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(registration => console.log('ServiceWorker registered:', registration.scope))
-                    .catch(error => console.log('ServiceWorker registration failed:', error));
+                navigator.serviceWorker.register('sw.js').catch(() => {});
             });
         }
-		
-		// Add this right after <script> tag starts
-		document.getElementById('login-version').innerText = PBL_APP_VERSION;
     </script>
 </body>
 </html>
