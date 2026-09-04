@@ -39,14 +39,14 @@
         .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .dark .custom-scroll::-webkit-scrollbar-thumb { background: #334155; }
         
-        /* 📅 MODERN CALENDAR GRID */
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-        .cal-day { min-height: 48px; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; border-radius: 10px; font-weight: 700; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; position: relative; padding: 4px 6px; }
-        @media(min-width: 768px) { .cal-day { min-height: 58px; } }
+        /* 📅 TACTILE VISIONOS CALENDAR MATRIX */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+        .cal-day { min-height: 52px; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; border-radius: 14px; font-weight: 800; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid rgba(0,0,0,0.04); position: relative; padding: 6px 8px; backdrop-filter: blur(8px); }
+        @media(min-width: 768px) { .cal-day { min-height: 62px; } }
         
-        .cal-day:hover:not(.empty) { border-color: #3b82f6; transform: translateY(-2px); z-index: 50; box-shadow: 0 8px 20px -5px rgba(59,130,246,0.3); }
+        .cal-day:hover:not(.empty) { border-color: #10b981; transform: translateY(-3px) scale(1.02); z-index: 50; box-shadow: 0 12px 25px -5px rgba(16,185,129,0.25); }
         .empty { opacity: 0; pointer-events: none; }
-        .day-header { font-size: 10px; text-transform: uppercase; font-weight: 900; color: #94a3b8; text-align: center; margin-bottom: 8px; letter-spacing: 1px;}
+        .day-header { font-size: 10px; text-transform: uppercase; font-weight: 900; color: #94a3b8; text-align: center; margin-bottom: 8px; letter-spacing: 1.5px; }
         
         /* 🎨 DYNAMIC DATE COLORS */
         .bg-leave-approved { background-color: #dcfce7 !important; color: #166534 !important; border-color: #bbf7d0 !important; }
@@ -103,12 +103,13 @@
         <div class="max-w-[1920px] mx-auto px-4 sm:px-6 h-full flex justify-between items-center">
             
             <div class="flex items-center gap-3 sm:gap-4 shrink-0">
-                <a href="IT_Dashboard.html" @click="haptic('light')" class="group flex items-center transition-transform active:scale-95" title="Return to IT Dashboard">
+                <!-- 🚀 FIXED: Static Non-clickable Brand Container (Prevents recursive iframe loop) -->
+                <div class="flex items-center cursor-default select-none">
                     <div class="relative h-9 sm:h-11 w-auto flex items-center">
-                        <img src="pbl-logo.png" alt="PBL Logo" class="h-full w-auto object-contain drop-shadow-md transition-transform group-hover:scale-105" @error="$el.style.display='none'; $refs.fbLogo.style.display='flex'">
-                        <div x-ref="fbLogo" style="display:none;" class="w-9 h-9 sm:w-11 sm:h-11 bg-gradient-to-tr from-brand to-indigo-600 text-white rounded-xl flex items-center justify-center font-black text-xl shadow-[0_0_15px_rgba(59,130,246,0.4)] group-hover:shadow-[0_0_25px_rgba(59,130,246,0.6)] transition-all">P</div>
+                        <img src="pbl-logo.png" alt="PBL Logo" class="h-full w-auto object-contain drop-shadow-md" @error="$el.style.display='none'; $refs.fbLogo.style.display='flex'">
+                        <div x-ref="fbLogo" style="display:none;" class="w-9 h-9 sm:w-11 sm:h-11 bg-gradient-to-tr from-brand to-indigo-600 text-white rounded-xl flex items-center justify-center font-black text-xl shadow-[0_0_15px_rgba(59,130,246,0.4)]">P</div>
                     </div>
-                </a>
+                </div>
                 <div class="flex flex-col justify-center">
                     <div class="flex items-center gap-1.5 sm:gap-2 mb-0.5">
                         <span class="px-2 py-0.5 rounded-md bg-brand/10 text-brand border border-brand/20 dark:bg-brand/20 dark:border-brand/30 dark:text-brand_glow font-mono font-black text-[9px] leading-none shadow-sm" x-text="PBL_APP_VERSION"></span>
@@ -190,10 +191,15 @@
                     </div>
                     
                     <div x-show="showProfile" x-transition.origin.top.right class="absolute right-0 top-full mt-2 w-48 bg-white/95 dark:bg-dark_surface/95 backdrop-blur-xl rounded-2xl shadow-xl border border-slate-200 dark:border-dark_border z-[100] overflow-hidden" style="display: none;">
+                        <!-- 🚀 FIXED: Removed internal IT Dashboard link & made logout escape the iframe safely -->
                         <div class="p-2 space-y-1">
-                            <a href="IT_Dashboard.html" class="w-full text-left flex items-center gap-3 px-4 py-2.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-500/10 dark:hover:text-emerald-400 rounded-xl transition"><i class="fa-solid fa-gauge opacity-70"></i> IT Dashboard</a>
-                            <div class="h-px bg-slate-100 dark:bg-white/10 my-1"></div>
-                            <button onclick="sessionStorage.clear(); window.location.href='it-login.html';" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition text-left"><i class="fa-solid fa-arrow-right-from-bracket opacity-70"></i> Secure Logout</button>
+                            <div class="px-3 py-2 border-b border-slate-100 dark:border-white/5 text-center">
+                                <span class="text-xs font-bold text-slate-800 dark:text-white block truncate" x-text="user.name"></span>
+                                <span class="text-[9px] text-slate-400 uppercase tracking-widest font-black mt-0.5 block" x-text="user.role || 'HR-OPS'"></span>
+                            </div>
+                            <button onclick="sessionStorage.clear(); (window.top || window).location.href='it-login.html';" class="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition text-center">
+                                <i class="fa-solid fa-power-off text-xs"></i> <span>Secure Logout</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -207,39 +213,113 @@
             <!-- 🟩 LEFT COLUMN -->
             <div class="lg:col-span-2 flex flex-col gap-4 sm:gap-6 lg:min-h-0">
                 
-                <!-- WALLET CARDS -->
+                <!-- 🍩 VISIONOS RADIAL LEAVE WALLETS -->
                 <div class="grid grid-cols-3 gap-3 sm:gap-4 shrink-0">
-                    <div @click="openPolicy('CL')" class="bg-white dark:bg-dark_surface p-3 sm:p-5 rounded-[1.5rem] shadow-sm border border-emerald-100 dark:border-emerald-900/30 flex flex-col relative overflow-hidden transition hover:-translate-y-1 hover:shadow-md cursor-pointer active:scale-95 group">
-                        <div class="absolute -right-4 -top-4 text-5xl sm:text-7xl text-emerald-500 opacity-5 group-hover:scale-110 transition-transform duration-500"><i class="fa-solid fa-mug-hot"></i></div>
-                        <span class="text-[8px] sm:text-[11px] font-black uppercase text-emerald-600 dark:text-emerald-400 tracking-tight sm:tracking-widest mb-1 leading-tight whitespace-normal break-words line-clamp-2 sm:truncate">Casual Leave (CL)</span>
-                        <h2 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading text-emerald-600 dark:text-emerald-400 mb-2 sm:mb-3 leading-none mt-1"><span x-text="balance.cl"></span> <span class="text-[10px] sm:text-sm text-slate-400 font-bold">/ 7</span></h2>
-                        <div class="w-full bg-slate-100 dark:bg-black/30 h-1.5 sm:h-2 rounded-full mt-auto"><div class="bg-emerald-500 h-full rounded-full transition-all" :style="`width: ${(balance.cl/7)*100}%`"></div></div>
+                    
+                    <!-- 1. Casual Leave (CL) -->
+                    <div @click="openPolicy('CL')" class="bg-gradient-to-br from-emerald-50/90 via-white to-emerald-50/40 dark:from-emerald-950/20 dark:via-dark_surface dark:to-transparent p-3.5 sm:p-5 rounded-[1.4rem] sm:rounded-[1.75rem] shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-emerald-200/80 dark:border-emerald-800/40 flex flex-col justify-between relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer active:scale-[0.98] group">
+                        <div class="flex items-center justify-between relative z-10">
+                            <span class="text-[9px] sm:text-[11px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 leading-none">Casual (CL)</span>
+                            <div class="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs"><i class="fa-solid fa-mug-hot"></i></div>
+                        </div>
+
+                        <div class="flex items-center justify-between my-2 relative z-10">
+                            <div>
+                                <h2 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading text-emerald-600 dark:text-emerald-400 leading-none" x-text="balance.cl"></h2>
+                                <span class="text-[9px] sm:text-[10px] font-mono font-bold text-slate-400 mt-1 block">/ 7 Available</span>
+                            </div>
+
+                            <!-- SVG Radial Progress Ring -->
+                            <div class="relative w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center shrink-0">
+                                <svg class="w-full h-full transform -rotate-90">
+                                    <circle cx="50%" cy="50%" r="18" stroke="currentColor" stroke-width="3.5" fill="transparent" class="text-emerald-100 dark:text-emerald-950/60" />
+                                    <circle cx="50%" cy="50%" r="18" stroke="currentColor" stroke-width="3.5" fill="transparent" class="text-emerald-500 transition-all duration-700 ease-out" 
+                                            stroke-dasharray="113.1" :stroke-dashoffset="113.1 - (113.1 * (balance.cl / 7))" stroke-linecap="round" />
+                                </svg>
+                                <span class="absolute text-[9px] font-mono font-black text-emerald-600 dark:text-emerald-400" x-text="Math.round((balance.cl/7)*100) + '%'"></span>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center text-[8px] sm:text-[9.5px] font-bold text-slate-500 pt-2 border-t border-emerald-100 dark:border-white/5 relative z-10">
+                            <span>Quota 7 Days</span>
+                            <span class="text-emerald-600 dark:text-emerald-400 font-black">Active</span>
+                        </div>
                     </div>
                     
-                    <div @click="openPolicy('ML')" class="bg-white dark:bg-dark_surface p-3 sm:p-5 rounded-[1.5rem] shadow-sm border border-rose-100 dark:border-rose-900/30 flex flex-col relative overflow-hidden transition hover:-translate-y-1 hover:shadow-md cursor-pointer active:scale-95 group">
-                        <div class="absolute -right-4 -top-4 text-5xl sm:text-7xl text-rose-500 opacity-5 group-hover:scale-110 transition-transform duration-500"><i class="fa-solid fa-briefcase-medical"></i></div>
-                        <span class="text-[8px] sm:text-[11px] font-black uppercase text-rose-600 dark:text-rose-400 tracking-tight sm:tracking-widest mb-1 leading-tight whitespace-normal break-words line-clamp-2 sm:truncate">Sick Leave (ML)</span>
-                        <h2 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading text-rose-600 dark:text-rose-400 mb-2 sm:mb-3 leading-none mt-1"><span x-text="balance.ml"></span> <span class="text-[10px] sm:text-sm text-slate-400 font-bold">/ 7</span></h2>
-                        <div class="w-full bg-slate-100 dark:bg-black/30 h-1.5 sm:h-2 rounded-full mt-auto"><div class="bg-rose-500 h-full rounded-full transition-all" :style="`width: ${(balance.ml/7)*100}%`"></div></div>
+                    <!-- 2. Sick Leave (ML) -->
+                    <div @click="openPolicy('ML')" class="bg-gradient-to-br from-rose-50/90 via-white to-rose-50/40 dark:from-rose-950/20 dark:via-dark_surface dark:to-transparent p-3.5 sm:p-5 rounded-[1.4rem] sm:rounded-[1.75rem] shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-rose-200/80 dark:border-rose-800/40 flex flex-col justify-between relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer active:scale-[0.98] group">
+                        <div class="flex items-center justify-between relative z-10">
+                            <span class="text-[9px] sm:text-[11px] font-black uppercase tracking-widest text-rose-600 dark:text-rose-400 leading-none">Sick (ML)</span>
+                            <div class="w-6 h-6 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center text-xs"><i class="fa-solid fa-briefcase-medical"></i></div>
+                        </div>
+
+                        <div class="flex items-center justify-between my-2 relative z-10">
+                            <div>
+                                <h2 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading text-rose-600 dark:text-rose-400 leading-none" x-text="balance.ml"></h2>
+                                <span class="text-[9px] sm:text-[10px] font-mono font-bold text-slate-400 mt-1 block">/ 7 Available</span>
+                            </div>
+
+                            <div class="relative w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center shrink-0">
+                                <svg class="w-full h-full transform -rotate-90">
+                                    <circle cx="50%" cy="50%" r="18" stroke="currentColor" stroke-width="3.5" fill="transparent" class="text-rose-100 dark:text-rose-950/60" />
+                                    <circle cx="50%" cy="50%" r="18" stroke="currentColor" stroke-width="3.5" fill="transparent" class="text-rose-500 transition-all duration-700 ease-out" 
+                                            stroke-dasharray="113.1" :stroke-dashoffset="113.1 - (113.1 * (balance.ml / 7))" stroke-linecap="round" />
+                                </svg>
+                                <span class="absolute text-[9px] font-mono font-black text-rose-600 dark:text-rose-400" x-text="Math.round((balance.ml/7)*100) + '%'"></span>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center text-[8px] sm:text-[9.5px] font-bold text-slate-500 pt-2 border-t border-rose-100 dark:border-white/5 relative z-10">
+                            <span>Quota 7 Days</span>
+                            <span class="text-rose-600 dark:text-rose-400 font-black">Medical</span>
+                        </div>
                     </div>
 
-                    <div @click="openPolicy('PL')" class="bg-white dark:bg-dark_surface p-3 sm:p-5 rounded-[1.5rem] shadow-sm border border-blue-100 dark:border-blue-900/30 flex flex-col relative overflow-hidden transition hover:-translate-y-1 hover:shadow-md cursor-pointer active:scale-95 group">
-                        <div class="absolute -right-4 -top-4 text-5xl sm:text-7xl text-blue-500 opacity-5 group-hover:scale-110 transition-transform duration-500"><i class="fa-solid fa-plane-departure"></i></div>
-                        <span class="text-[8px] sm:text-[11px] font-black uppercase text-blue-600 dark:text-blue-400 tracking-tight sm:tracking-widest mb-1 leading-tight whitespace-normal break-words line-clamp-2 sm:truncate">Privilege Leave (PL)</span>
-                        <h2 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading text-blue-600 dark:text-blue-400 mb-2 sm:mb-3 leading-none mt-1"><span x-text="balance.pl"></span> <span class="text-[10px] sm:text-sm text-slate-400 font-bold">/ 18</span></h2>
-                        <div class="w-full bg-slate-100 dark:bg-black/30 h-1.5 sm:h-2 rounded-full mt-auto"><div class="bg-blue-500 h-full rounded-full transition-all" :style="`width: ${(balance.pl/18)*100}%`"></div></div>
+                    <!-- 3. Privilege Leave (PL) -->
+                    <div @click="openPolicy('PL')" class="bg-gradient-to-br from-blue-50/90 via-white to-blue-50/40 dark:from-blue-950/20 dark:via-dark_surface dark:to-transparent p-3.5 sm:p-5 rounded-[1.4rem] sm:rounded-[1.75rem] shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-blue-200/80 dark:border-blue-800/40 flex flex-col justify-between relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer active:scale-[0.98] group">
+                        <div class="flex items-center justify-between relative z-10">
+                            <span class="text-[9px] sm:text-[11px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 leading-none">Privilege (PL)</span>
+                            <div class="w-6 h-6 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs"><i class="fa-solid fa-plane-departure"></i></div>
+                        </div>
+
+                        <div class="flex items-center justify-between my-2 relative z-10">
+                            <div>
+                                <h2 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading text-blue-600 dark:text-blue-400 leading-none" x-text="balance.pl"></h2>
+                                <span class="text-[9px] sm:text-[10px] font-mono font-bold text-slate-400 mt-1 block">/ 18 Available</span>
+                            </div>
+
+                            <div class="relative w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center shrink-0">
+                                <svg class="w-full h-full transform -rotate-90">
+                                    <circle cx="50%" cy="50%" r="18" stroke="currentColor" stroke-width="3.5" fill="transparent" class="text-blue-100 dark:text-blue-950/60" />
+                                    <circle cx="50%" cy="50%" r="18" stroke="currentColor" stroke-width="3.5" fill="transparent" class="text-blue-500 transition-all duration-700 ease-out" 
+                                            stroke-dasharray="113.1" :stroke-dashoffset="113.1 - (113.1 * (balance.pl / 18))" stroke-linecap="round" />
+                                </svg>
+                                <span class="absolute text-[9px] font-mono font-black text-blue-600 dark:text-blue-400" x-text="Math.round((balance.pl/18)*100) + '%'"></span>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center text-[8px] sm:text-[9.5px] font-bold text-slate-500 pt-2 border-t border-blue-100 dark:border-white/5 relative z-10">
+                            <span>Quota 18 Days</span>
+                            <span class="text-blue-600 dark:text-blue-400 font-black">Encashable</span>
+                        </div>
                     </div>
+
                 </div>
 
-                <!-- HOLIDAY SCHEDULE -->
-                <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl p-5 sm:p-6 rounded-[2rem] shadow-sm border border-slate-200 dark:border-dark_border flex flex-col flex-1 min-h-[350px] lg:min-h-0 relative z-10">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 shrink-0">
-                        <h3 class="text-xl sm:text-2xl font-black font-heading text-slate-800 dark:text-white">Holiday Schedule</h3>
-                        <div class="flex bg-slate-100 dark:bg-black/30 p-1 rounded-xl border border-slate-200 dark:border-white/5 shadow-inner">
-                            <button @click="viewMode = 'list'" class="px-4 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-2" :class="viewMode === 'list' ? 'bg-white dark:bg-dark_surface text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'">
+                <!-- 📅 VISIONOS GLASS HOLIDAY & TIME-OFF MATRIX -->
+                <div class="bg-white/95 dark:bg-dark_surface/95 backdrop-blur-2xl p-5 sm:p-6 rounded-[2rem] shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-slate-200/90 dark:border-dark_border flex flex-col flex-1 min-h-[350px] lg:min-h-0 relative z-10">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-5 shrink-0">
+                        <div>
+                            <h3 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white flex items-center gap-2">
+                                <span>Schedule Matrix</span>
+                                <span class="text-[9px] font-mono font-bold bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30 px-2 py-0.5 rounded-full" x-text="fiscalYearLabel"></span>
+                            </h3>
+                        </div>
+                        <div class="flex bg-slate-100 dark:bg-black/40 p-1 rounded-xl border border-slate-200/80 dark:border-white/5 shadow-inner">
+                            <button @click="viewMode = 'list'; haptic('light')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5" :class="viewMode === 'list' ? 'bg-white dark:bg-dark_surface text-emerald-600 dark:text-emerald-400 shadow-sm font-black' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'">
                                 <i class="fa-solid fa-list-ul"></i> List
                             </button>
-                            <button @click="viewMode = 'calendar'" class="px-4 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-2" :class="viewMode === 'calendar' ? 'bg-white dark:bg-dark_surface text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'">
+                            <button @click="viewMode = 'calendar'; haptic('light')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5" :class="viewMode === 'calendar' ? 'bg-white dark:bg-dark_surface text-emerald-600 dark:text-emerald-400 shadow-sm font-black' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'">
                                 <i class="fa-regular fa-calendar"></i> Calendar
                             </button>
                         </div>
@@ -331,33 +411,29 @@
             <!-- 🟨 RIGHT COLUMN -->
             <div class="flex flex-col gap-5 sm:gap-6 lg:h-full lg:overflow-hidden">
                 
-                <!-- 💳 NEXT HOLIDAY -->
-                <div class="bg-gradient-to-br from-indigo-600 to-blue-600 rounded-[2rem] p-6 text-white relative overflow-hidden shadow-[0_15px_30px_-5px_rgba(79,70,229,0.4)] shrink-0 group hover:shadow-[0_20px_40px_-5px_rgba(79,70,229,0.5)] transition-all">
-                    <div class="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:scale-125 transition-transform duration-500"></div>
-                    <div class="absolute -bottom-10 -left-10 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
+                <!-- 🎆 HOLOGRAPHIC FESTIVE NEXT HOLIDAY SHOWCASE -->
+                <div class="bg-gradient-to-br from-indigo-700 via-indigo-900 to-slate-950 rounded-[2rem] p-5 sm:p-6 text-white relative overflow-hidden shadow-[0_15px_35px_-5px_rgba(79,70,229,0.4)] shrink-0 border border-white/10 group transition-all duration-300 hover:shadow-xl">
+                    <div class="absolute -top-12 -right-12 w-40 h-40 bg-indigo-500/25 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-700 pointer-events-none"></div>
+                    <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-purple-500/20 rounded-full blur-2xl pointer-events-none"></div>
                     
-                    <div class="flex justify-between items-start relative z-10">
-                        <div class="w-10 h-7 rounded-md bg-gradient-to-br from-amber-200 to-amber-500 border border-white/30 flex items-center justify-center relative overflow-hidden">
-                            <div class="w-full h-px bg-black/20 absolute top-1/2"></div>
-                            <div class="h-full w-px bg-black/20 absolute left-1/2"></div>
-                        </div>
-                        <span class="text-[9px] font-black uppercase tracking-widest opacity-80">Next Holiday</span>
+                    <div class="flex justify-between items-center relative z-10 mb-3">
+                        <span class="text-[9px] font-black uppercase tracking-widest bg-white/15 px-2.5 py-1 rounded-full border border-white/20 backdrop-blur-md flex items-center gap-1.5 shadow-sm">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span>Holiday Radar</span>
+                        </span>
+                        <span class="text-[9px] font-mono font-bold text-indigo-200 uppercase tracking-widest" x-text="nextHoliday ? formatDateShort(nextHoliday.date) : ''"></span>
                     </div>
                     
                     <template x-if="nextHoliday">
-                        <div class="relative z-10 mt-5 flex flex-col h-[110px] justify-between">
+                        <div class="relative z-10 flex flex-col justify-between h-[120px]">
                             <div class="flex items-baseline gap-2">
-                                <h2 class="text-5xl font-black font-heading tracking-tighter drop-shadow-md" x-text="nextHoliday.daysLeft === 0 ? 'Now' : nextHoliday.daysLeft"></h2>
-                                <span class="text-xs font-bold uppercase tracking-widest opacity-80" x-text="nextHoliday.daysLeft === 0 ? 'Today' : (nextHoliday.daysLeft === 1 ? 'Tomorrow' : 'Days Left')"></span>
+                                <h2 class="text-5xl font-black font-heading tracking-tight leading-none text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-100 to-emerald-200 drop-shadow-md" x-text="nextHoliday.daysLeft === 0 ? 'Today' : nextHoliday.daysLeft"></h2>
+                                <span class="text-xs font-mono font-bold uppercase tracking-widest opacity-80" x-text="nextHoliday.daysLeft === 0 ? '🎉 Celebrate' : (nextHoliday.daysLeft === 1 ? 'Day Remaining' : 'Days Countdown')"></span>
                             </div>
-                            <div class="flex justify-between items-end mt-auto gap-4">
+                            <div class="flex justify-between items-end mt-auto gap-3 pt-2 border-t border-white/10">
                                 <div class="flex-1 min-w-0">
-                                        <h4 class="font-bold text-lg leading-tight whitespace-normal break-words" x-text="(nextHoliday.icon || '🎌') + ' ' + nextHoliday.name"></h4>
-                                        <p class="text-[9px] font-bold uppercase tracking-widest opacity-70 mt-1" x-text="nextHoliday.type === 'Govt' ? 'Government' : 'Restricted'"></p>
-                                    </div>
-                                <div class="text-right shrink-0">
-                                    <p class="text-[8px] font-black uppercase tracking-widest opacity-70 mb-0.5">Date</p>
-                                    <h4 class="font-bold text-sm" x-text="formatDateShort(nextHoliday.date)"></h4>
+                                    <h4 class="font-black text-lg leading-tight truncate text-white drop-shadow-sm" x-text="(nextHoliday.icon || '🎌') + ' ' + nextHoliday.name"></h4>
+                                    <p class="text-[8.5px] font-mono font-bold uppercase tracking-widest text-indigo-300 mt-0.5" x-text="nextHoliday.type === 'Govt' ? 'Official Public Holiday' : 'Restricted Holiday'"></p>
                                 </div>
                             </div>
                         </div>
@@ -433,23 +509,23 @@
                     </template>
                 </div>
 
-                <!-- 🏢 LEAVE MANAGEMENT HUB -->
-                <div class="bg-white/90 dark:bg-dark_surface/90 backdrop-blur-xl p-4 sm:p-5 rounded-[2rem] shadow-sm border border-slate-200 dark:border-dark_border flex flex-col flex-1 min-h-[400px] lg:min-h-0 relative z-10">
+                <!-- 🏢 TACTILE TIME-OFF MANAGEMENT & APPROVAL HUB -->
+                <div class="bg-white/95 dark:bg-dark_surface/95 backdrop-blur-2xl p-4 sm:p-5 rounded-[2rem] shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-slate-200/90 dark:border-dark_border flex flex-col flex-1 min-h-[400px] lg:min-h-0 relative z-10">
                     
-                    <div class="flex justify-between items-center mb-4 shrink-0">
-                        <div class="flex items-center gap-1.5 bg-slate-100 dark:bg-black/30 p-1.5 rounded-[14px] border border-slate-200 dark:border-white/5 shadow-inner">
-                            <button @click="activeTab = 'myLeaves'; haptic('light')" class="px-3 sm:px-4 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition flex items-center gap-1.5" :class="activeTab === 'myLeaves' ? 'bg-white dark:bg-dark_surface text-brand shadow-sm border border-slate-200 dark:border-white/10' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'">
+                    <div class="flex justify-between items-center mb-3.5 shrink-0">
+                        <div class="flex items-center gap-1 bg-slate-100 dark:bg-black/40 p-1 rounded-xl border border-slate-200/80 dark:border-white/5 shadow-inner">
+                            <button @click="activeTab = 'myLeaves'; haptic('light')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5" :class="activeTab === 'myLeaves' ? 'bg-white dark:bg-dark_surface text-emerald-600 dark:text-emerald-400 shadow-sm border border-slate-200/80 dark:border-white/10 font-black' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'">
                                 <i class="fa-solid fa-clock-rotate-left"></i> My Leaves
                             </button>
-                            <button x-show="isAdmin" @click="activeTab = 'approvals'; haptic('light')" class="px-3 sm:px-4 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition flex items-center gap-1.5 relative" :class="activeTab === 'approvals' ? 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 shadow-sm border border-amber-200 dark:border-amber-500/30' : 'text-slate-500 hover:text-amber-600 dark:hover:text-amber-400'" x-cloak>
+                            <button x-show="isAdmin" @click="activeTab = 'approvals'; haptic('light')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 relative" :class="activeTab === 'approvals' ? 'bg-amber-50 dark:bg-amber-500/15 text-amber-700 dark:text-amber-300 shadow-sm border border-amber-200 dark:border-amber-500/30 font-black' : 'text-slate-500 hover:text-amber-600 dark:hover:text-amber-400'" x-cloak>
                                 <i class="fa-solid fa-clipboard-check"></i> Approvals
                                 <span x-show="pendingRequests.length > 0" class="absolute -top-1 -right-1 flex h-2.5 w-2.5">
                                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500 border border-white dark:border-dark_surface"></span>
+                                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500 border border-white dark:border-dark_surface shadow-sm"></span>
                                 </span>
                             </button>
                         </div>
-                        <button @click="fetchData()" class="w-8 h-8 rounded-xl bg-slate-50 dark:bg-white/5 text-slate-400 hover:text-brand transition flex justify-center items-center shadow-sm border border-slate-200 dark:border-white/10 active:scale-95"><i class="fa-solid fa-rotate text-xs"></i></button>
+                        <button @click="fetchData(true)" class="w-8 h-8 rounded-xl bg-slate-50 dark:bg-white/5 text-slate-400 hover:text-emerald-500 transition flex justify-center items-center shadow-sm border border-slate-200 dark:border-white/10 active:scale-95"><i class="fa-solid fa-rotate text-xs" :class="loading ? 'fa-spin' : ''"></i></button>
                     </div>
 
                     <div x-show="loading" class="flex justify-center py-5"><div class="loader" style="width:20px;height:20px;border-width:2px;"></div></div>
@@ -739,7 +815,8 @@
                     
                     <div class="bg-white dark:bg-black/40 px-3 py-2.5 rounded-lg border border-slate-100 dark:border-white/5 flex justify-between items-center shadow-inner relative z-10">
                         <span class="text-[9px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-1.5"><i class="fa-solid fa-calculator opacity-70"></i> Algorithm</span>
-                        <span class="text-[11px] font-mono font-black text-emerald-500 dark:text-emerald-400 tracking-tight">((Gross/26)+48%) * L</span>
+                        <!-- 🚀 UPDATED: Encashment multiplier corrected to 40% -->
+                        <span class="text-[11px] font-mono font-black text-emerald-500 dark:text-emerald-400 tracking-tight">((Gross/26)+40%) * L</span>
                     </div>
                 </div>
             </div>
