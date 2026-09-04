@@ -73,12 +73,28 @@
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
 
         .isp-card {
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            position: relative; overflow: hidden; border: 1px solid rgba(0,0,0,0.05); backdrop-filter: blur(10px);
+            transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative; overflow: hidden; backdrop-filter: blur(16px);
         }
         @media (hover: hover) {
-            .isp-card:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1); z-index: 20; }
+            .isp-card:hover, .isp-card.is-hovered { 
+                transform: translateY(-4px) scale(1.02); 
+                box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.12); 
+                z-index: 25; 
+            }
             .cards-container:hover > .isp-card:not(:hover) { filter: blur(2px) grayscale(0.4); transform: scale(0.97); opacity: 0.7; }
+        }
+
+        /* 📡 CARRIER SIGNAL WAVE ANIMATION */
+        .carrier-wave {
+            position: absolute; right: -20px; bottom: -20px; width: 140px; height: 140px;
+            border-radius: 50%; opacity: 0.08; pointer-events: none;
+            background: radial-gradient(circle, currentColor 0%, transparent 70%);
+            animation: carrier-pulse 4s infinite ease-in-out alternate;
+        }
+        @keyframes carrier-pulse {
+            0% { transform: scale(0.9); opacity: 0.06; }
+            100% { transform: scale(1.25); opacity: 0.14; }
         }
         
         .status-dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; box-shadow: 0 0 0 2px rgba(255,255,255,0.8); }
@@ -250,72 +266,148 @@
     <main class="flex-1 flex flex-col overflow-y-auto p-4 sm:p-6 bg-slate-50/50 dark:bg-[#020617]">
         <div class="max-w-[1920px] mx-auto w-full flex flex-col gap-4 sm:gap-6 h-full">
             
-            <!-- 📍 ISP CARDS (DYNAMIC BASED ON LOCATION) -->
-            <div class="cards-container grid grid-cols-3 gap-2 md:gap-4 shrink-0">
+            <!-- 🛰️ TELECOM CARRIER TELEMETRY MODULES (MOBILE PERFECT & DESKTOP CRISP) -->
+            <div class="cards-container grid grid-cols-3 gap-2 sm:gap-4 shrink-0">
                 
-                <!-- CARD 1: PRIMARY ISP -->
-                <div @click="filterBy(isps.primary.id)" class="isp-card bg-gradient-to-br from-rose-50 to-white dark:from-rose-900/10 dark:to-transparent rounded-2xl md:rounded-[1.25rem] p-2.5 sm:p-4 shadow-sm hover:shadow-md border cursor-pointer select-none group flex flex-col justify-between min-h-[85px] sm:min-h-[125px] relative" :class="activeFilter === isps.primary.id ? 'border-rose-500 ring-2 ring-rose-500/30 transform scale-[1.02]' : (activeFilter ? 'opacity-40 border-rose-100 dark:border-rose-900/50' : 'border-rose-100 dark:border-rose-900/50')">
-                    <i class="fa-solid absolute -bottom-2 -right-2 text-5xl sm:text-8xl opacity-20 dark:opacity-10 group-hover:scale-110 transition-transform duration-500 text-rose-500" :class="isps.primary.icon"></i>
-                    <div class="absolute top-2.5 right-2.5 z-20"><span class="status-dot w-2 h-2 sm:w-2.5 sm:h-2.5 bg-emerald-500 animate-pulse-fast shadow-[0_0_5px_rgba(16,185,129,0.5)] border-2 border-white dark:border-dark_surface rounded-full block"></span></div>
-                    <div class="flex items-center justify-between relative z-10 mb-1 sm:mb-2">
-                        <div class="flex items-center gap-1.5 sm:gap-2">
-                            <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white dark:bg-dark_surface shadow-sm flex items-center justify-center text-[10px] sm:text-xs shrink-0 text-rose-500"><i class="fa-solid" :class="isps.primary.icon"></i></div>
-                            <span class="hidden sm:inline-block text-[11px] font-black uppercase tracking-widest leading-none truncate text-rose-600 dark:text-rose-400" x-text="isps.primary.short"></span>
+                <!-- CARD 1: PRIMARY LEASED LINE (AIRTEL LL) -->
+                <div @click="filterBy(isps.primary.id)" 
+                     class="isp-card bg-gradient-to-br from-rose-50/90 via-white to-rose-50/40 dark:from-rose-950/20 dark:via-dark_surface dark:to-transparent rounded-2xl md:rounded-[1.4rem] p-2.5 sm:p-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border cursor-pointer select-none group flex flex-col justify-between min-h-[95px] sm:min-h-[145px] relative transition-all duration-300 active:scale-[0.99]" 
+                     :class="[
+                         activeFilter === isps.primary.id ? 'border-rose-500 ring-2 ring-rose-500/30 shadow-[0_12px_30px_-5px_rgba(244,63,94,0.35)] transform scale-[1.02]' : (activeFilter ? 'opacity-40 border-rose-100 dark:border-rose-900/40' : 'border-rose-200/90 dark:border-rose-800/50 hover:border-rose-400'),
+                         (hoveredIsp && hoveredIsp.toLowerCase().includes(isps.primary.id.split('(')[0].toLowerCase().trim())) ? 'ring-2 ring-rose-400 scale-[1.02] shadow-lg' : ''
+                     ]">
+                    
+                    <div class="carrier-wave text-rose-500"></div>
+                    <i class="fa-solid absolute -bottom-3 -right-2 text-5xl sm:text-8xl opacity-[0.06] dark:opacity-[0.04] group-hover:scale-110 transition-transform duration-500 text-rose-500 pointer-events-none" :class="isps.primary.icon"></i>
+                    
+                    <!-- 1. Header: Icon + Name (No Ellipsis on Mobile) -->
+                    <div class="flex items-center justify-between relative z-10 gap-1 sm:gap-2 mb-1">
+                        <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                            <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-white dark:bg-black/40 shadow-sm flex items-center justify-center text-[10px] sm:text-xs shrink-0 text-rose-500 border border-rose-100 dark:border-rose-500/20"><i class="fa-solid" :class="isps.primary.icon"></i></div>
+                            <div class="flex flex-col min-w-0">
+                                <span class="text-[10px] sm:text-[13px] font-black uppercase tracking-tight leading-none text-rose-600 dark:text-rose-400 truncate" x-text="isps.primary.short"></span>
+                                <!-- Hidden on Mobile to prevent text squeeze -->
+                                <span class="hidden sm:inline-block text-[8px] sm:text-[9px] font-mono font-bold text-slate-400 uppercase tracking-wider mt-0.5 truncate" x-text="getCircuitId(isps.primary.id)"></span>
+                            </div>
                         </div>
+                        <span class="status-dot w-1.5 h-1.5 sm:w-2 sm:h-2 bg-emerald-500 animate-pulse-fast shadow-[0_0_6px_#10b981] border-2 border-white dark:border-dark_surface rounded-full shrink-0"></span>
                     </div>
-                    <div class="relative z-10 mt-auto">
-                        <div class="flex items-baseline gap-0.5 sm:gap-1">
+
+                    <!-- 2. Mid: Big Speed Telemetry -->
+                    <div class="relative z-10 my-auto py-0.5 sm:py-1">
+                        <div class="flex items-baseline gap-1 sm:gap-1.5">
                             <h3 class="text-2xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-rose-600 dark:text-rose-400 leading-none" x-text="isps.primary.speed"></h3>
-                            <span class="text-[8px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest">Mbps</span>
+                            <div class="flex flex-col">
+                                <span class="text-[8px] sm:text-xs font-mono font-black text-slate-700 dark:text-slate-300 uppercase leading-none">MBPS</span>
+                                <span class="hidden sm:inline-block text-[7.5px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">1:1 Dedicated</span>
+                            </div>
                         </div>
-                        <p class="text-[8px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1.5 truncate">
-                            <span class="sm:hidden" x-text="isps.primary.short"></span>
-                            <span class="hidden sm:inline" x-text="isps.primary.id.split('(')[0]"></span> 🔴
-                        </p>
+                    </div>
+
+                    <!-- 3. Footer: Text on Desktop, Clean Centered Logs Pill on Mobile -->
+                    <div class="flex justify-between items-center relative z-10 pt-1.5 sm:pt-2 border-t border-rose-100/80 dark:border-white/5">
+                        <span class="hidden sm:flex text-[8.5px] sm:text-[11px] font-bold text-slate-600 dark:text-slate-300 truncate items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Fiber Leased Line
+                        </span>
+                        
+                        <span class="w-full sm:w-auto text-center sm:text-left text-[8px] sm:text-[9.5px] font-mono font-black px-1.5 sm:px-2 py-0.5 rounded-md bg-white dark:bg-black/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/30 shadow-sm flex items-center justify-center sm:justify-start gap-1 shrink-0">
+                            <i class="fa-solid fa-clock-rotate-left text-[7px] sm:text-[8px] opacity-70"></i>
+                            <span x-text="baseFilteredList.filter(l => l.isp && l.isp.includes(isps.primary.id.split('(')[0].trim())).length + ' Logs'"></span>
+                        </span>
                     </div>
                 </div>
 
-                <!-- CARD 2: SECONDARY ISP -->
-                <div @click="filterBy(isps.secondary.id)" class="isp-card bg-gradient-to-br from-sky-50 to-white dark:from-sky-900/10 dark:to-transparent rounded-2xl md:rounded-[1.25rem] p-2.5 sm:p-4 shadow-sm hover:shadow-md border cursor-pointer select-none group flex flex-col justify-between min-h-[85px] sm:min-h-[125px] relative" :class="activeFilter === isps.secondary.id ? 'border-sky-500 ring-2 ring-sky-500/30 transform scale-[1.02]' : (activeFilter ? 'opacity-40 border-sky-100 dark:border-sky-900/50' : 'border-sky-100 dark:border-sky-900/50')">
-                    <i class="fa-solid absolute -bottom-2 -right-2 text-5xl sm:text-8xl opacity-20 dark:opacity-10 group-hover:scale-110 transition-transform duration-500 text-sky-500" :class="isps.secondary.icon"></i>
-                    <div class="absolute top-2.5 right-2.5 z-20"><span class="status-dot w-2 h-2 sm:w-2.5 sm:h-2.5 bg-emerald-500 animate-pulse-fast shadow-[0_0_5px_rgba(16,185,129,0.5)] border-2 border-white dark:border-dark_surface rounded-full block"></span></div>
-                    <div class="flex items-center justify-between relative z-10 mb-1 sm:mb-2">
-                        <div class="flex items-center gap-1.5 sm:gap-2">
-                            <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white dark:bg-dark_surface shadow-sm flex items-center justify-center text-[10px] sm:text-xs shrink-0 text-sky-500"><i class="fa-solid" :class="isps.secondary.icon"></i></div>
-                            <span class="hidden sm:inline-block text-[11px] font-black uppercase tracking-widest leading-none truncate text-sky-600 dark:text-sky-400" x-text="isps.secondary.short"></span>
+                <!-- CARD 2: SECONDARY LEASED LINE (STPI 20M) -->
+                <div @click="filterBy(isps.secondary.id)" 
+                     class="isp-card bg-gradient-to-br from-sky-50/90 via-white to-sky-50/40 dark:from-sky-950/20 dark:via-dark_surface dark:to-transparent rounded-2xl md:rounded-[1.4rem] p-2.5 sm:p-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border cursor-pointer select-none group flex flex-col justify-between min-h-[95px] sm:min-h-[145px] relative transition-all duration-300 active:scale-[0.99]" 
+                     :class="[
+                         activeFilter === isps.secondary.id ? 'border-sky-500 ring-2 ring-sky-500/30 shadow-[0_12px_30px_-5px_rgba(14,165,233,0.35)] transform scale-[1.02]' : (activeFilter ? 'opacity-40 border-sky-100 dark:border-sky-900/40' : 'border-sky-200/80 dark:border-sky-800/50 hover:border-sky-400'),
+                         (hoveredIsp && hoveredIsp.toLowerCase().includes(isps.secondary.id.split('(')[0].toLowerCase().trim())) ? 'ring-2 ring-sky-400 scale-[1.02] shadow-lg' : ''
+                     ]">
+                    
+                    <div class="carrier-wave text-sky-500"></div>
+                    <i class="fa-solid absolute -bottom-3 -right-2 text-5xl sm:text-8xl opacity-[0.06] dark:opacity-[0.04] group-hover:scale-110 transition-transform duration-500 text-sky-500 pointer-events-none" :class="isps.secondary.icon"></i>
+                    
+                    <!-- 1. Header -->
+                    <div class="flex items-center justify-between relative z-10 gap-1 sm:gap-2 mb-1">
+                        <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                            <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-white dark:bg-black/40 shadow-sm flex items-center justify-center text-[10px] sm:text-xs shrink-0 text-sky-500 border border-sky-100 dark:border-sky-500/20"><i class="fa-solid" :class="isps.secondary.icon"></i></div>
+                            <div class="flex flex-col min-w-0">
+                                <span class="text-[10px] sm:text-[13px] font-black uppercase tracking-tight leading-none text-sky-600 dark:text-sky-400 truncate" x-text="isps.secondary.short"></span>
+                                <span class="hidden sm:inline-block text-[8px] sm:text-[9px] font-mono font-bold text-slate-400 uppercase tracking-wider mt-0.5 truncate" x-text="getCircuitId(isps.secondary.id)"></span>
+                            </div>
                         </div>
+                        <span class="status-dot w-1.5 h-1.5 sm:w-2 sm:h-2 bg-emerald-500 animate-pulse-fast shadow-[0_0_6px_#10b981] border-2 border-white dark:border-dark_surface rounded-full shrink-0"></span>
                     </div>
-                    <div class="relative z-10 mt-auto">
-                        <div class="flex items-baseline gap-0.5 sm:gap-1">
+
+                    <!-- 2. Mid -->
+                    <div class="relative z-10 my-auto py-0.5 sm:py-1">
+                        <div class="flex items-baseline gap-1 sm:gap-1.5">
                             <h3 class="text-2xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-sky-600 dark:text-sky-400 leading-none" x-text="isps.secondary.speed"></h3>
-                            <span class="text-[8px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest">Mbps</span>
+                            <div class="flex flex-col">
+                                <span class="text-[8px] sm:text-xs font-mono font-black text-slate-700 dark:text-slate-300 uppercase leading-none">MBPS</span>
+                                <span class="hidden sm:inline-block text-[7.5px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Symmetrical RF</span>
+                            </div>
                         </div>
-                        <p class="text-[8px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1.5 truncate">
-                            <span class="sm:hidden" x-text="isps.secondary.short"></span>
-                            <span class="hidden sm:inline" x-text="isps.secondary.id.split('(')[0]"></span> 📡
-                        </p>
+                    </div>
+
+                    <!-- 3. Footer -->
+                    <div class="flex justify-between items-center relative z-10 pt-1.5 sm:pt-2 border-t border-sky-100/80 dark:border-white/5">
+                        <span class="hidden sm:flex text-[8.5px] sm:text-[11px] font-bold text-slate-600 dark:text-slate-300 truncate items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> Wireless RF Trunk
+                        </span>
+                        
+                        <span class="w-full sm:w-auto text-center sm:text-left text-[8px] sm:text-[9.5px] font-mono font-black px-1.5 sm:px-2 py-0.5 rounded-md bg-white dark:bg-black/40 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-500/30 shadow-sm flex items-center justify-center sm:justify-start gap-1 shrink-0">
+                            <i class="fa-solid fa-clock-rotate-left text-[7px] sm:text-[8px] opacity-70"></i>
+                            <span x-text="baseFilteredList.filter(l => l.isp && l.isp.includes(isps.secondary.id.split('(')[0].trim())).length + ' Logs'"></span>
+                        </span>
                     </div>
                 </div>
 
-                <!-- CARD 3: BROADBAND ISP -->
-                <div @click="filterBy(isps.broadband.id)" class="isp-card bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-900/10 dark:to-transparent rounded-2xl md:rounded-[1.25rem] p-2.5 sm:p-4 shadow-sm hover:shadow-md border cursor-pointer select-none group flex flex-col justify-between min-h-[85px] sm:min-h-[125px] relative" :class="activeFilter === isps.broadband.id ? 'border-emerald-500 ring-2 ring-emerald-500/30 transform scale-[1.02]' : (activeFilter ? 'opacity-40 border-emerald-100 dark:border-emerald-900/50' : 'border-emerald-100 dark:border-emerald-900/50')">
-                    <i class="fa-solid absolute -bottom-2 -right-2 text-5xl sm:text-8xl opacity-20 dark:opacity-10 group-hover:scale-110 transition-transform duration-500 text-emerald-500" :class="isps.broadband.icon"></i>
-                    <div class="absolute top-2.5 right-2.5 z-20"><span class="status-dot w-2 h-2 sm:w-2.5 sm:h-2.5 bg-emerald-500 animate-pulse-fast shadow-[0_0_5px_rgba(16,185,129,0.5)] border-2 border-white dark:border-dark_surface rounded-full block"></span></div>
-                    <div class="flex items-center justify-between relative z-10 mb-1 sm:mb-2">
-                        <div class="flex items-center gap-1.5 sm:gap-2">
-                            <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white dark:bg-dark_surface shadow-sm flex items-center justify-center text-[10px] sm:text-xs shrink-0 text-emerald-500"><i class="fa-solid" :class="isps.broadband.icon"></i></div>
-                            <span class="hidden sm:inline-block text-[11px] font-black uppercase tracking-widest leading-none truncate text-emerald-600 dark:text-emerald-400" x-text="isps.broadband.short"></span>
+                <!-- CARD 3: BROADBAND FIBER (AIRTEL BB) -->
+                <div @click="filterBy(isps.broadband.id)" 
+                     class="isp-card bg-gradient-to-br from-emerald-50/90 via-white to-emerald-50/40 dark:from-emerald-950/20 dark:via-dark_surface dark:to-transparent rounded-2xl md:rounded-[1.4rem] p-2.5 sm:p-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border cursor-pointer select-none group flex flex-col justify-between min-h-[95px] sm:min-h-[145px] relative transition-all duration-300 active:scale-[0.99]" 
+                     :class="[
+                         activeFilter === isps.broadband.id ? 'border-emerald-500 ring-2 ring-emerald-500/30 shadow-[0_12px_30px_-5px_rgba(16,185,129,0.35)] transform scale-[1.02]' : (activeFilter ? 'opacity-40 border-emerald-100 dark:border-emerald-900/40' : 'border-emerald-200/80 dark:border-emerald-800/50 hover:border-emerald-400'),
+                         (hoveredIsp && hoveredIsp.toLowerCase().includes(isps.broadband.id.split('(')[0].toLowerCase().trim())) ? 'ring-2 ring-emerald-400 scale-[1.02] shadow-lg' : ''
+                     ]">
+                    
+                    <div class="carrier-wave text-emerald-500"></div>
+                    <i class="fa-solid absolute -bottom-3 -right-2 text-5xl sm:text-8xl opacity-[0.06] dark:opacity-[0.04] group-hover:scale-110 transition-transform duration-500 text-emerald-500 pointer-events-none" :class="isps.broadband.icon"></i>
+                    
+                    <!-- 1. Header -->
+                    <div class="flex items-center justify-between relative z-10 gap-1 sm:gap-2 mb-1">
+                        <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                            <div class="w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-white dark:bg-black/40 shadow-sm flex items-center justify-center text-[10px] sm:text-xs shrink-0 text-emerald-500 border border-emerald-100 dark:border-emerald-500/20"><i class="fa-solid" :class="isps.broadband.icon"></i></div>
+                            <div class="flex flex-col min-w-0">
+                                <span class="text-[10px] sm:text-[13px] font-black uppercase tracking-tight leading-none text-emerald-600 dark:text-emerald-400 truncate" x-text="isps.broadband.short"></span>
+                                <span class="hidden sm:inline-block text-[8px] sm:text-[9px] font-mono font-bold text-slate-400 uppercase tracking-wider mt-0.5 truncate" x-text="getCircuitId(isps.broadband.id)"></span>
+                            </div>
+                        </div>
+                        <span class="status-dot w-1.5 h-1.5 sm:w-2 sm:h-2 bg-emerald-500 animate-pulse-fast shadow-[0_0_6px_#10b981] border-2 border-white dark:border-dark_surface rounded-full shrink-0"></span>
+                    </div>
+
+                    <!-- 2. Mid -->
+                    <div class="relative z-10 my-auto py-0.5 sm:py-1">
+                        <div class="flex items-baseline gap-1 sm:gap-1.5">
+                            <h3 class="text-2xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-emerald-600 dark:text-emerald-400 leading-none" x-text="isps.broadband.speed"></h3>
+                            <div class="flex flex-col">
+                                <span class="text-[8px] sm:text-xs font-mono font-black text-slate-700 dark:text-slate-300 uppercase leading-none">MBPS</span>
+                                <span class="hidden sm:inline-block text-[7.5px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">High-Speed FTTH</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="relative z-10 mt-auto">
-                        <div class="flex items-baseline gap-0.5 sm:gap-1">
-                            <h3 class="text-2xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-emerald-600 dark:text-emerald-400 leading-none" x-text="isps.broadband.speed"></h3>
-                            <span class="text-[8px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest">Mbps</span>
-                        </div>
-                        <p class="text-[8px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1.5 truncate">
-                            <span class="sm:hidden" x-text="isps.broadband.short"></span>
-                            <span class="hidden sm:inline" x-text="isps.broadband.id.split('(')[0]"></span> 🟢
-                        </p>
+
+                    <!-- 3. Footer -->
+                    <div class="flex justify-between items-center relative z-10 pt-1.5 sm:pt-2 border-t border-emerald-100/80 dark:border-white/5">
+                        <span class="hidden sm:flex text-[8.5px] sm:text-[11px] font-bold text-slate-600 dark:text-slate-300 truncate items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> FTTH Line
+                        </span>
+                        
+                        <span class="w-full sm:w-auto text-center sm:text-left text-[8px] sm:text-[9.5px] font-mono font-black px-1.5 sm:px-2 py-0.5 rounded-md bg-white dark:bg-black/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30 shadow-sm flex items-center justify-center sm:justify-start gap-1 shrink-0">
+                            <i class="fa-solid fa-clock-rotate-left text-[7px] sm:text-[8px] opacity-70"></i>
+                            <span x-text="baseFilteredList.filter(l => l.isp && l.isp.includes(isps.broadband.id.split('(')[0].trim())).length + ' Logs'"></span>
+                        </span>
                     </div>
                 </div>
 
@@ -438,32 +530,82 @@
                             </thead>
                             <tbody class="divide-y divide-slate-100 dark:divide-white/5 text-xs">
                                 <template x-for="(log, index) in filteredList" :key="'desk-'+index">
-                                    <tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition cursor-pointer group" @click="editLog(log)">
-                                        <td class="px-3 py-3.5 font-mono font-bold text-slate-600 dark:text-slate-300 align-middle text-center truncate" x-text="formatDate(log.date)"></td>
-                                        <td class="px-3 py-3.5 align-middle whitespace-normal break-words pr-2">
-                                            <div class="font-black leading-tight text-[13px]" :class="getISPColor(log.isp)" x-text="log.isp.split('(')[0]"></div>
-                                            <div class="text-[9px] text-slate-500 font-bold mt-1.5">Case: <span class="font-mono text-slate-700 dark:text-slate-300 break-all" x-text="log.caseId || 'N/A'"></span></div>
+                                    <tr class="hover:bg-amber-50/50 dark:hover:bg-white/5 transition-all duration-150 cursor-pointer group border-b border-slate-100 dark:border-white/5" 
+                                        @mouseenter="hoveredIsp = log.isp" 
+                                        @mouseleave="hoveredIsp = null"
+                                        @click="editLog(log)">
+                                        
+                                        <!-- 1. Date with Calendar Badge -->
+                                        <td class="px-3 py-3.5 align-middle text-center">
+                                            <div class="inline-flex flex-col items-center justify-center bg-white dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-lg px-2 py-1 shadow-sm">
+                                                <span class="text-[11px] font-mono font-bold text-slate-800 dark:text-slate-200" x-text="formatDate(log.date).split('-')[0] + ' ' + (formatDate(log.date).split('-')[1] || '')"></span>
+                                                <span class="text-[8px] font-mono font-bold text-slate-400" x-text="formatDate(log.date).split('-')[2] || ''"></span>
+                                            </div>
                                         </td>
+                                        
+                                        <!-- 2. ISP & Case ID -->
                                         <td class="px-3 py-3.5 align-middle whitespace-normal break-words pr-2">
-                                            <span class="px-2 py-1.5 rounded-md font-black uppercase text-[8px] sm:text-[9px] tracking-wider border shadow-sm inline-block mb-1.5 leading-none" :class="getTypeClass(log.type)"><span x-text="log.type"></span></span>
-                                            <div class="text-[9px] text-slate-500 font-bold leading-tight">Fault: <span class="text-slate-700 dark:text-slate-300" x-text="log.faultParty || '-'"></span></div>
+                                            <div class="font-black leading-tight text-[13px] flex items-center gap-1.5" :class="getISPColor(log.isp)">
+                                                <i class="fa-solid fa-tower-broadcast text-[11px] opacity-70"></i>
+                                                <span x-text="log.isp.split('(')[0]"></span>
+                                            </div>
+                                            <div class="text-[9.5px] text-slate-500 font-bold mt-1.5 flex items-center gap-1">
+                                                <span class="font-mono text-slate-400">Case:</span>
+                                                <span class="font-mono text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-1.5 py-0.5 rounded border border-blue-100 dark:border-blue-500/20 shadow-sm" x-text="log.caseId || 'N/A'"></span>
+                                            </div>
                                         </td>
+
+                                        <!-- 3. Event & Fault Party -->
+                                        <td class="px-3 py-3.5 align-middle whitespace-normal break-words pr-2">
+                                            <span class="px-2 py-1 rounded-md font-black uppercase text-[8px] sm:text-[9px] tracking-wider border shadow-sm inline-block mb-1.5 leading-none" :class="getTypeClass(log.type)">
+                                                <span x-text="log.type"></span>
+                                            </span>
+                                            <div class="text-[9px] text-slate-500 font-bold leading-tight flex items-center gap-1">
+                                                <span class="text-slate-400">Fault:</span>
+                                                <span class="text-slate-700 dark:text-slate-300" x-text="log.faultParty || '-'"></span>
+                                            </div>
+                                        </td>
+
+                                        <!-- 4. Timing & Smart Duration Heat-Pill -->
                                         <td class="px-3 py-3.5 align-middle truncate">
-                                            <div class="font-mono text-slate-500 dark:text-slate-400 font-bold text-[10px]"><span x-text="log.start"></span> - <span x-text="log.end"></span></div>
-                                            <div class="text-[10px] font-black text-brand mt-1" x-text="log.duration"></div>
+                                            <div class="font-mono text-slate-500 dark:text-slate-400 font-bold text-[10px] flex items-center gap-1 mb-1">
+                                                <i class="fa-regular fa-clock text-[9px] text-slate-400"></i>
+                                                <span x-text="log.start || '--:--'"></span> <span class="text-slate-300 dark:text-slate-600">→</span> <span x-text="log.end || '--:--'"></span>
+                                            </div>
+                                            <span class="inline-block px-2 py-0.5 rounded-md text-[9.5px] font-mono font-black uppercase tracking-wider border shadow-sm" 
+                                                  :class="getDurationSeverityClass(log.duration)"
+                                                  x-text="log.duration"></span>
                                         </td>
-                                        <td class="px-3 py-3.5 align-middle whitespace-normal break-words pr-2" :title="'Cause: ' + (log.rootCause||'-') + '\nAction: ' + (log.action||'-')">
-                                            <div class="text-[11px] font-bold text-slate-800 dark:text-slate-200 mb-1.5 leading-tight"><span class="text-[8px] text-slate-400 uppercase tracking-widest block mb-0.5">Cause:</span> <span x-text="log.rootCause || '-'"></span></div>
-                                            <div class="text-[10px] font-medium text-slate-500 dark:text-slate-400 leading-tight"><span class="text-[8px] text-slate-400 uppercase tracking-widest block mb-0.5">Action:</span> <span x-text="log.actionTaken || '-'"></span></div>
+
+                                        <!-- 5. Two-Tone Root Cause & Remediation -->
+                                        <td class="px-3 py-3.5 align-middle whitespace-normal break-words pr-2">
+                                            <div class="bg-slate-50 dark:bg-black/30 p-2 rounded-xl border border-slate-100 dark:border-white/5 space-y-1 shadow-inner">
+                                                <div class="text-[10.5px] font-bold text-slate-800 dark:text-slate-200 leading-tight">
+                                                    <span class="text-[8px] font-black uppercase tracking-widest text-rose-500 block mb-0.5">Cause:</span>
+                                                    <span x-text="log.rootCause || '-'"></span>
+                                                </div>
+                                                <div class="text-[10px] font-medium text-slate-600 dark:text-slate-300 leading-tight pt-1 border-t border-slate-200/50 dark:border-white/5">
+                                                    <span class="text-[8px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 block mb-0.5">Action:</span>
+                                                    <span x-text="log.actionTaken || '-'"></span>
+                                                </div>
+                                            </div>
                                         </td>
+
+                                        <!-- 6. Remarks -->
                                         <td class="px-3 py-3.5 text-slate-500 font-medium align-middle whitespace-normal break-words pr-2" :title="log.remarks" x-text="log.remarks || '-'"></td>
+
+                                        <!-- 7. Status Indicator -->
                                         <td class="px-3 py-3.5 text-center align-middle">
-                                            <span class="w-3 h-3 rounded-full inline-block shadow-sm" :class="(log.status || '').includes('Resolved') ? 'bg-emerald-500' : ((log.status || '').includes('Escalated') ? 'bg-orange-500' : 'bg-red-500 animate-pulse')" :title="log.status"></span>
+                                            <span class="px-2 py-1 rounded-md text-[8.5px] font-black uppercase tracking-wider border shadow-sm inline-block"
+                                                  :class="(log.status || '').includes('Resolved') ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30' : ((log.status || '').includes('Escalated') ? 'bg-orange-50 text-orange-600 border-orange-200 dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/30' : 'bg-red-50 text-red-600 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/30 animate-pulse')"
+                                                  x-text="(log.status || 'Pending').replace(/🕒|⏳|✅/g, '').trim()"></span>
                                         </td>
+
+                                        <!-- 8. Actions -->
                                         <td class="px-3 py-3.5 text-center align-middle sticky-col bg-transparent">
-                                            <div class="flex items-center justify-center gap-1.5 opacity-50 group-hover:opacity-100 transition">
-                                                <button @click.stop="editLog(log)" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-black/30 hover:bg-brand hover:text-white text-slate-500 dark:text-slate-400 transition flex items-center justify-center border border-slate-200 dark:border-white/5 hover:border-brand/50 shadow-sm"><i class="fa-solid fa-pen text-[10px]"></i></button>
-                                                <button @click.stop="confirmDelete(log.id)" class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-black/30 hover:bg-red-500 hover:text-white text-slate-500 dark:text-slate-400 transition flex items-center justify-center border border-slate-200 dark:border-white/5 hover:border-red-500/50 shadow-sm"><i class="fa-solid fa-trash text-[10px]"></i></button>
+                                            <div class="flex items-center justify-center gap-1.5 opacity-40 group-hover:opacity-100 transition-opacity">
+                                                <button @click.stop="editLog(log)" class="w-7 h-7 rounded-lg bg-white dark:bg-black/30 hover:bg-amber-500 hover:text-white text-slate-500 dark:text-slate-400 transition flex items-center justify-center border border-slate-200 dark:border-white/5 shadow-sm"><i class="fa-solid fa-pen text-[10px]"></i></button>
+                                                <button @click.stop="confirmDelete(log.id)" class="w-7 h-7 rounded-lg bg-white dark:bg-black/30 hover:bg-red-500 hover:text-white text-slate-500 dark:text-slate-400 transition flex items-center justify-center border border-slate-200 dark:border-white/5 shadow-sm"><i class="fa-solid fa-trash text-[10px]"></i></button>
                                             </div>
                                         </td>
                                     </tr>
@@ -624,34 +766,47 @@
                         </div>
                     </div>
 
+                    <!-- 🎛️ DUAL-CHAMBER INCIDENT TIMELINE CONSOLE -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
-                        <div class="bg-white dark:bg-black/20 p-3 sm:p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm">
-                            <h4 class="text-[9px] sm:text-[10px] font-black text-rose-500 uppercase tracking-widest mb-2.5 flex items-center gap-1.5"><i class="fa-solid fa-arrow-trend-down"></i> Downtime Started</h4>
-                            <div class="grid grid-cols-2 gap-3">
+                        
+                        <!-- Chamber A: Downtime Trigger (Red Theme) -->
+                        <div class="bg-rose-50/50 dark:bg-rose-950/20 p-3.5 sm:p-4 rounded-2xl border border-rose-200/80 dark:border-rose-900/40 shadow-sm relative overflow-hidden">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-rose-500"></div>
+                            <h4 class="text-[9.5px] sm:text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest mb-2.5 flex items-center gap-1.5 pl-1.5">
+                                <i class="fa-solid fa-arrow-trend-down animate-bounce"></i> Downtime Incident Started
+                            </h4>
+                            <div class="grid grid-cols-2 gap-2.5 pl-1.5">
                                 <div>
-                                    <label class="block text-[8px] sm:text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1 ml-1">Date *</label>
-                                    <input type="date" x-model="form.date" @change="calculateDuration" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-lg sm:rounded-xl px-2.5 py-2 text-xs font-bold outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 transition text-slate-800 dark:text-white shadow-inner">
+                                    <label class="block text-[8px] sm:text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Start Date *</label>
+                                    <input type="date" x-model="form.date" @change="calculateDuration" class="w-full bg-white dark:bg-black/60 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 transition text-slate-800 dark:text-white shadow-sm">
                                 </div>
                                 <div>
-                                    <label class="block text-[8px] sm:text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1 ml-1">Time *</label>
-                                    <input type="time" x-model="form.start" @change="calculateDuration" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-lg sm:rounded-xl px-2.5 py-2 text-xs font-bold outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 transition text-slate-800 dark:text-white shadow-inner">
+                                    <label class="block text-[8px] sm:text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Start Time *</label>
+                                    <input type="time" x-model="form.start" @change="calculateDuration" class="w-full bg-white dark:bg-black/60 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 transition text-slate-800 dark:text-white shadow-sm">
                                 </div>
                             </div>
                         </div>
 
-                        <div class="bg-white dark:bg-black/20 p-3 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm" :class="!form.status.includes('Resolved') ? 'border-slate-200 dark:border-white/5 opacity-60 grayscale pointer-events-none' : 'border-emerald-200 dark:border-emerald-500/30 bg-emerald-50/30 dark:bg-emerald-900/10'">
-                            <h4 class="text-[9px] sm:text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-2.5 flex items-center gap-1.5"><i class="fa-solid fa-arrow-trend-up"></i> Link Restored</h4>
-                            <div class="grid grid-cols-2 gap-3">
+                        <!-- Chamber B: Link Restored (Green Theme) -->
+                        <div class="p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm relative overflow-hidden" 
+                             :class="!form.status.includes('Resolved') ? 'bg-slate-50/70 dark:bg-black/20 border-slate-200 dark:border-white/5 opacity-60 grayscale pointer-events-none' : 'bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-200/80 dark:border-emerald-900/40'">
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5" :class="form.status.includes('Resolved') ? 'bg-emerald-500' : 'bg-slate-300'"></div>
+                            <h4 class="text-[9.5px] sm:text-[10px] font-black uppercase tracking-widest mb-2.5 flex items-center gap-1.5 pl-1.5"
+                                :class="form.status.includes('Resolved') ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'">
+                                <i class="fa-solid fa-arrow-trend-up"></i> Link Restored & Verified
+                            </h4>
+                            <div class="grid grid-cols-2 gap-2.5 pl-1.5">
                                 <div>
-                                    <label class="block text-[8px] sm:text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1 ml-1">Date</label>
-                                    <input type="date" x-model="form.endDate" @change="calculateDuration" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-lg sm:rounded-xl px-2.5 py-2 text-xs font-bold outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition text-slate-800 dark:text-white shadow-inner">
+                                    <label class="block text-[8px] sm:text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Restore Date</label>
+                                    <input type="date" x-model="form.endDate" @change="calculateDuration" class="w-full bg-white dark:bg-black/60 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition text-slate-800 dark:text-white shadow-sm">
                                 </div>
                                 <div>
-                                    <label class="block text-[8px] sm:text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1 ml-1">Time</label>
-                                    <input type="time" x-model="form.end" @change="calculateDuration" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-lg sm:rounded-xl px-2.5 py-2 text-xs font-bold outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition text-slate-800 dark:text-white shadow-inner">
+                                    <label class="block text-[8px] sm:text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Restore Time</label>
+                                    <input type="time" x-model="form.end" @change="calculateDuration" class="w-full bg-white dark:bg-black/60 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition text-slate-800 dark:text-white shadow-sm">
                                 </div>
                             </div>
                         </div>
+
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -755,10 +910,31 @@
                     loading: false, saving: false, deleting: false, logs: [], showModal: false, showDeleteModal: false,
                     currentDate: '', currentTime: '', activeFilter: null, isLocked: false, 
                     searchQuery: '', mobileSearchOpen: false, deleteId: null, deleteSecret: '',
+                    hoveredIsp: null, // 🚀 NEW: Bidirectional hover sync state
+
+                    // 🚀 NEW: Get Official Telecom Circuit IDs
+                    getCircuitId(isp) {
+                        const s = String(isp || '').toLowerCase();
+                        if (s.includes('airtel leased') || s.includes('airtel ll')) return 'CIRCUIT #9202902';
+                        if (s.includes('stpi leased') || s.includes('stpi ll')) return 'CIRCUIT #PAN-STP-01';
+                        if (s.includes('broadband')) return 'DSL #01204204260';
+                        if (s.includes('gstech')) return 'FIBER #DDN-GST-10M';
+                        if (s.includes('bsnl')) return 'FIBER #DDN-BSNL-15M';
+                        return 'CIRCUIT #ACTIVE';
+                    },
+
+                    // 🚀 NEW: Smart Outage Duration Heat-Pills
+                    getDurationSeverityClass(dur) {
+                        const d = String(dur || '').toLowerCase();
+                        if (d.includes('invalid') || d === '-' || d === '--') return 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-white/5 dark:text-slate-400 dark:border-white/10';
+                        if (d.includes('d') || d.includes('day') || parseInt(d) >= 4) return 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/30 font-black animate-pulse';
+                        if (parseInt(d) >= 1) return 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/30';
+                        return 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30';
+                    },
                     
                     form: { id: null, isp: '', type: '🔴 Link Down (Complete Outage)', faultParty: '🌐 External (ISP Side)', caseId: '', date: '', start: '', endDate: '', end: '', duration: '', actionTaken: '', rootCause: '', remarks: '', status: '🕒 Pending', secret: '' },
                     
-                    // 📍 DYNAMIC ISPS PROPERTY
+                    // 📍 DYNAMIC ISPS PROPERTY (STPI Corrected to 20 Mbps)
                     get isps() {
                         if (this.currentLocation === 'Dehradun') {
                             return {
@@ -769,7 +945,7 @@
                         } else {
                             return {
                                 primary: { id: 'Airtel Leased Line (15Mbps)', short: 'Airtel LL', icon: 'fa-tower-broadcast', speed: '15' },
-                                secondary: { id: 'STPI Leased Line (15Mbps)', short: 'STPI LL', icon: 'fa-satellite-dish', speed: '15' },
+                                secondary: { id: 'STPI Leased Line (20Mbps)', short: 'STPI LL', icon: 'fa-satellite-dish', speed: '20' }, // 🚀 20 Mbps Corrected
                                 broadband: { id: 'Airtel Broadband (30Mbps)', short: 'Airtel BB', icon: 'fa-wifi', speed: '30' }
                             };
                         }
