@@ -2,14 +2,30 @@
 <html lang="en" class="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- 🚀 viewport-fit=cover extends HTML behind notch/status bar -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <script src="pbl-config.js"></script>
     <title>Dashboard | IT Operations</title>
-    <script>document.title += " " + PBL_APP_VERSION;</script>
+    
+    <!-- 🚀 Instant Pre-Paint Status Bar Matcher (Matches Navbar Exact Hex) -->
+    <script>
+        document.title += " " + PBL_APP_VERSION;
+        const isDarkTheme = localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        if (isDarkTheme) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+    
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <link rel="icon" type="image/x-icon" href="Assets/images/pbl-logo.ico">
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" id="meta-theme-color" content="#f1f5f9">
+    
+    <!-- 🚀 Theme Color set to #ffffff (Navbar color) instead of blue/grey -->
+    <meta name="theme-color" id="meta-theme-color" content="#ffffff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" id="meta-status-bar-style" content="default">
     <link rel="apple-touch-icon" href="app-icon.png">
     
     <script>
