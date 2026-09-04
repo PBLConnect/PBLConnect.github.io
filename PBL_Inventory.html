@@ -987,8 +987,8 @@
     </footer>
 
     <!-- 🗄️ UNIFIED HARDWARE ASSET & SOFTWARE CONFIG CONSOLE -->
-    <div x-show="showModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/70 backdrop-blur-md p-3 sm:p-6" x-cloak>
-        <div class="bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-3xl w-full max-w-5xl h-full sm:h-auto sm:max-h-[92vh] rounded-2xl sm:rounded-[2.2rem] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden border border-slate-200/90 dark:border-white/10"
+<div x-show="showModal" class="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-900/80 backdrop-blur-md p-2.5 sm:p-6" x-cloak>
+    <div class="bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-3xl w-full max-w-5xl h-auto max-h-[96dvh] sm:max-h-[92vh] rounded-2xl sm:rounded-[2.2rem] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden border border-slate-200/90 dark:border-white/10"
              x-transition:enter="transition ease-out duration-300 transform"
              x-transition:enter-start="opacity-0 scale-95 translate-y-6"
              x-transition:enter-end="opacity-100 scale-100 translate-y-0"
@@ -1039,8 +1039,8 @@
              </div>
 
              <!-- Modal Body -->
-             <div class="flex-1 overflow-y-auto custom-scroll p-4 sm:p-6 bg-slate-50/50 dark:bg-[#020617]/50">
-                 <form @submit.prevent="saveAsset" class="flex flex-col h-full space-y-4">
+			<div class="flex-1 overflow-y-auto custom-scroll p-4 sm:p-6 pb-8 sm:pb-6 bg-slate-50/50 dark:bg-[#020617]/50">
+				<form @submit.prevent="saveAsset" class="flex flex-col min-h-full space-y-4 pb-4 sm:pb-0">
                      
                      <!-- 🖥️ HARDWARE TAB START -->
                      <div x-show="currentTab === 'hardware'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 flex-1" x-cloak>
@@ -1390,7 +1390,7 @@
                      <!-- 💿 SOFTWARE TELEMETRY & DEPLOYMENT VAULT END -->
 
                      <!-- 🚀 Fixed Action Bar -->
-                     <div x-show="modalMode !== 'view'" class="mt-5 pt-4 border-t border-slate-200 dark:border-white/10 flex flex-col sm:flex-row justify-between items-center gap-3 shrink-0" x-cloak>
+						<div x-show="modalMode !== 'view'" class="mt-5 pt-4 pb-2 border-t border-slate-200 dark:border-white/10 flex flex-col sm:flex-row justify-between items-center gap-3 shrink-0" x-cloak>
                          <div class="relative w-full sm:w-56">
                              <i class="fa-solid fa-key absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
                              <input type="password" x-model="form.secret" placeholder="Admin Key" class="w-full pl-8 pr-3 py-2 sm:py-2.5 bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-mono font-bold outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition shadow-sm text-slate-800 dark:text-white">
