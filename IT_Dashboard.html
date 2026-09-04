@@ -1289,125 +1289,127 @@
                             <div class="absolute -top-20 -left-20 w-60 h-60 bg-purple-400/10 dark:bg-purple-600/10 rounded-full blur-[60px] pointer-events-none"></div>
                             <div class="absolute top-1/2 -right-20 w-60 h-60 bg-sky-400/10 dark:bg-sky-600/10 rounded-full blur-[60px] pointer-events-none"></div>
 
-                            <!-- 📍 HEADER (Crisp & Solid) -->
-                            <div class="px-5 py-4 border-b border-slate-200/80 dark:border-slate-700 bg-slate-50/90 dark:bg-slate-800/50 flex justify-between items-center relative z-10 shrink-0">
+                            <!-- 📍 HEADER (MODERN TELEMETRY HUD EDITION) -->
+                            <div class="px-5 py-3.5 border-b border-slate-200/70 dark:border-white/10 bg-gradient-to-r from-blue-50/70 via-white to-indigo-50/40 dark:from-slate-800/90 dark:via-slate-900/90 dark:to-slate-950/90 backdrop-blur-xl flex justify-between items-center relative z-10 shrink-0">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 rounded-[0.7rem] bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center shadow-sm shrink-0">
-                                        <i class="fa-solid fa-satellite-dish text-[15px] drop-shadow-md"></i>
+                                    <!-- Layered Glow Icon Badge with Active Radar Blip -->
+                                    <div class="relative w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-[0_4px_12px_rgba(59,130,246,0.4),inset_0_1px_0_rgba(255,255,255,0.3)] shrink-0 group">
+                                        <i class="fa-solid fa-satellite-dish text-[14px] drop-shadow-sm group-hover:rotate-12 transition-transform duration-300"></i>
+                                        <!-- Active Radar Blip Indicator -->
+                                        <span class="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+                                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-[0_0_6px_#10b981]"></span>
+                                        </span>
                                     </div>
-                                    <h4 class="font-heading font-black text-[16px] text-slate-800 dark:text-white tracking-tight leading-tight">Network Status</h4>
+                                    
+                                    <!-- Title & Sub-Telemetry Hierarchy -->
+                                    <div class="flex flex-col text-left">
+                                        <h4 class="font-heading font-black text-[15px] sm:text-[16px] text-slate-800 dark:text-white tracking-tight leading-none">
+                                            Network <span class="text-brand dark:text-brand_glow">Status</span>
+                                        </h4>
+                                        <span class="text-[8.5px] font-mono font-bold uppercase tracking-widest text-slate-400 dark:text-slate-400 mt-1 flex items-center gap-1.5 leading-none">
+                                            <i class="fa-solid fa-bolt-lightning text-[7.5px] text-emerald-500"></i> Real-time Telemetry
+                                        </span>
+                                    </div>
                                 </div>
-                                <button @click="showNet = false" class="w-8 h-8 rounded-full bg-slate-200/50 dark:bg-slate-700/50 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-300 dark:hover:bg-slate-600 hover:text-slate-800 dark:hover:text-white transition-all active:scale-95 shadow-sm border border-slate-300/50 dark:border-transparent shrink-0"><i class="fa-solid fa-xmark text-sm"></i></button>
+
+                                <!-- Tactile Frosted Close Button with Hover Rotate Effect -->
+                                <button @click="showNet = false" 
+                                        class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-100 dark:bg-white/10 hover:bg-rose-50 hover:text-rose-500 dark:hover:bg-rose-500/20 dark:hover:text-rose-300 flex items-center justify-center text-slate-400 transition-all duration-300 active:scale-90 shadow-sm border border-slate-200/60 dark:border-white/5 shrink-0 group" 
+                                        title="Close Panel">
+                                    <i class="fa-solid fa-xmark text-xs group-hover:rotate-90 transition-transform duration-300"></i>
+                                </button>
                             </div>
                             
                             <!-- 📍 BODY (Opaque Cards with Clear Borders) -->
                             <div class="p-4 sm:p-5 flex flex-col gap-3.5 max-h-[70vh] overflow-y-auto custom-scroll relative z-10 bg-white/50 dark:bg-transparent">
                                 
-                                <!-- 🌐 REFINED WAN MESH TELEMETRY (LIGHT & DARK DUAL-THEME) -->
-                                <div class="relative bg-gradient-to-br from-blue-50/80 via-white to-indigo-50/40 dark:from-slate-900/90 dark:via-[#0b1226] dark:to-slate-950 p-3.5 rounded-2xl border border-blue-200/80 dark:border-blue-500/25 shadow-sm overflow-hidden flex items-center gap-3.5 transition-all">
-                                    
-                                    <!-- Left: High-Precision Vector WAN Orbit -->
-                                    <div class="relative w-14 h-14 sm:w-16 sm:h-16 shrink-0 flex items-center justify-center">
-                                        <!-- Soft Radial Ambient Glow -->
-                                        <div class="absolute inset-1 rounded-full bg-blue-500/10 dark:bg-blue-500/20 blur-md pointer-events-none"></div>
-                                        
-                                        <!-- Scalable Vector Globe -->
-                                        <svg class="w-full h-full text-blue-500 dark:text-blue-400" viewBox="0 0 64 64" fill="none">
-                                            <circle cx="32" cy="32" r="28" stroke="currentColor" stroke-opacity="0.25" stroke-width="1.5" stroke-dasharray="3 3" />
-                                            <ellipse cx="32" cy="32" rx="26" ry="10" stroke="currentColor" stroke-opacity="0.4" stroke-width="1.2" transform="rotate(-25 32 32)" />
-                                            <circle cx="32" cy="32" r="16" stroke="currentColor" stroke-opacity="0.25" stroke-width="1" />
-                                            <!-- Noida HQ Node -->
-                                            <circle cx="32" cy="32" r="3.5" fill="#3b82f6" class="animate-pulse" />
-                                            <!-- Dehradun Node -->
-                                            <circle cx="44" cy="24" r="2.5" fill="#10b981" />
-                                            <!-- Connection Arc -->
-                                            <path d="M32 32 Q 40 25 44 24" stroke="#10b981" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2 2" />
-                                        </svg>
-                                        
-                                        <!-- Micro Satellite Indicator -->
-                                        <div class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-white dark:bg-slate-800 shadow-sm border border-blue-200/80 dark:border-blue-500/30 flex items-center justify-center text-brand dark:text-blue-400 text-[9px]">
-                                            <i class="fa-solid fa-satellite animate-pulse"></i>
-                                        </div>
-                                    </div>
-
-                                    <!-- Right: Perfectly Aligned Telemetry Data Rows -->
-                                    <div class="flex-1 min-w-0 flex flex-col justify-center">
-                                        <!-- Header Row -->
-                                        <div class="flex items-center justify-between mb-1.5 pb-1 border-b border-slate-200/70 dark:border-white/5">
-                                            <div class="flex items-center gap-1.5">
-                                                <span class="relative flex h-1.5 w-1.5">
-                                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                                    <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
-                                                </span>
-                                                <span class="text-[9px] font-mono font-black uppercase tracking-wider text-slate-700 dark:text-blue-300">WAN Mesh Status</span>
-                                            </div>
-                                            <span class="text-[8px] font-mono font-bold text-slate-400 dark:text-slate-500">ACTIVE</span>
-                                        </div>
-
-                                        <!-- Metric Rows with Clean High-Contrast Pill Badges -->
-                                        <div class="space-y-1.5 text-[10px] font-mono font-bold">
-                                            <!-- Row 1: Noida to Dehradun -->
-                                            <div class="flex items-center justify-between">
-                                                <span class="text-slate-600 dark:text-slate-300">NOIDA ➔ DDN</span>
-                                                <span class="px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 text-[8.5px] font-black tracking-wider leading-none">
-                                                    ONLINE
-                                                </span>
-                                            </div>
-
-                                            <!-- Row 2: Noida to Germany (Berlin) -->
-                                            <div class="flex items-center justify-between">
-                                                <span class="text-slate-500 dark:text-slate-400">HQ ➔ BERLIN</span>
-                                                <span class="px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-500/10 text-blue-600 dark:text-cyan-400 border border-blue-200 dark:border-blue-500/20 text-[8.5px] font-black tracking-wider leading-none">
-                                                    128ms
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Ping Module (Solid Panel) -->
-                                <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col transition-all hover:shadow-md">
-                                    <div class="flex justify-between items-start mb-2">
+                                <!-- 📶 ROCK-SOLID PING MODULE (TOP CARD REMOVED, ZERO LAYOUT SHIFT) -->
+                                <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between h-[155px] shrink-0 transition-none">
+                                    <div class="flex justify-between items-start">
                                         <div>
-                                            <span class="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-1.5"><i class="fa-solid fa-satellite-dish"></i> <span x-text="isPinging ? 'Pinging Google...' : 'Ping to Google'"></span></span>
-                                            <div class="text-[17px] font-black mt-1 transition-colors duration-300" :class="getPingColor(pingVal)" x-text="pingVal + ' ms'"></div>
+                                            <span class="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
+                                                <i class="fa-solid fa-satellite-dish text-brand"></i> 
+                                                <span>PING LATENCY (GOOGLE)</span>
+                                            </span>
+                                            <!-- Dimension-Locked Metric Box (Frozen Width & Height) -->
+                                            <div class="h-7 w-36 flex items-center mt-0.5 shrink-0 overflow-hidden">
+                                                <span class="text-[20px] font-mono font-black tabular-nums transition-colors duration-150 whitespace-nowrap" 
+                                                      :class="getPingColor(pingVal)" 
+                                                      x-text="isPinging ? 'Probing...' : (pingVal === 'Err' ? 'Error' : pingVal + ' ms')"></span>
+                                            </div>
                                         </div>
-                                        <button @click="if(!isPinging){ pingTarget = 'Google'; runPing(); }" :disabled="isPinging" class="w-8 h-8 rounded-xl bg-slate-50 dark:bg-slate-700 shadow-sm border border-slate-200 dark:border-slate-600 flex items-center justify-center text-slate-500 hover:text-brand transition disabled:opacity-40"><i class="fa-solid fa-rotate-right text-[11px]" :class="isPinging ? 'fa-spin' : ''"></i></button>
+                                        <button @click="if(!isPinging){ pingTarget = 'Google'; runPing(); }" :disabled="isPinging" class="w-8 h-8 rounded-xl bg-slate-50 dark:bg-slate-700 shadow-sm border border-slate-200 dark:border-slate-600 flex items-center justify-center text-slate-500 hover:text-brand transition active:scale-95 disabled:opacity-40" title="Re-test Ping">
+                                            <i class="fa-solid fa-rotate-right text-[11px]" :class="isPinging ? 'fa-spin text-brand' : ''"></i>
+                                        </button>
                                     </div>
-                                    <div x-show="isPinging || pingHistory.length === 0" class="flex items-end gap-1.5 h-10 mt-auto border-b border-slate-100 dark:border-slate-700 pb-2">
-                                        <template x-for="(p, index) in pingHistory" :key="index">
-                                            <div class="flex-1 rounded-full opacity-90 transition-all duration-500 ease-out" :style="`height: ${Math.max(15, Math.min(100, (p/200)*100))}%; background-color: ${getPingColorCode(p)};`"></div>
-                                        </template>
-                                    </div>
-                                    <div x-show="!isPinging && pingHistory.length > 0" class="flex items-center gap-3 mt-3 bg-slate-50 dark:bg-slate-900/50 rounded-xl px-3 py-2.5 border border-slate-100 dark:border-slate-700" x-cloak>
-                                        <div class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] text-white shadow-sm" :style="`background-color: ${getPingColorCode(pingVal)}`">
-                                            <i class="fa-solid" :class="pingVal === 'Err' ? 'fa-xmark' : 'fa-check'"></i>
+
+                                    <!-- 10 Permanent Fixed Slots (Never Added/Removed, Zero DOM Shift) -->
+                                    <div class="pt-2 border-t border-slate-100 dark:border-slate-700/60">
+                                        <div class="flex items-end gap-1.5 h-8 w-full">
+                                            <template x-for="slot in 10" :key="slot">
+                                                <div class="flex-1 rounded-full transition-all duration-200"
+                                                     :style="`height: ${pingHistory[slot - 1] ? Math.max(15, Math.min(100, (pingHistory[slot - 1] / 200) * 100)) : 10}%; 
+                                                             background-color: ${pingHistory[slot - 1] ? getPingColorCode(pingHistory[slot - 1]) : 'rgba(148, 163, 184, 0.25)'};`"></div>
+                                            </template>
                                         </div>
-                                        <div class="flex-1 flex flex-col justify-center text-left">
-                                            <span class="text-[12.5px] font-black text-slate-800 dark:text-slate-200 leading-tight mb-0.5" x-text="pingVal === 'Err' ? 'Connection Failed ❌' : 'Internet is working 🌐'"></span>
-                                            <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest leading-none" x-text="pingVal === 'Err' ? 'Check Network Connection' : `Avg Latency: ${pingVal} ms`"></span>
+                                        
+                                        <!-- Permanent Footer Telemetry Strip -->
+                                        <div class="flex items-center justify-between text-[9px] font-mono font-bold text-slate-500 dark:text-slate-400 mt-2">
+                                            <span class="flex items-center gap-1.5">
+                                                <span class="w-1.5 h-1.5 rounded-full" :class="pingVal === 'Err' ? 'bg-rose-500' : 'bg-emerald-500'"></span>
+                                                <span x-text="isPinging ? 'Sending ICMP packets...' : (pingVal === 'Err' ? 'Request Timed Out' : 'Route Verified')"></span>
+                                            </span>
+                                            <span x-text="(pingHistory.length) + '/10 Pkts'"></span>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- IP & ISP (Solid Panels) -->
+                                <!-- 💎 ULTRA-MODERN COLORFUL BENTO CARDS -->
                                 <div class="grid grid-cols-2 gap-3">
-                                    <div class="bg-gradient-to-br from-blue-50/50 to-white dark:from-slate-800 dark:to-slate-800/80 p-3.5 rounded-[1.25rem] border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden group text-left hover:-translate-y-0.5 transition-transform">
-                                        <i class="fa-solid fa-globe absolute -bottom-2 -right-2 text-[4rem] text-brand opacity-10 group-hover:scale-110 transition-transform duration-500"></i>
-                                        <div class="flex items-center gap-2 mb-2.5 relative z-10">
-                                            <div class="w-6 h-6 rounded-full bg-white dark:bg-slate-700 flex items-center justify-center text-brand text-[10px] shadow-sm border border-slate-100 dark:border-slate-600"><i class="fa-solid fa-globe"></i></div>
-                                            <span class="text-[8px] font-black text-brand uppercase tracking-widest">Public IP</span>
+                                    
+                                    <!-- 1. Public IP Bento Card (Cyber Sky Glow) -->
+                                    <div class="relative p-3.5 rounded-2xl bg-gradient-to-br from-sky-500/[0.12] via-blue-500/[0.04] to-white dark:from-sky-950/40 dark:via-slate-800/80 dark:to-slate-900 border border-sky-300/60 dark:border-sky-500/30 shadow-[0_4px_15px_rgba(14,165,233,0.08)] hover:shadow-[0_8px_20px_rgba(14,165,233,0.18)] hover:-translate-y-0.5 transition-all duration-300 overflow-hidden group text-left">
+                                        <!-- Ambient Backdrop Mesh Watermark -->
+                                        <i class="fa-solid fa-globe absolute -bottom-3 -right-3 text-[4.5rem] text-sky-500/15 dark:text-sky-400/10 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 pointer-events-none"></i>
+                                        
+                                        <!-- Tag & Micro-LED -->
+                                        <div class="flex items-center justify-between mb-2 relative z-10">
+                                            <div class="flex items-center gap-1.5">
+                                                <div class="w-6 h-6 rounded-lg bg-sky-500/15 text-sky-600 dark:text-sky-400 flex items-center justify-center text-[10px] shadow-sm border border-sky-200/80 dark:border-sky-500/30">
+                                                    <i class="fa-solid fa-network-wired"></i>
+                                                </div>
+                                                <span class="text-[8.5px] font-mono font-black text-sky-600 dark:text-sky-400 uppercase tracking-widest">Public IP</span>
+                                            </div>
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_#10b981] animate-pulse"></span>
                                         </div>
-                                        <span class="text-[12px] sm:text-[13px] font-black text-slate-800 dark:text-slate-200 truncate block relative z-10" x-text="publicIp || 'Fetching...'"></span>
+
+                                        <!-- Value -->
+                                        <span class="text-[13px] sm:text-[14px] font-mono font-black text-slate-800 dark:text-white tracking-tight block relative z-10 truncate" 
+                                              x-text="publicIp || 'Fetching...'"></span>
                                     </div>
-                                    <div class="bg-gradient-to-br from-indigo-50/50 to-white dark:from-slate-800 dark:to-slate-800/80 p-3.5 rounded-[1.25rem] border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden group text-left hover:-translate-y-0.5 transition-transform">
-                                        <i class="fa-solid fa-building absolute -bottom-2 -right-2 text-[4rem] text-indigo-500 opacity-10 group-hover:scale-110 transition-transform duration-500"></i>
-                                        <div class="flex items-center gap-2 mb-2.5 relative z-10">
-                                            <div class="w-6 h-6 rounded-full bg-white dark:bg-slate-700 flex items-center justify-center text-indigo-500 text-[10px] shadow-sm border border-slate-100 dark:border-slate-600"><i class="fa-solid fa-building"></i></div>
-                                            <span class="text-[8px] font-black text-indigo-500 uppercase tracking-widest">Internet Line</span>
+
+                                    <!-- 2. Internet Line Bento Card (Airtel Red & Coral Glow) -->
+                                    <div class="relative p-3.5 rounded-2xl bg-gradient-to-br from-rose-500/[0.12] via-orange-500/[0.04] to-white dark:from-rose-950/40 dark:via-slate-800/80 dark:to-slate-900 border border-rose-300/60 dark:border-rose-500/30 shadow-[0_4px_15px_rgba(244,63,94,0.08)] hover:shadow-[0_8px_20px_rgba(244,63,94,0.18)] hover:-translate-y-0.5 transition-all duration-300 overflow-hidden group text-left">
+                                        <!-- Ambient Backdrop Mesh Watermark -->
+                                        <i class="fa-solid fa-tower-broadcast absolute -bottom-3 -right-3 text-[4.5rem] text-rose-500/15 dark:text-rose-400/10 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-500 pointer-events-none"></i>
+                                        
+                                        <!-- Tag & ISP Icon -->
+                                        <div class="flex items-center justify-between mb-2 relative z-10">
+                                            <div class="flex items-center gap-1.5">
+                                                <div class="w-6 h-6 rounded-lg bg-rose-500/15 text-rose-600 dark:text-rose-400 flex items-center justify-center text-[10px] shadow-sm border border-rose-200/80 dark:border-rose-500/30">
+                                                    <i class="fa-solid fa-bolt-lightning"></i>
+                                                </div>
+                                                <span class="text-[8.5px] font-mono font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest">ISP Line</span>
+                                            </div>
+                                            <span class="text-[7.5px] font-mono font-black px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 uppercase tracking-wider">Fiber</span>
                                         </div>
-                                        <span class="text-[12px] sm:text-[13px] font-black text-slate-800 dark:text-slate-200 truncate block relative z-10" x-text="ispName || 'Checking...'"></span>
+
+                                        <!-- Value (Airtel Broadband Saaf Saaf Dikhayega) -->
+                                        <span class="text-[13px] sm:text-[14px] font-heading font-black text-slate-800 dark:text-white tracking-tight block relative z-10 truncate" 
+                                              x-text="ispName || 'Airtel Broadband'"></span>
                                     </div>
+
                                 </div>
 
                                 <!-- Speedtest (Solid Panel) -->
@@ -1421,21 +1423,74 @@
                                             </div>
                                         </div>
                                         
-                                        <div class="relative flex bg-slate-100 dark:bg-slate-900 rounded-[0.5rem] p-1 shadow-inner w-[90px] border border-slate-200/50 dark:border-slate-700">
-                                            <div class="absolute bg-brand dark:bg-blue-600 rounded flex items-center justify-center h-[calc(100%-8px)] w-[calc(50%-4px)] top-1 transition-all duration-300 shadow-sm" :class="speedSize === 20 ? 'left-1' : 'left-[calc(50%+2px)]'"></div>
-                                            <label class="flex-1 text-center py-1 text-[9px] font-bold cursor-pointer relative z-10 transition-colors" :class="speedSize === 20 ? 'text-white' : 'text-slate-500 dark:text-slate-400'"><input type="radio" value="20" x-model.number="speedSize" class="hidden">20 MB</label>
-                                            <label class="flex-1 text-center py-1 text-[9px] font-bold cursor-pointer relative z-10 transition-colors" :class="speedSize === 50 ? 'text-white' : 'text-slate-500 dark:text-slate-400'"><input type="radio" value="50" x-model.number="speedSize" class="hidden">50 MB</label>
+                                        <!-- Audit-Style 3D Radio Group with Pop Animation -->
+                                        <div class="audit-radio-group !w-[110px] !p-0.5 !gap-1 !rounded-xl border border-slate-200/80 dark:border-slate-700/80 shadow-inner">
+                                            <label class="radio pass flex-1">
+                                                <input type="radio" value="20" x-model.number="speedSize">
+                                                <span class="name !py-1 !px-1.5 !text-[9px] !rounded-lg font-black tracking-wider">20 MB</span>
+                                            </label>
+                                            <label class="radio pass flex-1">
+                                                <input type="radio" value="50" x-model.number="speedSize">
+                                                <span class="name !py-1 !px-1.5 !text-[9px] !rounded-lg font-black tracking-wider">50 MB</span>
+                                            </label>
                                         </div>
                                     </div>
                                     
-                                    <!-- Punchy Start Button -->
-                                    <button @click="runSpeedTest()" :disabled="isTestingSpeed" class="w-full bg-brand hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-500 text-white py-3 rounded-xl text-[11px] font-black uppercase tracking-widest shadow-md hover:shadow-lg hover:-translate-y-[1px] transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 group">
-                                        <span x-show="!isTestingSpeed" class="flex items-center gap-2">
-                                            <i class="fa-solid fa-paper-plane group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform opacity-90"></i> Start Test
-                                        </span>
-                                        <span x-show="isTestingSpeed" class="flex items-center gap-2" x-cloak>
-                                            <i class="fa-solid fa-circle-notch fa-spin"></i> <span x-text="speedProgress + '%'"></span>
-                                        </span>
+                                    <!-- ✈️ UIVERSE FLYING PAPER-PLANE SPEEDTEST BUTTON -->
+                                    <style>
+                                        .btn-plane-speed {
+                                            background: royalblue;
+                                            cursor: pointer;
+                                            overflow: hidden;
+                                            transition: all 0.2s ease-out;
+                                        }
+                                        .btn-plane-speed .plane-text {
+                                            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
+                                        }
+                                        .btn-plane-speed .plane-svg {
+                                            transform-origin: center center;
+                                            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+                                        }
+                                        .btn-plane-speed:hover:not(:disabled) .plane-wrapper {
+                                            animation: plane-fly 0.6s ease-in-out infinite alternate;
+                                        }
+                                        .btn-plane-speed:hover:not(:disabled) .plane-svg {
+                                            transform: translateX(1.8em) rotate(45deg) scale(1.15);
+                                        }
+                                        .btn-plane-speed:hover:not(:disabled) .plane-text {
+                                            transform: translateX(6em);
+                                            opacity: 0;
+                                        }
+                                        .btn-plane-speed:active {
+                                            transform: scale(0.96);
+                                        }
+                                        @keyframes plane-fly {
+                                            from { transform: translateY(0.12em); }
+                                            to { transform: translateY(-0.12em); }
+                                        }
+                                    </style>
+
+                                    <button @click="runSpeedTest()" :disabled="isTestingSpeed" 
+                                            class="btn-plane-speed w-full py-3 px-4 rounded-2xl text-white font-extrabold text-[12px] uppercase tracking-wider shadow-md hover:shadow-lg flex items-center justify-center relative disabled:opacity-50 disabled:cursor-not-allowed">
+                                        
+                                        <!-- Idle State (Hover to Fly) -->
+                                        <div x-show="!isTestingSpeed" class="flex items-center justify-center gap-2">
+                                            <div class="plane-wrapper-outer">
+                                                <div class="plane-wrapper">
+                                                    <svg class="plane-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
+                                                        <path fill="none" d="M0 0h24v24H0z"></path>
+                                                        <path fill="currentColor" d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"></path>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <span class="plane-text block tracking-widest font-black">START TEST</span>
+                                        </div>
+
+                                        <!-- Testing/Loading State (Active Speed Progress) -->
+                                        <div x-show="isTestingSpeed" class="flex items-center gap-2" x-cloak>
+                                            <i class="fa-solid fa-circle-notch fa-spin text-sm"></i> 
+                                            <span class="font-mono font-black" x-text="speedProgress + '%'"></span>
+                                        </div>
                                     </button>
                                 </div>
                             </div>
@@ -1458,17 +1513,18 @@
                     
                     <div class="md:hidden w-px h-3 bg-slate-300 dark:bg-slate-600 shadow-[1px_0_0_rgba(255,255,255,1)] dark:shadow-none mx-0.5 sm:mx-0"></div>
 
-                    <!-- Dynamic Oscillating Telemetry Wave Pill -->
-                    <div class="flex items-center gap-2 bg-slate-50 sm:bg-white dark:bg-dark_surface px-2 sm:px-3 py-1 rounded sm:rounded-full sm:shadow-[0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,1)] border border-slate-200/60 sm:border-slate-200/90 text-[8px] sm:text-[10px] font-bold text-slate-500 sm:text-slate-600 cursor-default" title="Real-time Network Telemetry">
+                    <!-- Frozen Width Latency Pill (Stops 100% of Footer & Popup Jitter) -->
+                    <div class="w-[80px] sm:w-[86px] shrink-0 flex items-center justify-between bg-slate-50 sm:bg-white dark:bg-dark_surface px-2 py-1 rounded sm:rounded-full sm:shadow-[0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,1)] border border-slate-200/60 sm:border-slate-200/90 text-[8px] sm:text-[10px] font-bold text-slate-500 sm:text-slate-600 cursor-default" title="Real-time Network Telemetry">
                         <!-- Live ECG Waveform -->
-                        <div class="flex items-center h-2.5 w-7 overflow-hidden opacity-90">
+                        <div class="flex items-center h-2.5 w-6 overflow-hidden opacity-90 shrink-0">
                             <svg class="w-full h-full text-emerald-500 stroke-current fill-none stroke-[2]" viewBox="0 0 40 15">
                                 <path d="M0,7 L10,7 L13,2 L17,13 L20,7 L25,7 L28,4 L31,7 L40,7" stroke-dasharray="80" stroke-dashoffset="0">
                                     <animate attributeName="stroke-dashoffset" from="80" to="0" dur="1.5s" repeatCount="indefinite" />
                                 </path>
                             </svg>
                         </div>
-                        <span class="font-mono text-emerald-600 dark:text-emerald-400 font-black" x-text="(pingVal !== '--' ? pingVal : '12') + 'ms'"></span>
+                        <!-- Rigid Tabular Width (Never Changes Pixel Width) -->
+                        <span class="w-[42px] text-right font-mono tabular-nums text-emerald-600 dark:text-emerald-400 font-black" x-text="(pingVal !== '--' ? pingVal : '12') + 'ms'"></span>
                     </div>
                     
                     <div class="hidden sm:block w-px h-3.5 bg-slate-200 dark:bg-slate-700 shadow-[1px_0_0_rgba(255,255,255,1)] dark:shadow-none"></div>
@@ -3262,19 +3318,33 @@
 
                 // 🚀 NETWORK APP FUNCTIONS
                 async fetchPublicIP() {
-                    const lines = { '122.160.116.30': 'Airtel Broadband', '203.190.135.3': 'STPI Leased Line', '122.180.106.42': 'Airtel Leased Line' };
+                    // 🌐 Exact IP Mapping + Smart Regex for Airtel Lines
+                    const lines = { 
+                        '27.57.19.69': 'Airtel Broadband',
+                        '122.160.116.30': 'Airtel Broadband', 
+                        '203.190.135.3': 'STPI Leased Line', 
+                        '122.180.106.42': 'Airtel Leased Line' 
+                    };
                     try {
                         const r = await fetch('https://ipinfo.io/json');
                         if(!r.ok) throw new Error("limit");
                         const d = await r.json();
                         this.publicIp = d.ip;
-                        this.ispName = lines[d.ip] || (d.org || 'Unknown ISP');
+                        
+                        // 🚀 Smart Check: Agar IP mapped ho ya org mein "Airtel" ho toh clean naam dikhaye
+                        if (lines[d.ip]) {
+                            this.ispName = lines[d.ip];
+                        } else if (d.org && d.org.toLowerCase().includes('airtel')) {
+                            this.ispName = 'Airtel Broadband';
+                        } else {
+                            this.ispName = d.org || 'Unknown ISP';
+                        }
                     } catch (e) {
                         try {
                             const r2 = await fetch('https://api.ipify.org?format=json');
                             const d2 = await r2.json();
                             this.publicIp = d2.ip;
-                            this.ispName = lines[d2.ip] || 'Fetching ISP...';
+                            this.ispName = lines[d2.ip] || 'Airtel Broadband';
                         } catch (e2) {
                             this.publicIp = "Unavailable"; 
                             this.ispName = "Offline";
