@@ -648,25 +648,81 @@
                     <!-- 📱 MOBILE VIEW -->
                     <div class="md:hidden flex flex-col gap-3 p-3 pb-6" x-show="!loading" x-cloak>
                         <div x-show="currentTab === 'hardware'" class="flex flex-col gap-3" x-cloak>
-                            <template x-for="(item, index) in filteredHardware" :key="'mob-hw-'+index">
-                                <div class="bg-white dark:bg-dark_surface border border-slate-200 dark:border-white/10 rounded-2xl p-3 shadow-sm flex flex-col gap-2.5 relative overflow-hidden transition-all hover:shadow-md cursor-pointer" @click="openModal('view', item)">
-                                    <div class="absolute left-0 top-0 bottom-0 w-1.5" :class="item.Status === 'In Use' ? 'bg-emerald-500' : (item.Status === 'Spare' ? 'bg-amber-500' : 'bg-red-500')"></div>
-                                    <div class="flex justify-between items-start pl-2.5">
-                                        <h4 class="font-black text-[15px] text-brand dark:text-brand_glow leading-none tracking-tight truncate pr-2" x-text="item.AssetID"></h4>
-                                        <span class="px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border shrink-0" :class="item.Status === 'In Use' ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30' : (item.Status === 'Spare' ? 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/30' : 'bg-red-50 text-red-600 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/30')" x-text="item.Status"></span>
-                                    </div>
-                                    <div class="flex items-center flex-wrap gap-1.5 pl-2.5 text-[10px] font-bold text-slate-400 dark:text-slate-500">
-                                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-desktop opacity-70"></i> <span x-text="(item.DeviceType||'') + ' ' + (item.Make||'')"></span></span>
-                                        <span class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600 mx-0.5"></span>
-                                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-barcode opacity-70"></i> <span class="font-mono text-slate-500 dark:text-slate-400" x-text="'SN: ' + (item.SerialNo || 'N/A')"></span></span>
-                                    </div>
-                                    <div class="ml-2.5 mt-0.5 bg-slate-50/80 dark:bg-black/20 rounded-xl p-3 border border-slate-100 dark:border-white/5 flex flex-col gap-2.5">
-                                        <div class="flex justify-between items-center"><span class="text-[9px] font-black uppercase tracking-widest text-slate-400">Assigned To</span><span class="font-bold text-slate-800 dark:text-slate-200 text-xs truncate pl-2" x-text="item.AssignedTo || 'Unassigned'"></span></div>
-                                        <div class="flex justify-between items-center"><span class="font-mono font-bold text-[10px] text-blue-600 dark:text-blue-400 bg-blue-50/80 dark:bg-blue-500/10 px-2.5 py-1 rounded-md border border-blue-100 dark:border-blue-500/20 shadow-sm" x-text="item.Live_IP || 'Not Allocated'"></span><span class="font-bold text-slate-500 dark:text-slate-400 text-[10px]" x-text="item.RAM_GB ? item.RAM_GB+'GB RAM' : '-'"></span></div>
-                                    </div>
-                                </div>
-                            </template>
-                        </div>
+					<template x-for="(item, index) in filteredHardware" :key="'mob-hw-'+index">
+						<div class="relative p-3.5 rounded-2xl bg-white dark:bg-[#0f172a] border border-slate-200/80 dark:border-white/10 shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-md transition-all active:scale-[0.98] cursor-pointer overflow-hidden flex flex-col gap-2.5 group" 
+							 @click="openModal('view', item)">
+							
+							<!-- ⚡ Left Laser Accent Line -->
+							<div class="absolute left-0 top-0 bottom-0 w-1 transition-all" 
+								 :class="item.Status === 'In Use' ? 'bg-emerald-500' : (item.Status === 'Spare' ? 'bg-amber-500' : 'bg-rose-500')"></div>
+
+							<!-- 1. Top Header: Icon + AssetID (Sized 12px, Zero Truncate) + Hostname + Status -->
+							<div class="flex items-center justify-between gap-1.5 pl-1">
+								<div class="flex items-center gap-1.5 min-w-0">
+									<span class="text-sm shrink-0 leading-none" x-text="getDeviceEmoji(item.DeviceType)"></span>
+									<!-- 🚀 Font 12px + shrink-0: Full Asset ID will now fit 100% without ellipsis -->
+									<h4 class="font-heading font-black text-[12px] text-slate-900 dark:text-white leading-none tracking-tight shrink-0 group-hover:text-brand transition-colors" x-text="item.AssetID"></h4>
+									<template x-if="item.Hostname && item.Hostname !== '-'">
+										<span class="font-mono text-[9px] font-black text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-500/30 px-1.5 py-0.5 rounded leading-none shrink-0" x-text="item.Hostname"></span>
+									</template>
+								</div>
+								<!-- Status Pill -->
+								<span class="px-2 py-0.5 rounded-full text-[8.5px] font-black uppercase tracking-wider border shrink-0 flex items-center gap-1.5 leading-none" 
+									  :class="item.Status === 'In Use' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30' : (item.Status === 'Spare' ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/30' : 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/30')">
+									<span class="w-1.5 h-1.5 rounded-full bg-current" :class="item.Status === 'In Use' ? 'animate-pulse' : ''"></span>
+									<span x-text="item.Status"></span>
+								</span>
+							</div>
+
+							<!-- 2. Dual Hardware Spec Nameplates: Framed Model Pill + Barcode SN Pill -->
+							<div class="flex items-center justify-between gap-2 pl-1 leading-none">
+								<!-- 🚀 Matching Framed Model Nameplate with Microchip Icon -->
+								<div class="flex items-center gap-1.5 text-[10.5px] font-bold text-slate-700 dark:text-slate-200 bg-slate-100/80 dark:bg-white/5 px-2 py-0.5 rounded border border-slate-200/70 dark:border-white/5 shadow-sm truncate min-w-0">
+									<i class="fa-solid fa-microchip text-[9px] text-indigo-500 dark:text-indigo-400 shrink-0 opacity-80"></i>
+									<span class="truncate" x-text="(item.Make || '') + ' ' + (item.Model || '')"></span>
+								</div>
+								
+								<!-- 🚀 Matching Barcode Serial Pill -->
+								<div class="flex items-center gap-1.5 font-mono text-[9.5px] font-bold text-slate-600 dark:text-slate-300 shrink-0 bg-slate-100/80 dark:bg-white/5 px-2 py-0.5 rounded border border-slate-200/70 dark:border-white/5 shadow-sm">
+									<i class="fa-solid fa-barcode text-[11px] text-slate-400 dark:text-slate-500"></i>
+									<span x-text="item.SerialNo || 'N/A'"></span>
+								</div>
+							</div>
+
+							<!-- 3. Integrated Telemetry Pod -->
+							<div class="bg-slate-50/80 dark:bg-black/30 rounded-xl p-2.5 border border-slate-200/70 dark:border-white/5 flex flex-col gap-2">
+								<!-- User & Location Row -->
+								<div class="flex items-center justify-between gap-2 text-xs">
+									<div class="flex items-center gap-1.5 min-w-0">
+										<div class="w-4 h-4 rounded-full bg-indigo-600 text-white font-black text-[7.5px] flex items-center justify-center shrink-0" x-text="getInitials(item.AssignedTo)"></div>
+										<span class="font-bold text-slate-800 dark:text-slate-200 truncate text-[11.5px]" x-text="item.AssignedTo || 'Unassigned'"></span>
+									</div>
+									<div class="flex items-center gap-1 font-bold text-slate-500 dark:text-slate-400 text-[10px] shrink-0">
+										<i class="fa-solid fa-location-dot text-[8.5px] text-rose-500"></i>
+										<span class="uppercase font-mono" x-text="item.Location || 'N/A'"></span>
+									</div>
+								</div>
+
+								<!-- Network IP & Colorful Specs Row -->
+								<div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-200/60 dark:border-white/5">
+									<!-- Carrier Coded Full IP -->
+									<span class="font-mono font-black text-[10.5px] px-2 py-0.5 rounded border shadow-sm leading-none" :class="getIpCarrierClass(item.Live_IP)">
+										<span class="w-1.5 h-1.5 rounded-full bg-current inline-block mr-1 opacity-80"></span>
+										<span x-text="item.Live_IP || 'Not Allocated'"></span>
+									</span>
+
+									<!-- 🚀 Restored Colorful Purple RAM & Amber Storage Chips -->
+									<div class="flex items-center gap-1.5 font-mono text-[9.5px] font-black shrink-0">
+										<span x-show="item.RAM_GB" class="bg-purple-50 text-purple-700 border border-purple-200/90 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-500/30 px-1.5 py-0.5 rounded shadow-sm" x-text="item.RAM_GB + 'G'"></span>
+										<span x-show="item.Storage_GB" class="bg-amber-50 text-amber-700 border border-amber-200/90 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-500/30 px-1.5 py-0.5 rounded shadow-sm" x-text="item.Storage_GB + 'G'"></span>
+										<i class="fa-solid fa-chevron-right text-[8.5px] text-slate-300 dark:text-slate-600 group-hover:text-brand group-hover:translate-x-0.5 transition-all ml-0.5"></i>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</template>
+				</div>
 
                         <div x-show="currentTab === 'software'" class="flex flex-col gap-3" x-cloak>
                             <!-- Software usually doesn't have strict branch location, but keeping original logic -->
