@@ -1,1 +1,1 @@
-const PBL_APP_VERSION = "v2.5";
+const PBL_APP_VERSION = "v3.0";
