@@ -3461,7 +3461,8 @@
 
                 async init() {
                     if (this.isDark) document.documentElement.classList.add('dark');
-                    document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
+                    // init() aur toggleTheme() ke andar wali line ko aise update karo:
+					document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#ffffff");
                     
                     this.setupCustomCursor();
                     this.runDecryption('decrypt-title');
