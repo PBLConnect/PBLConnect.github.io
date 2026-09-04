@@ -324,62 +324,66 @@
                 
                 <!-- CARD 1: TOTAL INVENTORY POOL -->
                 <div @click="haptic('light'); filterStatus = []; filterType = []; filterLoc = []; searchQuery = '';" 
-                     class="kpi-card cursor-pointer select-none bg-gradient-to-br from-indigo-50/90 via-white to-indigo-50/30 dark:from-indigo-950/20 dark:via-dark_surface dark:to-transparent rounded-2xl md:rounded-[1.4rem] p-3.5 sm:p-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-indigo-200/80 dark:border-indigo-800/40 hover:border-indigo-400 flex flex-col justify-between min-h-[105px] sm:min-h-[140px] relative group active:scale-[0.99] transition-all duration-300">
+                     class="kpi-card cursor-pointer select-none bg-gradient-to-br from-indigo-50/90 via-white to-indigo-50/30 dark:from-indigo-950/20 dark:via-dark_surface dark:to-transparent rounded-2xl md:rounded-[1.4rem] p-3 sm:p-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-indigo-200/80 dark:border-indigo-800/40 hover:border-indigo-400 flex flex-col justify-between min-h-[105px] sm:min-h-[140px] relative group active:scale-[0.99] transition-all duration-300">
                     <i class="fa-solid absolute -bottom-3 -right-2 text-6xl sm:text-8xl opacity-[0.08] dark:opacity-[0.05] group-hover:scale-110 transition-transform duration-500 text-indigo-500 pointer-events-none" :class="currentTab === 'hardware' ? 'fa-computer' : 'fa-compact-disc'"></i>
                     
+                    <!-- Header: Clean layout without mobile location collision -->
                     <div class="flex items-center justify-between relative z-10 mb-1">
-                        <div class="flex items-center gap-2 min-w-0">
-                            <div class="w-8 h-8 rounded-xl bg-white dark:bg-black/40 shadow-sm flex items-center justify-center text-indigo-500 text-xs border border-indigo-100 dark:border-indigo-500/20 shrink-0"><i class="fa-solid" :class="currentTab === 'hardware' ? 'fa-database' : 'fa-layer-group'"></i></div>
-                            <span class="text-[11px] sm:text-[12px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest leading-none truncate">Total Fleet</span>
+                        <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-white dark:bg-black/40 shadow-sm flex items-center justify-center text-indigo-500 text-[11px] sm:text-xs border border-indigo-100 dark:border-indigo-500/20 shrink-0"><i class="fa-solid" :class="currentTab === 'hardware' ? 'fa-database' : 'fa-layer-group'"></i></div>
+                            <!-- 🚀 tracking-wider saves space; no truncation -->
+                            <span class="text-[11px] sm:text-[12px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-wider leading-none truncate">Total Fleet</span>
                         </div>
-                        <span class="text-[8px] font-mono font-black px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-600 border border-indigo-200 dark:bg-indigo-500/10 dark:text-indigo-300 dark:border-indigo-500/20 uppercase" x-text="currentLocation"></span>
+                        <!-- 🚀 Hidden on mobile because location is already in top navbar -->
+                        <span class="hidden sm:inline-block text-[8px] font-mono font-black px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-600 border border-indigo-200 dark:bg-indigo-500/10 dark:text-indigo-300 dark:border-indigo-500/20 uppercase" x-text="currentLocation"></span>
                     </div>
 
                     <div class="relative z-10 my-auto py-1">
                         <h3 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-indigo-600 dark:text-indigo-400 leading-none" x-text="currentTab === 'hardware' ? baseFilteredHardware.length : filteredSoftware.length">0</h3>
                     </div>
 
-                    <div class="flex justify-between items-center relative z-10 pt-2 border-t border-indigo-100/80 dark:border-white/5">
-                        <span class="text-[9px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400 truncate" x-text="currentTab === 'hardware' ? 'Hardware Assets 💻' : 'Total Licenses 📀'"></span>
-                        <span class="text-[8px] font-mono font-black text-indigo-600 dark:text-indigo-400">100% Tracked</span>
+                    <!-- Footer: Succinct labels with whitespace-nowrap -->
+                    <div class="flex justify-between items-center relative z-10 pt-1.5 sm:pt-2 border-t border-indigo-100/80 dark:border-white/5">
+                        <span class="text-[9.5px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400 truncate" x-text="currentTab === 'hardware' ? 'Assets 💻' : 'Licenses 📀'"></span>
+                        <span class="text-[8.5px] sm:text-[9px] font-mono font-black text-indigo-600 dark:text-indigo-400 shrink-0 whitespace-nowrap">100% Tracked</span>
                     </div>
                 </div>
 
                 <!-- CARD 2: OPERATIONAL (IN USE / ACTIVE) -->
                 <div @click="haptic('light'); filterStatus = currentTab === 'hardware' ? ['In Use'] : ['Active'];" 
-                     class="kpi-card cursor-pointer select-none bg-gradient-to-br from-emerald-50/90 via-white to-emerald-50/30 dark:from-emerald-950/20 dark:via-dark_surface dark:to-transparent rounded-2xl md:rounded-[1.4rem] p-3.5 sm:p-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-emerald-200/80 dark:border-emerald-800/40 hover:border-emerald-400 flex flex-col justify-between min-h-[105px] sm:min-h-[140px] relative group active:scale-[0.99] transition-all duration-300"
+                     class="kpi-card cursor-pointer select-none bg-gradient-to-br from-emerald-50/90 via-white to-emerald-50/30 dark:from-emerald-950/20 dark:via-dark_surface dark:to-transparent rounded-2xl md:rounded-[1.4rem] p-3 sm:p-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-emerald-200/80 dark:border-emerald-800/40 hover:border-emerald-400 flex flex-col justify-between min-h-[105px] sm:min-h-[140px] relative group active:scale-[0.99] transition-all duration-300"
                      :class="filterStatus.includes('In Use') || filterStatus.includes('Active') ? 'ring-2 ring-emerald-500/40 border-emerald-500' : ''">
                     <i class="fa-solid fa-check-double absolute -bottom-3 -right-2 text-6xl sm:text-8xl opacity-[0.08] dark:opacity-[0.05] group-hover:scale-110 transition-transform duration-500 text-emerald-500 pointer-events-none"></i>
                     
                     <div class="flex items-center justify-between relative z-10 mb-1">
-                        <div class="flex items-center gap-2 min-w-0">
-                            <div class="w-8 h-8 rounded-xl bg-white dark:bg-black/40 shadow-sm flex items-center justify-center text-emerald-500 text-xs border border-emerald-100 dark:border-emerald-500/20 shrink-0"><i class="fa-solid fa-bolt"></i></div>
-                            <span class="text-[11px] sm:text-[12px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest leading-none truncate">Operational</span>
+                        <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-white dark:bg-black/40 shadow-sm flex items-center justify-center text-emerald-500 text-[11px] sm:text-xs border border-emerald-100 dark:border-emerald-500/20 shrink-0"><i class="fa-solid fa-bolt"></i></div>
+                            <span class="text-[11px] sm:text-[12px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-wider leading-none truncate">Operational</span>
                         </div>
                         <span class="status-dot w-2 h-2 bg-emerald-500 animate-pulse-fast shadow-[0_0_6px_#10b981] border-2 border-white dark:border-dark_surface rounded-full shrink-0"></span>
                     </div>
 
-                    <div class="relative z-10 my-auto py-1 flex items-baseline gap-2">
+                    <div class="relative z-10 my-auto py-1 flex items-baseline gap-1.5 sm:gap-2">
                         <h3 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-emerald-600 dark:text-emerald-400 leading-none" x-text="currentTab === 'hardware' ? baseFilteredHardware.filter(a=>a.Status=='In Use').length : filteredSoftware.filter(s=>s.Status=='Active').length">0</h3>
-                        <span class="text-[9px] font-mono font-bold text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 px-1.5 py-0.5 rounded" x-text="currentTab === 'hardware' ? (baseFilteredHardware.length > 0 ? Math.round((baseFilteredHardware.filter(a=>a.Status=='In Use').length / baseFilteredHardware.length) * 100) + '% Active' : '100%') : 'Active'"></span>
+                        <span class="text-[8.5px] sm:text-[9px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-1.5 py-0.5 rounded shrink-0 whitespace-nowrap" x-text="currentTab === 'hardware' ? (baseFilteredHardware.length > 0 ? Math.round((baseFilteredHardware.filter(a=>a.Status=='In Use').length / baseFilteredHardware.length) * 100) + '% Active' : '100%') : 'Active'"></span>
                     </div>
 
-                    <div class="flex justify-between items-center relative z-10 pt-2 border-t border-emerald-100/80 dark:border-white/5">
-                        <span class="text-[9px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400 truncate" x-text="currentTab === 'hardware' ? 'Active / In Use ✅' : 'Active Software ✅'"></span>
-                        <span class="text-[8px] font-mono font-black text-emerald-600 dark:text-emerald-400">Deployed</span>
+                    <div class="flex justify-between items-center relative z-10 pt-1.5 sm:pt-2 border-t border-emerald-100/80 dark:border-white/5">
+                        <span class="text-[9.5px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400 truncate" x-text="currentTab === 'hardware' ? 'In Use ✅' : 'Active Software ✅'"></span>
+                        <span class="text-[8.5px] sm:text-[9px] font-mono font-black text-emerald-600 dark:text-emerald-400 shrink-0 whitespace-nowrap">Deployed</span>
                     </div>
                 </div>
 
                 <!-- CARD 3: RESERVE (SPARE STOCK) -->
                 <div @click="haptic('light'); if(currentTab === 'hardware') filterStatus = ['Spare'];" 
-                     class="kpi-card cursor-pointer select-none bg-gradient-to-br from-amber-50/90 via-white to-amber-50/30 dark:from-amber-950/20 dark:via-dark_surface dark:to-transparent rounded-2xl md:rounded-[1.4rem] p-3.5 sm:p-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-amber-200/80 dark:border-amber-800/40 hover:border-amber-400 flex flex-col justify-between min-h-[105px] sm:min-h-[140px] relative group active:scale-[0.99] transition-all duration-300"
+                     class="kpi-card cursor-pointer select-none bg-gradient-to-br from-amber-50/90 via-white to-amber-50/30 dark:from-amber-950/20 dark:via-dark_surface dark:to-transparent rounded-2xl md:rounded-[1.4rem] p-3 sm:p-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-amber-200/80 dark:border-amber-800/40 hover:border-amber-400 flex flex-col justify-between min-h-[105px] sm:min-h-[140px] relative group active:scale-[0.99] transition-all duration-300"
                      :class="filterStatus.includes('Spare') ? 'ring-2 ring-amber-500/40 border-amber-500' : ''">
                     <i class="fa-solid fa-boxes-stacked absolute -bottom-3 -right-2 text-6xl sm:text-8xl opacity-[0.08] dark:opacity-[0.05] group-hover:scale-110 transition-transform duration-500 text-amber-500 pointer-events-none"></i>
                     
                     <div class="flex items-center justify-between relative z-10 mb-1">
-                        <div class="flex items-center gap-2 min-w-0">
-                            <div class="w-8 h-8 rounded-xl bg-white dark:bg-black/40 shadow-sm flex items-center justify-center text-amber-500 text-xs border border-amber-100 dark:border-amber-500/20 shrink-0"><i class="fa-solid fa-box"></i></div>
-                            <span class="text-[11px] sm:text-[12px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest leading-none truncate">Reserve</span>
+                        <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-white dark:bg-black/40 shadow-sm flex items-center justify-center text-amber-500 text-[11px] sm:text-xs border border-amber-100 dark:border-amber-500/20 shrink-0"><i class="fa-solid fa-box"></i></div>
+                            <span class="text-[11px] sm:text-[12px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-wider leading-none truncate">Reserve</span>
                         </div>
                     </div>
 
@@ -387,22 +391,22 @@
                         <h3 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-amber-600 dark:text-amber-400 leading-none" x-text="currentTab === 'hardware' ? baseFilteredHardware.filter(a=>a.Status=='Spare').length : filteredSoftware.filter(s=>s.Type=='Subscription').length">0</h3>
                     </div>
 
-                    <div class="flex justify-between items-center relative z-10 pt-2 border-t border-amber-100/80 dark:border-white/5">
-                        <span class="text-[9px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400 truncate" x-text="currentTab === 'hardware' ? 'In Stock / Spare 📦' : 'Subscriptions 🔁'"></span>
-                        <span class="text-[8px] font-mono font-black text-amber-600 dark:text-amber-400">Ready</span>
+                    <div class="flex justify-between items-center relative z-10 pt-1.5 sm:pt-2 border-t border-amber-100/80 dark:border-white/5">
+                        <span class="text-[9.5px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400 truncate" x-text="currentTab === 'hardware' ? 'Spare Stock 📦' : 'Subscriptions 🔁'"></span>
+                        <span class="text-[8.5px] sm:text-[9px] font-mono font-black text-amber-600 dark:text-amber-400 shrink-0 whitespace-nowrap">Ready</span>
                     </div>
                 </div>
 
                 <!-- CARD 4: ATTENTION (DECOM / IN REPAIR / DEFICIT) -->
                 <div @click="haptic('light'); if(currentTab === 'hardware') filterStatus = ['Decommissioned', 'In Repair'];" 
-                     class="kpi-card cursor-pointer select-none bg-gradient-to-br from-rose-50/90 via-white to-rose-50/30 dark:from-rose-950/20 dark:via-dark_surface dark:to-transparent rounded-2xl md:rounded-[1.4rem] p-3.5 sm:p-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-rose-200/80 dark:border-rose-800/40 hover:border-rose-400 flex flex-col justify-between min-h-[105px] sm:min-h-[140px] relative group active:scale-[0.99] transition-all duration-300"
+                     class="kpi-card cursor-pointer select-none bg-gradient-to-br from-rose-50/90 via-white to-rose-50/30 dark:from-rose-950/20 dark:via-dark_surface dark:to-transparent rounded-2xl md:rounded-[1.4rem] p-3 sm:p-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-rose-200/80 dark:border-rose-800/40 hover:border-rose-400 flex flex-col justify-between min-h-[105px] sm:min-h-[140px] relative group active:scale-[0.99] transition-all duration-300"
                      :class="filterStatus.includes('Decommissioned') || filterStatus.includes('In Repair') ? 'ring-2 ring-rose-500/40 border-rose-500' : ''">
                     <i class="fa-solid fa-triangle-exclamation absolute -bottom-3 -right-2 text-6xl sm:text-8xl opacity-[0.08] dark:opacity-[0.05] group-hover:scale-110 transition-transform duration-500 text-rose-500 pointer-events-none"></i>
                     
                     <div class="flex items-center justify-between relative z-10 mb-1">
-                        <div class="flex items-center gap-2 min-w-0">
-                            <div class="w-8 h-8 rounded-xl bg-white dark:bg-black/40 shadow-sm flex items-center justify-center text-rose-500 text-xs border border-rose-100 dark:border-rose-500/20 shrink-0"><i class="fa-solid fa-bell"></i></div>
-                            <span class="text-[11px] sm:text-[12px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest leading-none truncate">Attention</span>
+                        <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-white dark:bg-black/40 shadow-sm flex items-center justify-center text-rose-500 text-[11px] sm:text-xs border border-rose-100 dark:border-rose-500/20 shrink-0"><i class="fa-solid fa-bell"></i></div>
+                            <span class="text-[11px] sm:text-[12px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-wider leading-none truncate">Attention</span>
                         </div>
                         <span x-show="(currentTab === 'hardware' ? baseFilteredHardware.filter(a=>['Decommissioned','In Repair'].includes(a.Status)).length : filteredSoftware.filter(s=> (s.TotalLicense - getTotalUsed(s)) < 0).length) > 0" 
                               class="status-dot w-2 h-2 bg-rose-500 animate-pulse-fast shadow-[0_0_6px_#f43f5e] border-2 border-white dark:border-dark_surface rounded-full shrink-0"></span>
@@ -412,9 +416,9 @@
                         <h3 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-rose-600 dark:text-rose-400 leading-none" x-text="currentTab === 'hardware' ? baseFilteredHardware.filter(a=>['Decommissioned','In Repair'].includes(a.Status)).length : filteredSoftware.filter(s=> (s.TotalLicense - getTotalUsed(s)) < 0).length">0</h3>
                     </div>
 
-                    <div class="flex justify-between items-center relative z-10 pt-2 border-t border-rose-100/80 dark:border-white/5">
-                        <span class="text-[9px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400 truncate" x-text="currentTab === 'hardware' ? 'Decom / Repair 🔴' : 'License Deficit 🔴'"></span>
-                        <span class="text-[8px] font-mono font-black" :class="(currentTab === 'hardware' ? baseFilteredHardware.filter(a=>['Decommissioned','In Repair'].includes(a.Status)).length : filteredSoftware.filter(s=> (s.TotalLicense - getTotalUsed(s)) < 0).length) > 0 ? 'text-rose-600 animate-pulse' : 'text-emerald-500'" x-text="(currentTab === 'hardware' ? baseFilteredHardware.filter(a=>['Decommissioned','In Repair'].includes(a.Status)).length : filteredSoftware.filter(s=> (s.TotalLicense - getTotalUsed(s)) < 0).length) > 0 ? 'Action Req.' : 'All Normal'"></span>
+                    <div class="flex justify-between items-center relative z-10 pt-1.5 sm:pt-2 border-t border-rose-100/80 dark:border-white/5">
+                        <span class="text-[9.5px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400 truncate" x-text="currentTab === 'hardware' ? 'Decom/Repair 🔴' : 'Deficit 🔴'"></span>
+                        <span class="text-[8.5px] sm:text-[9px] font-mono font-black shrink-0 whitespace-nowrap" :class="(currentTab === 'hardware' ? baseFilteredHardware.filter(a=>['Decommissioned','In Repair'].includes(a.Status)).length : filteredSoftware.filter(s=> (s.TotalLicense - getTotalUsed(s)) < 0).length) > 0 ? 'text-rose-600 animate-pulse' : 'text-emerald-500'" x-text="(currentTab === 'hardware' ? baseFilteredHardware.filter(a=>['Decommissioned','In Repair'].includes(a.Status)).length : filteredSoftware.filter(s=> (s.TotalLicense - getTotalUsed(s)) < 0).length) > 0 ? 'Action Req.' : 'All Normal'"></span>
                     </div>
                 </div>
 
