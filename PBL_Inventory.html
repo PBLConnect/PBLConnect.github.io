@@ -954,10 +954,43 @@
                             </tbody>
                         </table>
                     </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </main>
+
+            <!-- 🚀 100% Autonomous Floating Scroll-To-Top Button -->
+            <div x-data="{ showTop: false }"
+                 x-init="
+                    const updateScroll = () => {
+                        const mainScroll = document.querySelector('main')?.scrollTop || 0;
+                        const winScroll = window.scrollY || document.documentElement.scrollTop || 0;
+                        showTop = (mainScroll > 300 || winScroll > 300);
+                    };
+                    document.querySelector('main')?.addEventListener('scroll', updateScroll, { passive: true });
+                    window.addEventListener('scroll', updateScroll, { passive: true });
+                 "
+                 class="fixed bottom-16 right-4 sm:bottom-20 sm:right-6 z-[600]"
+                 x-cloak>
+                <button type="button"
+                        x-show="showTop"
+                        x-transition:enter="transition ease-out duration-300 transform"
+                        x-transition:enter-start="opacity-0 translate-y-6 scale-75"
+                        x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                        x-transition:leave="transition ease-in duration-200 transform"
+                        x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                        x-transition:leave-end="opacity-0 translate-y-6 scale-75"
+                        @click="
+                            const m = document.querySelector('main');
+                            if (m && m.scrollTop > 0) m.scrollTo({ top: 0, behavior: 'smooth' });
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                            if (window.navigator?.vibrate) window.navigator.vibrate(15);
+                        "
+                        class="w-11 h-11 rounded-2xl bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-2xl border border-indigo-200/90 dark:border-white/20 shadow-[0_10px_25px_rgba(79,70,229,0.35)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.8)] flex items-center justify-center text-indigo-600 dark:text-brand_glow hover:scale-110 active:scale-90 transition-all duration-200"
+                        title="Scroll to Top">
+                    <i class="fa-solid fa-arrow-up text-sm"></i>
+                </button>
+            </div>
+        </main>
 
     <!-- UNIFIED STATUS BAR (NEUMORPHIC ENGRAVED TRAY UI) -->
     <footer class="fixed sm:relative bottom-3 sm:bottom-0 left-3 right-3 sm:left-0 sm:right-0 z-[500] sm:z-50 pb-0 sm:pb-4 px-0 sm:px-6 w-[calc(100%-24px)] sm:w-full mx-auto flex items-center justify-center pointer-events-none transition-all duration-300">
