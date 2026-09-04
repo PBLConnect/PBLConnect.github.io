@@ -58,10 +58,22 @@
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
 
-        .rma-card { transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); position: relative; overflow: hidden; border: 1px solid rgba(0,0,0,0.05); backdrop-filter: blur(10px); }
+        .rma-card { transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1); position: relative; overflow: hidden; backdrop-filter: blur(16px); }
         @media (hover: hover) {
-            .rma-card:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1); z-index: 20; }
+            .rma-card:hover, .rma-card.is-hovered { transform: translateY(-4px) scale(1.02); box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.12); z-index: 25; }
             .cards-container:hover > .rma-card:not(:hover) { filter: blur(2px) grayscale(0.4); transform: scale(0.97); opacity: 0.7; }
+        }
+
+        /* 🛠️ HARDWARE DIAGNOSTIC HALO & WAVE */
+        .hardware-wave {
+            position: absolute; right: -25px; bottom: -25px; width: 150px; height: 150px;
+            border-radius: 50%; opacity: 0.08; pointer-events: none;
+            background: radial-gradient(circle, currentColor 0%, transparent 70%);
+            animation: hardware-pulse 4s infinite ease-in-out alternate;
+        }
+        @keyframes hardware-pulse {
+            0% { transform: scale(0.85); opacity: 0.05; }
+            100% { transform: scale(1.3); opacity: 0.12; }
         }
         
         .status-dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; box-shadow: 0 0 0 2px rgba(255,255,255,0.8); }
@@ -275,64 +287,121 @@
     <main class="flex-1 flex flex-col overflow-y-auto p-4 sm:p-6 bg-slate-50/50 dark:bg-[#020617]">
         <div class="max-w-[1920px] mx-auto w-full flex flex-col gap-4 sm:gap-6 h-full">
             
-            <!-- KPI CARDS -->
-            <div class="cards-container grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 shrink-0">
-                <div @click="filterBy(null)" class="rma-card bg-gradient-to-br from-violet-50 to-white dark:from-violet-900/10 dark:to-transparent rounded-2xl md:rounded-[1.25rem] p-3 sm:p-4 shadow-sm hover:shadow-md border cursor-pointer select-none group flex flex-col justify-between min-h-[90px] sm:min-h-[125px] relative transition-all duration-300" :class="activeFilter ? 'opacity-40 border-violet-100 dark:border-violet-900/50' : 'border-violet-200 dark:border-violet-800/50'">
-                    <i class="fa-solid fa-clipboard-list absolute -bottom-2 -right-2 text-8xl sm:text-8xl text-violet-500 opacity-20 dark:opacity-10 group-hover:scale-110 transition-transform duration-500"></i>
-                    <div class="flex items-center justify-between relative z-10 mb-1 sm:mb-2">
-                        <div class="flex items-center gap-1.5 sm:gap-2">
-                            <div class="w-8 h-8 sm:w-8 sm:h-8 rounded-full bg-white dark:bg-dark_surface shadow-sm flex items-center justify-center text-violet-500 text-[18px] sm:text-xs shrink-0"><i class="fa-solid fa-layer-group"></i></div>
-                            <span class="hidden sm:inline-block text-[11px] font-black text-violet-600 dark:text-violet-400 uppercase tracking-widest leading-none truncate">All Records</span>
+            <!-- 🛠️ TACTILE DIAGNOSTIC TELEMETRY KPI MODULES -->
+            <div class="cards-container grid grid-cols-2 lg:grid-cols-4 gap-2.5 md:gap-4 shrink-0">
+                
+                <!-- CARD 1: ALL CLAIMS -->
+                <div @click="filterBy(null)" 
+                     class="rma-card bg-gradient-to-br from-violet-50/90 via-white to-violet-50/30 dark:from-violet-950/20 dark:via-dark_surface dark:to-transparent rounded-2xl md:rounded-[1.4rem] p-3 sm:p-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border cursor-pointer select-none group flex flex-col justify-between min-h-[105px] sm:min-h-[140px] relative transition-all duration-300 active:scale-[0.99]" 
+                     :class="[
+                         activeFilter === null ? 'border-violet-400 dark:border-violet-700 shadow-md' : 'opacity-40 border-violet-100 dark:border-violet-900/30',
+                         hoveredStatus === 'all' ? 'ring-2 ring-violet-400 scale-[1.02]' : ''
+                     ]">
+                    <div class="hardware-wave text-violet-500"></div>
+                    <i class="fa-solid fa-clipboard-list absolute -bottom-3 -right-2 text-6xl sm:text-8xl opacity-[0.08] dark:opacity-[0.05] group-hover:scale-110 transition-transform duration-500 text-violet-500 pointer-events-none"></i>
+                    
+                    <div class="flex items-center justify-between relative z-10 mb-1">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <div class="w-8 h-8 rounded-xl bg-white dark:bg-black/40 shadow-sm flex items-center justify-center text-violet-500 text-xs border border-violet-100 dark:border-violet-500/20 shrink-0"><i class="fa-solid fa-layer-group"></i></div>
+                            <span class="text-[11px] sm:text-[12px] font-black text-violet-600 dark:text-violet-400 uppercase tracking-widest leading-none truncate">Total Ledger</span>
                         </div>
                     </div>
-                    <div class="relative z-10 mt-auto">
+                    
+                    <div class="relative z-10 my-auto py-1">
                         <h3 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-violet-600 dark:text-violet-400 leading-none" x-text="baseFilteredLogs.length">0</h3>
-                        <p class="text-[12px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1.5 truncate">Total Claims 📋</p>
+                    </div>
+                    
+                    <div class="flex justify-between items-center relative z-10 pt-2 border-t border-violet-100/80 dark:border-white/5">
+                        <span class="text-[9px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400 truncate">Total RMA Claims 📋</span>
+                        <span class="text-[8px] font-mono font-black px-1.5 py-0.5 rounded bg-violet-50 text-violet-600 border border-violet-200 dark:bg-violet-500/10 dark:text-violet-300 dark:border-violet-500/20">All Time</span>
                     </div>
                 </div>
 
-                <div @click="filterBy('Resolved')" class="rma-card bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-900/10 dark:to-transparent rounded-2xl md:rounded-[1.25rem] p-3 sm:p-4 shadow-sm hover:shadow-md border cursor-pointer select-none group flex flex-col justify-between min-h-[90px] sm:min-h-[125px] relative" :class="activeFilter === 'Resolved' ? 'border-emerald-500 ring-2 ring-emerald-500/30 transform scale-[1.02]' : (activeFilter ? 'opacity-40 border-emerald-100 dark:border-emerald-900/50' : 'border-emerald-100 dark:border-emerald-900/50')">
-                    <i class="fa-solid fa-microchip absolute -bottom-2 -right-2 text-8xl sm:text-8xl text-emerald-500 opacity-20 dark:opacity-10 group-hover:scale-110 transition-transform duration-500"></i>
-                    <div class="flex items-center justify-between relative z-10 mb-1 sm:mb-2">
-                        <div class="flex items-center gap-1.5 sm:gap-2">
-                            <div class="w-8 h-8 sm:w-8 sm:h-8 rounded-full bg-white dark:bg-dark_surface shadow-sm flex items-center justify-center text-emerald-500 text-[18px] sm:text-xs shrink-0"><i class="fa-solid fa-check"></i></div>
-                            <span class="hidden sm:inline-block text-[11px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest leading-none truncate">Completed</span>
+                <!-- CARD 2: COMPLETED (WITH RESOLUTION EFFICIENCY INDEX) -->
+                <div @click="filterBy('Resolved')" 
+                     class="rma-card bg-gradient-to-br from-emerald-50/90 via-white to-emerald-50/30 dark:from-emerald-950/20 dark:via-dark_surface dark:to-transparent rounded-2xl md:rounded-[1.4rem] p-3 sm:p-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border cursor-pointer select-none group flex flex-col justify-between min-h-[105px] sm:min-h-[140px] relative transition-all duration-300 active:scale-[0.99]" 
+                     :class="[
+                         activeFilter === 'Resolved' ? 'border-emerald-500 ring-2 ring-emerald-500/30 shadow-[0_12px_30px_-5px_rgba(16,185,129,0.35)] transform scale-[1.02]' : (activeFilter ? 'opacity-40 border-emerald-100 dark:border-emerald-900/30' : 'border-emerald-200/80 dark:border-emerald-800/40 hover:border-emerald-400'),
+                         hoveredStatus === 'Resolved' ? 'ring-2 ring-emerald-400 scale-[1.02] shadow-lg' : ''
+                     ]">
+                    <div class="hardware-wave text-emerald-500"></div>
+                    <i class="fa-solid fa-microchip absolute -bottom-3 -right-2 text-6xl sm:text-8xl opacity-[0.08] dark:opacity-[0.05] group-hover:scale-110 transition-transform duration-500 text-emerald-500 pointer-events-none"></i>
+                    
+                    <div class="flex items-center justify-between relative z-10 mb-1">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <div class="w-8 h-8 rounded-xl bg-white dark:bg-black/40 shadow-sm flex items-center justify-center text-emerald-500 text-xs border border-emerald-100 dark:border-emerald-500/20 shrink-0"><i class="fa-solid fa-check-double"></i></div>
+                            <span class="text-[11px] sm:text-[12px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest leading-none truncate">Resolved</span>
                         </div>
+                        <span class="status-dot w-2 h-2 bg-emerald-500 animate-pulse-fast shadow-[0_0_6px_#10b981] border-2 border-white dark:border-dark_surface rounded-full shrink-0"></span>
                     </div>
-                    <div class="relative z-10 mt-auto">
+                    
+                    <div class="relative z-10 my-auto py-1 flex items-baseline gap-2">
                         <h3 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-emerald-600 dark:text-emerald-400 leading-none" x-text="baseFilteredLogs.filter(l => l.status === 'Resolved').length">0</h3>
-                        <p class="text-[12px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1.5 truncate">Replaced / Fixed ✅</p>
+                        <span class="text-[9px] font-mono font-bold text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 px-1.5 py-0.5 rounded" x-text="baseFilteredLogs.length > 0 ? Math.round((baseFilteredLogs.filter(l => l.status === 'Resolved').length / baseFilteredLogs.length) * 100) + '% Rate' : '100%'"></span>
+                    </div>
+                    
+                    <div class="flex justify-between items-center relative z-10 pt-2 border-t border-emerald-100/80 dark:border-white/5">
+                        <span class="text-[9px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400 truncate">Replaced / Repaired ✅</span>
+                        <span class="text-[8px] font-mono font-black text-emerald-600 dark:text-emerald-400">Fixed</span>
                     </div>
                 </div>
 
-                <div @click="filterBy('AMC Logged')" class="rma-card bg-gradient-to-br from-blue-50 to-white dark:from-blue-900/10 dark:to-transparent rounded-2xl md:rounded-[1.25rem] p-3 sm:p-4 shadow-sm hover:shadow-md border cursor-pointer select-none group flex flex-col justify-between min-h-[90px] sm:min-h-[125px] relative" :class="activeFilter === 'AMC Logged' ? 'border-blue-500 ring-2 ring-blue-500/30 transform scale-[1.02]' : (activeFilter ? 'opacity-40 border-blue-100 dark:border-blue-900/50' : 'border-blue-100 dark:border-blue-900/50')">
-                    <i class="fa-solid fa-toolbox absolute -bottom-2 -right-2 text-8xl sm:text-8xl text-blue-500 opacity-20 dark:opacity-10 group-hover:scale-110 transition-transform duration-500"></i>
-                    <div class="flex items-center justify-between relative z-10 mb-1 sm:mb-2">
-                        <div class="flex items-center gap-1.5 sm:gap-2">
-                            <div class="w-8 h-8 sm:w-8 sm:h-8 rounded-full bg-white dark:bg-dark_surface shadow-sm flex items-center justify-center text-blue-500 text-[18px] sm:text-xs shrink-0"><i class="fa-solid fa-headset"></i></div>
-                            <span class="hidden sm:inline-block text-[11px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest leading-none truncate">Vendor Action</span>
+                <!-- CARD 3: VENDOR ACTION (AMC QUEUE) -->
+                <div @click="filterBy('AMC Logged')" 
+                     class="rma-card bg-gradient-to-br from-blue-50/90 via-white to-blue-50/30 dark:from-blue-950/20 dark:via-dark_surface dark:to-transparent rounded-2xl md:rounded-[1.4rem] p-3 sm:p-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border cursor-pointer select-none group flex flex-col justify-between min-h-[105px] sm:min-h-[140px] relative transition-all duration-300 active:scale-[0.99]" 
+                     :class="[
+                         activeFilter === 'AMC Logged' ? 'border-blue-500 ring-2 ring-blue-500/30 shadow-[0_12px_30px_-5px_rgba(59,130,246,0.35)] transform scale-[1.02]' : (activeFilter ? 'opacity-40 border-blue-100 dark:border-blue-900/30' : 'border-blue-200/80 dark:border-blue-800/40 hover:border-blue-400'),
+                         hoveredStatus === 'AMC Logged' ? 'ring-2 ring-blue-400 scale-[1.02] shadow-lg' : ''
+                     ]">
+                    <div class="hardware-wave text-blue-500"></div>
+                    <i class="fa-solid fa-toolbox absolute -bottom-3 -right-2 text-6xl sm:text-8xl opacity-[0.08] dark:opacity-[0.05] group-hover:scale-110 transition-transform duration-500 text-blue-500 pointer-events-none"></i>
+                    
+                    <div class="flex items-center justify-between relative z-10 mb-1">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <div class="w-8 h-8 rounded-xl bg-white dark:bg-black/40 shadow-sm flex items-center justify-center text-blue-500 text-xs border border-blue-100 dark:border-blue-500/20 shrink-0"><i class="fa-solid fa-headset"></i></div>
+                            <span class="text-[11px] sm:text-[12px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest leading-none truncate">Vendor Action</span>
                         </div>
+                        <span x-show="baseFilteredLogs.filter(l => l.status === 'AMC Logged').length > 0" class="status-dot w-2 h-2 bg-blue-500 animate-pulse shadow-[0_0_6px_#3b82f6] border-2 border-white dark:border-dark_surface rounded-full shrink-0"></span>
                     </div>
-                    <div class="relative z-10 mt-auto">
+                    
+                    <div class="relative z-10 my-auto py-1">
                         <h3 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-blue-600 dark:text-blue-400 leading-none" x-text="baseFilteredLogs.filter(l => l.status === 'AMC Logged').length">0</h3>
-                        <p class="text-[12px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1.5 truncate">Waiting for AMC 🧰</p>
+                    </div>
+                    
+                    <div class="flex justify-between items-center relative z-10 pt-2 border-t border-blue-100/80 dark:border-white/5">
+                        <span class="text-[9px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400 truncate">Waiting for AMC 🧰</span>
+                        <span class="text-[8px] font-mono font-black text-blue-600 dark:text-blue-400">In Transit</span>
                     </div>
                 </div>
 
-                <div @click="filterBy('Pending')" class="rma-card bg-gradient-to-br from-red-50 to-white dark:from-red-900/10 dark:to-transparent rounded-2xl md:rounded-[1.25rem] p-3 sm:p-4 shadow-sm hover:shadow-md border cursor-pointer select-none group flex flex-col justify-between min-h-[90px] sm:min-h-[125px] relative" :class="activeFilter === 'Pending' ? 'border-red-500 ring-2 ring-red-500/30 transform scale-[1.02]' : (activeFilter ? 'opacity-40 border-red-100 dark:border-red-900/50' : 'border-red-100 dark:border-red-900/50')">
-                    <i class="fa-solid fa-hourglass-half absolute -bottom-2 -right-2 text-8xl sm:text-8xl text-red-500 opacity-20 dark:opacity-10 group-hover:scale-110 transition-transform duration-500"></i>
-                    <div x-show="baseFilteredLogs.filter(l => l.status === 'Pending').length > 0" class="absolute top-2.5 right-2.5 z-20"><span class="status-dot w-2 h-2 sm:w-2.5 sm:h-2.5 bg-red-500 animate-pulse-fast shadow-[0_0_5px_rgba(239,68,68,0.5)] border-2 border-white dark:border-dark_surface rounded-full block"></span></div>
-                    <div class="flex items-center justify-between relative z-10 mb-1 sm:mb-2">
-                        <div class="flex items-center gap-1.5 sm:gap-2">
-                            <div class="w-8 h-8 sm:w-8 sm:h-8 rounded-full bg-white dark:bg-dark_surface shadow-sm flex items-center justify-center text-red-500 text-[18px] sm:text-xs shrink-0"><i class="fa-regular fa-clock"></i></div>
-                            <span class="hidden sm:inline-block text-[11px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest leading-none truncate">Action Required</span>
+                <!-- CARD 4: ACTION REQUIRED (OPEN TICKETS WARNING) -->
+                <div @click="filterBy('Pending')" 
+                     class="rma-card bg-gradient-to-br from-rose-50/90 via-white to-rose-50/30 dark:from-rose-950/20 dark:via-dark_surface dark:to-transparent rounded-2xl md:rounded-[1.4rem] p-3 sm:p-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border cursor-pointer select-none group flex flex-col justify-between min-h-[105px] sm:min-h-[140px] relative transition-all duration-300 active:scale-[0.99]" 
+                     :class="[
+                         activeFilter === 'Pending' ? 'border-rose-500 ring-2 ring-rose-500/30 shadow-[0_12px_30px_-5px_rgba(244,63,94,0.35)] transform scale-[1.02]' : (activeFilter ? 'opacity-40 border-rose-100 dark:border-rose-900/30' : 'border-rose-200/80 dark:border-rose-800/40 hover:border-rose-400'),
+                         hoveredStatus === 'Pending' ? 'ring-2 ring-rose-400 scale-[1.02] shadow-lg' : ''
+                     ]">
+                    <div class="hardware-wave text-rose-500"></div>
+                    <i class="fa-solid fa-hourglass-half absolute -bottom-3 -right-2 text-6xl sm:text-8xl opacity-[0.08] dark:opacity-[0.05] group-hover:scale-110 transition-transform duration-500 text-rose-500 pointer-events-none"></i>
+                    
+                    <div class="flex items-center justify-between relative z-10 mb-1">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <div class="w-8 h-8 rounded-xl bg-white dark:bg-black/40 shadow-sm flex items-center justify-center text-rose-500 text-xs border border-rose-100 dark:border-rose-500/20 shrink-0"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                            <span class="text-[11px] sm:text-[12px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest leading-none truncate">Action Req.</span>
                         </div>
+                        <span x-show="baseFilteredLogs.filter(l => l.status === 'Pending').length > 0" class="status-dot w-2 h-2 bg-rose-500 animate-pulse-fast shadow-[0_0_6px_#f43f5e] border-2 border-white dark:border-dark_surface rounded-full shrink-0"></span>
                     </div>
-                    <div class="relative z-10 mt-auto">
-                        <h3 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-red-600 dark:text-red-400 leading-none" x-text="baseFilteredLogs.filter(l => l.status === 'Pending').length">0</h3>
-                        <p class="text-[12px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 mt-0.5 sm:mt-1.5 truncate">Open Cases 🔴</p>
+                    
+                    <div class="relative z-10 my-auto py-1">
+                        <h3 class="text-3xl sm:text-4xl xl:text-5xl font-black font-heading tracking-tight text-rose-600 dark:text-rose-400 leading-none" x-text="baseFilteredLogs.filter(l => l.status === 'Pending').length">0</h3>
+                    </div>
+                    
+                    <div class="flex justify-between items-center relative z-10 pt-2 border-t border-rose-100/80 dark:border-white/5">
+                        <span class="text-[9px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400 truncate">Unresolved Faults 🔴</span>
+                        <span class="text-[8px] font-mono font-black" :class="baseFilteredLogs.filter(l => l.status === 'Pending').length > 0 ? 'text-rose-600 animate-pulse' : 'text-emerald-500'" x-text="baseFilteredLogs.filter(l => l.status === 'Pending').length > 0 ? 'Urgent' : 'All Clear'"></span>
                     </div>
                 </div>
+
             </div>
 
             <!-- TABLE WRAPPER -->
@@ -436,44 +505,71 @@
                             </thead>
                             <tbody class="divide-y divide-slate-100 dark:divide-white/5 text-xs">
                                 <template x-for="(log, index) in filteredLogs" :key="'desk-'+index">
-                                    <tr class="hover:bg-slate-50/80 dark:hover:bg-white/5 transition duration-200 cursor-pointer group" @click="editLog(log)">
+                                    <tr class="hover:bg-purple-50/50 dark:hover:bg-white/5 transition-all duration-150 cursor-pointer group border-b border-slate-100 dark:border-white/5" 
+                                        @mouseenter="hoveredStatus = log.status"
+                                        @mouseleave="hoveredStatus = null"
+                                        @click="editLog(log)">
+                                        
+                                        <!-- 1. Log Date Badge -->
                                         <td class="px-4 py-3 align-middle text-center">
-                                            <div class="inline-flex flex-col items-center justify-center bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-lg px-2.5 py-1 shadow-sm group-hover:border-brand/30 transition-colors">
-                                                <span class="text-[11px] font-black text-slate-700 dark:text-slate-200 leading-tight" x-text="formatDisplayDate(log.date).split('-')[0] + ' ' + formatDisplayDate(log.date).split('-')[1]"></span>
-                                                <span class="text-[8px] font-bold text-slate-400 tracking-widest" x-text="formatDisplayDate(log.date).split('-')[2]"></span>
+                                            <div class="inline-flex flex-col items-center justify-center bg-white dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-lg px-2.5 py-1 shadow-sm">
+                                                <span class="text-[11px] font-mono font-bold text-slate-800 dark:text-slate-200" x-text="formatDisplayDate(log.date).split('-')[0] + ' ' + (formatDisplayDate(log.date).split('-')[1] || '')"></span>
+                                                <span class="text-[8px] font-mono font-bold text-slate-400" x-text="formatDisplayDate(log.date).split('-')[2] || ''"></span>
                                             </div>
                                         </td>
+
+                                        <!-- 2. Asset Details & Dynamic Component Avatar -->
                                         <td class="px-4 py-3 align-middle truncate">
                                             <div class="flex items-center gap-3">
-                                                <div class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 flex items-center justify-center text-sm shrink-0 border border-indigo-100 dark:border-indigo-500/20 shadow-sm"><i class="fa-solid fa-desktop"></i></div>
+                                                <div class="w-8 h-8 rounded-xl flex items-center justify-center text-xs shrink-0 shadow-sm border border-black/5 dark:border-white/5"
+                                                     :class="getFaultIcon(log.issue).color">
+                                                    <i class="fa-solid" :class="getFaultIcon(log.issue).icon"></i>
+                                                </div>
                                                 <div class="truncate">
-                                                    <div class="font-black text-brand dark:text-brand_glow text-[13px] truncate leading-tight group-hover:text-blue-600 transition-colors" x-text="log.asset"></div>
-                                                    <div class="text-[9px] text-slate-500 font-bold mt-0.5 truncate uppercase tracking-widest flex items-center gap-1"><i class="fa-solid fa-barcode opacity-50"></i> <span class="font-mono text-slate-700 dark:text-slate-300" x-text="log.serial || 'N/A'"></span></div>
+                                                    <div class="font-black text-purple-600 dark:text-purple-400 text-[13px] truncate leading-tight group-hover:text-indigo-600 transition-colors" x-text="log.asset"></div>
+                                                    <div class="text-[9.5px] text-slate-400 font-mono font-bold mt-0.5 truncate uppercase flex items-center gap-1">
+                                                        <span>SN:</span> <span class="text-slate-600 dark:text-slate-300" x-text="log.serial || 'N/A'"></span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </td>
+
+                                        <!-- 3. Problem Reported (Semantic Component Badge) -->
                                         <td class="px-4 py-3 align-middle truncate" :title="log.issue">
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/10 text-[10px] font-bold text-slate-700 dark:text-slate-300 truncate max-w-full shadow-sm">
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[10px] font-bold border shadow-sm truncate max-w-full"
+                                                  :class="getFaultIcon(log.issue).badge">
+                                                <i class="fa-solid text-[9px]" :class="getFaultIcon(log.issue).icon"></i>
                                                 <span class="truncate" x-text="log.issue || '-'"></span>
                                             </span>
                                         </td>
+
+                                        <!-- 4. Action Taken -->
                                         <td class="px-4 py-3 align-middle truncate" :title="log.actionTaken">
-                                            <div class="flex items-start gap-1.5"><i class="fa-solid fa-wrench text-brand opacity-60 text-[10px] mt-0.5"></i><span class="text-[11px] font-medium text-slate-600 dark:text-slate-400 truncate leading-tight" x-text="log.actionTaken || 'Pending...'"></span></div>
+                                            <div class="flex items-start gap-1.5">
+                                                <i class="fa-solid fa-wrench text-purple-500 opacity-70 text-[10px] mt-0.5 shrink-0"></i>
+                                                <span class="text-[11px] font-medium text-slate-700 dark:text-slate-300 truncate leading-tight" x-text="log.actionTaken || 'Pending Action...'"></span>
+                                            </div>
                                         </td>
+
+                                        <!-- 5. Vendor Case ID -->
                                         <td class="px-4 py-3 text-center align-middle truncate">
                                             <span class="font-mono text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 px-2.5 py-1 rounded-md shadow-sm" x-text="log.caseId || 'N/A'"></span>
                                         </td>
+
+                                        <!-- 6. Status Badge -->
                                         <td class="px-4 py-3 text-center align-middle">
-                                            <span class="px-2 py-1 rounded-md text-[9px] font-black uppercase inline-flex items-center gap-1 border shadow-sm truncate max-w-full" 
-                                                  :class="(log.status || '').includes('Resolved') ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30' : ((log.status || '').includes('AMC') ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/30' : 'bg-red-50 text-red-600 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/30')">
-                                                <i class="fa-solid text-[8px]" :class="(log.status || '').includes('Resolved') ? 'fa-check' : ((log.status || '').includes('AMC') ? 'fa-toolbox' : 'fa-clock')"></i>
-                                                <span x-text="(log.status || '').replace(/✅|🕒|🧰/g, '').trim()"></span>
+                                            <span class="px-2.5 py-1 rounded-md text-[8.5px] font-black uppercase tracking-wider border shadow-sm inline-flex items-center gap-1" 
+                                                  :class="(log.status || '').includes('Resolved') ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30' : ((log.status || '').includes('AMC') ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/30' : 'bg-red-50 text-red-600 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/30 animate-pulse')">
+                                                <i class="fa-solid text-[7.5px]" :class="(log.status || '').includes('Resolved') ? 'fa-check' : ((log.status || '').includes('AMC') ? 'fa-headset' : 'fa-clock')"></i>
+                                                <span x-text="(log.status || 'Pending').replace(/✅|🕒|🧰/g, '').trim()"></span>
                                             </span>
                                         </td>
+
+                                        <!-- 7. Actions -->
                                         <td class="px-4 py-3 text-right align-middle pr-5 sticky-col bg-transparent">
-                                            <div class="flex items-center justify-end gap-1.5 opacity-40 group-hover:opacity-100 transition-opacity duration-300">
-                                                <button @click.stop="editLog(log)" class="w-7 h-7 rounded-lg bg-white dark:bg-black/40 hover:bg-brand hover:text-white text-slate-500 dark:text-slate-400 transition flex items-center justify-center border border-slate-200 dark:border-white/10 hover:border-brand/50 shadow-sm"><i class="fa-solid fa-pen text-[10px]"></i></button>
-                                                <button @click.stop="confirmDelete(log)" class="w-7 h-7 rounded-lg bg-white dark:bg-black/40 hover:bg-red-500 hover:text-white text-slate-500 dark:text-slate-400 transition flex items-center justify-center border border-slate-200 dark:border-white/10 hover:border-red-500/50 shadow-sm"><i class="fa-solid fa-trash text-[10px]"></i></button>
+                                            <div class="flex items-center justify-end gap-1.5 opacity-40 group-hover:opacity-100 transition-opacity">
+                                                <button @click.stop="editLog(log)" class="w-7 h-7 rounded-lg bg-white dark:bg-black/30 hover:bg-purple-600 hover:text-white text-slate-500 dark:text-slate-400 transition flex items-center justify-center border border-slate-200 dark:border-white/5 shadow-sm"><i class="fa-solid fa-pen text-[10px]"></i></button>
+                                                <button @click.stop="confirmDelete(log)" class="w-7 h-7 rounded-lg bg-white dark:bg-black/30 hover:bg-red-500 hover:text-white text-slate-500 dark:text-slate-400 transition flex items-center justify-center border border-slate-200 dark:border-white/10 shadow-sm"><i class="fa-solid fa-trash text-[10px]"></i></button>
                                             </div>
                                         </td>
                                     </tr>
@@ -657,24 +753,41 @@
                     <input type="text" x-model="form.actionTaken" class="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-lg sm:rounded-xl px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-medium outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition" placeholder="e.g. Replaced HDD / Updated BIOS">
                 </div>
                 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 p-3 bg-slate-50/80 dark:bg-black/20 rounded-xl border border-slate-100 dark:border-white/5 shadow-sm">
-				<div>
-					<label class="block text-[9px] sm:text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 sm:mb-1.5 ml-1">Current Status</label>
-					<select x-model="form.status" class="w-full bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-lg sm:rounded-xl px-2 sm:px-3 py-2 sm:py-2.5 text-[10px] sm:text-sm font-bold outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition cursor-pointer shadow-sm">
-					<option value="Pending">🕒 Pending</option>
-					<option value="AMC Logged">🧰 AMC Logged</option>
-					<option value="Resolved">✅ Resolved</option>
-				</select>
-				</div>
-				<div :class="form.status !== 'Resolved' ? 'opacity-50 grayscale pointer-events-none' : ''">
-					<label class="block text-[9px] sm:text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1 sm:mb-1.5 ml-1">Resolved Date</label>
-					<input type="date" x-model="form.resolveDate" class="w-full bg-white dark:bg-black/40 border border-emerald-200 dark:border-emerald-700/50 rounded-lg sm:rounded-xl px-2 sm:px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-medium outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition shadow-sm text-slate-800 dark:text-white">
-				</div>
-				<div :class="form.status !== 'Resolved' ? 'opacity-50 grayscale pointer-events-none' : ''">
-					<label class="block text-[9px] sm:text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1 sm:mb-1.5 ml-1">Resolved Time</label>
-					<input type="time" x-model="form.resolveTime" class="w-full bg-white dark:bg-black/40 border border-emerald-200 dark:border-emerald-700/50 rounded-lg sm:rounded-xl px-2 sm:px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-medium outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition shadow-sm text-slate-800 dark:text-white">
-				</div>
-			</div>
+                <!-- 🎛️ SEGMENTED HARDWARE SERVICE STATE CONTROLLER -->
+                <div class="p-3.5 bg-slate-50/90 dark:bg-black/30 rounded-2xl border border-slate-200/80 dark:border-white/5 space-y-3">
+                    <div>
+                        <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5 pl-1">Hardware Claim Lifecycle</label>
+                        <div class="grid grid-cols-3 gap-1 bg-white dark:bg-black/50 p-1 rounded-xl border border-slate-200 dark:border-white/5 shadow-inner">
+                            <button type="button" @click="form.status = 'Pending'; haptic('light')"
+                                    class="py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+                                    :class="form.status === 'Pending' ? 'bg-rose-500 text-white shadow-md shadow-rose-500/30 font-black' : 'text-slate-500 hover:text-rose-600'">
+                                <span class="w-2 h-2 rounded-full bg-white shadow-[0_0_5px_#fff]"></span> Pending
+                            </button>
+                            <button type="button" @click="form.status = 'AMC Logged'; haptic('light')"
+                                    class="py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+                                    :class="form.status === 'AMC Logged' ? 'bg-blue-500 text-white shadow-md shadow-blue-500/30 font-black' : 'text-slate-500 hover:text-blue-600'">
+                                <span class="w-2 h-2 rounded-full bg-white shadow-[0_0_5px_#fff]"></span> AMC Logged
+                            </button>
+                            <button type="button" @click="form.status = 'Resolved'; haptic('light')"
+                                    class="py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+                                    :class="form.status === 'Resolved' ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/30 font-black' : 'text-slate-500 hover:text-emerald-600'">
+                                <span class="w-2 h-2 rounded-full bg-white shadow-[0_0_5px_#fff]"></span> Resolved
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Resolution Timestamps (Visible when Resolved) -->
+                    <div x-show="form.status === 'Resolved'" x-transition class="grid grid-cols-2 gap-3 pt-2 border-t border-slate-200/60 dark:border-white/5" x-cloak>
+                        <div>
+                            <label class="block text-[8.5px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-1 pl-1">Resolution Date</label>
+                            <input type="date" x-model="form.resolveDate" class="w-full bg-white dark:bg-black/60 border border-emerald-200 dark:border-emerald-500/30 rounded-xl px-3 py-2 text-xs font-bold outline-none focus:ring-2 focus:ring-emerald-500/20 transition text-slate-800 dark:text-white shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-[8.5px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-1 pl-1">Resolution Time</label>
+                            <input type="time" x-model="form.resolveTime" class="w-full bg-white dark:bg-black/60 border border-emerald-200 dark:border-emerald-500/30 rounded-xl px-3 py-2 text-xs font-bold outline-none focus:ring-2 focus:ring-emerald-500/20 transition text-slate-800 dark:text-white shadow-sm">
+                        </div>
+                    </div>
+                </div>
             </fieldset>
             
             <div class="bg-slate-50/50 dark:bg-black/20 px-4 py-3 sm:px-6 sm:py-4 border-t border-slate-100 dark:border-white/5 flex flex-row justify-between items-center gap-3 shrink-0">
@@ -742,8 +855,36 @@
                     loading: false, logs: [], showModal: false, showDeleteModal: false,
                     currentDate: '', currentTime: '', 
                     activeFilter: null, searchQuery: '', mobileSearchOpen: false, isLocked: false, 
-                    
+                    hoveredStatus: null, // 🚀 NEW: Hover highlighting sync state
+
                     form: { id: null, asset: '', serial: '', caseId: '', issue: '', actionTaken: '', date: '', resolveDate: '', status: '🕒 Pending', secret: '' },
+
+                    // 🚀 NEW: Smart Component & Hardware Fault Mapping
+                    getFaultIcon(issue) {
+                        const str = String(issue || '').toLowerCase();
+                        if (str.includes('lan') || str.includes('nic') || str.includes('port')) {
+                            return { icon: 'fa-network-wired', color: 'bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400', badge: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-300 dark:border-blue-500/20' };
+                        }
+                        if (str.includes('hdd') || str.includes('ssd') || str.includes('storage') || str.includes('boot')) {
+                            return { icon: 'fa-hard-drive', color: 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400', badge: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/10 dark:text-rose-300 dark:border-rose-500/20' };
+                        }
+                        if (str.includes('ram') || str.includes('screen') || str.includes('blue')) {
+                            return { icon: 'fa-memory', color: 'bg-purple-50 text-purple-600 dark:bg-purple-500/10 dark:text-purple-400', badge: 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-500/10 dark:text-purple-300 dark:border-purple-500/20' };
+                        }
+                        if (str.includes('power') || str.includes('smps') || str.includes('display')) {
+                            return { icon: 'fa-bolt', color: 'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400', badge: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-300 dark:border-amber-500/20' };
+                        }
+                        if (str.includes('mouse')) {
+                            return { icon: 'fa-mouse', color: 'bg-teal-50 text-teal-600 dark:bg-teal-500/10 dark:text-teal-400', badge: 'bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-500/10 dark:text-teal-300 dark:border-teal-500/20' };
+                        }
+                        if (str.includes('keyboard')) {
+                            return { icon: 'fa-keyboard', color: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400', badge: 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-500/10 dark:text-indigo-300 dark:border-indigo-500/20' };
+                        }
+                        if (str.includes('monitor') || str.includes('screen')) {
+                            return { icon: 'fa-display', color: 'bg-sky-50 text-sky-600 dark:bg-sky-500/10 dark:text-sky-400', badge: 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-500/10 dark:text-sky-300 dark:border-sky-500/20' };
+                        }
+                        return { icon: 'fa-wrench', color: 'bg-slate-50 text-slate-600 dark:bg-white/5 dark:text-slate-300', badge: 'bg-slate-50 text-slate-700 border-slate-200 dark:bg-white/5 dark:text-slate-300 dark:border-white/10' };
+                    },
                     
                     inventoryList: [],
                     assetSearchQuery: '',
