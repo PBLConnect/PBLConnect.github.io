@@ -788,7 +788,7 @@
                             <h3 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate mb-1">IT Sec Audit</h3>
                             
                             <!-- 🚀 PROPER ALIGNMENT: High-Contrast 2-Line Hierarchy -->
-                            <div class="h-[28px] sm:h-[34px] flex flex-col justify-center w-full">
+                            <div class="h-[32px] sm:h-[36px] flex flex-col justify-center w-full">
                                 
                                 <!-- State: Open / Draft / Overdue with Enlarged Gauge Ring -->
                                 <div x-show="auditMeta.status !== 'Submitted'" class="flex items-center justify-between w-full gap-2 py-0.5">
@@ -823,15 +823,17 @@
                                 </div>
 
                                 <!-- State: Submitted (Proper Alignment & High-Contrast Timestamp) -->
-                                <div x-show="auditMeta.status === 'Submitted'" x-cloak class="flex flex-col w-full justify-center leading-none">
-                                    <div class="flex items-center gap-1 text-[11px] sm:text-[12px] font-black text-emerald-600 dark:text-emerald-400 truncate mb-1">
-                                        <span>✅ Submitted by</span>
-                                        <span class="text-slate-800 dark:text-white" x-text="auditMeta.auditor ? auditMeta.auditor.split(' ')[0] : 'IT'"></span>
+                                <div x-show="auditMeta.status === 'Submitted'" x-cloak class="flex flex-col w-full justify-center leading-tight">
+                                    <!-- 1. Top Row: Crisp Badge + Auditor Name -->
+                                    <div class="flex items-center gap-1.5 text-[11px] sm:text-[12px] font-black text-emerald-600 dark:text-emerald-400 truncate mb-1">
+                                        <i class="fa-solid fa-circle-check text-emerald-500 text-[11px] shrink-0"></i>
+                                        <span class="truncate">Submitted by <span class="text-slate-800 dark:text-white font-black" x-text="auditMeta.auditor ? auditMeta.auditor.split(' ')[0] : 'IT'"></span></span>
                                     </div>
-                                    <div class="flex items-center gap-1.5 text-[9.5px] sm:text-[10.5px] font-bold text-slate-700 dark:text-slate-200 truncate leading-none">
-                                        <span x-text="auditMeta.cycle.includes('(') ? auditMeta.cycle.split('(')[0].replace('Noida Audit - ', '').trim() : 'Monthly'"></span>
-                                        <span class="text-slate-300 dark:text-slate-600 font-normal">•</span>
-                                        <span class="font-mono font-bold text-slate-600 dark:text-slate-300 truncate" x-text="auditMeta.date || ''"></span>
+                                    <!-- 2. Bottom Row: Cycle Badge + Clean Sliced Date (Zero Clipping) -->
+                                    <div class="flex items-center gap-1.5 text-[9.5px] sm:text-[10.5px] font-bold text-slate-600 dark:text-slate-300 truncate leading-none" :title="auditMeta.date || ''">
+                                        <span class="shrink-0 text-slate-700 dark:text-slate-200" x-text="auditMeta.cycle.includes('(') ? auditMeta.cycle.split('(')[0].replace('Noida Audit - ', '').trim() : 'Monthly'"></span>
+                                        <span class="text-slate-300 dark:text-slate-600 font-normal shrink-0">•</span>
+                                        <span class="font-mono font-bold text-slate-500 dark:text-slate-400 truncate" x-text="auditMeta.date ? auditMeta.date.split(',')[0].trim() : ''"></span>
                                     </div>
                                 </div>
                                 
