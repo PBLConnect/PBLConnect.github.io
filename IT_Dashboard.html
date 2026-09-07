@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <!-- 🚀 viewport-fit=cover extends HTML behind notch/status bar -->
@@ -7,46 +7,71 @@
     <script src="pbl-config.js"></script>
     <title>Dashboard | IT Operations</title>
 
-    <!-- 🚀 100% Strict Pre-Paint Matcher (Matches Top Navbar Exact Hex) -->
+    <!-- 🚀 1. Pre-Paint Theme Detection & Frame-0 State Matcher -->
     <script>
         const appVer = typeof PBL_APP_VERSION !== 'undefined' ? PBL_APP_VERSION : '';
         if (appVer) document.title += " " + appVer;
-        
-        // 🛡️ FIX: Sirf tabhi Dark hoga agar user ne manually Dark chuna ho, phone ke dark mode se zabardasti black nahi hoga
-        const isDarkTheme = localStorage.getItem('theme') === 'dark';
+
+        // 🛡️ Strict & Unified Dark Mode Detection (Respects Manual Selection + System Fallback)
+        const savedTheme = localStorage.getItem('theme');
+        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const isDarkTheme = savedTheme === 'dark' || (!savedTheme && systemDark);
+
         if (isDarkTheme) {
             document.documentElement.classList.add('dark');
+            document.documentElement.classList.remove('light');
         } else {
             document.documentElement.classList.remove('dark');
+            document.documentElement.classList.add('light');
         }
     </script>
     
-    <!-- 🚀 PWA Manifest & Icons -->
+    <!-- 🚀 2. PWA Manifest & App Capabilities -->
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/x-icon" href="Assets/images/pbl-logo.ico">
     <link rel="apple-touch-icon" href="app-icon.png">
-    
-    <!-- 📱 Android Chrome Dual-Scheme Status Bar Meta Tags -->
-    <meta name="theme-color" id="meta-theme-color" content="#ffffff">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" id="meta-status-bar-style" content="default">
 
-    <!-- ⚡ Dynamic Frame-0 Status Bar Color Matcher -->
+    <!-- 🚀 3. Native Media Query Status Bar Tags (Android Chrome Instant Engine) -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#020617">
+
+    <!-- ⚡ 4. Bulletproof Android Chrome & iOS Status Bar DOM Repainter -->
     <script>
-        const statusColor = isDarkTheme ? '#020617' : '#ffffff';
-        document.getElementById('meta-theme-color')?.setAttribute('content', statusColor);
-        document.getElementById('meta-status-bar-style')?.setAttribute('content', isDarkTheme ? 'black-translucent' : 'default');
+        function setSystemStatusBarColor(isDark) {
+            const hex = isDark ? '#020617' : '#ffffff';
+
+            // 🛡️ Remove old non-media meta tags to force Chromium / Android SystemUI repaint
+            document.querySelectorAll('meta[name="theme-color"]:not([media])').forEach(el => el.remove());
+
+            // ⚡ Fresh node insertion forces Android Chrome to update the battery/clock bar color instantly
+            const meta = document.createElement('meta');
+            meta.name = 'theme-color';
+            meta.id = 'meta-theme-color';
+            meta.content = hex;
+            document.head.appendChild(meta);
+
+            // iOS status bar text color match (black text on white, white text on dark)
+            const iosMeta = document.getElementById('meta-status-bar-style');
+            if (iosMeta) {
+                iosMeta.content = isDark ? 'black-translucent' : 'default';
+            }
+        }
+
+        // Execute synchronously before body paint
+        setSystemStatusBarColor(isDarkTheme);
     </script>
 
-    <!-- 🔒 Session Authentication Guard -->
+    <!-- 🔒 5. Session Authentication Guard -->
     <script>
         if (!sessionStorage.getItem('isLoggedIn')) {
             window.location.href = 'it-login.html';
         }
     </script>
 
-    <!-- 📲 Global PWA Service Worker Registration (Required for Android Install Banner) -->
+    <!-- 📲 6. Global PWA Service Worker Registration -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -57,7 +82,7 @@
         }
     </script>
     
-    <!-- UI & External Libraries -->
+    <!-- 📦 7. UI & External Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.13.3/dist/cdn.min.js"></script>
@@ -66,7 +91,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 
-    <!-- Tailwind Config -->
+    <!-- ⚙️ 8. Tailwind Configuration -->
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -3006,7 +3031,11 @@
             let safeSettings = { notifications: true, animations: true };
             let safeUser = { name: 'Guest', role: 'Viewer', empId: '-', email: '-', location: 'Noida', allowedLocation: 'Noida' };
 
-            try { safeDark = localStorage.getItem('theme') === 'dark'; } catch(e) {}
+            // 🛡️ FIX: Head script aur phone ke system dark mode se 100% sync rakhein
+            try { 
+                safeDark = localStorage.getItem('theme') === 'dark' || 
+                           (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches); 
+            } catch(e) {}
             try { safeSettings = JSON.parse(localStorage.getItem('pbl_settings')) || safeSettings; } catch(e) {}
             try { safeUser = JSON.parse(sessionStorage.getItem('userData')) || safeUser; } catch(e) {}
 
@@ -3487,10 +3516,13 @@
                 },
 
                 async init() {
-                    if (this.isDark) document.documentElement.classList.add('dark');
-                    // init() aur toggleTheme() ke andar wali line ko aise update karo:
-					// Frame sync with top navbar
-					document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#ffffff");
+                    if (this.isDark) {
+                        document.documentElement.classList.add('dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                    }
+                    // 🚀 Status bar ko re-paint function ke through dark (#020617) par lock karein
+                    setSystemStatusBarColor(this.isDark);
 					document.getElementById('meta-status-bar-style')?.setAttribute("content", this.isDark ? "black-translucent" : "default");
                     
                     this.setupCustomCursor();
@@ -4285,18 +4317,16 @@
                 formatDisplayDate(dateStr) { return dateStr ? dateStr.substring(0, 11) : 'N/A'; },
                 
                 toggleTheme() { 
-				this.haptic('light'); 
-				this.isDark = !this.isDark; 
-				document.documentElement.classList.toggle('dark', this.isDark); 
-				try { localStorage.setItem('theme', this.isDark ? 'dark' : 'light'); } catch(e) {}
-				
-				// 🛡️ FIX: Light mode me '#f1f5f9' ki jagah exact navbar color '#ffffff' set karein
-				const activeHex = this.isDark ? "#020617" : "#ffffff";
-				document.getElementById('meta-theme-color')?.setAttribute("content", activeHex);
-				document.getElementById('meta-status-bar-style')?.setAttribute("content", this.isDark ? "black-translucent" : "default");
+                    this.haptic('light'); 
+                    this.isDark = !this.isDark; 
+                    document.documentElement.classList.toggle('dark', this.isDark); 
+                    try { localStorage.setItem('theme', this.isDark ? 'dark' : 'light'); } catch(e) {}
+                    
+                    // 🚀 Toggle hote hi instant black/white status bar update karein
+                    setSystemStatusBarColor(this.isDark);
 
-				if(this.chartInstance) { this.chartInstance.updateOptions({ theme: { mode: this.isDark ? 'dark' : 'light' } }); }
-			}
+                    if(this.chartInstance) { this.chartInstance.updateOptions({ theme: { mode: this.isDark ? 'dark' : 'light' } }); }
+                }
             }; 
         }); 
     }); 
