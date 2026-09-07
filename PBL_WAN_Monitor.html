@@ -917,7 +917,7 @@
                         const s = String(isp || '').toLowerCase();
                         if (s.includes('airtel leased') || s.includes('airtel ll')) return 'CIRCUIT #9202902';
                         if (s.includes('stpi leased') || s.includes('stpi ll')) return 'CIRCUIT #PAN-STP-01';
-                        if (s.includes('broadband')) return 'DSL #01204204260';
+                        if (s.includes('broadband')) return 'FIBER #01204204260';
                         if (s.includes('gstech')) return 'FIBER #DDN-GST-10M';
                         if (s.includes('bsnl')) return 'FIBER #DDN-BSNL-15M';
                         return 'CIRCUIT #ACTIVE';
@@ -934,7 +934,7 @@
                     
                     form: { id: null, isp: '', type: '🔴 Link Down (Complete Outage)', faultParty: '🌐 External (ISP Side)', caseId: '', date: '', start: '', endDate: '', end: '', duration: '', actionTaken: '', rootCause: '', remarks: '', status: '🕒 Pending', secret: '' },
                     
-                    // 📍 DYNAMIC ISPS PROPERTY (STPI Corrected to 20 Mbps)
+                    // 📍 DYNAMIC ISPS PROPERTY (STPI 20Mbps & Airtel Broadband 200Mbps Fiber)
                     get isps() {
                         if (this.currentLocation === 'Dehradun') {
                             return {
@@ -945,8 +945,8 @@
                         } else {
                             return {
                                 primary: { id: 'Airtel Leased Line (15Mbps)', short: 'Airtel LL', icon: 'fa-tower-broadcast', speed: '15' },
-                                secondary: { id: 'STPI Leased Line (20Mbps)', short: 'STPI LL', icon: 'fa-satellite-dish', speed: '20' }, // 🚀 20 Mbps Corrected
-                                broadband: { id: 'Airtel Broadband (30Mbps)', short: 'Airtel BB', icon: 'fa-wifi', speed: '30' }
+                                secondary: { id: 'STPI Leased Line (20Mbps)', short: 'STPI LL', icon: 'fa-satellite-dish', speed: '20' },
+                                broadband: { id: 'Airtel Broadband (200Mbps)', short: 'Airtel BB', icon: 'fa-wifi', speed: '200' }
                             };
                         }
                     },
