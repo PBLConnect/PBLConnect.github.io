@@ -6,10 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <script src="pbl-config.js"></script>
     <title>Dashboard | IT Operations</title>
-    
-    <!-- 🚀 Instant Pre-Paint Status Bar Matcher (Matches Navbar Exact Hex) -->
+
+    <!-- 🚀 Instant Pre-Paint Status Bar & Dark Mode Matcher (Frame-0 Sync) -->
     <script>
-        document.title += " " + PBL_APP_VERSION;
+        const appVer = typeof PBL_APP_VERSION !== 'undefined' ? PBL_APP_VERSION : '';
+        if (appVer) document.title += " " + appVer;
+        
         const isDarkTheme = localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
         if (isDarkTheme) {
             document.documentElement.classList.add('dark');
@@ -18,30 +20,52 @@
         }
     </script>
     
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <link rel="icon" type="image/x-icon" href="Assets/images/pbl-logo.ico">
+    <!-- 🚀 PWA Manifest & Dynamic Theme-Color Sync -->
     <link rel="manifest" href="manifest.json">
-    
-    <!-- 🚀 Theme Color set to #ffffff (Navbar color) instead of blue/grey -->
-    <meta name="theme-color" id="meta-theme-color" content="#ffffff">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" id="meta-status-bar-style" content="default">
+    <link rel="icon" type="image/x-icon" href="Assets/images/pbl-logo.ico">
     <link rel="apple-touch-icon" href="app-icon.png">
     
+    <!-- 📱 Android Chrome & iOS Fullscreen/Status-bar Meta Tags -->
+    <meta name="theme-color" id="meta-theme-color" content="#ffffff">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" id="meta-status-bar-style" content="default">
+
+    <!-- ⚡ Pre-Paint Theme Color Injector (Prevents White Flash in Dark Mode) -->
+    <script>
+        if (isDarkTheme) {
+            document.getElementById('meta-theme-color')?.setAttribute('content', '#020617');
+        }
+    </script>
+
+    <!-- 🔒 Session Authentication Guard -->
     <script>
         if (!sessionStorage.getItem('isLoggedIn')) {
             window.location.href = 'it-login.html';
         }
     </script>
+
+    <!-- 📲 Global PWA Service Worker Registration (Required for Android Install Banner) -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('✅ PWA Service Worker Active:', reg.scope))
+                    .catch(err => console.error('❌ Service Worker Error:', err));
+            });
+        }
+    </script>
     
+    <!-- UI & External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-	<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.13.3/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.13.3/dist/cdn.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
-    <!-- 🚀 ADDED: SheetJS Library for Excel Export -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 
+    <!-- Tailwind Config -->
     <script>
         tailwind.config = {
             darkMode: 'class',
