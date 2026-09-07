@@ -7,12 +7,13 @@
     <script src="pbl-config.js"></script>
     <title>Dashboard | IT Operations</title>
 
-    <!-- 🚀 Instant Pre-Paint Status Bar & Dark Mode Matcher (Frame-0 Sync) -->
+    <!-- 🚀 100% Strict Pre-Paint Matcher (Matches Top Navbar Exact Hex) -->
     <script>
         const appVer = typeof PBL_APP_VERSION !== 'undefined' ? PBL_APP_VERSION : '';
         if (appVer) document.title += " " + appVer;
         
-        const isDarkTheme = localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        // 🛡️ FIX: Sirf tabhi Dark hoga agar user ne manually Dark chuna ho, phone ke dark mode se zabardasti black nahi hoga
+        const isDarkTheme = localStorage.getItem('theme') === 'dark';
         if (isDarkTheme) {
             document.documentElement.classList.add('dark');
         } else {
@@ -20,22 +21,22 @@
         }
     </script>
     
-    <!-- 🚀 PWA Manifest & Dynamic Theme-Color Sync -->
+    <!-- 🚀 PWA Manifest & Icons -->
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/x-icon" href="Assets/images/pbl-logo.ico">
     <link rel="apple-touch-icon" href="app-icon.png">
     
-    <!-- 📱 Android Chrome & iOS Fullscreen/Status-bar Meta Tags -->
+    <!-- 📱 Android Chrome Dual-Scheme Status Bar Meta Tags -->
     <meta name="theme-color" id="meta-theme-color" content="#ffffff">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" id="meta-status-bar-style" content="default">
 
-    <!-- ⚡ Pre-Paint Theme Color Injector (Prevents White Flash in Dark Mode) -->
+    <!-- ⚡ Dynamic Frame-0 Status Bar Color Matcher -->
     <script>
-        if (isDarkTheme) {
-            document.getElementById('meta-theme-color')?.setAttribute('content', '#020617');
-        }
+        const statusColor = isDarkTheme ? '#020617' : '#ffffff';
+        document.getElementById('meta-theme-color')?.setAttribute('content', statusColor);
+        document.getElementById('meta-status-bar-style')?.setAttribute('content', isDarkTheme ? 'black-translucent' : 'default');
     </script>
 
     <!-- 🔒 Session Authentication Guard -->
@@ -3488,7 +3489,9 @@
                 async init() {
                     if (this.isDark) document.documentElement.classList.add('dark');
                     // init() aur toggleTheme() ke andar wali line ko aise update karo:
+					// Frame sync with top navbar
 					document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#ffffff");
+					document.getElementById('meta-status-bar-style')?.setAttribute("content", this.isDark ? "black-translucent" : "default");
                     
                     this.setupCustomCursor();
                     this.runDecryption('decrypt-title');
@@ -4282,13 +4285,18 @@
                 formatDisplayDate(dateStr) { return dateStr ? dateStr.substring(0, 11) : 'N/A'; },
                 
                 toggleTheme() { 
-                    this.haptic('light'); 
-                    this.isDark = !this.isDark; 
-                    document.documentElement.classList.toggle('dark', this.isDark); 
-                    try { localStorage.setItem('theme', this.isDark ? 'dark' : 'light'); } catch(e) {}
-                    document.getElementById('meta-theme-color')?.setAttribute("content", this.isDark ? "#020617" : "#f1f5f9");
-                    if(this.chartInstance) { this.chartInstance.updateOptions({ theme: { mode: this.isDark ? 'dark' : 'light' } }); }
-                }
+				this.haptic('light'); 
+				this.isDark = !this.isDark; 
+				document.documentElement.classList.toggle('dark', this.isDark); 
+				try { localStorage.setItem('theme', this.isDark ? 'dark' : 'light'); } catch(e) {}
+				
+				// 🛡️ FIX: Light mode me '#f1f5f9' ki jagah exact navbar color '#ffffff' set karein
+				const activeHex = this.isDark ? "#020617" : "#ffffff";
+				document.getElementById('meta-theme-color')?.setAttribute("content", activeHex);
+				document.getElementById('meta-status-bar-style')?.setAttribute("content", this.isDark ? "black-translucent" : "default");
+
+				if(this.chartInstance) { this.chartInstance.updateOptions({ theme: { mode: this.isDark ? 'dark' : 'light' } }); }
+			}
             }; 
         }); 
     }); 
