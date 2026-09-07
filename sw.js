@@ -1,43 +1,65 @@
-const CACHE_NAME = 'pbl-connect-v1';
+const CACHE_NAME = 'pbl-connect-v3.0';
 
-// Jo files cache karni hain (Taki offline shell load ho sake)
 const urlsToCache = [
   './it-login.html',
   './IT_Dashboard.html',
-  './app-icon.png' // Yahan bhi naya naam update kardo
+  './manifest.json',
+  './pbl-config.js',
+  './app-icon.png'
 ];
 
-// Install Event
+// Install Event (Fault-tolerant cache)
 self.addEventListener('install', event => {
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      console.log('Opened cache');
-      return cache.addAll(urlsToCache);
+    caches.open(CACHE_NAME).then(async cache => {
+      console.log('📦 PWA: Pre-caching core shell');
+      for (const url of urlsToCache) {
+        try {
+          await cache.add(url);
+        } catch (err) {
+          console.warn('⚠️ Cache skipped for:', url);
+        }
+      }
     })
   );
 });
 
-// Fetch Event (Network First, Cache Fallback strategy so you never see stale data)
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    fetch(event.request).catch(() => {
-      return caches.match(event.request);
-    })
-  );
-});
-
-// Activate Event (Delete old caches if version changes)
+// Activate Event (Purge old cache versions)
 self.addEventListener('activate', event => {
-  const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
-    caches.keys().then(cacheNames => {
+    caches.keys().then(keys => {
       return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName);
+        keys.map(key => {
+          if (key !== CACHE_NAME) {
+            console.log('🧹 Purging outdated PWA cache:', key);
+            return caches.delete(key);
           }
         })
       );
-    })
+    }).then(() => self.clients.claim())
+  );
+});
+
+// Fetch Event (Network-First Strategy)
+self.addEventListener('fetch', event => {
+  // Google Apps Script API calls ko cache nahi karna
+  if (event.request.url.includes('script.google.com') || event.request.method !== 'GET') {
+    return;
+  }
+
+  event.respondWith(
+    fetch(event.request)
+      .then(response => {
+        // Agar response valid hai to cache update karo
+        if (response && response.status === 200) {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, responseClone);
+          });
+        }
+        return response;
+      })
+      .catch(() => caches.match(event.request))
   );
 });
