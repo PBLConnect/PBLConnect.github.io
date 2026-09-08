@@ -953,25 +953,36 @@
                             <span class="px-2 py-0.5 bg-gradient-to-br from-brand to-indigo-600 text-white rounded-full font-mono text-[9px] sm:text-[10px] font-black shadow-sm shrink-0" x-text="displayedTickets.length"></span>
                         </div>
 
-                        <!-- 2. 🚀 Header Center: Segmented Filter Pills (Space Utilized) -->
-                        <div class="flex items-center bg-slate-100/80 dark:bg-black/40 p-0.5 rounded-xl border border-slate-200/80 dark:border-white/5 shadow-inner order-3 sm:order-2 w-full sm:w-auto justify-between sm:justify-start">
+                        <!-- 2. 🚀 Header Center: Segmented Filter Pills (Robust Mobile Height & 3D Pop) -->
+                        <div class="flex items-center flex-nowrap bg-[#f1f5f9] dark:bg-black/40 p-1 sm:p-0.5 rounded-xl border border-slate-200/80 dark:border-white/5 shadow-inner order-3 sm:order-2 w-full sm:w-auto justify-between sm:justify-start gap-1 sm:gap-0.5">
+                            <!-- All -->
                             <button @click="ticketFilter = 'all'; haptic('light')" 
-                                    class="flex-1 sm:flex-none px-2.5 py-1 rounded-lg text-[9px] sm:text-[10px] font-bold transition-all flex items-center justify-center gap-1 leading-none"
-                                    :class="ticketFilter === 'all' ? 'bg-white dark:bg-slate-800 text-brand shadow-sm font-black' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'">
+                                    class="flex-1 sm:flex-none py-2 sm:py-1 px-2 sm:px-2.5 rounded-lg text-[10px] sm:text-[10px] font-bold transition-all flex items-center justify-center gap-1 leading-none select-none active:scale-95 whitespace-nowrap"
+                                    :class="ticketFilter === 'all' 
+                                        ? 'bg-gradient-to-br from-brand to-blue-600 text-white shadow-sm font-black animate-[btn-pop_0.25s_cubic-bezier(0.4,0,0.2,1)] [text-shadow:0_1px_2px_rgba(0,0,0,0.2)] translate-y-[0.5px]' 
+                                        : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/5'">
                                 <span>All</span>
-                                <span class="font-mono text-[8.5px] opacity-70" x-text="'(' + filteredTickets.length + ')'"></span>
+                                <span class="font-mono text-[10px] sm:text-[8.5px] opacity-80" x-text="'(' + filteredTickets.length + ')'"></span>
                             </button>
+                            
+                            <!-- Pending -->
                             <button @click="ticketFilter = 'open'; haptic('light')" 
-                                    class="flex-1 sm:flex-none px-2.5 py-1 rounded-lg text-[9px] sm:text-[10px] font-bold transition-all flex items-center justify-center gap-1 leading-none"
-                                    :class="ticketFilter === 'open' ? 'bg-rose-500 text-white shadow-sm font-black shadow-rose-500/30' : 'text-slate-500 hover:text-rose-600 dark:hover:text-rose-400'">
-                                <span class="w-1.5 h-1.5 rounded-full bg-rose-500" :class="ticketFilter === 'open' ? 'bg-white' : ''"></span>
+                                    class="flex-1 sm:flex-none py-2 sm:py-1 px-2 sm:px-2.5 rounded-lg text-[10px] sm:text-[10px] font-bold transition-all flex items-center justify-center gap-1.5 leading-none select-none active:scale-95 whitespace-nowrap"
+                                    :class="ticketFilter === 'open' 
+                                        ? 'bg-gradient-to-br from-rose-500 to-red-600 text-white shadow-sm font-black animate-[btn-pop_0.25s_cubic-bezier(0.4,0,0.2,1)] [text-shadow:0_1px_2px_rgba(0,0,0,0.2)] translate-y-[0.5px]' 
+                                        : 'text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-white/60 dark:hover:bg-white/5'">
+                                <span class="w-1.5 h-1.5 rounded-full" :class="ticketFilter === 'open' ? 'bg-white shadow-[0_0_3px_#fff]' : 'bg-rose-500'"></span>
                                 <span>Pending</span>
-                                <span class="font-mono text-[8.5px] opacity-80" x-text="'(' + openTickets.length + ')'"></span>
+                                <span class="font-mono text-[10px] sm:text-[8.5px] opacity-80" x-text="'(' + openTickets.length + ')'"></span>
                             </button>
+                            
+                            <!-- Resolved -->
                             <button @click="ticketFilter = 'resolved'; haptic('light')" 
-                                    class="flex-1 sm:flex-none px-2.5 py-1 rounded-lg text-[9px] sm:text-[10px] font-bold transition-all flex items-center justify-center gap-1 leading-none"
-                                    :class="ticketFilter === 'resolved' ? 'bg-emerald-500 text-white shadow-sm font-black shadow-emerald-500/30' : 'text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400'">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500" :class="ticketFilter === 'resolved' ? 'bg-white' : ''"></span>
+                                    class="flex-1 sm:flex-none py-2 sm:py-1 px-2 sm:px-2.5 rounded-lg text-[10px] sm:text-[10px] font-bold transition-all flex items-center justify-center gap-1.5 leading-none select-none active:scale-95 whitespace-nowrap"
+                                    :class="ticketFilter === 'resolved' 
+                                        ? 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-sm font-black animate-[btn-pop_0.25s_cubic-bezier(0.4,0,0.2,1)] [text-shadow:0_1px_2px_rgba(0,0,0,0.2)] translate-y-[0.5px]' 
+                                        : 'text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 hover:bg-white/60 dark:hover:bg-white/5'">
+                                <span class="w-1.5 h-1.5 rounded-full" :class="ticketFilter === 'resolved' ? 'bg-white shadow-[0_0_3px_#fff]' : 'bg-emerald-500'"></span>
                                 <span>Resolved</span>
                             </button>
                         </div>
@@ -1137,50 +1148,50 @@
                                   x-text="filteredTickets.length > 0 ? Math.round((stats.resolved / filteredTickets.length) * 100) + '% Fixed' : '100% OK'"></span>
                         </div>
                         
-                        <!-- 🎛️ Unified Segmented Pill Tray (Status, Category, WAN & Time Filter All in One) -->
-                        <div class="flex items-center flex-nowrap bg-[#f1f5f9] dark:bg-black/40 p-0.5 rounded-xl border border-slate-200/80 dark:border-white/5 shadow-inner order-3 sm:order-2 w-full sm:w-auto justify-between sm:justify-start gap-0.5">
+                        <!-- 🎛️ Unified Segmented Pill Tray (Robust Mobile Height & 3D Pop - Single Line Locked) -->
+                        <div class="flex items-center flex-nowrap bg-[#f1f5f9] dark:bg-black/40 p-1 sm:p-0.5 rounded-xl border border-slate-200/80 dark:border-white/5 shadow-inner order-3 sm:order-2 w-full sm:w-auto justify-between sm:justify-start gap-1 sm:gap-0.5">
                             
                             <!-- Status Button -->
                             <button @click="chartConfig.type = 'status'; renderChart(); haptic('light')" 
-                                    class="flex-1 sm:flex-none px-2.5 py-1 rounded-lg text-[9px] sm:text-[10px] font-bold transition-all flex items-center justify-center gap-1 leading-none select-none active:scale-95"
+                                    class="flex-1 sm:flex-none py-2 sm:py-1 px-1.5 sm:px-2.5 rounded-lg text-[10px] sm:text-[10px] font-bold transition-all flex items-center justify-center gap-1 leading-none select-none active:scale-95 whitespace-nowrap"
                                     :class="chartConfig.type === 'status' 
-                                        ? 'bg-gradient-to-br from-brand to-blue-600 text-white shadow-sm font-black animate-[btn-pop_0.25s_cubic-bezier(0.4,0,0.2,1)] [text-shadow:0_1px_2px_rgba(0,0,0,0.2)]' 
+                                        ? 'bg-gradient-to-br from-brand to-blue-600 text-white shadow-sm font-black animate-[btn-pop_0.25s_cubic-bezier(0.4,0,0.2,1)] [text-shadow:0_1px_2px_rgba(0,0,0,0.2)] translate-y-[0.5px]' 
                                         : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/5'">
-                                <i class="fa-solid fa-chart-pie text-[8px]" :class="chartConfig.type === 'status' ? 'text-white' : 'text-brand opacity-80'"></i> 
+                                <i class="fa-solid fa-chart-pie text-[10px]" :class="chartConfig.type === 'status' ? 'text-white' : 'text-brand opacity-80'"></i> 
                                 <span>Status</span>
                             </button>
                             
                             <!-- Category Button -->
                             <button @click="chartConfig.type = 'category'; renderChart(); haptic('light')" 
-                                    class="flex-1 sm:flex-none px-2.5 py-1 rounded-lg text-[9px] sm:text-[10px] font-bold transition-all flex items-center justify-center gap-1 leading-none select-none active:scale-95"
+                                    class="flex-1 sm:flex-none py-2 sm:py-1 px-1.5 sm:px-2.5 rounded-lg text-[10px] sm:text-[10px] font-bold transition-all flex items-center justify-center gap-1 leading-none select-none active:scale-95 whitespace-nowrap"
                                     :class="chartConfig.type === 'category' 
-                                        ? 'bg-gradient-to-br from-brand to-blue-600 text-white shadow-sm font-black animate-[btn-pop_0.25s_cubic-bezier(0.4,0,0.2,1)] [text-shadow:0_1px_2px_rgba(0,0,0,0.2)]' 
+                                        ? 'bg-gradient-to-br from-brand to-blue-600 text-white shadow-sm font-black animate-[btn-pop_0.25s_cubic-bezier(0.4,0,0.2,1)] [text-shadow:0_1px_2px_rgba(0,0,0,0.2)] translate-y-[0.5px]' 
                                         : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/5'">
-                                <i class="fa-solid fa-layer-group text-[8px]" :class="chartConfig.type === 'category' ? 'text-white' : 'text-brand opacity-80'"></i> 
+                                <i class="fa-solid fa-layer-group text-[10px]" :class="chartConfig.type === 'category' ? 'text-white' : 'text-brand opacity-80'"></i> 
                                 <span>Category</span>
                             </button>
                             
                             <!-- WAN Links Button -->
                             <button @click="chartConfig.type = 'wan'; renderChart(); haptic('light')" 
-                                    class="flex-1 sm:flex-none px-2.5 py-1 rounded-lg text-[9px] sm:text-[10px] font-bold transition-all flex items-center justify-center gap-1 leading-none select-none active:scale-95"
+                                    class="flex-1 sm:flex-none py-2 sm:py-1 px-1.5 sm:px-2.5 rounded-lg text-[10px] sm:text-[10px] font-bold transition-all flex items-center justify-center gap-1 leading-none select-none active:scale-95 whitespace-nowrap"
                                     :class="chartConfig.type === 'wan' 
-                                        ? 'bg-gradient-to-br from-brand to-blue-600 text-white shadow-sm font-black animate-[btn-pop_0.25s_cubic-bezier(0.4,0,0.2,1)] [text-shadow:0_1px_2px_rgba(0,0,0,0.2)]' 
+                                        ? 'bg-gradient-to-br from-brand to-blue-600 text-white shadow-sm font-black animate-[btn-pop_0.25s_cubic-bezier(0.4,0,0.2,1)] [text-shadow:0_1px_2px_rgba(0,0,0,0.2)] translate-y-[0.5px]' 
                                         : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/5'">
-                                <i class="fa-solid fa-satellite-dish text-[8px]" :class="chartConfig.type === 'wan' ? 'text-white' : 'text-brand opacity-80'"></i> 
+                                <i class="fa-solid fa-satellite-dish text-[10px]" :class="chartConfig.type === 'wan' ? 'text-white' : 'text-brand opacity-80'"></i> 
                                 <span>WAN Links</span>
                             </button>
 
-                            <!-- Sleek Tray Divider (Separates Category from Time Filter) -->
-                            <div class="w-px h-3.5 bg-slate-300 dark:bg-slate-700 mx-0.5 shrink-0"></div>
+                            <!-- Tray Divider -->
+                            <div class="w-px h-4 sm:h-3.5 bg-slate-300 dark:bg-slate-700 mx-0.5 shrink-0"></div>
 
-                            <!-- All / Month Time Filter (Inside the Exact Same Tray!) -->
+                            <!-- All / Month Time Filter -->
                             <button @click="chartConfig.time = (chartConfig.time === 'all' ? 'month' : 'all'); renderChart(); haptic('light')" 
-                                    class="flex-1 sm:flex-none px-2 py-1 rounded-lg text-[9px] sm:text-[10px] font-bold transition-all flex items-center justify-center gap-1 leading-none select-none active:scale-95 shrink-0"
+                                    class="flex-1 sm:flex-none py-2 sm:py-1 px-1.5 sm:px-2 rounded-lg text-[10px] sm:text-[10px] font-bold transition-all flex items-center justify-center gap-1 leading-none select-none active:scale-95 whitespace-nowrap shrink-0"
                                     :class="chartConfig.time === 'month' 
                                         ? 'bg-gradient-to-br from-indigo-500 to-indigo-700 text-white shadow-sm font-black' 
                                         : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/5'"
                                     :title="'Switch to ' + (chartConfig.time === 'all' ? 'This Month' : 'All Time')">
-                                <i class="fa-solid fa-calendar-days text-[8px]" :class="chartConfig.time === 'month' ? 'text-white' : 'text-indigo-500'"></i>
+                                <i class="fa-solid fa-calendar-days text-[10px]" :class="chartConfig.time === 'month' ? 'text-white' : 'text-indigo-500'"></i>
                                 <span x-text="chartConfig.time === 'all' ? 'All' : 'Month'"></span>
                             </button>
 
