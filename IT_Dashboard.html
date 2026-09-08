@@ -906,26 +906,29 @@
                                     </div>
                                 </div>
 
-                                <!-- State: Submitted (High-Contrast Score & Open Findings Telemetry) -->
-                                <div x-show="auditMeta.status === 'Submitted'" x-cloak class="flex flex-col w-full justify-center leading-tight">
-                                    <!-- 1. Top Row: Auditor + Realtime Score Badge -->
-                                    <div class="flex items-center justify-between gap-1.5 mb-1">
-                                        <div class="flex items-center gap-1.5 text-[11px] sm:text-[12px] font-black text-emerald-600 dark:text-emerald-400 truncate">
-                                            <i class="fa-solid fa-circle-check text-emerald-500 text-[11px] shrink-0"></i>
-                                            <span class="truncate" x-text="'Verified: ' + (auditMeta.auditor ? auditMeta.auditor.split(' ')[0] : 'IT')"></span>
+                                <!-- State: Submitted (Zero-Truncation Clean Executive Telemetry) -->
+                                <div x-show="auditMeta.status === 'Submitted'" x-cloak class="flex flex-col w-full justify-center leading-tight gap-1">
+                                    <!-- 1. Top Row: Auditor Identity + Realtime Score Badge -->
+                                    <div class="flex items-center justify-between gap-1 w-full">
+                                        <div class="flex items-center gap-1 text-slate-800 dark:text-slate-100 min-w-0">
+                                            <i class="fa-solid fa-circle-check text-emerald-500 text-[10px] shrink-0"></i>
+                                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 shrink-0">By</span>
+                                            <span class="font-black text-[11px] sm:text-xs truncate tracking-tight text-slate-800 dark:text-slate-100" x-text="auditMeta.auditor ? auditMeta.auditor.split(' ')[0] : 'IT'"></span>
                                         </div>
-                                        <!-- Score Pill -->
-                                        <span class="text-[8.5px] font-mono font-black px-1.5 py-0.5 rounded shadow-sm border shrink-0"
+                                        <!-- Score Pill (Crisp Monospace) -->
+                                        <span class="text-[9px] font-mono font-black px-1.5 py-0.5 rounded shadow-sm border shrink-0"
                                               :class="(auditMeta.score || 100) >= 90 ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30' : 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/15 dark:text-rose-300 dark:border-rose-500/30'"
                                               x-text="(auditMeta.score || 100) + '%'"></span>
                                     </div>
-                                    <!-- 2. Bottom Row: Cycle Date + Open Findings Risk Beacon -->
-                                    <div class="flex items-center justify-between gap-1.5 text-[9.5px] font-bold text-slate-600 dark:text-slate-300 leading-none">
-                                        <span class="truncate text-slate-500 dark:text-slate-400 font-mono text-[9px]" x-text="auditMeta.date ? auditMeta.date.split(',')[0].trim() : 'Archived'"></span>
-                                        <!-- Findings Pill -->
+                                    <!-- 2. Bottom Row: Compact Date + Anti-Collision Finding Badge -->
+                                    <div class="flex items-center justify-between gap-1 w-full text-slate-600 dark:text-slate-300 leading-none">
+                                        <!-- Clean 2-digit Year Date (Zero Ellipsis) -->
+                                        <span class="font-mono font-bold text-[8.5px] sm:text-[9px] text-slate-500 dark:text-slate-400 shrink-0" 
+                                              x-text="auditMeta.date ? auditMeta.date.split(',')[0].trim().replace('-20', '-') : 'Archived'"></span>
+                                        <!-- Smart Finding Pill (No 100% Repetition) -->
                                         <span class="text-[7.5px] font-mono font-black uppercase tracking-wider px-1.5 py-0.5 rounded shadow-sm border shrink-0"
-                                              :class="(auditMeta.fails || 0) > 0 ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 animate-pulse' : 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400'"
-                                              x-text="(auditMeta.fails || 0) > 0 ? (auditMeta.fails + ' Finding ⚠️') : '100% Compliant ✅'"></span>
+                                              :class="(auditMeta.fails || 0) > 0 ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 animate-pulse' : 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30'"
+                                              x-text="(auditMeta.fails || 0) > 0 ? (auditMeta.fails + ' Finding ⚠️') : 'Compliant ✅'"></span>
                                     </div>
                                 </div>
                                 
