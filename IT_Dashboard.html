@@ -868,13 +868,13 @@
                         <div class="relative z-10 mt-auto w-full">
                             <h3 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate mb-1">IT Sec Audit</h3>
                             
-                            <!-- 🚀 PROPER ALIGNMENT: High-Contrast 2-Line Hierarchy -->
-                            <div class="h-[32px] sm:h-[36px] flex flex-col justify-center w-full">
+                            <!-- 🚀 Symmetrical Matrix: Auto-Breathing Height (Zero Clipping on Mobile) -->
+                            <div class="min-h-[38px] sm:min-h-[42px] h-auto flex flex-col justify-center w-full py-0.5">
                                 
                                 <!-- State: Open / Draft / Overdue with Ergonomic Anti-Clipping Gauge Ring -->
                                 <div x-show="auditMeta.status !== 'Submitted'" class="flex items-center justify-between w-full gap-1.5 py-0.5" x-cloak>
                                     <div class="flex flex-col justify-center min-w-0 flex-1 pr-1">
-                                        <!-- 🚀 Clean Title with Slim Vector Icon (Zero Text Cutting) -->
+                                        <!-- Clean Title with Slim Vector Icon -->
                                         <div class="flex items-center gap-1.5 text-[11px] sm:text-[11.5px] font-black tracking-tight leading-none mb-1.5 truncate"
                                              :class="auditMeta.status === 'Overdue' ? 'text-rose-600 dark:text-rose-400' : (auditMeta.status === 'Draft' ? 'text-amber-600 dark:text-amber-400' : 'text-indigo-600 dark:text-indigo-300')">
                                             <i class="fa-solid text-[9.5px] shrink-0" 
@@ -891,7 +891,7 @@
                                         </div>
                                     </div>
                                     
-                                    <!-- 🚀 34px Ergonomic Compact Radial Ring (Saves 12px Horizontal Room for Text) -->
+                                    <!-- Ergonomic Compact Radial Ring -->
                                     <div class="relative w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center shrink-0">
                                         <svg class="w-full h-full transform -rotate-90 drop-shadow-sm" viewBox="0 0 36 36">
                                             <circle cx="18" cy="18" r="14" stroke="currentColor" stroke-width="3" fill="transparent" class="text-slate-200/80 dark:text-slate-700/60" />
@@ -906,30 +906,49 @@
                                     </div>
                                 </div>
 
-                                <!-- State: Submitted (Zero-Truncation Clean Executive Telemetry) -->
-                                <div x-show="auditMeta.status === 'Submitted'" x-cloak class="flex flex-col w-full justify-center leading-tight gap-1">
-                                    <!-- 1. Top Row: Auditor Identity + Realtime Score Badge -->
-                                    <div class="flex items-center justify-between gap-1 w-full">
-                                        <div class="flex items-center gap-1 text-slate-800 dark:text-slate-100 min-w-0">
-                                            <i class="fa-solid fa-circle-check text-emerald-500 text-[10px] shrink-0"></i>
-                                            <span class="text-[8px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 shrink-0">By</span>
-                                            <span class="font-black text-[11px] sm:text-xs truncate tracking-tight text-slate-800 dark:text-slate-100" x-text="auditMeta.auditor ? auditMeta.auditor.split(' ')[0] : 'IT'"></span>
+                                <!-- State: Submitted (Smart Zero-Collision Executive Matrix) -->
+                                <div x-show="auditMeta.status === 'Submitted'" x-cloak class="flex flex-col w-full justify-center gap-1.5 pt-0.5">
+                                    
+                                    <!-- 1. ROW 1: Cycle Tag (Left) + High-Density Compliant Pill (Zero Right Clipping) -->
+                                    <div class="flex items-center justify-between gap-1 w-full leading-none">
+                                        <!-- Cycle Badge: Compact Padding & Tight Typography -->
+                                        <span class="px-1.5 py-0.5 rounded text-[7.5px] sm:text-[8px] font-mono font-black uppercase tracking-tight border shadow-sm shrink-0 leading-none"
+                                              :class="(currentLocation === 'Dehradun' || (auditMeta.cycle || '').toLowerCase().includes('dehradun'))
+                                                  ? 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/40 dark:text-violet-300 dark:border-violet-500/30'
+                                                  : 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-500/30'"
+                                              x-text="(currentLocation === 'Dehradun' || (auditMeta.cycle || '').toLowerCase().includes('dehradun')) 
+                                                  ? 'Monthly' 
+                                                  : ((auditMeta.cycle || '').includes('01') || (auditMeta.cycle || '').includes('Cycle 1') ? 'Cycle 1' : 'Cycle 2')"></span>
+
+                                        <!-- 🚀 Fixed: High-Density font-sans saves 30px width and stops edge cutting completely -->
+                                        <span class="font-sans text-[8px] sm:text-[8.5px] font-black tracking-tight px-1.5 py-0.5 rounded-md border shadow-sm shrink-0 leading-none flex items-center gap-1"
+                                              :class="(auditMeta.fails || 0) > 0 
+                                                  ? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/15 dark:text-rose-300 dark:border-rose-500/30 animate-pulse' 
+                                                  : 'bg-emerald-50 text-emerald-700 border-emerald-200/90 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30'">
+                                            <span x-text="(auditMeta.score || 100) + '%'"></span>
+                                            <span class="opacity-40">•</span>
+                                            <span x-text="(auditMeta.fails || 0) > 0 ? (auditMeta.fails + ' Fail ⚠️') : 'Compliant ✅'"></span>
+                                        </span>
+                                    </div>
+
+                                    <!-- 2. ROW 2: First Name Only (Zero Truncation) + Compact Date Badge -->
+                                    <div class="flex items-center justify-between gap-1 w-full leading-none">
+                                        <!-- 🚀 Fixed: First name only (.split(' ')[0]) with whitespace-nowrap - No 'Deepend...' cutting -->
+                                        <div class="flex items-center gap-1.5 min-w-0">
+                                            <span class="w-3.5 h-3.5 rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400 flex items-center justify-center text-[7.5px] shrink-0 border border-emerald-200 dark:border-emerald-500/30 shadow-sm">
+                                                <i class="fa-solid fa-check"></i>
+                                            </span>
+                                            <span class="font-sans font-black text-[11px] sm:text-[11.5px] text-slate-800 dark:text-slate-100 tracking-tight leading-none whitespace-nowrap" 
+                                                  x-text="(auditMeta.auditor || 'IT Operations').split(' ')[0]"></span>
                                         </div>
-                                        <!-- Score Pill (Crisp Monospace) -->
-                                        <span class="text-[9px] font-mono font-black px-1.5 py-0.5 rounded shadow-sm border shrink-0"
-                                              :class="(auditMeta.score || 100) >= 90 ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30' : 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/15 dark:text-rose-300 dark:border-rose-500/30'"
-                                              x-text="(auditMeta.score || 100) + '%'"></span>
+
+                                        <!-- Ultra-Compact Monospace Date -->
+                                        <span class="font-mono text-[8px] sm:text-[8.5px] font-bold text-slate-400 dark:text-slate-500 shrink-0 flex items-center gap-1 leading-none">
+                                            <i class="fa-regular fa-calendar text-[7px] opacity-70"></i>
+                                            <span x-text="auditMeta.date ? auditMeta.date.split(',')[0].trim().replace('-20', '-') : 'Archived'"></span>
+                                        </span>
                                     </div>
-                                    <!-- 2. Bottom Row: Compact Date + Anti-Collision Finding Badge -->
-                                    <div class="flex items-center justify-between gap-1 w-full text-slate-600 dark:text-slate-300 leading-none">
-                                        <!-- Clean 2-digit Year Date (Zero Ellipsis) -->
-                                        <span class="font-mono font-bold text-[8.5px] sm:text-[9px] text-slate-500 dark:text-slate-400 shrink-0" 
-                                              x-text="auditMeta.date ? auditMeta.date.split(',')[0].trim().replace('-20', '-') : 'Archived'"></span>
-                                        <!-- Smart Finding Pill (No 100% Repetition) -->
-                                        <span class="text-[7.5px] font-mono font-black uppercase tracking-wider px-1.5 py-0.5 rounded shadow-sm border shrink-0"
-                                              :class="(auditMeta.fails || 0) > 0 ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 animate-pulse' : 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30'"
-                                              x-text="(auditMeta.fails || 0) > 0 ? (auditMeta.fails + ' Finding ⚠️') : 'Compliant ✅'"></span>
-                                    </div>
+
                                 </div>
                                 
                             </div>
@@ -1066,18 +1085,40 @@
                                         <h4 class="text-[13.5px] sm:text-[14px] font-bold text-slate-800 dark:text-white leading-tight mb-2 tracking-tight group-hover:text-brand transition-colors truncate" 
                                             x-text="meta.cleanDesc.includes('➤') ? meta.cleanDesc.split('➤')[1].split('\n')[0].replace(/\[.*?\]/g, '').trim() : (meta.cleanDesc.includes('>') ? meta.cleanDesc.split('>')[1].split('\n')[0].replace(/\[.*?\]/g, '').trim() : ticket.issue)"></h4>
                                         
-                                        <!-- 5. 🎛️ Unified Glassmorphic Action & Context Strip (Replaces Ugly Pastel Dual-Boxes) -->
-                                        <div class="bg-slate-50/90 dark:bg-black/30 border border-slate-200/70 dark:border-white/5 rounded-xl px-3.5 py-2.5 mb-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-inner">
-                                            <!-- Left: Remediation / Action Note -->
-                                            <div class="flex items-center gap-2 min-w-0 text-xs font-semibold" 
-                                                 :class="ticket.status === 'Open' ? 'text-amber-700 dark:text-amber-400' : 'text-emerald-700 dark:text-emerald-300'">
-                                                <i class="fa-solid text-[10.5px] shrink-0" :class="ticket.status === 'Open' ? 'fa-triangle-exclamation text-amber-500 animate-pulse' : 'fa-check-double text-emerald-500'"></i>
-                                                <span class="truncate leading-tight" 
-                                                      x-text="ticket.status === 'Open' ? 'Action required: Under active diagnostics' : ((meta.actionDesc && meta.actionDesc.trim() !== '') ? 'Fixed: ' + meta.actionDesc.charAt(0).toUpperCase() + meta.actionDesc.slice(1) : 'Status: Successfully resolved and verified')"></span>
+                                        <!-- 5. 🎛️ High-Contrast Remediation Callout (Full 2-Line Natural Wrap - Zero Text Cutting) -->
+                                        <div class="rounded-xl px-3.5 py-2.5 mb-2.5 flex flex-col sm:flex-row sm:items-start justify-between gap-2.5 shadow-inner transition-all duration-300"
+                                             :class="ticket.status === 'Open' 
+                                                 ? 'bg-amber-50/80 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-900/40' 
+                                                 : 'bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-200/80 dark:border-emerald-900/40'">
+                                            
+                                            <!-- Left: Remediation Note with Top-Anchored Icon & Multiline Text -->
+                                            <div class="flex items-start gap-2.5 min-w-0 flex-1 text-xs">
+                                                
+                                                <!-- Status Micro-Pill Icon Box -->
+                                                <div class="w-5 h-5 rounded-md flex items-center justify-center shrink-0 mt-0.5 shadow-sm border"
+                                                     :class="ticket.status === 'Open' 
+                                                         ? 'bg-amber-100 text-amber-600 border-amber-300/80 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/40' 
+                                                         : 'bg-emerald-100 text-emerald-700 border-emerald-300/80 dark:bg-emerald-500/20 dark:text-emerald-300 dark:border-emerald-500/40'">
+                                                    <i class="fa-solid text-[9.5px]" :class="ticket.status === 'Open' ? 'fa-triangle-exclamation animate-pulse' : 'fa-check-double'"></i>
+                                                </div>
+                                                
+                                                <!-- Multiline Text Block (Zero Truncation) -->
+                                                <div class="leading-relaxed break-words flex-1 min-w-0 text-[11.5px] sm:text-[12px]">
+                                                    <span class="font-mono font-black uppercase text-[9.5px] mr-1.5 px-1.5 py-0.5 rounded shadow-sm border inline-block"
+                                                          :class="ticket.status === 'Open' 
+                                                              ? 'bg-amber-100/90 text-amber-800 border-amber-300 dark:bg-amber-500/30 dark:text-amber-200 dark:border-amber-500/50' 
+                                                              : 'bg-emerald-100/90 text-emerald-800 border-emerald-300 dark:bg-emerald-500/30 dark:text-emerald-200 dark:border-emerald-500/50'"
+                                                          x-text="ticket.status === 'Open' ? 'DIAGNOSTIC' : 'FIXED'"></span>
+                                                    <span class="text-slate-800 dark:text-slate-100 font-semibold"
+                                                          x-text="ticket.status === 'Open' 
+                                                              ? 'Action required: Under active diagnostics and vendor dispatch' 
+                                                              : ((meta.actionDesc && meta.actionDesc.trim() !== '') ? meta.actionDesc.charAt(0).toUpperCase() + meta.actionDesc.slice(1) : 'Successfully resolved and verified by IT operations')"></span>
+                                                </div>
                                             </div>
-                                            <!-- Right: Vendor Case ID Chip (If Exists) -->
+
+                                            <!-- Right: Vendor Case ID Chip (Safely Top-Aligned) -->
                                             <template x-if="meta.caseId">
-                                                <span class="font-mono text-[9px] font-black px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shadow-sm shrink-0 flex items-center gap-1 self-start sm:self-auto">
+                                                <span class="font-mono text-[9px] font-black px-2 py-1 rounded-md bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-sm shrink-0 flex items-center gap-1 self-start">
                                                     <span class="text-slate-400 font-sans font-bold uppercase text-[8px]">Case:</span>
                                                     <span class="text-blue-600 dark:text-blue-400" x-text="meta.caseId"></span>
                                                 </span>
@@ -1151,12 +1192,12 @@
                                   x-text="filteredTickets.length > 0 ? Math.round((stats.resolved / filteredTickets.length) * 100) + '% Fixed' : '100% OK'"></span>
                         </div>
                         
-                        <!-- 🎛️ Unified Segmented Pill Tray (Robust Mobile Height & 3D Pop - Single Line Locked) -->
+                        <!-- 🎛️ Unified Segmented Pill Tray (Status & Category Only) -->
                         <div class="flex items-center flex-nowrap bg-[#f1f5f9] dark:bg-black/40 p-1 sm:p-0.5 rounded-xl border border-slate-200/80 dark:border-white/5 shadow-inner order-3 sm:order-2 w-full sm:w-auto justify-between sm:justify-start gap-1 sm:gap-0.5">
                             
                             <!-- Status Button -->
                             <button @click="chartConfig.type = 'status'; renderChart(); haptic('light')" 
-                                    class="flex-1 sm:flex-none py-2 sm:py-1 px-1.5 sm:px-2.5 rounded-lg text-[10px] sm:text-[10px] font-bold transition-all flex items-center justify-center gap-1 leading-none select-none active:scale-95 whitespace-nowrap"
+                                    class="flex-1 sm:flex-none py-2 sm:py-1 px-2 sm:px-3 rounded-lg text-[10px] font-bold transition-all flex items-center justify-center gap-1.5 leading-none select-none active:scale-95 whitespace-nowrap"
                                     :class="chartConfig.type === 'status' 
                                         ? 'bg-gradient-to-br from-brand to-blue-600 text-white shadow-sm font-black animate-[btn-pop_0.25s_cubic-bezier(0.4,0,0.2,1)] [text-shadow:0_1px_2px_rgba(0,0,0,0.2)] translate-y-[0.5px]' 
                                         : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/5'">
@@ -1166,22 +1207,12 @@
                             
                             <!-- Category Button -->
                             <button @click="chartConfig.type = 'category'; renderChart(); haptic('light')" 
-                                    class="flex-1 sm:flex-none py-2 sm:py-1 px-1.5 sm:px-2.5 rounded-lg text-[10px] sm:text-[10px] font-bold transition-all flex items-center justify-center gap-1 leading-none select-none active:scale-95 whitespace-nowrap"
+                                    class="flex-1 sm:flex-none py-2 sm:py-1 px-2 sm:px-3 rounded-lg text-[10px] font-bold transition-all flex items-center justify-center gap-1.5 leading-none select-none active:scale-95 whitespace-nowrap"
                                     :class="chartConfig.type === 'category' 
                                         ? 'bg-gradient-to-br from-brand to-blue-600 text-white shadow-sm font-black animate-[btn-pop_0.25s_cubic-bezier(0.4,0,0.2,1)] [text-shadow:0_1px_2px_rgba(0,0,0,0.2)] translate-y-[0.5px]' 
                                         : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/5'">
                                 <i class="fa-solid fa-layer-group text-[10px]" :class="chartConfig.type === 'category' ? 'text-white' : 'text-brand opacity-80'"></i> 
                                 <span>Category</span>
-                            </button>
-                            
-                            <!-- WAN Links Button -->
-                            <button @click="chartConfig.type = 'wan'; renderChart(); haptic('light')" 
-                                    class="flex-1 sm:flex-none py-2 sm:py-1 px-1.5 sm:px-2.5 rounded-lg text-[10px] sm:text-[10px] font-bold transition-all flex items-center justify-center gap-1 leading-none select-none active:scale-95 whitespace-nowrap"
-                                    :class="chartConfig.type === 'wan' 
-                                        ? 'bg-gradient-to-br from-brand to-blue-600 text-white shadow-sm font-black animate-[btn-pop_0.25s_cubic-bezier(0.4,0,0.2,1)] [text-shadow:0_1px_2px_rgba(0,0,0,0.2)] translate-y-[0.5px]' 
-                                        : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/5'">
-                                <i class="fa-solid fa-satellite-dish text-[10px]" :class="chartConfig.type === 'wan' ? 'text-white' : 'text-brand opacity-80'"></i> 
-                                <span>WAN Links</span>
                             </button>
 
                             <!-- Tray Divider -->
@@ -1189,7 +1220,7 @@
 
                             <!-- All / Month Time Filter -->
                             <button @click="chartConfig.time = (chartConfig.time === 'all' ? 'month' : 'all'); renderChart(); haptic('light')" 
-                                    class="flex-1 sm:flex-none py-2 sm:py-1 px-1.5 sm:px-2 rounded-lg text-[10px] sm:text-[10px] font-bold transition-all flex items-center justify-center gap-1 leading-none select-none active:scale-95 whitespace-nowrap shrink-0"
+                                    class="flex-1 sm:flex-none py-2 sm:py-1 px-2 sm:px-2.5 rounded-lg text-[10px] font-bold transition-all flex items-center justify-center gap-1 leading-none select-none active:scale-95 whitespace-nowrap shrink-0"
                                     :class="chartConfig.time === 'month' 
                                         ? 'bg-gradient-to-br from-indigo-500 to-indigo-700 text-white shadow-sm font-black' 
                                         : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/5'"
@@ -1204,80 +1235,61 @@
                     <!-- 2. 🍩 CENTER: Split Telemetry Deck (Natural Flow - Zero Clipping) -->
                     <div class="flex-1 flex flex-col p-3.5 sm:p-5 relative z-20 justify-start sm:justify-between gap-4 h-auto">
                         
-                        <!-- Telemetry Grid: Fixed Shrinkage Bug -->
+                        <!-- Telemetry Grid: Twin 50/50 Dual-Donut Cockpit Engine -->
                         <div class="w-full flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4 relative shrink-0">
                             
-                            <!-- Left: Donut Chart Container -->
-                            <div class="w-full md:w-3/5 h-[175px] sm:h-[210px] relative flex items-center justify-center shrink-0">
-                                <div id="analyticsChart" class="w-full h-full drop-shadow-md"></div>
+                            <!-- 1. LEFT DONUT: Overall Ticket Resolution Engine -->
+                            <div class="w-full md:w-1/2 h-[190px] sm:h-[215px] relative flex flex-col items-center justify-between p-2 rounded-2xl bg-slate-50/60 dark:bg-black/20 border border-slate-200/60 dark:border-white/5 shrink-0">
+                                <div class="w-full flex items-center justify-between px-2 pt-1 shrink-0">
+                                    <span class="text-[9px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                                        <i class="fa-solid fa-ticket text-brand"></i> Incident Status
+                                    </span>
+                                    <span class="text-[8px] font-mono font-black px-1.5 py-0.5 rounded bg-white dark:bg-black/40 text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-white/5"
+                                          x-text="stats.total + ' Total'"></span>
+                                </div>
+                                <div class="w-full flex-1 relative flex items-center justify-center">
+                                    <div id="analyticsChart" class="w-full h-full drop-shadow-md"></div>
+                                </div>
                             </div>
 
-                            <!-- Right: Live NOC Telemetry Cards (Fix Ratio, Open Load, RMA Pipeline) -->
-                            <div class="w-full md:w-2/5 flex flex-col justify-center gap-2 shrink-0">
+                            <!-- 2. RIGHT DONUT: Dedicated Infrastructure (WAN ⇋ RMA Switch) -->
+                            <div class="w-full md:w-1/2 h-[190px] sm:h-[215px] relative flex flex-col items-center justify-between p-2 rounded-2xl bg-slate-50/60 dark:bg-black/20 border border-slate-200/60 dark:border-white/5 shrink-0">
                                 
-                                <!-- Card 1: Resolution Success Ratio -->
-                                <div class="p-2.5 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/20 border border-emerald-200/80 dark:border-emerald-900/40 flex items-center justify-between shadow-sm">
-                                    <div class="flex items-center gap-2 min-w-0">
-                                        <div class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-[10px] shrink-0">
-                                            <i class="fa-solid fa-check-double"></i>
-                                        </div>
-                                        <span class="text-[9.5px] font-black text-slate-600 dark:text-slate-300 uppercase tracking-wider">Fix Ratio</span>
-                                    </div>
-                                    <span class="font-mono font-black text-xs text-emerald-600 dark:text-emerald-400"
-                                          x-text="filteredTickets.length > 0 ? Math.round((stats.resolved / filteredTickets.length) * 100) + '%' : '100%'"></span>
-                                </div>
+                                <!-- Top Segmented Toggle Switch (No Redundant Left Text) -->
+                                <div class="w-full flex items-center justify-end px-1 sm:px-2 pt-0.5 shrink-0">
+                                    
+                                    <!-- 🎛️ Exact Twin Button Tray (Same Size, Icons, Gradients & 3D btn-pop) -->
+                                    <div class="flex items-center flex-nowrap bg-[#f1f5f9] dark:bg-black/40 p-1 sm:p-0.5 rounded-xl border border-slate-200/80 dark:border-white/5 shadow-inner shrink-0 gap-1 sm:gap-0.5">
+                                        
+                                        <!-- WAN Links Button -->
+                                        <button type="button" @click="infraMode = 'wan'; renderInfraChart(); haptic('light')" 
+                                                class="py-1.5 sm:py-1 px-2.5 sm:px-3 rounded-lg text-[10px] font-bold transition-all flex items-center justify-center gap-1.5 leading-none select-none active:scale-95 whitespace-nowrap"
+                                                :class="infraMode === 'wan' 
+                                                    ? 'bg-gradient-to-br from-sky-500 to-blue-600 text-white shadow-sm font-black animate-[btn-pop_0.25s_cubic-bezier(0.4,0,0.2,1)] [text-shadow:0_1px_2px_rgba(0,0,0,0.2)] translate-y-[0.5px]' 
+                                                    : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/5'">
+                                            <i class="fa-solid fa-satellite-dish text-[10px]" :class="infraMode === 'wan' ? 'text-white' : 'text-sky-500 opacity-80'"></i>
+                                            <span>WAN Links</span>
+                                        </button>
+                                        
+                                        <!-- Hardware RMA Button -->
+                                        <button type="button" @click="infraMode = 'rma'; renderInfraChart(); haptic('light')" 
+                                                class="py-1.5 sm:py-1 px-2.5 sm:px-3 rounded-lg text-[10px] font-bold transition-all flex items-center justify-center gap-1.5 leading-none select-none active:scale-95 whitespace-nowrap"
+                                                :class="infraMode === 'rma' 
+                                                    ? 'bg-gradient-to-br from-purple-500 to-indigo-600 text-white shadow-sm font-black animate-[btn-pop_0.25s_cubic-bezier(0.4,0,0.2,1)] [text-shadow:0_1px_2px_rgba(0,0,0,0.2)] translate-y-[0.5px]' 
+                                                    : 'text-slate-500 hover:text-purple-600 dark:text-slate-400 dark:hover:text-purple-400 hover:bg-white/60 dark:hover:bg-white/5'">
+                                            <i class="fa-solid fa-screwdriver-wrench text-[10px]" :class="infraMode === 'rma' ? 'text-white' : 'text-purple-500 opacity-80'"></i>
+                                            <span>RMA</span>
+                                        </button>
 
-                                <!-- Card 2: Active Open Incident Load -->
-                                <div class="p-2.5 rounded-xl border flex items-center justify-between shadow-sm transition-all"
-                                     :class="openTickets.length > 0 ? 'bg-rose-50/80 dark:bg-rose-950/20 border-rose-200/80 dark:border-rose-900/40' : 'bg-slate-50 dark:bg-black/30 border-slate-200/70 dark:border-white/5'">
-                                    <div class="flex items-center gap-2 min-w-0">
-                                        <div class="w-6 h-6 rounded-lg flex items-center justify-center text-[10px] shrink-0"
-                                             :class="openTickets.length > 0 ? 'bg-rose-500/20 text-rose-600 dark:text-rose-400' : 'bg-slate-200 dark:bg-white/10 text-slate-400'">
-                                            <i class="fa-solid fa-bell" :class="openTickets.length > 0 ? 'animate-bounce' : ''"></i>
-                                        </div>
-                                        <span class="text-[9.5px] font-black text-slate-600 dark:text-slate-300 uppercase tracking-wider">Open Load</span>
-                                    </div>
-                                    <span class="font-mono font-black text-xs"
-                                          :class="openTickets.length > 0 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-500'"
-                                          x-text="openTickets.length + ' Pending'"></span>
-                                </div>
-
-                                <!-- Card 3: Hardware RMA & Vendor Pipeline (Option 1 - Interactive) -->
-                                <div x-data="{ 
-                                        get rmaCount() { 
-                                            return filteredTickets.filter(t => (t.hasRma || /\[RMA_ID/i.test(t.desc) || (t.issue && /hardware/i.test(t.issue))) && t.status === 'Open').length; 
-                                        } 
-                                     }"
-                                     @click="haptic('light'); window.location.href='PBL_Hardware_RMA.html'"
-                                     class="p-2.5 rounded-xl border flex items-center justify-between shadow-sm transition-all duration-300 cursor-pointer group hover:-translate-y-0.5 hover:shadow-md relative overflow-hidden"
-                                     :class="rmaCount > 0 
-                                          ? 'bg-purple-50/90 dark:bg-purple-950/30 border-purple-300/80 dark:border-purple-800/60 ring-1 ring-purple-400/30' 
-                                          : 'bg-slate-50 dark:bg-black/30 border-slate-200/70 dark:border-white/5'"
-                                     title="Click to Open Hardware RMA Tracker">
-                                    <div class="flex items-center gap-2 min-w-0">
-                                        <div class="w-6 h-6 rounded-lg flex items-center justify-center text-[10px] shrink-0 border shadow-sm transition-transform group-hover:scale-105"
-                                             :class="rmaCount > 0 
-                                                  ? 'bg-purple-500 text-white border-purple-400 shadow-purple-500/30' 
-                                                  : 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400 border-purple-200 dark:border-purple-800/40'">
-                                            <i class="fa-solid" :class="rmaCount > 0 ? 'fa-screwdriver-wrench animate-bounce' : 'fa-boxes-packing'"></i>
-                                        </div>
-                                        <div class="flex flex-col min-w-0">
-                                            <span class="text-[9.5px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-200 leading-none truncate group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">RMA Pipeline</span>
-                                            <span class="text-[7.5px] font-mono font-bold text-slate-400 uppercase mt-0.5 truncate" x-text="currentLocation + ' Repairs'"></span>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center gap-1.5 shrink-0">
-                                        <span class="text-[8.5px] font-mono font-black px-2 py-0.5 rounded-md shadow-sm border leading-tight flex items-center gap-1"
-                                              :class="rmaCount > 0 
-                                                  ? 'bg-purple-100 text-purple-700 border-purple-300 dark:bg-purple-900/40 dark:text-purple-300 dark:border-purple-700 animate-pulse' 
-                                                  : 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30'">
-                                            <span class="w-1.5 h-1.5 rounded-full" :class="rmaCount > 0 ? 'bg-purple-500' : 'bg-emerald-500'"></span>
-                                            <span x-text="rmaCount > 0 ? (rmaCount + ' In Repair ⚠️') : 'All Fixed ✅'"></span>
-                                        </span>
                                     </div>
                                 </div>
 
+                                <!-- Donut Mount Point for Infrastructure -->
+                                <div class="w-full flex-1 relative flex items-center justify-center">
+                                    <div id="infraChart" class="w-full h-full drop-shadow-md"></div>
+                                </div>
                             </div>
+
                         </div>
 
                         <!-- 📱 3 RESTORED ORIGINAL KPI CARDS (Full Runway: pb-24 Clears Fixed Footer) -->
@@ -3562,6 +3574,8 @@
                 
                 chartConfig: { type: 'status', time: 'all' },
                 chartInstance: null,
+                infraMode: 'wan',          // 🚀 Controls right donut ('wan' or 'rma')
+                infraChartInstance: null,  // 🚀 ApexCharts instance for right donut
 
                 // 🚀 NETWORK APP FUNCTIONS
                 async fetchPublicIP() {
@@ -3738,7 +3752,11 @@
                             const pTickets = JSON.parse(cachedData);
                             this.tickets = Array.isArray(pTickets) ? pTickets : []; 
                             this.updateKPIs();
-                            setTimeout(() => this.renderChart(), 300); 
+                            // 🚀 FIX 1: Initial cache se dono donuts sath me render honge
+                            setTimeout(() => {
+                                this.renderChart();
+                                this.renderInfraChart();
+                            }, 300); 
                             if(this.tickets.length > 0) hasCache = true;
                         }
                     } catch(e) { this.tickets = []; }
@@ -3764,7 +3782,11 @@
                     } catch (error) {
                         console.error("Dashboard Init Error:", error);
                     } finally {
-                        this.loading = false; // API fail ho tab bhi loader hategi!
+                        this.loading = false;
+                        // 🚀 FIX 2: Page loading complete hote hi guarantee ke sath right donut render hoga
+                        setTimeout(() => {
+                            if (!this.infraChartInstance) this.renderInfraChart();
+                        }, 200);
                     }
 
                     this.setupFlipGroup('flip-h'); this.setupFlipGroup('flip-m');
@@ -3907,8 +3929,11 @@
                     this.checkAuditStatus();
 
                     // 🚀 Smart Fix: Wait 50ms for Alpine to update the DOM container dimensions before drawing
-                    setTimeout(() => { this.renderChart(); }, 50);
-                },
+                    setTimeout(() => { 
+						this.renderChart(); 
+						this.renderInfraChart(); 
+					}, 50);
+                }, // 👈 FIX: Yeh closing brace '},' lagte hi saare 200+ console errors khatam ho jayenge!
 				
 				// 🚀 Dual-Branch Telemetry Helper for Vikas Rawat
                 getBranchPendingCount(branchName) {
@@ -4467,6 +4492,7 @@
                             this.tickets = freshTickets;
                             this.updateKPIs(); 
                             this.renderChart();
+							this.renderInfraChart(); // 👈 Naya call
                             try { localStorage.setItem('pbl_tickets_cache', JSON.stringify(this.tickets)); } catch(e) {}
                             if(force) this.haptic('success'); 
                         } else {
@@ -4489,100 +4515,182 @@
                     this.stats.resolved = this.filteredTickets.filter(t => t.status === 'Resolved').length;
                 },
 
-                renderChart() {
-				const chartEl = document.querySelector("#analyticsChart");
-				if (!chartEl) return;
-				let filteredData = Array.isArray(this.filteredTickets) ? this.filteredTickets : []; // 📍 Updated to filteredTickets
-				if (this.chartConfig.time === 'month') {
-					const now = new Date();
-					filteredData = filteredData.filter(t => {
-						if (!t.date || t.date === '-') return false; const d = new Date(t.date);
-						return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-					});
-				}
-				
-				// 🧹 Smart Fix: Wipe out previous text/HTML completely before ApexCharts takes over
-				chartEl.innerHTML = ''; 
-				
-				if (filteredData.length === 0) {
-					if (this.chartInstance) this.chartInstance.destroy();
-					chartEl.innerHTML = '<div class="flex items-center justify-center h-full text-slate-400 text-xs font-medium">No Data Available</div>';
-					return;
-				}
-				
-                    let series = [], labels = [], colors = [], chartType = 'donut';
+                				
+				renderChart() {
+                    const chartEl = document.querySelector("#analyticsChart");
+                    if (!chartEl) return;
+                    let filteredData = Array.isArray(this.filteredTickets) ? this.filteredTickets : [];
+                    if (this.chartConfig.time === 'month') {
+                        const now = new Date();
+                        filteredData = filteredData.filter(t => {
+                            if (!t.date || t.date === '-') return false; 
+                            const d = new Date(t.date);
+                            return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+                        });
+                    }
+                    
+                    chartEl.innerHTML = ''; 
+                    if (filteredData.length === 0) {
+                        if (this.chartInstance) this.chartInstance.destroy();
+                        chartEl.innerHTML = '<div class="flex items-center justify-center h-full text-slate-400 text-xs font-medium">No Data Available</div>';
+                        return;
+                    }
+                    
+                    let series = [], labels = [], colors = [], centerLabel = 'TOTAL';
+                    
                     if (this.chartConfig.type === 'status') {
+                        // 🔴🟢 1. STATUS DONUT: Rose Red (Open) + Emerald Green (Resolved)
                         const open = filteredData.filter(t => t.status === 'Open').length;
                         const closed = filteredData.filter(t => t.status === 'Resolved' || t.status === 'Closed').length;
                         if (open === 0 && closed === 0) return;
-                        series = [open, closed]; labels = ['Pending', 'Resolved']; colors = ['#EF4444', '#10B981']; chartType = 'donut';
-                    } else if (this.chartConfig.type === 'wan') {
-					// 🚀 Telecom & Carrier Outage Distribution (Airtel vs STPI vs Broadband)
-					const isDDN = this.currentLocation === 'Dehradun';
-					const name1 = isDDN ? 'GSTech 10M' : 'Airtel LL';
-					const name2 = isDDN ? 'STPI 4M' : 'STPI LL';
-					const name3 = isDDN ? 'BSNL 15M' : 'Airtel BB';
+                        series = [open, closed]; 
+                        labels = ['Pending', 'Resolved']; 
+                        colors = ['#F43F5E', '#10B981']; 
+                        centerLabel = 'INCIDENTS';
+                    } else {
+                        // 🗂️ 2. CATEGORIES DONUT: Hardware (Amber), Software (Purple), Network (Sky), Other (Indigo)
+                        const catMap = {};
+                        filteredData.forEach(t => { 
+                            let cat = t.issue ? t.issue.split(' ')[0] : 'Other'; 
+                            catMap[cat] = (catMap[cat] || 0) + 1; 
+                        });
+                        labels = Object.keys(catMap);
+                        series = Object.values(catMap);
+                        centerLabel = 'CATEGORIES';
 
-					const c1 = filteredData.filter(t => new RegExp(isDDN ? 'gstech|10m' : 'airtel.*(?:ll|leased)|172\\.25', 'i').test(t.desc + t.issue + t.asset)).length;
-					const c2 = filteredData.filter(t => new RegExp('stpi|192\\.168\\.231', 'i').test(t.desc + t.issue + t.asset)).length;
-					const c3 = filteredData.filter(t => new RegExp(isDDN ? 'bsnl|15m' : 'broadband|192\\.168\\.1', 'i').test(t.desc + t.issue + t.asset)).length;
-
-					if (c1 === 0 && c2 === 0 && c3 === 0) {
-						series = [1];
-						labels = ['All Links 100% Up'];
-						colors = ['#10B981'];
-						chartType = 'donut';
-					} else {
-						series = [c1, c2, c3];
-						labels = [name1, name2, name3];
-						colors = ['#F43F5E', '#0EA5E9', '#10B981'];
-						chartType = 'donut';
-					}
-				} else {
-                        const categories = {};
-                        filteredData.forEach(t => { let cat = t.issue ? t.issue.split(' ')[0] : 'Other'; categories[cat] = (categories[cat] || 0) + 1; });
-                        labels = Object.keys(categories); series = [{ name: 'Tickets', data: Object.values(categories) }];
-                        colors = ['#3b82f6']; chartType = 'bar';
+                        // Semantic matching palette
+                        const catPalette = {
+                            'hardware': '#F59E0B',  // Amber
+                            'software': '#8B5CF6',  // Purple
+                            'network':  '#06B6D4',  // Cyan
+                            'internet': '#0EA5E9',  // Sky
+                            'printer':  '#64748B',  // Slate
+                            'audit':    '#EC4899',  // Pink
+                            'other':    '#4F46E5'   // Indigo
+                        };
+                        colors = labels.map(l => {
+                            const matchKey = Object.keys(catPalette).find(k => l.toLowerCase().includes(k));
+                            return matchKey ? catPalette[matchKey] : '#3B82F6';
+                        });
                     }
+
                     if (this.chartInstance) this.chartInstance.destroy();
                     const options = {
                         chart: { 
-                            type: chartType, 
+                            type: 'donut', 
                             height: '100%', 
                             width: '100%', 
                             parentHeightOffset: 0, 
-                            redrawOnParentResize: true, 
                             fontFamily: 'Inter, sans-serif', 
                             background: 'transparent', 
                             toolbar: { show: false },
-                            animations: { enabled: true, easing: 'easeinout', speed: 800 },
-                            dropShadow: { enabled: true, top: 2, left: 0, blur: 4, color: this.isDark ? '#000' : '#334155', opacity: this.isDark ? 0.35 : 0.1 }
+                            animations: { enabled: true, easing: 'easeinout', speed: 600 }
                         },
                         series: series, 
                         labels: labels, 
                         colors: colors,
                         theme: { mode: this.isDark ? 'dark' : 'light' },
                         plotOptions: { 
-                            bar: { borderRadius: 6, columnWidth: '35%' }, 
                             pie: { 
                                 donut: { 
                                     size: '72%', 
                                     labels: { 
                                         show: true, 
-                                        name: { show: true, fontSize: '10px', fontWeight: 800, color: '#94a3b8', offsetY: -4 },
-                                        value: { show: true, fontSize: '18px', fontWeight: 900, color: this.isDark ? '#fff' : '#0f172a', offsetY: 2 },
-                                        total: { show: true, label: 'TOTAL', fontSize: '9px', fontWeight: 900, color: '#94a3b8' } 
+                                        name: { show: true, fontSize: '9px', fontWeight: 800, color: '#94a3b8', offsetY: -3 },
+                                        value: { show: true, fontSize: '16px', fontWeight: 900, color: this.isDark ? '#fff' : '#0f172a', offsetY: 1 },
+                                        total: { show: true, label: centerLabel, fontSize: '8px', fontWeight: 900, color: '#94a3b8' } 
                                     } 
                                 } 
                             } 
                         },
                         dataLabels: { enabled: false }, 
-                        legend: { show: false },
-                        grid: { show: chartType === 'bar', borderColor: this.isDark ? '#334155' : '#e2e8f0', strokeDashArray: 4 },
-                        xaxis: { categories: labels, labels: { style: { fontSize: '9px', colors: '#64748b' } }, axisBorder: { show: false }, axisTicks: { show: false } }
+                        legend: { show: false }
                     };
                     this.chartInstance = new ApexCharts(chartEl, options);
                     this.chartInstance.render();
+                },
+
+                renderInfraChart() {
+                    const chartEl = document.querySelector("#infraChart");
+                    if (!chartEl) return;
+                    let filteredData = Array.isArray(this.filteredTickets) ? this.filteredTickets : [];
+                    chartEl.innerHTML = '';
+
+                    let series = [], labels = [], colors = [], centerLabel = 'CARRIER';
+                    const isDDN = this.currentLocation === 'Dehradun';
+
+                    if (this.infraMode === 'wan') {
+                        // 📡 3. WAN LINKS DONUT: Airtel Red, STPI Sky Blue, Broadband Teal, Clean Green
+                        centerLabel = 'WAN';
+                        const name1 = isDDN ? 'GSTech' : 'Airtel LL';
+                        const name2 = isDDN ? 'STPI 4M' : 'STPI LL';
+                        const name3 = isDDN ? 'BSNL' : 'Airtel BB';
+
+                        const c1 = filteredData.filter(t => new RegExp(isDDN ? 'gstech|10m' : 'airtel.*(?:ll|leased)|172\\.25', 'i').test(t.desc + t.issue + t.asset)).length;
+                        const c2 = filteredData.filter(t => new RegExp('stpi|192\\.168\\.231', 'i').test(t.desc + t.issue + t.asset)).length;
+                        const c3 = filteredData.filter(t => new RegExp(isDDN ? 'bsnl|15m' : 'broadband|192\\.168\\.1', 'i').test(t.desc + t.issue + t.asset)).length;
+
+                        if (c1 === 0 && c2 === 0 && c3 === 0) {
+                            series = [1];
+                            labels = ['100% Up'];
+                            colors = ['#10B981']; // All Healthy Emerald
+                        } else {
+                            labels = [name1, name2, name3];
+                            series = [c1, c2, c3];
+                            colors = ['#E11D48', '#0284C7', '#0D9488']; // Airtel Crimson, STPI Sky, BB Teal
+                        }
+                    } else {
+                        // 🛠️ 4. RMA HARDWARE DONUT: Active Repair (Purple #8B5CF6) + Replaced/Fixed (Emerald #10B981)
+                        centerLabel = 'RMA';
+                        const rmaTickets = filteredData.filter(t => t.hasRma || /\[RMA_ID/i.test(t.desc) || (t.issue && /hardware/i.test(t.issue)));
+                        const inRepair = rmaTickets.filter(t => t.status === 'Open').length;
+                        const fixed = rmaTickets.filter(t => t.status === 'Resolved' || t.status === 'Closed').length;
+
+                        if (inRepair === 0 && fixed === 0) {
+                            series = [1];
+                            labels = ['All Fixed'];
+                            colors = ['#10B981']; // 100% Repaired/Clean
+                        } else {
+                            labels = ['In Repair', 'Replaced'];
+                            series = [inRepair, fixed];
+                            colors = ['#8B5CF6', '#10B981']; // Signature RMA Purple & Verified Green
+                        }
+                    }
+
+                    if (this.infraChartInstance) this.infraChartInstance.destroy();
+                    const options = {
+                        chart: { 
+                            type: 'donut', 
+                            height: '100%', 
+                            width: '100%', 
+                            parentHeightOffset: 0, 
+                            fontFamily: 'Inter, sans-serif', 
+                            background: 'transparent', 
+                            toolbar: { show: false },
+                            animations: { enabled: true, easing: 'easeinout', speed: 600 }
+                        },
+                        series: series, 
+                        labels: labels, 
+                        colors: colors,
+                        theme: { mode: this.isDark ? 'dark' : 'light' },
+                        plotOptions: { 
+                            pie: { 
+                                donut: { 
+                                    size: '72%', 
+                                    labels: { 
+                                        show: true, 
+                                        name: { show: true, fontSize: '9px', fontWeight: 800, color: '#94a3b8', offsetY: -3 },
+                                        value: { show: true, fontSize: '16px', fontWeight: 900, color: this.isDark ? '#fff' : '#0f172a', offsetY: 1 },
+                                        total: { show: true, label: centerLabel, fontSize: '8px', fontWeight: 900, color: '#94a3b8' } 
+                                    } 
+                                } 
+                            } 
+                        },
+                        dataLabels: { enabled: false }, 
+                        legend: { show: false }
+                    };
+                    this.infraChartInstance = new ApexCharts(chartEl, options);
+                    this.infraChartInstance.render();
                 },
 
                 getIssueConfig(issue) {
@@ -4607,6 +4715,7 @@
                     setSystemStatusBarColor(this.isDark);
 
                     if(this.chartInstance) { this.chartInstance.updateOptions({ theme: { mode: this.isDark ? 'dark' : 'light' } }); }
+					if(this.infraChartInstance) { this.infraChartInstance.updateOptions({ theme: { mode: this.isDark ? 'dark' : 'light' } }); } // 👈 Naya call
                 }
             }; 
         }); 
