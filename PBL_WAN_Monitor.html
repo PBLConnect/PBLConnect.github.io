@@ -787,22 +787,45 @@
                             </div>
                         </div>
 
-                        <!-- Chamber B: Link Restored (Green Theme) -->
+                        <!-- Chamber B: Link Restored (Green Theme - Zero Pointer Lock) -->
                         <div class="p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm relative overflow-hidden" 
-                             :class="!form.status.includes('Resolved') ? 'bg-slate-50/70 dark:bg-black/20 border-slate-200 dark:border-white/5 opacity-60 grayscale pointer-events-none' : 'bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-200/80 dark:border-emerald-900/40'">
-                            <div class="absolute left-0 top-0 bottom-0 w-1.5" :class="form.status.includes('Resolved') ? 'bg-emerald-500' : 'bg-slate-300'"></div>
-                            <h4 class="text-[9.5px] sm:text-[10px] font-black uppercase tracking-widest mb-2.5 flex items-center gap-1.5 pl-1.5"
-                                :class="form.status.includes('Resolved') ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'">
-                                <i class="fa-solid fa-arrow-trend-up"></i> Link Restored & Verified
-                            </h4>
+                             :class="form.status.includes('Resolved') ? 'bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-200/80 dark:border-emerald-900/40 shadow-[0_4px_15px_rgba(16,185,129,0.1)]' : 'bg-slate-50/80 dark:bg-black/20 border-slate-200/80 dark:border-white/5'">
+                            
+                            <div class="absolute left-0 top-0 bottom-0 w-1.5 transition-all" :class="form.status.includes('Resolved') ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : 'bg-slate-300 dark:bg-slate-700'"></div>
+                            
+                            <div class="flex items-center justify-between mb-2.5 pl-1.5">
+                                <h4 class="text-[9.5px] sm:text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5"
+                                    :class="form.status.includes('Resolved') ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400'">
+                                    <i class="fa-solid text-xs" :class="form.status.includes('Resolved') ? 'fa-arrow-trend-up text-emerald-500' : 'fa-clock opacity-60'"></i> 
+                                    <span>Link Restored & Verified</span>
+                                </h4>
+                                
+                                <!-- 🚀 Instant Resolve Action Pill -->
+                                <button type="button" 
+                                        @click="toggleResolveState()"
+                                        class="text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg border shadow-sm transition-all active:scale-95 flex items-center gap-1.5 shrink-0"
+                                        :class="form.status.includes('Resolved') 
+                                            ? 'bg-emerald-500 text-white border-emerald-600 shadow-emerald-500/30' 
+                                            : 'bg-white hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-emerald-500/20 dark:hover:text-emerald-300'">
+                                    <i class="fa-solid text-[9px]" :class="form.status.includes('Resolved') ? 'fa-check-double' : 'fa-bolt text-amber-500'"></i>
+                                    <span x-text="form.status.includes('Resolved') ? 'Restored ✅' : 'Mark Resolved'"></span>
+                                </button>
+                            </div>
+                            
                             <div class="grid grid-cols-2 gap-2.5 pl-1.5">
                                 <div>
                                     <label class="block text-[8px] sm:text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Restore Date</label>
-                                    <input type="date" x-model="form.endDate" @change="calculateDuration" class="w-full bg-white dark:bg-black/60 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition text-slate-800 dark:text-white shadow-sm">
+                                    <input type="date" x-model="form.endDate" 
+                                           @focus="if(!form.status.includes('Resolved')) { form.status = '✅ Resolved'; calculateDuration(); }"
+                                           @change="calculateDuration" 
+                                           class="w-full bg-white dark:bg-black/60 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition text-slate-800 dark:text-white shadow-sm">
                                 </div>
                                 <div>
                                     <label class="block text-[8px] sm:text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Restore Time</label>
-                                    <input type="time" x-model="form.end" @change="calculateDuration" class="w-full bg-white dark:bg-black/60 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition text-slate-800 dark:text-white shadow-sm">
+                                    <input type="time" x-model="form.end" 
+                                           @focus="if(!form.status.includes('Resolved')) { form.status = '✅ Resolved'; calculateDuration(); }"
+                                           @change="calculateDuration" 
+                                           class="w-full bg-white dark:bg-black/60 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition text-slate-800 dark:text-white shadow-sm">
                                 </div>
                             </div>
                         </div>
@@ -840,19 +863,36 @@
             <div class="bg-slate-50/80 dark:bg-black/40 backdrop-blur-md px-4 sm:px-6 py-4 border-t border-slate-100 dark:border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4 shrink-0 relative z-20 rounded-b-3xl">
                 <div class="relative w-full sm:w-56 shrink-0">
                     <i class="fa-solid fa-key absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                    <input type="password" x-model="form.secret" @input="if(isLocked && form.secret === 'PBL2026') { isLocked = false; haptic('success'); }" placeholder="Admin Key" class="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-white dark:bg-black/40 border border-slate-200 dark:border-slate-700/50 rounded-xl text-xs font-mono font-bold outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition shadow-sm">
+                    <input type="password" x-model="form.secret" 
+                           @input="handleSecretInput()" 
+                           placeholder="Admin Key (PBL****)" 
+                           class="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-white dark:bg-black/40 border rounded-xl text-xs font-mono font-bold outline-none transition shadow-sm"
+                           :class="form.secret === 'PBL2026' ? 'border-emerald-500 ring-2 ring-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'border-slate-200 dark:border-slate-700/50 focus:border-brand focus:ring-2 focus:ring-brand/20'">
                 </div>
                 
                 <div class="flex items-center justify-end gap-3 sm:gap-4 w-full sm:w-auto">
                     <div class="hidden sm:flex flex-col text-right shrink-0">
                         <span class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-0.5 whitespace-nowrap">Calculated Duration</span>
-                        <span class="text-xs font-mono font-black text-brand whitespace-nowrap" x-text="form.duration || '--h --m'"></span>
+                        <span class="text-xs font-mono font-black whitespace-nowrap" 
+                              :class="form.status.includes('Resolved') ? 'text-emerald-600 dark:text-emerald-400' : 'text-brand'" 
+                              x-text="form.duration || '--h --m'"></span>
                     </div>
                     
                     <button @click="showModal = false; haptic('light')" class="text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white transition px-2 shrink-0">Cancel</button>
-                    <button @click="saveLog()" class="bg-brand hover:bg-blue-600 text-white px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider shadow-[0_5px_15px_-3px_rgba(59,130,246,0.4)] transition flex items-center justify-center gap-2 active:scale-95 shrink-0" :disabled="saving">
-                        <span x-show="!saving" x-text="form.id ? 'UPDATE' : 'SAVE'"></span>
-                        <span x-show="saving"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
+                    
+                    <!-- 🚀 Dynamic Emerald Button matching Ticket History Console -->
+                    <button @click="saveLog()" 
+                            class="px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-black uppercase tracking-wider transition-all duration-200 active:scale-95 flex items-center justify-center gap-2 shadow-md shrink-0 text-white" 
+                            :class="form.status.includes('Resolved') ? 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/30' : 'bg-brand hover:bg-amber-600 shadow-brand/30'"
+                            :disabled="saving">
+                        <span x-show="!saving" class="flex items-center gap-1.5">
+                            <i class="fa-solid" :class="form.status.includes('Resolved') ? 'fa-check-double text-xs' : 'fa-save text-xs'"></i>
+                            <span x-text="form.status.includes('Resolved') ? 'RESOLVE & UPDATE' : (form.id ? 'UPDATE LOG' : 'SAVE EVENT')"></span>
+                        </span>
+                        <span x-show="saving" class="flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-notch fa-spin"></i>
+                            <span x-text="form.status.includes('Resolved') ? 'Resolving...' : 'Saving...'"></span>
+                        </span>
                     </button>
                 </div>
             </div>
@@ -1096,9 +1136,21 @@
                     editLog(log) {
                         this.haptic('light'); 
                         this.isLocked = !!(log.status && log.status.includes('Resolved')); 
+
+                        // 🎯 Smart ISP String Normalizer (Prevents STPI flipping to Airtel)
+                        let matchedIsp = log.isp || this.isps.primary.id;
+                        const sIsp = String(matchedIsp).toLowerCase();
+                        if (sIsp.includes('stpi')) {
+                            matchedIsp = this.isps.secondary.id;
+                        } else if (sIsp.includes('broadband') || sIsp.includes('bsnl')) {
+                            matchedIsp = this.isps.broadband.id;
+                        } else if (sIsp.includes('airtel') || sIsp.includes('gstech')) {
+                            matchedIsp = this.isps.primary.id;
+                        }
+
                         this.form = { 
                             id: log.id, 
-                            isp: log.isp || this.isps.primary.id, 
+                            isp: matchedIsp, 
                             type: log.type || '', 
                             faultParty: log.faultParty || '🌐 External (ISP Side)', 
                             caseId: log.caseId || '', 
@@ -1114,6 +1166,36 @@
                             secret: '' 
                         };
                         this.showModal = true;
+                    },
+
+                    // 🚀 Quick One-Tap Resolve Toggle matching Ticket History
+                    toggleResolveState() {
+                        this.haptic('light');
+                        if (this.form.status.includes('Resolved')) {
+                            this.form.status = '⏳ Escalated';
+                            this.calculateDuration();
+                        } else {
+                            this.form.status = '✅ Resolved';
+                            const n = new Date();
+                            if (!this.form.endDate) this.form.endDate = n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0');
+                            if (!this.form.end) this.form.end = String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0');
+                            this.calculateDuration();
+                        }
+                    },
+
+                    // ⚡ Admin Key instant auto-unlock & resolve enabler
+                    handleSecretInput() {
+                        if (this.form.secret === 'PBL2026') {
+                            this.isLocked = false;
+                            this.haptic('success');
+                            if (!this.form.status.includes('Resolved')) {
+                                this.form.status = '✅ Resolved';
+                                const n = new Date();
+                                if (!this.form.endDate) this.form.endDate = n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0');
+                                if (!this.form.end) this.form.end = String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0');
+                                this.calculateDuration();
+                            }
+                        }
                     },
 
                     confirmDelete(id) { 
