@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- 🚀 GLOBAL APP CONFIGURATION -->
+    <script>
+        const PBL_APP_VERSION = "v1.0";
+        const API_URL = "https://script.google.com/macros/s/AKfycbxLuVpd5zOUJMwjnJsI9aRVEMTJNNfiizVFAAuxPiHMf7Tv144pq4uNsEgn_hCy6qx18g/exec";
+    </script>
+    <title>PBL Connect | Employee Intranet</title>
+    
+    <link rel="icon" type="image/x-icon" href="assets/images/pbl-logo.png">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.13.3/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'], heading: ['Outfit', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    colors: { brand: '#3b82f6', brand_glow: '#60a5fa', dark_bg: '#020617', dark_surface: '#0f172a', dark_border: '#1e293b' }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        [x-cloak] { display: none !important; }
+        /* Prevent Body Scroll completely */
+        body { background-color: #f1f5f9; transition: background-color 0.2s; overflow: hidden; }
+        .dark body { background-color: #020617; }
+        
+        /* 🚀 MAGIC SCALING: Forces Desktop UI to render at exactly 110% zoom natively */
+        @media (min-width: 1024px) {
+            body {
+                zoom: 1.1;
+                /* 🚀 MATH COMPENSATOR: Reduces the container bounds so the enlarged content doesn't get cut off or push the footer out of the screen */
+                height: calc(100dvh / 1.1) !important;
+                width: calc(100vw / 1.1) !important;
+            }
+        }
+        
+        .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark .custom-scroll::-webkit-scrollbar-thumb { background: #334155; }
+        
+        /* Premium Ambient Background */
+        .mesh-bg {
+            background-color: #f1f5f9;
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,0.03) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,0.03) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,0.03) 0, transparent 50%);
+        }
+        .dark .mesh-bg {
+            background-color: #020617;
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,0.15) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,0.15) 0, transparent 50%);
+        }
+
+        /* Hardware Accelerated Cursor */
+        @media (hover: hover) and (pointer: fine) { 
+            body, html { cursor: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24'%3e%3cpath d='M4.5.79v22.42l6.56-6.57h9.29L4.5.79z' fill='%233b82f6' stroke='%23ffffff' stroke-width='1.5' stroke-linejoin='round'/%3e%3c/svg%3e") 2 2, default !important; }
+            a, button, div.cursor-pointer, input[type="radio"] { cursor: pointer !important; }
+        }
+        .custom-ring { position: fixed; left: 0; top: 0; width: 30px; height: 30px; border: 2px solid rgba(59, 130, 246, 0.5); border-radius: 50%; z-index: 100000; pointer-events: none; transition: transform 0.35s ease-out; will-change: transform; }
+        @media (prefers-reduced-motion: reduce), (max-width: 768px) { .custom-ring { display: none !important; } }
+
+        /* 🎉 Celebration Popup CSS */
+        .celebration-popup { position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%) translateY(150px); background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); border-radius: 20px; box-shadow: 0 15px 40px rgba(0,0,0,0.25); display: flex; flex-direction: column; overflow: hidden; z-index: 11000; min-width: 320px; border: 1px solid rgba(255,255,255,0.6); opacity: 0; transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); pointer-events: none; }
+        .dark .celebration-popup { background: rgba(15, 23, 42, 0.95); border-color: rgba(255,255,255,0.1); }
+        .celebration-popup.show { transform: translateX(-50%) translateY(0); opacity: 1; pointer-events: auto; }
+        .popup-content-wrapper { display: flex; align-items: center; gap: 20px; padding: 20px; }
+        .popup-emoji { font-size: 3em; animation: bounce 1s infinite alternate; line-height: 1; }
+        @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-8px); } }
+        .popup-timer-bar { height: 4px; background: linear-gradient(90deg, #3b82f6, #ec4899, #f59e0b); width: 100%; transform-origin: left; transform: scaleX(1); transition: transform 5s linear; }
+        .celebration-popup.show .popup-timer-bar { transform: scaleX(0); }
+
+        /* 🚀 KPI Smart Focus Hover Effect */
+        .kpi-grid:hover > .kpi-card:not(:hover) {
+            filter: blur(2px); /* 🚀 Reduced from 4px for better legibility */
+            transform: scale(0.95); /* 🚀 Less aggressive shrink */
+            opacity: 0.75; /* 🚀 Retain some visibility */
+        }
+        .kpi-card {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), filter 0.4s ease, opacity 0.4s ease, box-shadow 0.3s ease !important;
+            will-change: transform, filter; 
+        }
+        .kpi-card:hover {
+            transform: scale(1.05);
+            z-index: 20;
+        }
+
+        /* 🚀 Footer Quick Links Smart Focus Effect */
+        .quick-links-grid:hover > .quick-link-btn:not(:hover) {
+            filter: blur(1px); /* 🚀 Reduced from 2px since icons are tiny */
+            transform: scale(0.90); /* 🚀 Smoother scale down */
+            opacity: 0.65; /* 🚀 Keep it visible */
+        }
+        .quick-link-btn {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            will-change: transform, filter;
+        }
+    </style>
+    <!-- Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+</head>
+
+<body class="text-slate-800 dark:text-slate-200 h-[100dvh] flex flex-col overflow-hidden mesh-bg" x-data="connectHub()">
+
+    <!-- NAVBAR (ULTRA-MODERN FLOATING APP HEADER) -->
+    <header class="mx-3 sm:mx-4 mt-3 sm:mt-4 h-14 sm:h-16 z-50 relative">
+        
+        <!-- Seamless Glass Background (Floating Island) -->
+        <div class="absolute inset-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-2xl border border-white/60 dark:border-white/10 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.3)] transition-all duration-300"></div>
+
+        <div class="max-w-[1920px] mx-auto px-4 sm:px-5 h-full flex justify-between items-center relative z-10">
+                        
+            <!-- LEFT: Clean Brand Identity -->
+            <div class="flex items-center shrink-0 min-w-0">
+                <a href="index.html" @click.prevent="haptic('light')" class="group/logo flex items-center gap-3 transition-transform active:scale-95 shrink-0">
+                    
+                    <!-- Logo Icon Box -->
+                    <div class="relative h-8 w-8 sm:h-10 sm:w-10 bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 rounded-xl shadow-sm border border-slate-200/60 dark:border-slate-700 flex items-center justify-center group-hover/logo:shadow-md transition-all">
+                        <img src="assets/images/pbl-logo.png" alt="PBL Logo" class="h-5 sm:h-6 w-auto object-contain dark:brightness-0 dark:invert dark:opacity-95 transition-transform group-hover/logo:scale-110" @error="$el.style.display='none'; $refs.fbLogo.style.display='flex'">
+                        <div x-ref="fbLogo" style="display:none;" class="w-full h-full bg-gradient-to-tr from-brand to-indigo-600 text-white rounded-xl flex items-center justify-center font-black text-sm sm:text-lg shadow-[0_0_15px_rgba(59,130,246,0.4)]">P</div>
+                    </div>
+                    
+                    <!-- Typography -->
+                    <div class="flex flex-col justify-center min-w-0">
+                        <h2 class="font-heading font-black text-[16px] sm:text-[20px] text-slate-800 dark:text-white leading-none tracking-tight whitespace-nowrap drop-shadow-sm transition-colors group-hover/logo:text-brand">PBL<span class="text-brand dark:text-brand_glow">Connect</span></h2>
+                        <span class="text-[7.5px] sm:text-[8.5px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-0.5">Intranet Portal</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- CENTER: Blank Spacer -->
+            <div class="hidden lg:flex flex-1 z-20"></div>
+
+            <!-- RIGHT: Hardware Buttons -->
+            <div class="flex items-center justify-end gap-2 sm:gap-3 w-auto relative z-30 shrink-0">
+                
+                <!-- Individual Hardware Buttons -->
+                <div class="flex items-center gap-1.5 sm:gap-2">
+                    
+                    <!-- Network Status -->
+                    <div class="relative" x-data="{ showNet: false }" @click.outside="showNet = false">
+                        <button @click="showNet = !showNet; haptic('light'); if(showNet && !isPinging){ pingTarget = 'Google'; runPing(); }" 
+                                class="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 text-slate-500 transition-all duration-300 hover:scale-105 active:scale-95 hover:text-brand hover:border-brand/30 hover:shadow-md"
+                                :class="showNet ? 'ring-2 ring-brand/20 text-brand' : ''" title="Network Status">
+                            <i class="fa-solid fa-satellite-dish text-[13px] sm:text-[14px]"></i>
+                        </button>
+                        
+                        <!-- 🚀 NOC TELEMETRY POPOVER (Retained exactly as is) -->
+                        <div x-show="showNet" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 -translate-y-2 scale-95" x-transition:enter-end="opacity-100 translate-y-0 scale-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 scale-100" x-transition:leave-end="opacity-0 -translate-y-2 scale-95" class="absolute right-0 top-full mt-4 w-[340px] sm:w-[380px] bg-white/95 dark:bg-slate-900/95 backdrop-blur-3xl rounded-[2rem] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25),0_0_0_1px_rgba(0,0,0,0.05)] dark:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.1)] border border-slate-200/80 dark:border-slate-700 flex flex-col overflow-hidden text-left cursor-default z-[100]" style="display: none;">
+                            <div class="absolute -top-20 -left-20 w-60 h-60 bg-purple-400/10 dark:bg-purple-600/10 rounded-full blur-[60px] pointer-events-none"></div>
+                            <div class="absolute top-1/2 -right-20 w-60 h-60 bg-sky-400/10 dark:bg-sky-600/10 rounded-full blur-[60px] pointer-events-none"></div>
+                            <div class="px-5 py-3.5 border-b border-slate-200/70 dark:border-white/10 bg-gradient-to-r from-blue-50/70 via-white to-indigo-50/40 dark:from-slate-800/90 dark:via-slate-900/90 dark:to-slate-950/90 backdrop-blur-xl flex justify-between items-center relative z-10 shrink-0">
+                                <div class="flex items-center gap-3">
+                                    <div class="relative w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-[0_4px_12px_rgba(59,130,246,0.4),inset_0_1px_0_rgba(255,255,255,0.3)] shrink-0 group">
+                                        <i class="fa-solid fa-satellite-dish text-[14px] drop-shadow-sm group-hover:rotate-12 transition-transform duration-300"></i>
+                                        <span class="absolute -top-0.5 -right-0.5 flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-[0_0_6px_#10b981]"></span></span>
+                                    </div>
+                                    <div class="flex flex-col text-left">
+                                        <h4 class="font-heading font-black text-[15px] sm:text-[16px] text-slate-800 dark:text-white tracking-tight leading-none">Network <span class="text-brand dark:text-brand_glow">Status</span></h4>
+                                        <span class="text-[8.5px] font-mono font-bold uppercase tracking-widest text-slate-400 dark:text-slate-400 mt-1 flex items-center gap-1.5 leading-none"><i class="fa-solid fa-bolt-lightning text-[7.5px] text-emerald-500"></i> Real-time Telemetry</span>
+                                    </div>
+                                </div>
+                                <button @click="showNet = false" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-100 dark:bg-white/10 hover:bg-rose-50 hover:text-rose-500 dark:hover:bg-rose-500/20 dark:hover:text-rose-300 flex items-center justify-center text-slate-400 transition-all duration-300 active:scale-90 shadow-sm border border-slate-200/60 dark:border-white/5 shrink-0 group" title="Close Panel"><i class="fa-solid fa-xmark text-xs group-hover:rotate-90 transition-transform duration-300"></i></button>
+                            </div>
+                            <div class="p-4 sm:p-5 flex flex-col gap-3.5 max-h-[70vh] overflow-y-auto custom-scroll relative z-10 bg-white/50 dark:bg-transparent">
+                                <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between h-[155px] shrink-0 transition-none">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <span class="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-1.5"><i class="fa-solid fa-satellite-dish text-brand"></i> <span>PING LATENCY (GOOGLE)</span></span>
+                                            <div class="h-7 w-36 flex items-center mt-0.5 shrink-0 overflow-hidden">
+                                                <span class="text-[20px] font-mono font-black tabular-nums transition-colors duration-150 whitespace-nowrap" :class="getPingColor(pingVal)" x-text="isPinging ? 'Probing...' : (pingVal === 'Err' ? 'Error' : pingVal + ' ms')"></span>
+                                            </div>
+                                        </div>
+                                        <button @click="if(!isPinging){ pingTarget = 'Google'; runPing(); }" :disabled="isPinging" class="w-8 h-8 rounded-xl bg-slate-50 dark:bg-slate-700 shadow-sm border border-slate-200 dark:border-slate-600 flex items-center justify-center text-slate-500 hover:text-brand transition active:scale-95 disabled:opacity-40" title="Re-test Ping"><i class="fa-solid fa-rotate-right text-[11px]" :class="isPinging ? 'fa-spin text-brand' : ''"></i></button>
+                                    </div>
+                                    <div class="pt-2 border-t border-slate-100 dark:border-slate-700/60">
+                                        <div class="flex items-end gap-1.5 h-8 w-full">
+                                            <template x-for="slot in 10" :key="slot"><div class="flex-1 rounded-full transition-all duration-200" :style="`height: ${pingHistory[slot - 1] ? Math.max(15, Math.min(100, (pingHistory[slot - 1] / 200) * 100)) : 10}%; background-color: ${pingHistory[slot - 1] ? getPingColorCode(pingHistory[slot - 1]) : 'rgba(148, 163, 184, 0.25)'};`"></div></template>
+                                        </div>
+                                        <div class="flex items-center justify-between text-[9px] font-mono font-bold text-slate-500 dark:text-slate-400 mt-2">
+                                            <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full" :class="pingVal === 'Err' ? 'bg-rose-500' : 'bg-emerald-500'"></span><span x-text="isPinging ? 'Sending ICMP packets...' : (pingVal === 'Err' ? 'Request Timed Out' : 'Route Verified')"></span></span>
+                                            <span x-text="(pingHistory.length) + '/10 Pkts'"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="relative p-3.5 rounded-2xl bg-gradient-to-br from-sky-500/[0.12] via-blue-500/[0.04] to-white dark:from-sky-950/40 dark:via-slate-800/80 dark:to-slate-900 border border-sky-300/60 dark:border-sky-500/30 shadow-[0_4px_15px_rgba(14,165,233,0.08)] hover:shadow-[0_8px_20px_rgba(14,165,233,0.18)] hover:-translate-y-0.5 transition-all duration-300 overflow-hidden group text-left">
+                                        <i class="fa-solid fa-globe absolute -bottom-3 -right-3 text-[4.5rem] text-sky-500/15 dark:text-sky-400/10 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 pointer-events-none"></i>
+                                        <div class="flex items-center justify-between mb-2 relative z-10"><div class="flex items-center gap-1.5"><div class="w-6 h-6 rounded-lg bg-sky-500/15 text-sky-600 dark:text-sky-400 flex items-center justify-center text-[10px] shadow-sm border border-sky-200/80 dark:border-sky-500/30"><i class="fa-solid fa-network-wired"></i></div><span class="text-[8.5px] font-mono font-black text-sky-600 dark:text-sky-400 uppercase tracking-widest">Public IP</span></div><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_#10b981] animate-pulse"></span></div>
+                                        <span class="text-[13px] sm:text-[14px] font-mono font-black text-slate-800 dark:text-white tracking-tight block relative z-10 truncate" x-text="publicIp || 'Fetching...'"></span>
+                                    </div>
+                                    <div class="relative p-3.5 rounded-2xl bg-gradient-to-br from-rose-500/[0.12] via-orange-500/[0.04] to-white dark:from-rose-950/40 dark:via-slate-800/80 dark:to-slate-900 border border-rose-300/60 dark:border-rose-500/30 shadow-[0_4px_15px_rgba(244,63,94,0.08)] hover:shadow-[0_8px_20px_rgba(244,63,94,0.18)] hover:-translate-y-0.5 transition-all duration-300 overflow-hidden group text-left">
+                                        <i class="fa-solid fa-tower-broadcast absolute -bottom-3 -right-3 text-[4.5rem] text-rose-500/15 dark:text-rose-400/10 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-500 pointer-events-none"></i>
+                                        <div class="flex items-center justify-between mb-2 relative z-10"><div class="flex items-center gap-1.5"><div class="w-6 h-6 rounded-lg bg-rose-500/15 text-rose-600 dark:text-rose-400 flex items-center justify-center text-[10px] shadow-sm border border-rose-200/80 dark:border-rose-500/30"><i class="fa-solid fa-bolt-lightning"></i></div><span class="text-[8.5px] font-mono font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest">ISP Line</span></div><span class="text-[7.5px] font-mono font-black px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 uppercase tracking-wider">Fiber</span></div>
+                                        <span class="text-[13px] sm:text-[14px] font-heading font-black text-slate-800 dark:text-white tracking-tight block relative z-10 truncate" x-text="ispName || 'Airtel Broadband'"></span>
+                                    </div>
+                                </div>
+                                <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm text-left">
+                                    <div class="flex justify-between items-center mb-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-9 h-9 rounded-[0.6rem] bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 text-emerald-500 flex items-center justify-center text-[15px] shadow-sm"><i class="fa-solid fa-download"></i></div>
+                                            <div>
+                                                <span class="block text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-0.5">Download Speed</span>
+                                                <span class="text-[16px] sm:text-[17px] font-black text-slate-800 dark:text-white leading-none tracking-tight" x-text="speedVal || '-- Mbps'"></span>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center bg-slate-100 dark:bg-black/40 p-1 rounded-xl border border-slate-200/80 dark:border-slate-700/80 shadow-inner w-[110px]">
+                                            <button type="button" @click="speedSize = 20" class="flex-1 py-1 text-[9px] font-black rounded-lg transition-all text-center leading-none" :class="speedSize === 20 ? 'bg-brand text-white shadow-sm' : 'text-slate-500 dark:text-slate-400'">20 MB</button>
+                                            <button type="button" @click="speedSize = 50" class="flex-1 py-1 text-[9px] font-black rounded-lg transition-all text-center leading-none" :class="speedSize === 50 ? 'bg-brand text-white shadow-sm' : 'text-slate-500 dark:text-slate-400'">50 MB</button>
+                                        </div>
+                                    </div>
+                                    <button @click="runSpeedTest()" :disabled="isTestingSpeed" class="w-full py-3 px-4 rounded-2xl text-white font-extrabold text-[12px] uppercase tracking-wider shadow-md hover:shadow-lg flex items-center justify-center relative bg-brand hover:bg-blue-600 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                                        <div x-show="!isTestingSpeed" class="flex items-center justify-center gap-2"><i class="fa-solid fa-paper-plane text-xs"></i><span class="tracking-widest font-black">START TEST</span></div>
+                                        <div x-show="isTestingSpeed" class="flex items-center gap-2" x-cloak><i class="fa-solid fa-circle-notch fa-spin text-sm"></i> <span class="font-mono font-black" x-text="speedProgress + '%'"></span></div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Theme Toggle -->
+                    <button @click="toggleTheme()" 
+                            class="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 text-slate-500 transition-all duration-300 hover:scale-105 active:scale-95 hover:shadow-md"
+                            :class="isDark ? 'hover:text-amber-400 hover:border-amber-400/30' : 'hover:text-indigo-500 hover:border-indigo-500/30'">
+                        <i class="fa-solid text-[13px] sm:text-[14px] pointer-events-none" :class="isDark ? 'fa-sun text-amber-400 drop-shadow-sm' : 'fa-moon'"></i>
+                    </button>
+
+                    <!-- Global Notification Bell -->
+                    <div class="relative" x-data="{ showNotifs: false }" @click.outside="showNotifs = false">
+                        <button @click="showNotifs = !showNotifs" 
+                                class="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 text-slate-500 transition-all duration-300 hover:scale-105 active:scale-95 hover:text-rose-500 hover:border-rose-500/30 hover:shadow-md relative"
+                                :class="showNotifs ? 'ring-2 ring-rose-500/20 text-rose-500' : ''">
+                            <i class="fa-regular fa-bell text-[13px] sm:text-[14px]" :class="notifications.length > 0 ? 'text-brand animate-pulse drop-shadow-md' : ''"></i>
+                            <span x-show="notifications.length > 0" class="absolute top-1.5 right-1.5 flex h-2 w-2" x-cloak>
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500 border-2 border-white dark:border-slate-800 shadow-sm"></span>
+                            </span>
+                        </button>
+                        
+                        <!-- 🚀 NOTIFICATION POPOVER (Retained exactly as is) -->
+                        <div x-show="showNotifs" x-transition.origin.top.right class="absolute right-0 top-full mt-4 w-72 bg-white/95 dark:bg-dark_surface/95 backdrop-blur-xl rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.15),0_0_0_1px_rgba(0,0,0,0.05)] dark:shadow-[0_20px_40px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.1)] z-[100] overflow-hidden flex flex-col" style="display: none;">
+                            <div class="p-3 border-b border-slate-100 dark:border-white/10 font-bold text-xs text-slate-800 dark:text-white flex justify-between items-center bg-slate-50/80 dark:bg-black/20 shadow-sm">
+                                Notifications <span class="bg-brand/10 text-brand px-1.5 py-0.5 rounded text-[9px] shadow-sm" x-text="notifications.length + ' New'"></span>
+                            </div>
+                            <div class="max-h-64 overflow-y-auto custom-scroll">
+                                <template x-for="notif in notifications" :key="notif.title">
+                                    <div class="p-3 border-b border-slate-50 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 transition flex items-start gap-3 cursor-pointer">
+                                        <div class="text-xl mt-0.5" x-text="notif.emoji"></div>
+                                        <div class="flex-1 min-w-0">
+                                            <h4 class="text-xs font-bold text-slate-800 dark:text-white truncate" x-text="notif.title"></h4>
+                                            <p class="text-[10px] text-slate-500 leading-tight mt-0.5" x-text="notif.desc"></p>
+                                            <span class="text-[8px] font-black uppercase text-brand mt-1 block" x-text="notif.time"></span>
+                                        </div>
+                                    </div>
+                                </template>
+                                <div x-show="notifications.length === 0" class="p-6 text-center text-slate-400 text-xs">
+                                    <i class="fa-regular fa-bell-slash text-2xl mb-2 opacity-50"></i><br>No new notifications
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+    </header>
+
+    <!-- MAIN DASHBOARD AREA -->
+        <main class="flex-1 p-3 sm:p-4 flex flex-col gap-3 sm:gap-4 overflow-y-auto lg:overflow-hidden custom-scroll max-w-[1920px] mx-auto w-full">
+
+        <!-- 🚀 SECTION 1: FEATURE-FLAGGED WORKPLACE SECTION -->
+        <section class="shrink-0 relative z-20">
+            
+            <!-- 🌟 1. WELCOME BANNER (Dynamic Glass Overlay) -->
+            <div x-show="!modulesLive" class="relative w-full h-[180px] sm:h-[195px] lg:h-[210px] rounded-[1.75rem] overflow-hidden border border-slate-200/90 dark:border-slate-800 shadow-sm bg-slate-900 shrink-0 group">
+                
+                <!-- Background Image (Scaled slightly on hover for premium feel) -->
+                <img src="data/pbl-banner.jpg" 
+                     alt="Welcome to PBL Connect" 
+                     class="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105 opacity-90 dark:opacity-75"
+                     @error="$el.style.display='none'">
+                     
+                <!-- Dark Gradient Overlay for Text Readability -->
+                <div class="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-900/40 to-transparent dark:from-black/90 dark:via-black/50"></div>
+
+                <!-- Content Container -->
+                <div class="absolute inset-0 p-6 sm:p-8 flex flex-col justify-center w-full md:w-2/3 lg:w-1/2 z-10">
+                    
+                    <!-- Dynamic Greeting Engine -->
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="px-2 py-0.5 rounded-full bg-brand/20 text-brand_glow font-mono font-black text-[9px] uppercase tracking-widest border border-brand/30 shadow-sm backdrop-blur-md">
+                            <span x-text="new Date().getHours() < 12 ? 'Good Morning' : (new Date().getHours() < 17 ? 'Good Afternoon' : 'Good Evening')"></span> 
+                        </span>
+                        <span class="text-slate-300 font-medium text-[10px] tracking-wide" x-text="currentDate"></span>
+                    </div>
+
+                    <!-- Main Headline -->
+                    <h1 class="font-heading font-black text-3xl sm:text-4xl text-white tracking-tight leading-none mb-3 drop-shadow-lg">
+                        Welcome to <span class="text-brand_glow">PBL Connect</span>
+                    </h1>
+
+                    <!-- Subtitle / Tagline -->
+                    <p class="text-xs sm:text-[13px] text-slate-300 font-medium leading-relaxed max-w-md drop-shadow-md">
+                        Your central intranet hub. Access essential tools, daily workflows, HR policies, and company updates—all in one secure place.
+                    </p>
+
+                    <!-- Quick Action Chips -->
+                    <div class="mt-4 flex items-center gap-3">
+                        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold tracking-wider hover:bg-white/20 transition-colors cursor-default">
+                            <i class="fa-solid fa-bolt text-amber-400"></i> Streamlined
+                        </div>
+                        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold tracking-wider hover:bg-white/20 transition-colors cursor-default">
+                            <i class="fa-solid fa-shield-halved text-emerald-400"></i> Secure Access
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            </div>
+
+            <!-- 🎯 2. COMPLETE 8 KPI CARDS (Safe & Intact - Live hone par turant show hoga) -->
+            <div x-show="modulesLive" x-cloak class="cards-container kpi-grid grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-3 sm:mb-4 transition-all">
+                
+                <!-- Card 1: IT Ticket -->
+                <div @click="openApp('submit-ticket.html', 'Raise IT Ticket')" class="kpi-card relative p-3 rounded-[1.25rem] cursor-pointer overflow-hidden group flex flex-col justify-between min-h-[80px] sm:min-h-[95px] bg-gradient-to-br from-amber-50/80 to-white/80 border border-amber-200/60 shadow-md hover:shadow-2xl hover:border-amber-400/50 dark:from-amber-900/10 dark:to-dark_surface/80 dark:border-amber-800/30">
+                    <i class="fa-solid fa-headset absolute -bottom-3 -right-2 text-5xl sm:text-6xl text-amber-500/20 dark:text-amber-500/10 group-hover:scale-110 transition-transform"></i>
+                    <div class="flex items-center justify-between relative z-10 mb-1">
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-amber-500 text-[10px] sm:text-[11px] shrink-0 border border-amber-100 dark:border-white/5"><i class="fa-solid fa-ticket"></i></div>
+                            <span class="hidden sm:inline-block text-[9px] sm:text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest leading-none mt-px">HELP</span>
+                        </div>
+                        <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-amber-100/50 dark:bg-amber-900/30 text-amber-500 flex items-center justify-center group-hover:bg-amber-500 group-hover:text-white transition-all shrink-0"><i class="fa-solid fa-arrow-right text-[9px] group-hover:translate-x-1 transition-transform"></i></div>
+                    </div>
+                    <div class="relative z-10 mt-auto">
+                        <h3 class="text-[16px] sm:text-lg font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">IT Ticket</h3>
+                        <div class="mt-0.5 flex flex-col justify-start w-full"><span class="text-[9px] sm:text-[10px] font-bold text-slate-500 dark:text-slate-400">Report issues 🛠️</span></div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Leave Hub -->
+                <div @click="openApp('apply-leave.html', 'Apply for Leave')" class="kpi-card relative p-3 rounded-[1.25rem] cursor-pointer overflow-hidden group flex flex-col justify-between min-h-[80px] sm:min-h-[95px] bg-gradient-to-br from-emerald-50/80 to-white/80 border border-emerald-200/60 shadow-md hover:shadow-2xl hover:border-emerald-400/50 dark:from-emerald-900/10 dark:to-dark_surface/80 dark:border-emerald-800/30">
+                    <i class="fa-solid fa-umbrella-beach absolute -bottom-3 -right-2 text-5xl sm:text-6xl text-emerald-500/20 dark:text-emerald-500/10 group-hover:scale-110 transition-transform"></i>
+                    <div class="flex items-center justify-between relative z-10 mb-1">
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-emerald-500 text-[10px] sm:text-[11px] shrink-0 border border-emerald-100 dark:border-white/5"><i class="fa-regular fa-calendar-check"></i></div>
+                            <span class="hidden sm:inline-block text-[9px] sm:text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest leading-none mt-px">HR OPS</span>
+                        </div>
+                        <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-emerald-100/50 dark:bg-emerald-900/30 text-emerald-500 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-all shrink-0"><i class="fa-solid fa-arrow-right text-[9px] group-hover:translate-x-1 transition-transform"></i></div>
+                    </div>
+                    <div class="relative z-10 mt-auto">
+                        <h3 class="text-[16px] sm:text-lg font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">Leave Hub</h3>
+                        <div class="mt-0.5 flex flex-col justify-start w-full"><span class="text-[9px] sm:text-[10px] font-bold text-slate-500 dark:text-slate-400">Apply & Track 🌴</span></div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Production -->
+                <div @click="openApp('production-hub.html', 'Production Hub')" class="kpi-card relative p-3 rounded-[1.25rem] cursor-pointer overflow-hidden group flex flex-col justify-between min-h-[80px] sm:min-h-[95px] bg-gradient-to-br from-indigo-50/80 to-white/80 border border-indigo-200/60 shadow-md hover:shadow-2xl hover:border-indigo-400/50 dark:from-indigo-900/10 dark:to-dark_surface/80 dark:border-indigo-800/30">
+                    <i class="fa-solid fa-cogs absolute -bottom-3 -right-2 text-5xl sm:text-6xl text-indigo-500/20 dark:text-indigo-500/10 group-hover:scale-110 transition-transform"></i>
+                    <div class="flex items-center justify-between relative z-10 mb-1">
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-indigo-500 text-[10px] sm:text-[11px] shrink-0 border border-indigo-100 dark:border-white/5"><i class="fa-solid fa-industry"></i></div>
+                            <span class="hidden sm:inline-block text-[9px] sm:text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest leading-none mt-px">PROJECTS</span>
+                        </div>
+                        <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-indigo-100/50 dark:bg-indigo-900/30 text-indigo-500 flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-all shrink-0"><i class="fa-solid fa-arrow-right text-[9px] group-hover:translate-x-1 transition-transform"></i></div>
+                    </div>
+                    <div class="relative z-10 mt-auto">
+                        <h3 class="text-[16px] sm:text-lg font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">Production</h3>
+                        <div class="mt-0.5 flex flex-col justify-start w-full"><span class="text-[9px] sm:text-[10px] font-bold text-slate-500 dark:text-slate-400">Tools & Updates ⚙️</span></div>
+                    </div>
+                </div>
+
+                <!-- Card 4: IT Dept -->
+                <div @click="openApp('it-hub.html', 'IT Dept Hub')" class="kpi-card relative p-3 rounded-[1.25rem] cursor-pointer overflow-hidden group flex flex-col justify-between min-h-[80px] sm:min-h-[95px] bg-gradient-to-br from-blue-50/80 to-white/80 border border-blue-200/60 shadow-md hover:shadow-2xl hover:border-blue-400/50 dark:from-blue-900/10 dark:to-dark_surface/80 dark:border-blue-800/30">
+                    <i class="fa-solid fa-server absolute -bottom-3 -right-2 text-5xl sm:text-6xl text-blue-500/20 dark:text-blue-500/10 group-hover:scale-110 transition-transform"></i>
+                    <div class="flex items-center justify-between relative z-10 mb-1">
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-blue-500 text-[10px] sm:text-[11px] shrink-0 border border-blue-100 dark:border-white/5"><i class="fa-solid fa-computer"></i></div>
+                            <span class="hidden sm:inline-block text-[9px] sm:text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest leading-none mt-px">SYS OPS</span>
+                        </div>
+                        <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-blue-100/50 dark:bg-blue-900/30 text-blue-500 flex items-center justify-center group-hover:bg-blue-500 group-hover:text-white transition-all shrink-0"><i class="fa-solid fa-arrow-right text-[9px] group-hover:translate-x-1 transition-transform"></i></div>
+                    </div>
+                    <div class="relative z-10 mt-auto">
+                        <h3 class="text-[16px] sm:text-lg font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">IT Dept</h3>
+                        <div class="mt-0.5 flex flex-col justify-start w-full"><span class="text-[9px] sm:text-[10px] font-bold text-slate-500 dark:text-slate-400">Status & SOPs 🖥️</span></div>
+                    </div>
+                </div>
+
+                <!-- Card 5: Holidays -->
+                <div @click="openApp('holidays.html', 'Holiday List')" class="kpi-card relative p-3 rounded-[1.25rem] cursor-pointer overflow-hidden group flex flex-col justify-between min-h-[80px] sm:min-h-[95px] bg-gradient-to-br from-purple-50/80 to-white/80 border border-purple-200/60 shadow-md hover:shadow-2xl hover:border-purple-400/50 dark:from-purple-900/10 dark:to-dark_surface/80 dark:border-purple-800/30">
+                    <i class="fa-solid fa-calendar-days absolute -bottom-3 -right-2 text-5xl sm:text-6xl text-purple-500/20 dark:text-purple-500/10 group-hover:scale-110 transition-transform"></i>
+                    <div class="flex items-center justify-between relative z-10 mb-1">
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-purple-500 text-[10px] sm:text-[11px] shrink-0 border border-purple-100 dark:border-white/5"><i class="fa-regular fa-flag"></i></div>
+                            <span class="hidden sm:inline-block text-[9px] sm:text-[10px] font-black text-purple-600 dark:text-purple-400 uppercase tracking-widest leading-none mt-px">CALENDAR</span>
+                        </div>
+                        <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-purple-100/50 dark:bg-purple-900/30 text-purple-500 flex items-center justify-center group-hover:bg-purple-500 group-hover:text-white transition-all shrink-0"><i class="fa-solid fa-arrow-right text-[9px] group-hover:translate-x-1 transition-transform"></i></div>
+                    </div>
+                    <div class="relative z-10 mt-auto">
+                        <h3 class="text-[16px] sm:text-lg font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">Holidays</h3>
+                        <div class="mt-0.5 flex flex-col justify-start w-full"><span class="text-[9px] sm:text-[10px] font-bold text-slate-500 dark:text-slate-400">Official Schedule 🗓️</span></div>
+                    </div>
+                </div>
+
+                <!-- Card 6: Suggestion Box -->
+                <div @click="openApp('suggestion-box.html', 'Suggestion Box')" class="kpi-card relative p-3 rounded-[1.25rem] cursor-pointer overflow-hidden group flex flex-col justify-between min-h-[80px] sm:min-h-[95px] bg-gradient-to-br from-sky-50/80 to-white/80 border border-sky-200/60 shadow-md hover:shadow-2xl hover:border-sky-400/50 dark:from-sky-900/10 dark:to-dark_surface/80 dark:border-sky-800/30">
+                    <i class="fa-solid fa-lightbulb absolute -bottom-3 -right-2 text-5xl sm:text-6xl text-sky-500/20 dark:text-sky-500/10 group-hover:scale-110 transition-transform"></i>
+                    <div class="flex items-center justify-between relative z-10 mb-1">
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-sky-500 text-[10px] sm:text-[11px] shrink-0 border border-sky-100 dark:border-white/5"><i class="fa-regular fa-comment-dots"></i></div>
+                            <span class="hidden sm:inline-block text-[9px] sm:text-[10px] font-black text-sky-600 dark:text-sky-400 uppercase tracking-widest leading-none mt-px">IDEAS</span>
+                        </div>
+                        <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-sky-100/50 dark:bg-sky-900/30 text-sky-500 flex items-center justify-center group-hover:bg-sky-500 group-hover:text-white transition-all shrink-0"><i class="fa-solid fa-arrow-right text-[9px] group-hover:translate-x-1 transition-transform"></i></div>
+                    </div>
+                    <div class="relative z-10 mt-auto">
+                        <h3 class="text-[16px] sm:text-lg font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">Suggestion Box</h3>
+                        <div class="mt-0.5 flex flex-col justify-start w-full"><span class="text-[9px] sm:text-[10px] font-bold text-slate-500 dark:text-slate-400">Share thoughts 💡</span></div>
+                    </div>
+                </div>
+
+                <!-- Card 7: Leave Policy -->
+                <div @click="openApp('leave-policy.html', 'Leave Policy')" class="kpi-card relative p-3 rounded-[1.25rem] cursor-pointer overflow-hidden group flex flex-col justify-between min-h-[80px] sm:min-h-[95px] bg-gradient-to-br from-rose-50/80 to-white/80 border border-rose-200/60 shadow-md hover:shadow-2xl hover:border-rose-400/50 dark:from-rose-900/10 dark:to-dark_surface/80 dark:border-rose-800/30">
+                    <i class="fa-solid fa-scale-balanced absolute -bottom-3 -right-2 text-5xl sm:text-6xl text-rose-500/20 dark:text-rose-500/10 group-hover:scale-110 transition-transform"></i>
+                    <div class="flex items-center justify-between relative z-10 mb-1">
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-rose-500 text-[10px] sm:text-[11px] shrink-0 border border-rose-100 dark:border-white/5"><i class="fa-solid fa-file-contract"></i></div>
+                            <span class="hidden sm:inline-block text-[9px] sm:text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest leading-none mt-px">RULES</span>
+                        </div>
+                        <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-rose-100/50 dark:bg-rose-900/30 text-rose-500 flex items-center justify-center group-hover:bg-rose-500 group-hover:text-white transition-all shrink-0"><i class="fa-solid fa-arrow-right text-[9px] group-hover:translate-x-1 transition-transform"></i></div>
+                    </div>
+                    <div class="relative z-10 mt-auto">
+                        <h3 class="text-[16px] sm:text-lg font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">Leave Policy</h3>
+                        <div class="mt-0.5 flex flex-col justify-start w-full"><span class="text-[9px] sm:text-[10px] font-bold text-slate-500 dark:text-slate-400">Guidelines 📄</span></div>
+                    </div>
+                </div>
+
+                <!-- Card 8: Training Center -->
+                <div @click="openApp('training-and-policies-center.html', 'Training Center')" class="kpi-card relative p-3 rounded-[1.25rem] cursor-pointer overflow-hidden group flex flex-col justify-between min-h-[80px] sm:min-h-[95px] bg-gradient-to-br from-teal-50/80 to-white/80 border border-teal-200/60 shadow-md hover:shadow-2xl hover:border-teal-400/50 dark:from-teal-900/10 dark:to-dark_surface/80 dark:border-teal-800/30">
+                    <i class="fa-solid fa-graduation-cap absolute -bottom-3 -right-2 text-5xl sm:text-6xl text-teal-500/20 dark:text-teal-500/10 group-hover:scale-110 transition-transform"></i>
+                    <div class="flex items-center justify-between relative z-10 mb-1">
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-teal-500 text-[10px] sm:text-[11px] shrink-0 border border-teal-100 dark:border-white/5"><i class="fa-solid fa-book-open"></i></div>
+                            <span class="hidden sm:inline-block text-[9px] sm:text-[10px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-widest leading-none mt-px">LEARN</span>
+                        </div>
+                        <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-teal-100/50 dark:bg-teal-900/30 text-teal-500 flex items-center justify-center group-hover:bg-teal-500 group-hover:text-white transition-all shrink-0"><i class="fa-solid fa-arrow-right text-[9px] group-hover:translate-x-1 transition-transform"></i></div>
+                    </div>
+                    <div class="relative z-10 mt-auto">
+                        <h3 class="text-[16px] sm:text-lg font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">Training</h3>
+                        <div class="mt-0.5 flex flex-col justify-start w-full"><span class="text-[9px] sm:text-[10px] font-bold text-slate-500 dark:text-slate-400">Company SOPs 🎓</span></div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 🚀 SECTION 2: WIDGETS (Glowing Border Aura Edition) -->
+        <!-- 🚀 FIXED: Removed 'lg:overflow-hidden' & added 'pt-2 px-1' so hover animations and outer glows NEVER get clipped at the top/sides! -->
+        <section class="flex flex-col lg:flex-1 lg:min-h-0 lg:grid lg:grid-cols-3 gap-5 pt-2 pb-4 px-1 relative z-20">
+            
+            <!-- COLUMN 1: Notice Board (🟠 AMBER GLOW) -->
+            <div class="group relative bg-white/70 dark:bg-slate-900/70 backdrop-blur-3xl rounded-[1.75rem] flex flex-col overflow-hidden shrink-0 lg:shrink lg:min-h-0 lg:h-full transition-all duration-500 hover:-translate-y-1 
+                 border border-amber-200/50 hover:border-amber-400/80 dark:border-amber-500/30 dark:hover:border-amber-400/70 
+                 shadow-[0_0_20px_rgba(245,158,11,0.08),0_8px_20px_-4px_rgba(245,158,11,0.12),inset_0_1px_0_rgba(255,255,255,1)] 
+                 hover:shadow-[0_0_35px_rgba(245,158,11,0.25),0_15px_30px_-5px_rgba(245,158,11,0.15),inset_0_1px_0_rgba(255,255,255,1)] 
+                 dark:shadow-[0_0_20px_rgba(245,158,11,0.05),0_8px_20px_-4px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.05)] 
+                 dark:hover:shadow-[0_0_35px_rgba(245,158,11,0.15),0_15px_30px_-5px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)]">
+                
+                <div class="absolute -top-32 -left-32 w-64 h-64 bg-amber-400/20 dark:bg-amber-500/15 rounded-full blur-[60px] pointer-events-none group-hover:opacity-100 opacity-40 transition-opacity duration-700 z-0"></div>
+                <div class="absolute -bottom-32 -right-32 w-64 h-64 bg-purple-400/20 dark:bg-purple-500/15 rounded-full blur-[60px] pointer-events-none group-hover:opacity-100 opacity-40 transition-opacity duration-700 z-0"></div>
+
+                <div class="px-5 py-4 border-b border-white/40 dark:border-white/5 flex justify-between items-center shrink-0 relative z-10">
+                    <h3 class="font-heading font-black text-[15px] text-slate-800 dark:text-white flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-full bg-white/80 dark:bg-slate-800/80 flex items-center justify-center border border-white dark:border-slate-700 shadow-sm">📌</div> Notice Board
+                    </h3>
+                    <span class="text-[9px] font-bold px-2.5 py-0.5 rounded-full bg-white/80 text-slate-500 border border-slate-200/50 dark:bg-slate-800/80 dark:border-slate-700 shadow-sm" x-text="noticeBoardData.length + ' Items'"></span>
+                </div>
+                
+                <div class="flex-1 lg:overflow-y-auto custom-scroll p-4 pb-6 flex flex-col gap-3 relative z-10">
+                    <div x-show="isLoadingNotices" class="p-6 text-center text-slate-400 text-xs font-bold uppercase tracking-widest"><i class="fa-solid fa-circle-notch fa-spin text-xl mb-2 text-brand"></i><br>Syncing Notices...</div>
+                    <div x-show="!isLoadingNotices && noticeBoardData.length === 0" class="text-center p-8 text-slate-400 text-xs font-bold uppercase tracking-wider bg-slate-50/50 dark:bg-white/[0.02] rounded-2xl border border-dashed border-slate-200 dark:border-slate-800" x-cloak><i class="fa-regular fa-bell-slash text-2xl mb-2 opacity-40"></i><br>No Active Notices Found</div>
+
+                    <!-- Clean Notice Card Template -->
+                    <template x-for="notice in noticeBoardData" :key="notice.title">
+                        <div class="relative p-4 rounded-2xl border transition-all duration-300 group/card overflow-hidden bg-white/80 dark:bg-slate-800/40 backdrop-blur-sm shrink-0 hover:shadow-lg dark:hover:shadow-[0_10px_25px_rgba(0,0,0,0.5)] hover:-translate-y-0.5" :class="notice.cardTheme">
+                            <div class="flex items-start gap-4">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-transform duration-300 group-hover/card:scale-105" :class="notice.iconBox">
+                                    <i :class="notice.icon" class="text-[15px]"></i>
+                                    <span x-show="notice.isToday" class="absolute top-0 right-0 flex h-2.5 w-2.5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500 border-2 border-white dark:border-slate-900"></span></span>
+                                </div>
+                                <div class="flex-1 min-w-0 flex flex-col">
+                                    <!-- 🚀 FIXED: Removed 'line-clamp-1' from title -->
+                                    <div class="flex items-start justify-between gap-2 mb-1.5">
+                                        <h4 class="font-bold text-[13px] text-slate-800 dark:text-white leading-snug tracking-tight group-hover/card:text-brand transition-colors" x-text="notice.title"></h4>
+                                        <span class="text-[8px] font-black uppercase px-2 py-0.5 rounded-full border shadow-sm shrink-0 tracking-wider mt-0.5" :class="notice.badgeTheme" x-text="notice.displayDate"></span>
+                                    </div>
+                                    
+                                    <!-- 🚀 FIXED: Removed 'line-clamp-2' from paragraph. Text will flow naturally now! -->
+                                    <p class="text-[11.5px] text-slate-500 dark:text-slate-400 leading-relaxed mb-3 text-justify" x-text="notice.text"></p>
+                                    
+                                    <div class="flex items-center gap-1.5 text-[9px] font-bold tracking-wider uppercase" :class="notice.textClass">
+                                        <i class="fa-solid fa-building-user opacity-80"></i> <span x-text="notice.author"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                    <div class="h-2 w-full shrink-0"></div>
+                </div>
+            </div>
+
+            <!-- COLUMN 2: Quick Launchpad (🔵 SKY BLUE GLOW) -->
+            <!-- 🚀 NEW: Sky colored border & glowing outer shadow spread -->
+            <div class="group relative bg-white/70 dark:bg-slate-900/70 backdrop-blur-3xl rounded-[1.75rem] flex flex-col overflow-hidden shrink-0 lg:min-h-0 transition-all duration-500 hover:-translate-y-1 
+                 border border-sky-200/50 hover:border-sky-400/80 dark:border-sky-500/30 dark:hover:border-sky-400/70 
+                 shadow-[0_0_20px_rgba(14,165,233,0.08),0_8px_20px_-4px_rgba(14,165,233,0.12),inset_0_1px_0_rgba(255,255,255,1)] 
+                 hover:shadow-[0_0_35px_rgba(14,165,233,0.25),0_15px_30px_-5px_rgba(14,165,233,0.15),inset_0_1px_0_rgba(255,255,255,1)] 
+                 dark:shadow-[0_0_20px_rgba(14,165,233,0.05),0_8px_20px_-4px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.05)] 
+                 dark:hover:shadow-[0_0_35px_rgba(14,165,233,0.15),0_15px_30px_-5px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)]">
+                
+                <div class="absolute -top-32 -left-32 w-64 h-64 bg-sky-400/20 dark:bg-sky-500/15 rounded-full blur-[60px] pointer-events-none group-hover:opacity-100 opacity-40 transition-opacity duration-700 z-0"></div>
+                <div class="absolute -bottom-32 -right-32 w-64 h-64 bg-indigo-400/20 dark:bg-indigo-500/15 rounded-full blur-[60px] pointer-events-none group-hover:opacity-100 opacity-40 transition-opacity duration-700 z-0"></div>
+
+                <div class="px-5 py-4 border-b border-white/40 dark:border-white/5 flex justify-between items-center shrink-0 relative z-10">
+                    <h3 class="font-heading font-black text-[15px] text-slate-800 dark:text-white flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-full bg-white/80 dark:bg-slate-800/80 flex items-center justify-center border border-white dark:border-slate-700 shadow-sm">⚡</div> Quick Launchpad
+                    </h3>
+                    <span class="text-[9px] font-bold px-2.5 py-0.5 rounded-full bg-brand/10 text-brand border border-brand/20 dark:bg-brand/20 shadow-sm">4 PORTALS</span>
+                </div>
+                
+                <div class="flex-1 overflow-hidden p-3.5 flex flex-col justify-center gap-2.5 relative z-10">
+                    <!-- App 1 -->
+                    <a href="https://www.panbusiness.net/eng/index.php" target="_blank" class="p-3 rounded-2xl bg-white/80 dark:bg-slate-800/40 backdrop-blur-sm border border-slate-200/60 dark:border-slate-700 hover:border-orange-200 hover:shadow-lg dark:hover:shadow-[0_8px_20px_rgba(249,115,22,0.15)] hover:bg-orange-50/50 dark:hover:bg-orange-500/10 hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-3.5 group/link">
+                        <div class="w-10 h-10 rounded-full bg-orange-50 text-orange-500 ring-1 ring-orange-100/50 dark:bg-orange-500/10 dark:ring-orange-500/20 flex items-center justify-center text-[16px] shrink-0 group-hover/link:scale-105 transition-transform shadow-sm"><i class="fa-solid fa-globe"></i></div>
+                        <div class="flex flex-col flex-1 min-w-0"><h4 class="font-bold text-[13px] text-slate-800 dark:text-white leading-tight">PBL Global Portal</h4><span class="text-[9.5px] text-slate-500 dark:text-slate-400 mt-0.5">Corporate Website & Directory</span></div>
+                        <div class="w-7 h-7 rounded-full flex items-center justify-center text-slate-300 dark:text-slate-500 group-hover/link:text-orange-500 group-hover/link:bg-orange-100 dark:group-hover/link:bg-orange-500/20 transition-all shadow-sm"><i class="fa-solid fa-arrow-right -rotate-45 text-[10px]"></i></div>
+                    </a>
+
+                    <!-- App 2 -->
+                    <a href="https://ede.dp-ds.de/vpn/index.html" target="_blank" class="p-3 rounded-2xl bg-white/80 dark:bg-slate-800/40 backdrop-blur-sm border border-slate-200/60 dark:border-slate-700 hover:border-sky-200 hover:shadow-lg dark:hover:shadow-[0_8px_20px_rgba(14,165,233,0.15)] hover:bg-sky-50/50 dark:hover:bg-sky-500/10 hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-3.5 group/link">
+                        <div class="w-10 h-10 rounded-full bg-sky-50 text-sky-500 ring-1 ring-sky-100/50 dark:bg-sky-500/10 dark:ring-sky-500/20 flex items-center justify-center text-[16px] shrink-0 group-hover/link:scale-105 transition-transform shadow-sm"><i class="fa-solid fa-desktop"></i></div>
+                        <div class="flex flex-col flex-1 min-w-0"><div class="flex items-center gap-1.5"><h4 class="font-bold text-[13px] text-slate-800 dark:text-white leading-tight">Citrix Workspace</h4><span class="px-1.5 py-0.5 rounded text-[7px] font-bold bg-white text-slate-500 shadow-sm border border-slate-100 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400">SECURE</span></div><span class="text-[9.5px] text-slate-500 dark:text-slate-400 mt-0.5">Remote Desktop Gateway</span></div>
+                        <div class="w-7 h-7 rounded-full flex items-center justify-center text-slate-300 dark:text-slate-500 group-hover/link:text-sky-500 group-hover/link:bg-sky-100 dark:group-hover/link:bg-sky-500/20 transition-all shadow-sm"><i class="fa-solid fa-arrow-right -rotate-45 text-[10px]"></i></div>
+                    </a>
+
+                    <!-- App 3 -->
+                    <a href="https://workplace.generali.de/logon/LogonPoint/tmindex.html" target="_blank" class="p-3 rounded-2xl bg-white/80 dark:bg-slate-800/40 backdrop-blur-sm border border-slate-200/60 dark:border-slate-700 hover:border-emerald-200 hover:shadow-lg dark:hover:shadow-[0_8px_20px_rgba(16,185,129,0.15)] hover:bg-emerald-50/50 dark:hover:bg-emerald-500/10 hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-3.5 group/link">
+                        <div class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-500 ring-1 ring-emerald-100/50 dark:bg-emerald-500/10 dark:ring-emerald-500/20 flex items-center justify-center text-[16px] shrink-0 group-hover/link:scale-105 transition-transform shadow-sm"><i class="fa-solid fa-briefcase"></i></div>
+                        <div class="flex flex-col flex-1 min-w-0"><h4 class="font-bold text-[13px] text-slate-800 dark:text-white leading-tight">Generali Portal</h4><span class="text-[9.5px] text-slate-500 dark:text-slate-400 mt-0.5">Client Production Workflows</span></div>
+                        <div class="w-7 h-7 rounded-full flex items-center justify-center text-slate-300 dark:text-slate-500 group-hover/link:text-emerald-500 group-hover/link:bg-emerald-100 dark:group-hover/link:bg-emerald-500/20 transition-all shadow-sm"><i class="fa-solid fa-arrow-right -rotate-45 text-[10px]"></i></div>
+                    </a>
+
+                    <!-- App 4 -->
+                    <div @click="triggerStreamModal()" class="p-3 rounded-2xl bg-white/80 dark:bg-slate-800/40 backdrop-blur-sm border border-slate-200/60 dark:border-slate-700 hover:border-teal-200 hover:shadow-lg dark:hover:shadow-[0_8px_20px_rgba(20,184,166,0.15)] hover:bg-teal-50/50 dark:hover:bg-teal-500/10 hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-3.5 group/link cursor-pointer">
+                        <div class="w-10 h-10 rounded-full bg-teal-50 text-teal-500 ring-1 ring-teal-100/50 dark:bg-teal-500/10 dark:ring-teal-500/20 flex items-center justify-center text-[16px] shrink-0 group-hover/link:scale-105 transition-transform shadow-sm"><i class="fa-solid fa-play ml-0.5"></i></div>
+                        <div class="flex flex-col flex-1 min-w-0"><div class="flex items-center gap-1.5"><h4 class="font-bold text-[13px] text-slate-800 dark:text-white leading-tight">PBL StreamStation</h4><span class="px-1.5 py-0.5 rounded text-[7px] font-bold bg-white text-teal-600 border border-teal-100 shadow-sm dark:bg-teal-500/10 dark:border-teal-500/20 dark:text-teal-400"><i class="fa-solid fa-lock text-[6px]"></i> LOCK</span></div><span class="text-[9.5px] text-slate-500 dark:text-slate-400 mt-0.5">Media Training & Video Hub</span></div>
+                        <div class="w-7 h-7 rounded-full flex items-center justify-center text-slate-300 dark:text-slate-500 group-hover/link:text-teal-500 group-hover/link:bg-teal-100 dark:group-hover/link:bg-teal-500/20 transition-all shadow-sm"><i class="fa-solid fa-shield-halved text-[10px]"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUMN 3: Upcoming Events (🔴 ROSE PINK GLOW) -->
+            <!-- 🚀 NEW: Rose colored border & glowing outer shadow spread -->
+            <div class="group relative bg-white/70 dark:bg-slate-900/70 backdrop-blur-3xl rounded-[1.75rem] flex flex-col overflow-hidden shrink-0 lg:min-h-0 transition-all duration-500 hover:-translate-y-1 
+                 border border-rose-200/50 hover:border-rose-400/80 dark:border-rose-500/30 dark:hover:border-rose-400/70 
+                 shadow-[0_0_20px_rgba(244,63,94,0.08),0_8px_20px_-4px_rgba(244,63,94,0.12),inset_0_1px_0_rgba(255,255,255,1)] 
+                 hover:shadow-[0_0_35px_rgba(244,63,94,0.25),0_15px_30px_-5px_rgba(244,63,94,0.15),inset_0_1px_0_rgba(255,255,255,1)] 
+                 dark:shadow-[0_0_20px_rgba(244,63,94,0.05),0_8px_20px_-4px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.05)] 
+                 dark:hover:shadow-[0_0_35px_rgba(244,63,94,0.15),0_15px_30px_-5px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.05)]">
+                
+                <div class="absolute -top-32 -left-32 w-64 h-64 bg-rose-400/10 dark:bg-rose-500/10 rounded-full blur-[60px] pointer-events-none group-hover:opacity-100 opacity-40 transition-opacity duration-700 z-0"></div>
+                <div class="absolute -bottom-32 -right-32 w-64 h-64 bg-pink-400/10 dark:bg-pink-500/10 rounded-full blur-[60px] pointer-events-none group-hover:opacity-100 opacity-40 transition-opacity duration-700 z-0"></div>
+
+                <div class="px-5 py-4 border-b border-white/40 dark:border-white/5 flex justify-between items-center shrink-0 relative z-10">
+                    <h3 class="font-heading font-black text-[15px] text-slate-800 dark:text-white flex items-center gap-2.5">
+                        <div class="w-7 h-7 rounded-full bg-white/80 dark:bg-slate-800/80 flex items-center justify-center border border-white dark:border-slate-700 shadow-sm">📅</div> Upcoming Events
+                    </h3>
+                    <span class="text-[9px] font-bold px-2.5 py-0.5 rounded-full bg-white/80 text-rose-500 border border-rose-200/50 shadow-sm dark:bg-rose-500/10 dark:border-rose-500/20">CELEBRATIONS</span>
+                </div>
+                
+                <div class="flex-1 overflow-hidden p-3.5 flex flex-col justify-center gap-2.5 relative z-10">
+                    <template x-for="event in upcomingEvents.slice(0, 5)" :key="event.title + event.date">
+                        <div class="relative p-3 rounded-2xl border transition-all duration-500 bg-white/60 dark:bg-slate-800/20 backdrop-blur-md group/card overflow-hidden flex items-center gap-4 cursor-default hover:-translate-y-[2px]" :class="event.cardTheme">
+                            
+                            <div class="w-11 h-11 rounded-[0.85rem] flex items-center justify-center text-[22px] shrink-0 transition-transform duration-500 group-hover/card:scale-110 relative" :class="event.iconBox">
+                                <span x-text="event.emoji" class="drop-shadow-sm"></span>
+                                <span x-show="event.isToday" class="absolute -top-1 -right-1 flex h-2.5 w-2.5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500 border-2 border-white dark:border-slate-900"></span></span>
+                            </div>
+                            
+                            <div class="flex flex-col min-w-0 flex-1 justify-center">
+                                <h4 class="font-bold text-[13.5px] text-slate-800 dark:text-white leading-tight truncate mb-1.5 transition-colors duration-300" :class="event.titleHover" x-text="event.title"></h4>
+                                <div class="flex items-center gap-2.5">
+                                    <span class="px-2 py-0.5 rounded-md text-[7px] font-black uppercase tracking-wider border shrink-0" :class="event.badgeTheme" x-text="event.badge"></span>
+                                    <span class="text-[10px] font-medium text-slate-500 dark:text-slate-400 flex items-center gap-1.5 truncate"><i class="fa-regular fa-calendar-days text-[9px] opacity-60"></i> <span x-text="event.date"></span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+            
+        </section>
+    </main>
+
+    <!-- UNIFIED STATUS BAR (SKEUOMORPHIC REDESIGN) -->
+    <footer class="shrink-0 z-50 pb-2 sm:pb-4 px-2 sm:px-6 w-full flex items-center justify-center pointer-events-none bg-transparent">
+        
+        <!-- 🚀 FIXED: Applied Header's precise gradient, soft diffused shadow, and crisp border -->
+		<div class="max-w-[1920px] w-full mx-auto bg-gradient-to-b from-white to-blue-50/40 dark:from-[#0a0f1d] dark:to-[#020617] backdrop-blur-2xl border border-slate-300/80 dark:border-slate-800 rounded-2xl h-10 sm:h-12 flex items-center px-4 pointer-events-auto shadow-[0_10px_35px_rgba(0,0,0,0.04),0_1px_3px_rgba(0,0,0,0.02),inset_0_1px_0_rgba(255,255,255,1)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.4),0_1px_3px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.05)] transition-all relative">
+            
+            <div class="w-full flex items-center justify-between text-[10px] sm:text-[11px] font-medium text-slate-500 dark:text-slate-400 relative z-10">
+            
+                <!-- LEFT: Copyright & Version (Wrapped in Engraved Tray) -->
+                <!-- 🚀 FIXED: Added the same engraved tray background as the center icons -->
+                <div class="flex items-center gap-1.5 bg-slate-100/80 dark:bg-black/40 p-1.5 rounded-full border border-slate-300/70 dark:border-white/5 shadow-[inset_0_2px_5px_rgba(0,0,0,0.06),0_1px_0_rgba(255,255,255,1)] dark:shadow-[inset_0_2px_5px_rgba(0,0,0,0.3),0_1px_0_rgba(255,255,255,0.05)] shrink-0">
+                    
+                    <!-- 🚀 TEXT PILL: Embossed white pill holding text -->
+                    <div class="flex items-center gap-1 bg-white dark:bg-dark_surface px-3 py-1 rounded-full shadow-[0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,1)] dark:shadow-[0_2px_5px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)] border border-slate-200/90 dark:border-slate-700/80 text-[10px] sm:text-[11px] font-bold text-slate-600 dark:text-slate-400">
+                        &copy; <span x-text="new Date().getFullYear()"></span> 
+                        
+                        <!-- 🚀 FIXED: Applied Dual-Color, Font-Heading & Font-Black to match main logo exactly -->
+                        <span class="hidden sm:inline ml-1 font-heading font-black tracking-tight text-slate-800 dark:text-white">PBL<span class="text-brand dark:text-brand_glow">Connect</span></span>
+                        
+                        <!-- Mobile fallback -->
+                        <span class="sm:hidden ml-1 font-heading font-black tracking-wider text-slate-800 dark:text-white">PBL</span>
+                    </div>
+                    
+                    <!-- 🚀 TRAY DIVIDER -->
+                    <div class="w-px h-3.5 bg-slate-200 dark:bg-slate-700 shadow-[1px_0_0_rgba(255,255,255,1)] dark:shadow-none"></div>
+                    
+                    <!-- 🚀 VERSION PILL -->
+                    <div class="flex items-center bg-white dark:bg-dark_surface px-2.5 py-1 rounded-full shadow-[0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,1)] dark:shadow-[0_2px_5px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)] border border-slate-200/90 dark:border-slate-700/80">
+                        <span class="text-brand font-mono font-black text-[9px] leading-none" x-text="PBL_APP_VERSION"></span>
+                    </div>
+                    
+                    <div class="hidden sm:block w-px h-3.5 bg-slate-200 dark:bg-slate-700 shadow-[1px_0_0_rgba(255,255,255,1)] dark:shadow-none"></div>
+                    
+                    <!-- 🚀 HUB BADGE PILL -->
+                    <div class="hidden sm:flex items-center bg-white dark:bg-dark_surface px-2.5 py-1 rounded-full shadow-[0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,1)] dark:shadow-[0_2px_5px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)] border border-slate-200/90 dark:border-slate-700/80">
+                        <span class="font-black uppercase tracking-[0.2em] text-[8px] leading-none text-slate-500 dark:text-slate-400">EMPLOYEE HUB</span>
+                    </div>
+                </div>
+
+                <!-- CENTER: Clean Intranet Tagline (Buttons Moved To Main Screen) -->
+                <div class="hidden md:flex flex-1 justify-center items-center px-4">
+                    <span class="font-mono text-[9px] font-black uppercase tracking-[0.25em] text-slate-400 dark:text-slate-500">
+                        ⚡ PAN BUSINESS LISTS INTRANET GATEWAY
+                    </span>
+                </div>
+
+                <!-- RIGHT: Tech Vitals (Wrapped in Engraved Tray) -->
+                <!-- 🚀 FIXED: Added the same engraved tray background here as well -->
+                <div class="flex items-center gap-1.5 bg-slate-100/80 dark:bg-black/40 p-1.5 rounded-full border border-slate-300/70 dark:border-white/5 shadow-[inset_0_2px_5px_rgba(0,0,0,0.06),0_1px_0_rgba(255,255,255,1)] dark:shadow-[inset_0_2px_5px_rgba(0,0,0,0.3),0_1px_0_rgba(255,255,255,0.05)] shrink-0 font-mono">
+                    
+                    <!-- 🚀 ONLINE PILL (Mobile) -->
+                    <div class="md:hidden flex items-center gap-1.5 bg-white dark:bg-dark_surface px-2.5 py-1 rounded-full shadow-[0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,1)] dark:shadow-[0_2px_5px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)] border border-slate-200/90 dark:border-slate-700/80">
+                        <span class="relative flex h-1.5 w-1.5">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.5)]"></span>
+                        </span>
+                        <span class="text-[8px] tracking-widest uppercase font-black text-slate-600 dark:text-slate-300">Online</span>
+                    </div>
+                    
+                    <div class="md:hidden w-px h-3.5 bg-slate-200 dark:bg-slate-700 shadow-[1px_0_0_rgba(255,255,255,1)] dark:shadow-none"></div>
+
+                    <!-- 🚀 LATENCY PILL -->
+                    <!-- 🚀 FIXED: Connected to live Alpine state (pingVal & isPinging) -->
+                    <div class="flex items-center gap-1.5 bg-white dark:bg-dark_surface px-2.5 py-1 rounded-full shadow-[0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,1)] dark:shadow-[0_2px_5px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)] border border-slate-200/90 dark:border-slate-700/80 text-[10px] font-bold text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white transition-colors cursor-default" title="Live Network Latency">
+                        
+                        <!-- 🚀 ICON DYNAMIC COLOR: Green (Good), Yellow (Lag), Red (Error) -->
+                        <i class="fa-solid fa-wifi text-[9px] sm:text-[10px] drop-shadow-sm transition-colors duration-300" :class="getPingColor(pingVal)"></i>
+                        
+                        <!-- 🚀 LIVE TEXT: Prevents UI jitter using tabular-nums and specific min-width -->
+                        <span class="tabular-nums min-w-[28px] text-left tracking-tight" x-text="isPinging ? '...' : (pingVal === 'Err' ? 'Err' : pingVal + 'ms')"></span>
+                        
+                    </div>
+                    
+                    <div class="hidden sm:block w-px h-3.5 bg-slate-200 dark:bg-slate-700 shadow-[1px_0_0_rgba(255,255,255,1)] dark:shadow-none"></div>
+                    
+                    <!-- 🚀 ENCRYPTION PILL -->
+                    <div class="hidden sm:flex items-center gap-1.5 bg-white dark:bg-dark_surface px-2.5 py-1 rounded-full shadow-[0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,1)] dark:shadow-[0_2px_5px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)] border border-slate-200/90 dark:border-slate-700/80 text-[10px] font-bold text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white transition-colors cursor-default" title="Encryption Level">
+                        <i class="fa-solid fa-shield-halved text-[10px] text-brand drop-shadow-[0_0_3px_rgba(59,130,246,0.4)]"></i>
+                        <span>AES-256</span>
+                    </div>
+                    
+                    <div class="hidden lg:block w-px h-3.5 bg-slate-200 dark:bg-slate-700 shadow-[1px_0_0_rgba(255,255,255,1)] dark:shadow-none"></div>
+                    
+                    <!-- 🚀 CLOCK PILL -->
+                    <div class="hidden lg:flex items-center gap-1.5 bg-white dark:bg-dark_surface px-3 py-1 rounded-full shadow-[0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,1)] dark:shadow-[0_2px_5px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)] border border-slate-200/90 dark:border-slate-700/80 text-[10px] font-bold text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white transition-colors cursor-default">
+                        <i class="fa-regular fa-clock text-slate-400 dark:text-slate-500 drop-shadow-sm"></i>
+                        
+                        <!-- 🚀 FIXED: Isolated Alpine timer flips opacity exactly like a digital LCD display -->
+                        <div class="flex items-center tracking-tight" x-data="{ blink: true }" x-init="setInterval(() => blink = !blink, 500)">
+                            <span x-text="currentTime ? currentTime.split(':')[0] : ''"></span>
+                            <span class="mx-[0.5px]" :class="blink ? 'opacity-100' : 'opacity-0'">:</span>
+                            <span x-text="currentTime ? currentTime.split(':')[1] : ''"></span>
+                        </div>
+                    </div>
+                </div>
+    </footer>
+
+    <!-- 🚀 DYNAMIC IFRAME MODAL (SPA ENGINE) -->
+    <div x-show="showAppModal" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/80 backdrop-blur-md sm:p-4" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
+        
+        <!-- 🚀 FIXED: Added lg:[zoom:0.9091] to perfectly reverse the body's 1.1 zoom. Modal and Iframe content will now render at exactly 100% natural physical size on desktop! -->
+        <div class="bg-slate-50 dark:bg-[#020617] w-full h-full sm:h-[95vh] sm:w-[95vw] max-w-[1920px] sm:rounded-[2rem] shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden flex flex-col relative lg:[zoom:0.9091]">
+            
+            <div class="flex-1 w-full h-full relative bg-slate-100 dark:bg-[#020617]">
+                <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-0">
+                    <i class="fa-solid fa-circle-notch fa-spin text-brand text-4xl mb-4"></i>
+                    <span class="text-xs font-black uppercase tracking-widest text-slate-400 animate-pulse">Launching Module...</span>
+                </div>
+                <template x-if="appIframeSrc !== ''">
+                    <iframe :src="appIframeSrc" class="w-full h-full border-0 relative z-10 sm:rounded-[2rem] bg-white dark:bg-[#020617]" :title="appTitle"></iframe>
+                </template>
+            </div>
+            <div class="absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-[10010]">
+                <button @click="closeApp()" class="px-6 py-3 rounded-full bg-slate-900/95 dark:bg-white/95 text-white dark:text-slate-900 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] border border-slate-700 dark:border-white/20 text-[10px] sm:text-xs font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Hub
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🎉 AUTO CELEBRATION POPUP HTML -->
+    <div :class="showPopup ? 'show' : ''" class="celebration-popup" x-cloak>
+        <div class="popup-content-wrapper">
+            <div class="popup-emoji" x-text="popupData.emoji"></div>
+            <div class="flex flex-col">
+                <h4 class="text-[15px] font-black text-brand mb-0.5" x-text="popupData.title"></h4>
+                <p class="text-xs font-bold text-slate-600 dark:text-slate-300 m-0" x-text="popupData.subtitle"></p>
+            </div>
+        </div>
+        <div class="popup-timer-bar"></div>
+    </div>
+
+    <!-- 👇👇👇 YAHAN PASTE KARNA HAI (LINE 495 KE AAS-PAAS) 👇👇👇 -->
+    <div x-show="showStreamModal" x-cloak class="fixed inset-0 z-[12000] flex items-center justify-center bg-slate-900/70 backdrop-blur-md p-4" x-transition.opacity>
+        <div class="bg-white dark:bg-dark_surface w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-slate-200 dark:border-slate-800 text-center relative" @click.outside="showStreamModal = false" x-transition.scale.95>
+            <div class="w-14 h-14 mx-auto rounded-2xl bg-teal-500/15 text-teal-600 dark:text-teal-400 flex items-center justify-center text-2xl mb-3 shadow-inner">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h3 class="text-base font-black font-heading text-slate-800 dark:text-white mb-1">PBL StreamStation</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Enter authorization password to launch video player.</p>
+            <div class="relative mb-2">
+                <i class="fa-solid fa-key absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <input type="password" x-model="streamPassword" @keydown.enter="unlockStreamPlayer()" x-ref="streamInput" placeholder="Enter password..." class="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white text-xs outline-none focus:border-teal-500">
+            </div>
+            <div x-show="streamError" class="text-rose-500 text-[11px] font-bold mb-3" x-cloak>
+                <i class="fa-solid fa-circle-exclamation mr-1"></i> Incorrect password. Access denied!
+            </div>
+            <div class="flex gap-2 justify-center mt-3">
+                <button @click="showStreamModal = false" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-bold hover:bg-slate-200">Cancel</button>
+                <button @click="unlockStreamPlayer()" class="px-5 py-2 rounded-xl bg-teal-600 text-white text-xs font-bold shadow-md hover:bg-teal-700">Unlock & Open</button>
+            </div>
+        </div>
+    </div>
+    <!-- 👆👆👆 YAHAN TAK PASTE KARNA HAI 👆👆👆 -->
+
+    <!-- SCRIPT LOGIC (100% COMPLETE & SYNTAX SAFE) -->
+    <!-- SCRIPT LOGIC (100% COMPLETE & SYNTAX SAFE) -->
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('connectHub', () => ({
+                isDark: false,
+                currentTime: '', 
+                currentDate: '',
+                showAppModal: false, 
+                appIframeSrc: '', 
+                appTitle: '',
+				 // 🚩 FEATURE FLAG ENGINE: Restore Old
+                // false = Abhi elegant Welcome Banner dikhega (No ugly blur)
+                // true  = Saare 8 KPI cards instantly live ho jayenge!
+                modulesLive: false, // 👈 JAB LIVE KARNA HO, SIRF ISSE TRUE KAR DENA!
+                
+                // Network Status State
+                publicIp: 'Fetching...', 
+                ispName: 'Checking...',
+                pingTarget: 'Google', 
+                pingVal: '--', 
+                isPinging: false,
+                pingHistory: [10, 15, 12, 18, 14, 11, 20, 16, 13, 15],
+                speedVal: '-- Mbps', 
+                speedSize: 20, 
+                isTestingSpeed: false, 
+                speedProgress: 0,
+                
+                // Notification & Popup States
+                notifications: [],
+                showPopup: false,
+                popupData: { title: '', subtitle: '', emoji: '' },
+
+                // 👇👇👇 YAHAN YE STREAMSTATION CODE PASTE KAREIN 👇👇👇
+                showStreamModal: false,
+                streamPassword: '',
+                streamError: false,
+
+                triggerStreamModal() {
+                    if (sessionStorage.getItem('pbl_stream_auth') === 'granted') {
+                        window.open('PBL-Player.html', '_blank');
+                    } else {
+                        this.streamPassword = '';
+                        this.streamError = false;
+                        this.showStreamModal = true;
+                        setTimeout(() => { if (this.$refs.streamInput) this.$refs.streamInput.focus(); }, 100);
+                    }
+                },
+
+                unlockStreamPlayer() {
+                    if (this.streamPassword.trim() === 'pbltraining') {
+                        sessionStorage.setItem('pbl_stream_auth', 'granted');
+                        this.showStreamModal = false;
+                        window.open('PBL-Player.html', '_blank');
+                    } else {
+                        this.streamError = true;
+                        this.streamPassword = '';
+                        if (this.$refs.streamInput) this.$refs.streamInput.focus();
+                    }
+                },
+                // 👆👆👆 YAHAN TAK PASTE KAREIN (COMMA KA DHYAN RAKHEIN) 👆👆👆
+
+                apps: [
+                    { title: "Raise IT Ticket", desc: "Report issues", emoji: "🎫", bgClass: "bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400", url: "submit-ticket.html" },
+                    { title: "Apply for Leave", desc: "Request time off", emoji: "📝", bgClass: "bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400", url: "apply-leave.html" },
+                    { title: "Production Hub", desc: "Project tools", emoji: "⚙️", bgClass: "bg-indigo-100 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400", url: "production-hub.html" },
+                    { title: "IT Dept Hub", desc: "Status & SOPs", emoji: "🖥️", bgClass: "bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400", url: "it-hub.html" },
+                    { title: "Holiday List", desc: "Official schedule", emoji: "🗓️", bgClass: "bg-purple-100 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400", url: "holidays.html" },
+                    { title: "Suggestion Box", desc: "Share thoughts", emoji: "💡", bgClass: "bg-sky-100 text-sky-600 dark:bg-sky-500/20 dark:text-sky-400", url: "suggestion-box.html" },
+                    { title: "Leave Policy", desc: "Rules & guidelines", emoji: "📄", bgClass: "bg-rose-100 text-rose-600 dark:bg-rose-500/20 dark:text-rose-400", url: "leave-policy.html" },
+                    { title: "Training Center", desc: "Company SOPs", emoji: "🎓", bgClass: "bg-teal-100 text-teal-600 dark:bg-teal-500/20 dark:text-teal-400", url: "training-and-policies-center.html" }
+                ],
+
+                // Upcoming Events & Notices
+                upcomingEvents: [],
+                noticeBoardData: [], 
+                isLoadingNotices: true, // 🚀 NEW BOOLEAN FOR LOADER
+
+                init() {
+                    this.setupCustomCursor();
+                    if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                        this.isDark = true;
+                        document.documentElement.classList.add('dark');
+                    }
+                    setInterval(() => {
+                        const now = new Date();
+                        this.currentTime = now.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' });
+                        this.currentDate = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                    }, 1000);
+
+                    this.fetchPublicIP();
+                    this.runPing();
+                    
+                    this.loadUpcomingEvents();
+                    this.loadNotices();
+
+                    // ⚡ CIPHER SCRAMBLE ENGINE TRIGGER (FROM IMAGE 2)
+                    this.setupCipherDecryption();
+                },
+
+                // 🪄 The Iconic Text Decryption Algorithm
+                setupCipherDecryption() {
+                    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
+                    
+                    function runScramble(element, originalText) {
+                        if (!element) return;
+                        let iteration = 0;
+                        const interval = setInterval(() => {
+                            element.innerText = originalText.split("").map((letter, index) => {
+                                if (index < iteration) return originalText[index];
+                                if (letter === " ") return " ";
+                                return letters[Math.floor(Math.random() * letters.length)];
+                            }).join("");
+
+                            if (iteration >= originalText.length) {
+                                clearInterval(interval);
+                            }
+                            iteration += 1 / 3;
+                        }, 35);
+                    }
+
+                    setTimeout(() => {
+                        const h = document.getElementById('cipher-headline');
+                        const s = document.getElementById('cipher-status');
+                        if (h) runScramble(h, h.getAttribute('data-scramble'));
+                        if (s) runScramble(s, s.getAttribute('data-scramble'));
+                    }, 400);
+
+                    // Har 20 seconds mein status word change hokar scramble hoga
+                    // 👈 Operational words jo live intranet ki feel dete hain
+					const dynamicWords = ['Connected.....', 'Operational.....', 'Synchronized.....', 'Online.....'];
+                    let wordIndex = 0;
+                    setInterval(() => {
+                        const s = document.getElementById('cipher-status');
+                        if (s) {
+                            wordIndex = (wordIndex + 1) % dynamicWords.length;
+                            s.setAttribute('data-scramble', dynamicWords[wordIndex]);
+                            runScramble(s, dynamicWords[wordIndex]);
+                        }
+                    }, 6000);
+                },
+
+                async loadUpcomingEvents() {
+                    this.isLoadingEvents = true;
+                    try {
+                        // 👈 Pehle data/ se fetch karega, fallback assets/
+                        let response = await fetch('data/events.json?v=' + new Date().getTime());
+                        if (!response.ok) {
+                            response = await fetch('assets/events.json?v=' + new Date().getTime());
+                        }
+                        if (!response.ok) throw new Error("Could not fetch events.json");
+                        
+                        const data = await response.json();
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0); 
+                        const currentYear = today.getFullYear();
+
+                        let processedEvents = data.map(item => {
+                            const parts = item.originalDate.split('-');
+                            const orgYear = parseInt(parts[0], 10);
+                            const orgMonth = parseInt(parts[1], 10) - 1; 
+                            const orgDay = parseInt(parts[2], 10);
+
+                            // 1. Rolling Date Logic
+                            let eventDate = new Date(currentYear, orgMonth, orgDay);
+                            let targetYear = currentYear;
+
+                            if (eventDate.getTime() < today.getTime()) {
+                                eventDate = new Date(currentYear + 1, orgMonth, orgDay);
+                                targetYear = currentYear + 1;
+                            }
+
+                            // 2. Age / Years Difference Calculation
+                            const yearsDiff = targetYear - orgYear;
+
+                            // 🚀 'isToday' initialized first to prevent ReferenceError
+                            const isToday = (new Date(currentYear, orgMonth, orgDay).getTime() === today.getTime());
+
+                            let title = item.name;
+                            let badge = "";
+                            let popupSubtitle = "";
+                            let emoji = item.emoji || "🎉";
+
+                            // 🧼 DEFAULT: Clean Minimalist Theme Engine (NO ARROWS)
+                            let iconBox = "bg-slate-50 text-slate-500 ring-1 ring-slate-100/50 dark:bg-slate-800/50 dark:ring-slate-700/50";
+                            let cardTheme = "border-slate-100/80 dark:border-slate-800 hover:border-slate-200 dark:hover:border-slate-700 hover:shadow-[0_8px_24px_rgba(148,163,184,0.12)]";
+                            let badgeTheme = "bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-800 dark:border-slate-700";
+                            let titleHover = "group-hover/card:text-slate-600 dark:group-hover/card:text-white";
+
+                            // 🎂 1. BIRTHDAY THEME (Soft Rose Glow)
+                            if (item.type === 'birthday') {
+                                title = `${item.name}'s Birthday`; 
+                                badge = `TURNS ${yearsDiff}`; 
+                                popupSubtitle = `Today • Turns ${yearsDiff} 🎂`;
+                                emoji = "🎂";
+                                iconBox = "bg-rose-50/80 text-rose-500 ring-1 ring-rose-100/50 dark:bg-rose-500/10 dark:ring-rose-500/20";
+                                cardTheme = "border-slate-100/80 dark:border-slate-800 hover:border-rose-200 dark:hover:border-rose-500/30 hover:shadow-[0_8px_24px_rgba(244,63,94,0.15)] hover:bg-rose-50/30 dark:hover:bg-rose-500/5";
+                                badgeTheme = "bg-white dark:bg-rose-950/50 border-rose-200 dark:border-rose-800/80 text-rose-500 shadow-sm";
+                                titleHover = "group-hover/card:text-rose-600 dark:group-hover/card:text-rose-400";
+                            } 
+                            // 💼 2. WORK ANNIVERSARY THEME (Soft Electric Blue)
+                            else if (item.type === 'work') {
+                                title = `${item.name}'s Work Anniv.`; 
+                                badge = `${yearsDiff} YEARS`; 
+                                popupSubtitle = `Today • ${yearsDiff} ${yearsDiff === 1 ? 'Year' : 'Years'} Completed 💼`;
+                                emoji = "💼";
+                                iconBox = "bg-blue-50/80 text-blue-500 ring-1 ring-blue-100/50 dark:bg-blue-500/10 dark:ring-blue-500/20";
+                                cardTheme = "border-slate-100/80 dark:border-slate-800 hover:border-blue-200 dark:hover:border-blue-500/30 hover:shadow-[0_8px_24px_rgba(59,130,246,0.15)] hover:bg-blue-50/30 dark:hover:bg-blue-500/5";
+                                badgeTheme = "bg-white dark:bg-blue-950/50 border-blue-200 dark:border-blue-800/80 text-blue-500 shadow-sm";
+                                titleHover = "group-hover/card:text-blue-600 dark:group-hover/card:text-blue-400";
+                            } 
+                            // 💍 3. MARRIAGE ANNIVERSARY THEME (Soft Amber Gold)
+                            else if (item.type === 'anniversary') {
+                                title = `${item.name}'s Anniversary`; 
+                                badge = `${yearsDiff} YEARS`; 
+                                popupSubtitle = `Today • ${yearsDiff} Years of Togetherness 💍`;
+                                emoji = "💍";
+                                iconBox = "bg-amber-50/80 text-amber-500 ring-1 ring-amber-100/50 dark:bg-amber-500/10 dark:ring-amber-500/20";
+                                cardTheme = "border-slate-100/80 dark:border-slate-800 hover:border-amber-200 dark:hover:border-amber-500/30 hover:shadow-[0_8px_24px_rgba(245,158,11,0.15)] hover:bg-amber-50/30 dark:hover:bg-amber-500/5";
+                                badgeTheme = "bg-white dark:bg-amber-950/50 border-amber-200 dark:border-amber-800/80 text-amber-500 shadow-sm";
+                                titleHover = "group-hover/card:text-amber-600 dark:group-hover/card:text-amber-400";
+                            } 
+                            // 🕊️ 4. GOVT HOLIDAYS & FESTIVALS THEME (Soft Emerald & Saffron)
+                            else if (item.type === 'holiday') {
+                                title = item.name; 
+                                const isNational = item.name.toLowerCase().includes('independence') || item.name.toLowerCase().includes('republic');
+                                badge = isNational ? 'GOVT HOLIDAY' : 'FESTIVAL'; 
+                                popupSubtitle = `Official Holiday • Today 🕊️`;
+                                emoji = item.emoji || "🕊️";
+                                
+                                iconBox = isNational 
+                                    ? "bg-orange-50/80 text-orange-500 ring-1 ring-orange-100/50 dark:bg-orange-500/10 dark:ring-orange-500/20" 
+                                    : "bg-emerald-50/80 text-emerald-500 ring-1 ring-emerald-100/50 dark:bg-emerald-500/10 dark:ring-emerald-500/20";
+                                
+                                cardTheme = isNational 
+                                    ? "border-slate-100/80 dark:border-slate-800 hover:border-orange-200 dark:hover:border-orange-500/30 hover:shadow-[0_8px_24px_rgba(249,115,22,0.15)] hover:bg-orange-50/30 dark:hover:bg-orange-500/5" 
+                                    : "border-slate-100/80 dark:border-slate-800 hover:border-emerald-200 dark:hover:border-emerald-500/30 hover:shadow-[0_8px_24px_rgba(16,185,129,0.15)] hover:bg-emerald-50/30 dark:hover:bg-emerald-500/5";
+                                
+                                badgeTheme = isNational 
+                                    ? "bg-white dark:bg-orange-950/50 border-orange-200 dark:border-orange-800/80 text-orange-500 shadow-sm" 
+                                    : "bg-white dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800/80 text-emerald-500 shadow-sm";
+                                
+                                titleHover = isNational 
+                                    ? "group-hover/card:text-orange-600 dark:group-hover/card:text-orange-400" 
+                                    : "group-hover/card:text-emerald-600 dark:group-hover/card:text-emerald-400";
+                            }
+
+                            // If happening today, show special highlight in badge
+                            if (isToday) { 
+                                badge = `TODAY (${yearsDiff > 0 ? yearsDiff + ' YRS' : 'TODAY'})`;
+                            }
+
+                            // 🚀 FIXED RETURN STATEMENT: Matches the new HTML variables exactly!
+                            return { 
+                                title, 
+                                badge, 
+                                popupSubtitle, 
+                                date: eventDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), 
+                                emoji, 
+                                iconBox, 
+                                cardTheme, 
+                                badgeTheme, 
+                                titleHover,
+                                timestamp: eventDate.getTime(),
+                                isToday
+                            };
+                        });
+
+                        processedEvents.sort((a, b) => a.timestamp - b.timestamp);
+                        this.upcomingEvents = processedEvents;
+                        this.processEvents();
+
+                    } catch (error) {
+                        console.error("Events Sync Error:", error);
+                    } finally {
+                        this.isLoadingEvents = false;
+                    }
+                },
+
+                async loadNotices() {
+                    this.isLoadingNotices = true;
+                    try {
+                        const response = await fetch('data/notices.json?v=' + new Date().getTime());
+                        if (!response.ok) throw new Error("Server returned " + response.status);
+                        
+                        const rawData = await response.json();
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+
+                        this.noticeBoardData = rawData.map(notice => {
+                            const nDate = new Date(notice.date);
+                            nDate.setHours(0, 0, 0, 0);
+                            
+                            const isToday = (nDate.getTime() === today.getTime());
+                            const isPast = (nDate.getTime() < today.getTime());
+                            const isUpcoming = (nDate.getTime() > today.getTime());
+                            
+                            const displayDate = isToday ? "TODAY" : nDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+                            const titleLower = (notice.title || "").toLowerCase();
+                            const authorLower = (notice.author || "").toLowerCase();
+                            
+                            // 🧼 Clean Minimalist Theme Engine for Notices
+                            let icon = notice.icon || "fa-solid fa-bullhorn";
+                            let textClass = "text-amber-500 dark:text-amber-400";
+                            let iconBox = "bg-amber-50/80 text-amber-500 dark:bg-amber-500/10 dark:text-amber-400 ring-1 ring-amber-100/50";
+                            let cardTheme = "border-slate-200/60 hover:border-amber-200 hover:shadow-md hover:bg-amber-50/10 dark:hover:bg-amber-500/5";
+                            let badgeTheme = "bg-white border-amber-200 text-amber-500 dark:bg-dark_surface dark:border-amber-800";
+
+                            if (titleLower.includes('lock') || titleLower.includes('security') || titleLower.includes('password') || titleLower.includes('phishing')) {
+                                icon = "fa-solid fa-shield-halved";
+                                textClass = "text-sky-500 dark:text-sky-400";
+                                iconBox = "bg-sky-50/80 text-sky-500 dark:bg-sky-500/10 dark:text-sky-400 ring-1 ring-sky-100/50";
+                                cardTheme = "border-slate-200/60 hover:border-sky-200 hover:shadow-md hover:bg-sky-50/10 dark:hover:bg-sky-500/5";
+                                badgeTheme = "bg-white border-sky-200 text-sky-500 dark:bg-dark_surface dark:border-sky-800";
+                            } 
+                            else if (titleLower.includes('attendance') || titleLower.includes('card') || titleLower.includes('biometric') || titleLower.includes('swipe')) {
+                                icon = "fa-solid fa-id-card-clip";
+                                textClass = "text-indigo-500 dark:text-indigo-400";
+                                iconBox = "bg-indigo-50/80 text-indigo-500 dark:bg-indigo-500/10 dark:text-indigo-400 ring-1 ring-indigo-100/50";
+                                cardTheme = "border-slate-200/60 hover:border-indigo-200 hover:shadow-md hover:bg-indigo-50/10 dark:hover:bg-indigo-500/5";
+                                badgeTheme = "bg-white border-indigo-200 text-indigo-500 dark:bg-dark_surface dark:border-indigo-800";
+                            } 
+                            else if (titleLower.includes('training') || titleLower.includes('awareness') || titleLower.includes('workshop') || titleLower.includes('session')) {
+                                icon = "fa-solid fa-graduation-cap";
+                                textClass = "text-emerald-500 dark:text-emerald-400";
+                                iconBox = "bg-emerald-50/80 text-emerald-500 dark:bg-emerald-500/10 dark:text-emerald-400 ring-1 ring-emerald-100/50";
+                                cardTheme = "border-slate-200/60 hover:border-emerald-200 hover:shadow-md hover:bg-emerald-50/10 dark:hover:bg-emerald-500/5";
+                                badgeTheme = "bg-white border-emerald-200 text-emerald-500 dark:bg-dark_surface dark:border-emerald-800";
+                            }
+                            else if (titleLower.includes('party') || titleLower.includes('celebration') || titleLower.includes('gifting') || titleLower.includes('diwali') || titleLower.includes('bonus')) {
+                                icon = "fa-solid fa-gift";
+                                textClass = "text-rose-500 dark:text-rose-400";
+                                iconBox = "bg-rose-50/80 text-rose-500 dark:bg-rose-500/10 dark:text-rose-400 ring-1 ring-rose-100/50";
+                                cardTheme = "border-slate-200/60 hover:border-rose-200 hover:shadow-md hover:bg-rose-50/10 dark:hover:bg-rose-500/5";
+                                badgeTheme = "bg-white border-rose-200 text-rose-500 dark:bg-dark_surface dark:border-rose-800";
+                            }
+                            else if (titleLower.includes('maintenance') || titleLower.includes('downtime') || titleLower.includes('server')) {
+                                icon = "fa-solid fa-screwdriver-wrench";
+                                textClass = "text-slate-600 dark:text-slate-400";
+                                iconBox = "bg-slate-100/80 text-slate-600 dark:bg-slate-800/80 dark:text-slate-400 ring-1 ring-slate-200 dark:ring-slate-700";
+                                cardTheme = "border-slate-200/60 hover:border-slate-300 hover:shadow-md hover:bg-slate-50 dark:hover:bg-slate-800/50";
+                                badgeTheme = "bg-white border-slate-200 text-slate-600 dark:bg-dark_surface dark:border-slate-700";
+                            }
+
+                            // PERFECT MATCH for the new minimalist HTML
+                            return { ...notice, displayDate, isToday, isUpcoming, isPast, icon, textClass, iconBox, cardTheme, badgeTheme, timestamp: nDate.getTime() };
+                        });
+
+                        // Sorting logic
+                        this.noticeBoardData.sort((a, b) => {
+                            if (a.isToday && !b.isToday) return -1;
+                            if (!a.isToday && b.isToday) return 1;
+                            if (a.isUpcoming && b.isPast) return -1;
+                            if (a.isPast && b.isUpcoming) return 1;
+                            if (a.isUpcoming && b.isUpcoming) return a.timestamp - b.timestamp;
+                            return b.timestamp - a.timestamp;
+                        });
+
+                    } catch (error) {
+                        console.error("Failed to load notices:", error);
+                        this.noticeBoardData = [];
+                    } finally {
+                        this.isLoadingNotices = false;
+                    }
+                },
+
+                processEvents() {
+                    const todayStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                    let delay = 1000;
+                    
+                    this.upcomingEvents.forEach(event => {
+                        if (event.date === todayStr || event.badge.toLowerCase() === 'today') {
+                            
+                            this.notifications.push({
+                                title: event.title,
+                                desc: event.badge === 'IN' ? 'Happy Independence Day!' : (event.emoji === '🎂' ? 'Wish them a great day!' : 'Happening Today!'),
+                                emoji: event.emoji,
+                                time: 'Just now'
+                            });
+
+                            setTimeout(() => {
+                                this.popupData = { 
+									title: event.title, 
+									subtitle: event.popupSubtitle || `Today • Celebrating! 🎉`, // 👈 Ab 'Today • Turns 35 🎂' dikhayega
+									emoji: event.emoji 
+								};
+                                this.showPopup = true;
+                                if (typeof confetti === 'function') {
+                                    confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, zIndex: 11001 });
+                                }
+                                setTimeout(() => { this.showPopup = false; }, 5000);
+                            }, delay);
+                            
+                            delay += 6000; 
+                        }
+                    });
+                },
+
+                openApp(url, title) { 
+                    this.haptic('light'); 
+                    this.appTitle = title; 
+                    let currentPath = window.location.pathname;
+                    if (!currentPath.endsWith('/') && !currentPath.toLowerCase().endsWith('.html')) { currentPath += '/'; }
+                    this.appIframeSrc = new URL(url, window.location.origin + currentPath).href; 
+                    this.showAppModal = true; 
+                },
+                
+                closeApp() { 
+                    this.haptic('light'); 
+                    this.showAppModal = false; 
+                    setTimeout(() => { this.appIframeSrc = ''; }, 300); 
+                },
+                
+                toggleTheme() { 
+                    this.haptic('light'); 
+                    this.isDark = !this.isDark; 
+                    document.documentElement.classList.toggle('dark', this.isDark); 
+                    localStorage.setItem('theme', this.isDark ? 'dark' : 'light'); 
+                },
+                
+                haptic(type = 'light') { 
+                    if (!window.navigator || !window.navigator.vibrate) return; 
+                    if (type === 'light') navigator.vibrate(15); 
+                },
+
+                async fetchPublicIP() {
+                    const lines = { '122.160.116.30': 'Airtel Broadband', '203.190.135.3': 'STPI Leased Line', '122.180.106.42': 'Airtel Leased Line' };
+                    try {
+                        const r = await fetch('https://ipinfo.io/json');
+                        if(!r.ok) throw new Error("limit");
+                        const d = await r.json();
+                        this.publicIp = d.ip;
+                        this.ispName = lines[d.ip] || (d.org || 'Unknown ISP');
+                    } catch (e) {
+                        try {
+                            const r2 = await fetch('https://api.ipify.org?format=json');
+                            const d2 = await r2.json();
+                            this.publicIp = d2.ip;
+                            this.ispName = lines[d2.ip] || 'Fetching ISP...';
+                        } catch (e2) {
+                            this.publicIp = "Unavailable"; 
+                            this.ispName = "Offline";
+                        }
+                    }
+                },
+                
+                async runPing() {
+                    if(this.isPinging) return;
+                    this.isPinging = true;
+                    this.pingHistory = [];
+                    const targetUrl = this.pingTarget === 'Google' ? 'https://www.google.com/favicon.ico?t=' : 'https://ede.dp-ds.de/vpn/index.html?t=';
+                    let totalLat = 0; let successCount = 0;
+                    
+                    for(let i=0; i<10; i++) {
+                        this.pingVal = '...';
+                        try {
+                            const start = performance.now();
+                            await fetch(`${targetUrl}${new Date().getTime()+i}`, { mode: 'no-cors', cache: 'no-cache' });
+                            const lat = Math.round(performance.now() - start);
+                            this.pingHistory.push(lat); 
+                            totalLat += lat; 
+                            successCount++; 
+                            this.pingVal = lat;
+                        } catch(e) { 
+                            this.pingHistory.push(200); 
+                        }
+                        await new Promise(r => setTimeout(r, 200));
+                    }
+                    this.pingVal = successCount > 0 ? Math.round(totalLat/successCount) : 'Err';
+                    this.isPinging = false;
+                },
+
+                getPingColor(val) {
+                    if(val === '--' || val === '...') return 'text-slate-500';
+                    if(val === 'Err' || val > 150) return 'text-red-500';
+                    if(val > 80) return 'text-amber-500';
+                    return 'text-emerald-500';
+                },
+                
+                getPingColorCode(val) {
+                    if(val > 150) return '#ef4444'; 
+                    if(val > 80) return '#f59e0b'; 
+                    return '#10b981'; 
+                },
+
+                runSpeedTest() {
+                    if(this.isTestingSpeed) return;
+                    this.isTestingSpeed = true; 
+                    this.speedProgress = 0; 
+                    this.speedVal = 'Testing...';
+                    
+                    const url = `https://speed.cloudflare.com/__down?bytes=${this.speedSize * 1024 * 1024}`;
+                    const start = performance.now();
+                    
+                    fetch(url, { cache: "no-store" }).then(res => {
+                        if (!res.body) throw new Error("No body");
+                        const reader = res.body.getReader(); 
+                        let len = 0; 
+                        const sizeBytes = this.speedSize * 1024 * 1024;
+                        
+                        const pump = () => {
+                            return reader.read().then(({ done, value }) => {
+                                if (done) {
+                                    const dur = (performance.now() - start) / 1000;
+                                    this.speedVal = ((sizeBytes * 8) / (dur * 1024 * 1024)).toFixed(2) + ' Mbps';
+                                    this.isTestingSpeed = false; 
+                                    return;
+                                }
+                                len += value.length; 
+                                this.speedProgress = Math.floor((len / sizeBytes) * 100);
+                                return pump();
+                            });
+                        };
+                        return pump();
+                    }).catch(e => { 
+                        this.speedVal = 'Error'; 
+                        this.isTestingSpeed = false; 
+                    });
+                },
+
+                setupCustomCursor() { 
+                    if(!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+                    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+                    const ring = document.createElement('div'); 
+                    ring.classList.add('custom-ring'); 
+                    document.body.appendChild(ring);
+                    document.addEventListener('mousemove', (e) => { 
+                        // 🚀 FIXED: Math Compensator for CSS Zoom.
+                        // Dividing the mouse coordinates by 1.1 on desktop completely eliminates the zoom offset discrepancy.
+                        const zoomFactor = window.innerWidth >= 1024 ? 1.1 : 1;
+                        ring.style.transform = `translate3d(${e.clientX / zoomFactor}px, ${e.clientY / zoomFactor}px, 0) translate(-50%, -50%)`; 
+                    });
+                }
+            }));
+        });
+    </script>
+</body>
+</html>
