@@ -1,0 +1,20 @@
+[
+  {
+    "title": "Attendance Card Signing",
+    "text": "Sign your physical card at the Guard Room desk before entering office premises. Unsigned entries will be marked absent.",
+    "date": "2026-09-09",
+    "author": "HR Department"
+  },
+  {
+    "title": "Lock Your Workstation",
+    "text": "Always lock your screen (Win + L) when stepping away from your desk. Leaving systems unlocked violates security policy.",
+    "date": "2026-09-10",
+    "author": "IT Department"
+  },
+  {
+    "title": "IT Awareness Training",
+    "text": "Mandatory Annual IT Awareness Training is scheduled for Monday, 12th Oct 2026. All staff must attend the session.",
+    "date": "2026-10-12",
+    "author": "IT Department"
+  }
+]

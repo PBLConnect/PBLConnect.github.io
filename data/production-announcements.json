@@ -1,0 +1,22 @@
+{
+  "announcements": [
+    {
+      "icon": "fas fa-bullhorn",
+      "text": "Reminder: Please submit your daily output before leaving for the day."
+    },
+    {
+      "icon": "fas fa-tools",
+      "text": "A new version of the QA Checklist for GDP 200 has been uploaded. Please review it in the SOP library."
+    }
+  ],
+  "projectFocus": [
+    {
+      "title": "GDP 116 (Main Class)",
+      "description": "<strong>Goal:</strong> Complete backlog from last week. Pay close attention to company addresses and phone number formats."
+    },
+    {
+      "title": "PDE Project",
+      "description": "<strong>Priority:</strong> High. All new entries must be completed by EOD."
+    }
+  ]
+}

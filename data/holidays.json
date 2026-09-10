@@ -1,0 +1,25 @@
+{
+  "_instructions": {
+    "title": "HOLIDAY LIST - EDIT GUIDE (Ise Edit Nahi Karna Hai)",
+    "description": "Yeh file 2026 ki chuttiyon ki list ko control karti hai. Sirf neeche di gayi 'holidays' list ko edit karein.",
+    "fields_guide": {
+      "date": "Chutti ki तारीख. Format hamesha 'YYYY-MM-DD' hona chahiye.",
+      "name": "Chutti ka poora naam, emoji ke saath.",
+      "type": "Chutti ka type. Sirf 'Government' ya 'Restricted' istemal karein."
+    }
+  },
+  "holidays": [
+    { "date": "2026-01-26", "name": "🇮🇳 Republic Day", "type": "Government" },
+    { "date": "2026-03-04", "name": "🎨 Holi ***", "type": "Government" },
+    { "date": "2026-04-03", "name": "🙏 Good Friday", "type": "Government" },
+    { "date": "2026-08-15", "name": "🇮🇳 Independence Day", "type": "Government" },
+    { "date": "2026-08-28", "name": "👫 Raksha Bandhan ***", "type": "Government" },
+    { "date": "2026-10-02", "name": "🕊️ Gandhi Jayanti", "type": "Government" },
+    { "date": "2026-10-20", "name": "🏹 Dussehra", "type": "Government" },
+    { "date": "2026-11-08", "name": "🪔 Deepawali ***", "type": "Government" },
+    { "date": "2026-01-01", "name": "🎉 New Year's Day", "type": "Restricted" },
+    { "date": "2026-05-01", "name": "👷‍♂️ Labour Day", "type": "Restricted" },
+    { "date": "2026-11-11", "name": "🧑‍🤝‍🧑 Bhai Duj", "type": "Restricted" },
+    { "date": "2026-12-25", "name": "🎄 Christmas Day", "type": "Restricted" }
+  ]
+}

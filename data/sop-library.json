@@ -1,0 +1,49 @@
+{
+  "categories": [
+    {
+      "name": "General SOPs",
+      "documents": [
+        {
+          "title": "Data Verification Protocol (SOP)",
+          "version": "2.1",
+          "lastUpdated": "2025-07-28",
+          "link": "#"
+        },
+        {
+          "title": "IT Acceptable Use Policy",
+          "version": "1.5",
+          "lastUpdated": "2025-07-25",
+          "link": "#"
+        }
+      ]
+    },
+    {
+      "name": "Quality Checklists",
+      "documents": [
+        {
+          "title": "Quality Assurance (QA) Checklist",
+          "version": "3.0",
+          "lastUpdated": "2025-06-30",
+          "link": "#"
+        },
+        {
+          "title": "GDP 200 Final Delivery Checklist",
+          "version": "1.0",
+          "lastUpdated": "2025-07-25",
+          "link": "#"
+        }
+      ]
+    },
+    {
+      "name": "Project Guidelines",
+      "documents": [
+        {
+          "title": "GDP 116 (Main Class) Guidelines",
+          "version": "1.8",
+          "lastUpdated": "2025-05-20",
+          "link": "#"
+        }
+      ]
+    }
+  ]
+}

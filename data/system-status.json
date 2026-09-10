@@ -1,0 +1,56 @@
+{
+  "_instructions": {
+    "title": "SYSTEM STATUS - EDIT GUIDE (Ise Edit Nahi Karna Hai)",
+    "description": "Portal par live status update karne ke liye, neeche di gayi 'systems' list ko edit karein. Upar ke is section ko ya 'templates' section ko na badlein.",
+    "how_to_edit": [
+      "1. 'systems' list mein uss system ko dhoondhe jiska status badalna hai.",
+      "2. Uska 'status' inme se ek karein: 'ok' (sab theek hai), 'warn' (slow hai ya problem hai), ya 'down' (band hai).",
+      "3. Icon, color aur default message apne aap templates se aa jayenge.",
+      "4. (Optional) Agar koi khaas message dena hai, to ek nayi line add karein: \"message\": \"Yahan apna message likhein.\""
+    ],
+    "example_ok": {
+      "tip": "Example 1: Agar Internet theek kaam kar raha hai, to bas itna likhein:",
+      "code": "{ \"name\": \"Internet Leased Line\", \"status\": \"ok\" }"
+    },
+    "example_custom_message": {
+      "tip": "Example 2: Agar Citrix slow hai aur alag se message dena hai, to aise likhein:",
+      "code": "{ \"name\": \"Citrix (Web Page)\", \"status\": \"warn\", \"message\": \"Login is very slow. Team is working on it.\" }"
+    }
+  },
+
+  "templates": {
+    "ok": { "message": "All services are operational.", "icon": "fa-check", "cssClass": "status-ok" },
+    "warn": { "message": "Experiencing minor issues or slow performance.", "icon": "fa-exclamation", "cssClass": "status-warn" },
+    "down": { "message": "Service is currently unavailable or under maintenance.", "icon": "fa-times", "cssClass": "status-down" },
+    "default": { "message": "Status is currently unknown.", "icon": "fa-question", "cssClass": "" }
+  },
+
+  "systems": [
+    { 
+      "name": "Internet Leased Line", 
+      "status": "ok" 
+    },
+    { 
+      "name": "FileZilla Server (DDN)", 
+      "status": "ok" 
+    },
+    {
+      "name": "Citrix (Web Page)",
+      "status": "warn",
+      "message": "We are observing slow login times. The team is investigating."
+    },
+    { 
+      "name": "Rediff Mail", 
+      "status": "down" 
+    },
+    { 
+      "name": "DC & ADC", 
+      "status": "ok" 
+    },
+    {
+      "name": "PBL (Linux Server)",
+      "status": "ok",
+      "message": "The server is currently under emergency maintenance. Please wait."
+    }
+  ]
+}

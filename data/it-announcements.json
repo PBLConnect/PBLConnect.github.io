@@ -1,0 +1,62 @@
+{
+  "_instructions": {
+    "title": "IT ANNOUNCEMENTS - EDIT GUIDE (Ise Edit Nahi Karna Hai)",
+    "description": "Nayi announcement daalne ke liye, neeche di gayi 'announcements' list mein sabse upar ek naya block add karein. Sabse nayi khabar hamesha list mein sabse upar honi chahiye.",
+    "fields_guide": {
+      "type": "Announcement ka type batayein. Use karein: 'alert' (urgent, red color), 'maintenance' (warning, orange color), ya 'info' (update, blue color).",
+      "date": "Jis din announcement daal rahe hain, woh date likhein. Format: 'YYYY-MM-DD'.",
+      "title": "Announcement ki ek chhoti si, bold headline.",
+      "content": "Announcement ki poori jaankari yahan likhein."
+    },
+    "example": {
+      "tip": "Example: Ek nayi maintenance ki soochana daalne ke liye, 'announcements' list mein sabse upar yeh add karein:",
+      "code": [
+        "{",
+        "  \"type\": \"maintenance\",",
+        "  \"date\": \"2025-08-05\",",
+        "  \"title\": \"New Firewall Installation\",",
+        "  \"content\": \"We will be installing a new firewall on Tuesday. No major downtime is expected.\"",
+        "},"
+      ]
+    }
+  },
+
+  "announcements": [
+    {
+      "type": "maintenance",
+      "date": "2025-12-10",
+      "title": "FileZilla Server Update (DDN)",
+      "content": "We will be applying critical security patches to the FileZilla server in Dehradun tonight at 10 PM. A brief disconnection of 5-10 minutes is expected."
+    },
+    {
+      "type": "maintenance",
+      "date": "2025-07-28",
+      "title": "Planned Internet Upgrade (Noida)",
+      "content": "Our Internet Service Provider will be performing an upgrade on Monday in the Noida office. Expect brief disconnections between 9 AM and 10 AM."
+    },
+    {
+      "type": "alert",
+      "date": "2025-07-24",
+      "title": "Phishing Alert",
+      "content": "A new phishing email is circulating. It claims to be from 'HR Department' about salary slips. Please do NOT click any links and report it to IT immediately."
+    },
+    {
+      "type": "maintenance",
+      "date": "2025-07-22",
+      "title": "Saturday Maintenance",
+      "content": "This Saturday, from 2 PM to 4 PM, the main server will be under maintenance. SAP and file storage will be unavailable during this time."
+    },
+    {
+      "type": "info",
+      "date": "2025-07-20",
+      "title": "New Antivirus Rollout",
+      "content": "Starting next week, we will be upgrading all systems to the new Sophos Antivirus. No action is required from your side."
+    },
+    {
+      "type": "info",
+      "date": "2025-07-18",
+      "title": "Updated Password Policy",
+      "content": "As part of our continuous security improvement, the mandatory password length has been increased to 12 characters. Please update your password at the next prompt."
+    }
+  ]
+}
