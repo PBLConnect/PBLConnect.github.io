@@ -117,166 +117,183 @@
 
 <body class="text-slate-800 dark:text-slate-200 h-[100dvh] flex flex-col overflow-hidden mesh-bg" x-data="connectHub()">
 
-    <!-- NAVBAR (ULTRA-MODERN FLOATING APP HEADER) -->
-    <header class="mx-3 sm:mx-4 mt-3 sm:mt-4 h-14 sm:h-16 z-50 relative">
+    <!-- NAVBAR (FOOTER-INSPIRED UNIFIED SKEUOMORPHIC HEADER) -->
+    <header class="mx-3 sm:mx-4 mt-2 sm:mt-3 h-14 sm:h-[60px] z-50 relative group pointer-events-auto">
         
-        <!-- Seamless Glass Background (Floating Island) -->
-        <div class="absolute inset-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-2xl border border-white/60 dark:border-white/10 shadow-[0_8px_30px_-4px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.3)] transition-all duration-300"></div>
+        <!-- 🔮 Vibrant Ambient Glow Behind Header -->
+        <div class="absolute -inset-1 bg-gradient-to-r from-brand/20 via-indigo-500/10 to-rose-500/20 dark:from-brand/30 dark:via-purple-500/20 dark:to-rose-500/20 rounded-3xl blur-[20px] opacity-70 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-0"></div>
 
-        <div class="max-w-[1920px] mx-auto px-4 sm:px-5 h-full flex justify-between items-center relative z-10">
+        <!-- 🚀 Seamless Glass Main Bar -->
+        <!-- 🚀 FIXED: Changed dark:border-slate-800 to dark:border-white/10 and boosted inset highlight -->
+        <div class="absolute inset-0 bg-gradient-to-b from-white to-blue-50/40 dark:from-[#0a0f1d] dark:to-[#020617] backdrop-blur-2xl border border-slate-300/80 dark:border-white/10 rounded-[1.25rem] shadow-[0_10px_35px_rgba(0,0,0,0.04),0_1px_3px_rgba(0,0,0,0.02),inset_0_1px_0_rgba(255,255,255,1)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.4),0_1px_3px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.08)] transition-all z-10"></div>
+
+        <div class="max-w-[1920px] w-full mx-auto px-2 sm:px-3 h-full flex items-center justify-between relative z-20">
                         
-            <!-- LEFT: Clean Brand Identity -->
-            <div class="flex items-center shrink-0 min-w-0">
-                <a href="index.html" @click.prevent="haptic('light')" class="group/logo flex items-center gap-3 transition-transform active:scale-95 shrink-0">
-                    
-                    <!-- Logo Icon Box -->
-                    <div class="relative h-8 w-8 sm:h-10 sm:w-10 bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 rounded-xl shadow-sm border border-slate-200/60 dark:border-slate-700 flex items-center justify-center group-hover/logo:shadow-md transition-all">
-                        <img src="data/pbl-logo.png" alt="PBL Logo" class="h-5 sm:h-6 w-auto object-contain dark:brightness-0 dark:invert dark:opacity-95 transition-transform group-hover/logo:scale-110" @error="$el.style.display='none'; $refs.fbLogo.style.display='flex'">
-                        <div x-ref="fbLogo" style="display:none;" class="w-full h-full bg-gradient-to-tr from-brand to-indigo-600 text-white rounded-xl flex items-center justify-center font-black text-sm sm:text-lg shadow-[0_0_15px_rgba(59,130,246,0.4)]">P</div>
-                    </div>
-                    
-                    <!-- Typography -->
-                    <div class="flex flex-col justify-center min-w-0">
-                        <h2 class="font-heading font-black text-[16px] sm:text-[20px] text-slate-800 dark:text-white leading-none tracking-tight whitespace-nowrap drop-shadow-sm transition-colors group-hover/logo:text-brand">PBL<span class="text-brand dark:text-brand_glow">Connect</span></h2>
-                        <span class="text-[7.5px] sm:text-[8.5px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-0.5">Intranet Portal</span>
-                    </div>
+            <!-- LEFT: Engraved Tray for Logo & Badges -->
+            <!-- 🚀 FIXED: Changed dark:border-white/5 to dark:border-white/10 and added a strong dark inner shadow for depth -->
+            <div class="flex items-center gap-2 bg-slate-100/80 dark:bg-black/50 p-1 sm:p-1.5 rounded-full border border-slate-300/70 dark:border-white/10 shadow-[inset_0_2px_5px_rgba(0,0,0,0.06),0_1px_0_rgba(255,255,255,1)] dark:shadow-[inset_0_2px_6px_rgba(0,0,0,0.5),0_1px_1px_rgba(255,255,255,0.08)] shrink-0 backdrop-blur-md">
+                
+                <!-- Raised White Pill Logo -->
+                <!-- 🚀 FIXED: Increased dark border to slate-600/60 and boosted inset highlight to make it 'pop' -->
+                <a href="index.html" @click.prevent="haptic('light')" class="flex items-center gap-2.5 bg-white dark:bg-slate-800/90 pl-3 pr-3.5 py-1.5 rounded-full shadow-[0_1px_3px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,1)] dark:shadow-[0_2px_4px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.15)] border border-slate-100/80 dark:border-slate-600/60 hover:shadow-md transition-all duration-300 active:scale-95 group/logo">
+                    <img src="data/pbl-logo.png" alt="PBL Logo" class="h-4 sm:h-[18px] w-auto object-contain drop-shadow-sm dark:brightness-0 dark:invert dark:opacity-95 transition-transform group-hover/logo:scale-105" @error="$el.style.display='none'; $refs.fbLogo.style.display='flex'">
+                    <div x-ref="fbLogo" style="display:none;" class="w-5 h-5 bg-gradient-to-tr from-brand to-indigo-600 text-white rounded-md flex items-center justify-center font-black text-xs shadow-sm">P</div>
+                    <span class="font-heading font-black text-slate-800 dark:text-white text-[13.5px] sm:text-[15px] tracking-tight leading-none mt-px">PBL<span class="text-brand dark:text-brand_glow transition-colors">Connect</span></span>
                 </a>
+
+                <!-- Divider -->
+                <!-- 🚀 FIXED: Darkened the divider line slightly and gave it a 1px soft glow -->
+                <div class="hidden sm:block w-[1px] h-4 bg-slate-200 dark:bg-slate-700 shadow-[1px_0_0_rgba(255,255,255,1)] dark:shadow-[1px_0_0_rgba(255,255,255,0.05)]"></div>
+
+                <!-- Active Workspace -->
+                <div class="hidden sm:flex items-center gap-1.5 pr-3 pl-1 py-1 cursor-default">
+                    <span class="relative flex h-1.5 w-1.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.4)]"></span>
+                    </span>
+                    <span class="font-black uppercase tracking-[0.2em] text-[7.5px] leading-none text-slate-500 dark:text-slate-300 mt-px">Workspace</span>
+                </div>
+
             </div>
 
-            <!-- CENTER: Blank Spacer -->
+            <!-- CENTER: Spacer -->
             <div class="hidden lg:flex flex-1 z-20"></div>
 
-            <!-- RIGHT: Hardware Buttons -->
-            <div class="flex items-center justify-end gap-2 sm:gap-3 w-auto relative z-30 shrink-0">
+            <!-- RIGHT: Engraved Tray for Hardware Buttons -->
+            <!-- 🚀 FIXED: Applied the same dark mode border/shadow enhancements to the right tray -->
+            <div class="flex items-center gap-1.5 bg-slate-100/80 dark:bg-black/50 p-1.5 rounded-full border border-slate-300/70 dark:border-white/10 shadow-[inset_0_2px_5px_rgba(0,0,0,0.06),0_1px_0_rgba(255,255,255,1)] dark:shadow-[inset_0_2px_6px_rgba(0,0,0,0.5),0_1px_1px_rgba(255,255,255,0.08)] shrink-0 backdrop-blur-md">
                 
-                <!-- Individual Hardware Buttons -->
-                <div class="flex items-center gap-1.5 sm:gap-2">
+                <!-- Raised White Pill: Network -->
+                <!-- 🚀 FIXED: Buttons now have dark:border-slate-600/60 and dark inner white reflection -->
+                <div class="relative" x-data="{ showNet: false }" @click.outside="showNet = false">
+                    <button @click="showNet = !showNet; haptic('light'); if(showNet && !isPinging){ pingTarget = 'Google'; runPing(); }" 
+                            class="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-white dark:bg-slate-800/90 shadow-[0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,1)] dark:shadow-[0_2px_4px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.15)] border border-slate-200/90 dark:border-slate-600/60 transition-all duration-300 active:scale-95 text-slate-500 hover:text-brand"
+                            :class="showNet ? 'text-brand ring-1 ring-slate-200 dark:ring-slate-500' : 'dark:text-slate-300'" title="Network Status">
+                        <i class="fa-solid fa-satellite-dish text-[13px]"></i>
+                    </button>
                     
-                    <!-- Network Status -->
-                    <div class="relative" x-data="{ showNet: false }" @click.outside="showNet = false">
-                        <button @click="showNet = !showNet; haptic('light'); if(showNet && !isPinging){ pingTarget = 'Google'; runPing(); }" 
-                                class="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 text-slate-500 transition-all duration-300 hover:scale-105 active:scale-95 hover:text-brand hover:border-brand/30 hover:shadow-md"
-                                :class="showNet ? 'ring-2 ring-brand/20 text-brand' : ''" title="Network Status">
-                            <i class="fa-solid fa-satellite-dish text-[13px] sm:text-[14px]"></i>
-                        </button>
-                        
-                        <!-- 🚀 NOC TELEMETRY POPOVER (Retained exactly as is) -->
-                        <div x-show="showNet" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 -translate-y-2 scale-95" x-transition:enter-end="opacity-100 translate-y-0 scale-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 scale-100" x-transition:leave-end="opacity-0 -translate-y-2 scale-95" class="absolute right-0 top-full mt-4 w-[340px] sm:w-[380px] bg-white/95 dark:bg-slate-900/95 backdrop-blur-3xl rounded-[2rem] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25),0_0_0_1px_rgba(0,0,0,0.05)] dark:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.1)] border border-slate-200/80 dark:border-slate-700 flex flex-col overflow-hidden text-left cursor-default z-[100]" style="display: none;">
-                            <div class="absolute -top-20 -left-20 w-60 h-60 bg-purple-400/10 dark:bg-purple-600/10 rounded-full blur-[60px] pointer-events-none"></div>
-                            <div class="absolute top-1/2 -right-20 w-60 h-60 bg-sky-400/10 dark:bg-sky-600/10 rounded-full blur-[60px] pointer-events-none"></div>
-                            <div class="px-5 py-3.5 border-b border-slate-200/70 dark:border-white/10 bg-gradient-to-r from-blue-50/70 via-white to-indigo-50/40 dark:from-slate-800/90 dark:via-slate-900/90 dark:to-slate-950/90 backdrop-blur-xl flex justify-between items-center relative z-10 shrink-0">
-                                <div class="flex items-center gap-3">
-                                    <div class="relative w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-[0_4px_12px_rgba(59,130,246,0.4),inset_0_1px_0_rgba(255,255,255,0.3)] shrink-0 group">
-                                        <i class="fa-solid fa-satellite-dish text-[14px] drop-shadow-sm group-hover:rotate-12 transition-transform duration-300"></i>
-                                        <span class="absolute -top-0.5 -right-0.5 flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-[0_0_6px_#10b981]"></span></span>
-                                    </div>
-                                    <div class="flex flex-col text-left">
-                                        <h4 class="font-heading font-black text-[15px] sm:text-[16px] text-slate-800 dark:text-white tracking-tight leading-none">Network <span class="text-brand dark:text-brand_glow">Status</span></h4>
-                                        <span class="text-[8.5px] font-mono font-bold uppercase tracking-widest text-slate-400 dark:text-slate-400 mt-1 flex items-center gap-1.5 leading-none"><i class="fa-solid fa-bolt-lightning text-[7.5px] text-emerald-500"></i> Real-time Telemetry</span>
-                                    </div>
+                    <!-- 🚀 NOC TELEMETRY POPOVER (Intact) -->
+                    <div x-show="showNet" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 -translate-y-2 scale-95" x-transition:enter-end="opacity-100 translate-y-0 scale-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 scale-100" x-transition:leave-end="opacity-0 -translate-y-2 scale-95" class="absolute right-0 top-full mt-4 w-[340px] sm:w-[380px] bg-white/95 dark:bg-slate-900/95 backdrop-blur-3xl rounded-[2rem] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25),0_0_0_1px_rgba(0,0,0,0.05)] dark:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.1)] border border-slate-200/80 dark:border-slate-700 flex flex-col overflow-hidden text-left cursor-default z-[100]" style="display: none;">
+                        <div class="absolute -top-20 -left-20 w-60 h-60 bg-purple-400/10 dark:bg-purple-600/10 rounded-full blur-[60px] pointer-events-none"></div>
+                        <div class="absolute top-1/2 -right-20 w-60 h-60 bg-sky-400/10 dark:bg-sky-600/10 rounded-full blur-[60px] pointer-events-none"></div>
+                        <div class="px-5 py-3.5 border-b border-slate-200/70 dark:border-white/10 bg-gradient-to-r from-blue-50/70 via-white to-indigo-50/40 dark:from-slate-800/90 dark:via-slate-900/90 dark:to-slate-950/90 backdrop-blur-xl flex justify-between items-center relative z-10 shrink-0">
+                            <div class="flex items-center gap-3">
+                                <div class="relative w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-[0_4px_12px_rgba(59,130,246,0.4),inset_0_1px_0_rgba(255,255,255,0.3)] shrink-0 group">
+                                    <i class="fa-solid fa-satellite-dish text-[14px] drop-shadow-sm group-hover:rotate-12 transition-transform duration-300"></i>
+                                    <span class="absolute -top-0.5 -right-0.5 flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-[0_0_6px_#10b981]"></span></span>
                                 </div>
-                                <button @click="showNet = false" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-100 dark:bg-white/10 hover:bg-rose-50 hover:text-rose-500 dark:hover:bg-rose-500/20 dark:hover:text-rose-300 flex items-center justify-center text-slate-400 transition-all duration-300 active:scale-90 shadow-sm border border-slate-200/60 dark:border-white/5 shrink-0 group" title="Close Panel"><i class="fa-solid fa-xmark text-xs group-hover:rotate-90 transition-transform duration-300"></i></button>
+                                <div class="flex flex-col text-left">
+                                    <h4 class="font-heading font-black text-[15px] sm:text-[16px] text-slate-800 dark:text-white tracking-tight leading-none">Network <span class="text-brand dark:text-brand_glow">Status</span></h4>
+                                    <span class="text-[8.5px] font-mono font-bold uppercase tracking-widest text-slate-400 dark:text-slate-400 mt-1 flex items-center gap-1.5 leading-none"><i class="fa-solid fa-bolt-lightning text-[7.5px] text-emerald-500"></i> Real-time Telemetry</span>
+                                </div>
                             </div>
-                            <div class="p-4 sm:p-5 flex flex-col gap-3.5 max-h-[70vh] overflow-y-auto custom-scroll relative z-10 bg-white/50 dark:bg-transparent">
-                                <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between h-[155px] shrink-0 transition-none">
-                                    <div class="flex justify-between items-start">
+                            <button @click="showNet = false" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-100 dark:bg-white/10 hover:bg-rose-50 hover:text-rose-500 dark:hover:bg-rose-500/20 dark:hover:text-rose-300 flex items-center justify-center text-slate-400 transition-all duration-300 active:scale-90 shadow-sm border border-slate-200/60 dark:border-white/5 shrink-0 group" title="Close Panel"><i class="fa-solid fa-xmark text-xs group-hover:rotate-90 transition-transform duration-300"></i></button>
+                        </div>
+                        <div class="p-4 sm:p-5 flex flex-col gap-3.5 max-h-[70vh] overflow-y-auto custom-scroll relative z-10 bg-white/50 dark:bg-transparent">
+                            <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between h-[155px] shrink-0 transition-none">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <span class="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-1.5"><i class="fa-solid fa-satellite-dish text-brand"></i> <span>PING LATENCY (GOOGLE)</span></span>
+                                        <div class="h-7 w-36 flex items-center mt-0.5 shrink-0 overflow-hidden">
+                                            <span class="text-[20px] font-mono font-black tabular-nums transition-colors duration-150 whitespace-nowrap" :class="getPingColor(pingVal)" x-text="isPinging ? 'Probing...' : (pingVal === 'Err' ? 'Error' : pingVal + ' ms')"></span>
+                                        </div>
+                                    </div>
+                                    <button @click="if(!isPinging){ pingTarget = 'Google'; runPing(); }" :disabled="isPinging" class="w-8 h-8 rounded-xl bg-slate-50 dark:bg-slate-700 shadow-sm border border-slate-200 dark:border-slate-600 flex items-center justify-center text-slate-500 hover:text-brand transition active:scale-95 disabled:opacity-40" title="Re-test Ping"><i class="fa-solid fa-rotate-right text-[11px]" :class="isPinging ? 'fa-spin text-brand' : ''"></i></button>
+                                </div>
+                                <div class="pt-2 border-t border-slate-100 dark:border-slate-700/60">
+                                    <div class="flex items-end gap-1.5 h-8 w-full">
+                                        <template x-for="slot in 10" :key="slot"><div class="flex-1 rounded-full transition-all duration-200" :style="`height: ${pingHistory[slot - 1] ? Math.max(15, Math.min(100, (pingHistory[slot - 1] / 200) * 100)) : 10}%; background-color: ${pingHistory[slot - 1] ? getPingColorCode(pingHistory[slot - 1]) : 'rgba(148, 163, 184, 0.25)'};`"></div></template>
+                                    </div>
+                                    <div class="flex items-center justify-between text-[9px] font-mono font-bold text-slate-500 dark:text-slate-400 mt-2">
+                                        <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full" :class="pingVal === 'Err' ? 'bg-rose-500' : 'bg-emerald-500'"></span><span x-text="isPinging ? 'Sending ICMP packets...' : (pingVal === 'Err' ? 'Request Timed Out' : 'Route Verified')"></span></span>
+                                        <span x-text="(pingHistory.length) + '/10 Pkts'"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="relative p-3.5 rounded-2xl bg-gradient-to-br from-sky-500/[0.12] via-blue-500/[0.04] to-white dark:from-sky-950/40 dark:via-slate-800/80 dark:to-slate-900 border border-sky-300/60 dark:border-sky-500/30 shadow-[0_4px_15px_rgba(14,165,233,0.08)] hover:shadow-[0_8px_20px_rgba(14,165,233,0.18)] hover:-translate-y-0.5 transition-all duration-300 overflow-hidden group text-left">
+                                    <i class="fa-solid fa-globe absolute -bottom-3 -right-3 text-[4.5rem] text-sky-500/15 dark:text-sky-400/10 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 pointer-events-none"></i>
+                                    <div class="flex items-center justify-between mb-2 relative z-10"><div class="flex items-center gap-1.5"><div class="w-6 h-6 rounded-lg bg-sky-500/15 text-sky-600 dark:text-sky-400 flex items-center justify-center text-[10px] shadow-sm border border-sky-200/80 dark:border-sky-500/30"><i class="fa-solid fa-network-wired"></i></div><span class="text-[8.5px] font-mono font-black text-sky-600 dark:text-sky-400 uppercase tracking-widest">Public IP</span></div><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_#10b981] animate-pulse"></span></div>
+                                    <span class="text-[13px] sm:text-[14px] font-mono font-black text-slate-800 dark:text-white tracking-tight block relative z-10 truncate" x-text="publicIp || 'Fetching...'"></span>
+                                </div>
+                                <div class="relative p-3.5 rounded-2xl bg-gradient-to-br from-rose-500/[0.12] via-orange-500/[0.04] to-white dark:from-rose-950/40 dark:via-slate-800/80 dark:to-slate-900 border border-rose-300/60 dark:border-rose-500/30 shadow-[0_4px_15px_rgba(244,63,94,0.08)] hover:shadow-[0_8px_20px_rgba(244,63,94,0.18)] hover:-translate-y-0.5 transition-all duration-300 overflow-hidden group text-left">
+                                    <i class="fa-solid fa-tower-broadcast absolute -bottom-3 -right-3 text-[4.5rem] text-rose-500/15 dark:text-rose-400/10 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-500 pointer-events-none"></i>
+                                    <div class="flex items-center justify-between mb-2 relative z-10"><div class="flex items-center gap-1.5"><div class="w-6 h-6 rounded-lg bg-rose-500/15 text-rose-600 dark:text-rose-400 flex items-center justify-center text-[10px] shadow-sm border border-rose-200/80 dark:border-rose-500/30"><i class="fa-solid fa-bolt-lightning"></i></div><span class="text-[8.5px] font-mono font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest">ISP Line</span></div><span class="text-[7.5px] font-mono font-black px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 uppercase tracking-wider">Fiber</span></div>
+                                    <span class="text-[13px] sm:text-[14px] font-heading font-black text-slate-800 dark:text-white tracking-tight block relative z-10 truncate" x-text="ispName || 'Airtel Broadband'"></span>
+                                </div>
+                            </div>
+                            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm text-left">
+                                <div class="flex justify-between items-center mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-9 h-9 rounded-[0.6rem] bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 text-emerald-500 flex items-center justify-center text-[15px] shadow-sm"><i class="fa-solid fa-download"></i></div>
                                         <div>
-                                            <span class="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-1.5"><i class="fa-solid fa-satellite-dish text-brand"></i> <span>PING LATENCY (GOOGLE)</span></span>
-                                            <div class="h-7 w-36 flex items-center mt-0.5 shrink-0 overflow-hidden">
-                                                <span class="text-[20px] font-mono font-black tabular-nums transition-colors duration-150 whitespace-nowrap" :class="getPingColor(pingVal)" x-text="isPinging ? 'Probing...' : (pingVal === 'Err' ? 'Error' : pingVal + ' ms')"></span>
-                                            </div>
+                                            <span class="block text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-0.5">Download Speed</span>
+                                            <span class="text-[16px] sm:text-[17px] font-black text-slate-800 dark:text-white leading-none tracking-tight" x-text="speedVal || '-- Mbps'"></span>
                                         </div>
-                                        <button @click="if(!isPinging){ pingTarget = 'Google'; runPing(); }" :disabled="isPinging" class="w-8 h-8 rounded-xl bg-slate-50 dark:bg-slate-700 shadow-sm border border-slate-200 dark:border-slate-600 flex items-center justify-center text-slate-500 hover:text-brand transition active:scale-95 disabled:opacity-40" title="Re-test Ping"><i class="fa-solid fa-rotate-right text-[11px]" :class="isPinging ? 'fa-spin text-brand' : ''"></i></button>
                                     </div>
-                                    <div class="pt-2 border-t border-slate-100 dark:border-slate-700/60">
-                                        <div class="flex items-end gap-1.5 h-8 w-full">
-                                            <template x-for="slot in 10" :key="slot"><div class="flex-1 rounded-full transition-all duration-200" :style="`height: ${pingHistory[slot - 1] ? Math.max(15, Math.min(100, (pingHistory[slot - 1] / 200) * 100)) : 10}%; background-color: ${pingHistory[slot - 1] ? getPingColorCode(pingHistory[slot - 1]) : 'rgba(148, 163, 184, 0.25)'};`"></div></template>
-                                        </div>
-                                        <div class="flex items-center justify-between text-[9px] font-mono font-bold text-slate-500 dark:text-slate-400 mt-2">
-                                            <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full" :class="pingVal === 'Err' ? 'bg-rose-500' : 'bg-emerald-500'"></span><span x-text="isPinging ? 'Sending ICMP packets...' : (pingVal === 'Err' ? 'Request Timed Out' : 'Route Verified')"></span></span>
-                                            <span x-text="(pingHistory.length) + '/10 Pkts'"></span>
-                                        </div>
+                                    <div class="flex items-center bg-slate-100 dark:bg-black/40 p-1 rounded-xl border border-slate-200/80 dark:border-slate-700/80 shadow-inner w-[110px]">
+                                        <button type="button" @click="speedSize = 20" class="flex-1 py-1 text-[9px] font-black rounded-lg transition-all text-center leading-none" :class="speedSize === 20 ? 'bg-brand text-white shadow-sm' : 'text-slate-500 dark:text-slate-400'">20 MB</button>
+                                        <button type="button" @click="speedSize = 50" class="flex-1 py-1 text-[9px] font-black rounded-lg transition-all text-center leading-none" :class="speedSize === 50 ? 'bg-brand text-white shadow-sm' : 'text-slate-500 dark:text-slate-400'">50 MB</button>
                                     </div>
                                 </div>
-                                <div class="grid grid-cols-2 gap-3">
-                                    <div class="relative p-3.5 rounded-2xl bg-gradient-to-br from-sky-500/[0.12] via-blue-500/[0.04] to-white dark:from-sky-950/40 dark:via-slate-800/80 dark:to-slate-900 border border-sky-300/60 dark:border-sky-500/30 shadow-[0_4px_15px_rgba(14,165,233,0.08)] hover:shadow-[0_8px_20px_rgba(14,165,233,0.18)] hover:-translate-y-0.5 transition-all duration-300 overflow-hidden group text-left">
-                                        <i class="fa-solid fa-globe absolute -bottom-3 -right-3 text-[4.5rem] text-sky-500/15 dark:text-sky-400/10 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 pointer-events-none"></i>
-                                        <div class="flex items-center justify-between mb-2 relative z-10"><div class="flex items-center gap-1.5"><div class="w-6 h-6 rounded-lg bg-sky-500/15 text-sky-600 dark:text-sky-400 flex items-center justify-center text-[10px] shadow-sm border border-sky-200/80 dark:border-sky-500/30"><i class="fa-solid fa-network-wired"></i></div><span class="text-[8.5px] font-mono font-black text-sky-600 dark:text-sky-400 uppercase tracking-widest">Public IP</span></div><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_#10b981] animate-pulse"></span></div>
-                                        <span class="text-[13px] sm:text-[14px] font-mono font-black text-slate-800 dark:text-white tracking-tight block relative z-10 truncate" x-text="publicIp || 'Fetching...'"></span>
-                                    </div>
-                                    <div class="relative p-3.5 rounded-2xl bg-gradient-to-br from-rose-500/[0.12] via-orange-500/[0.04] to-white dark:from-rose-950/40 dark:via-slate-800/80 dark:to-slate-900 border border-rose-300/60 dark:border-rose-500/30 shadow-[0_4px_15px_rgba(244,63,94,0.08)] hover:shadow-[0_8px_20px_rgba(244,63,94,0.18)] hover:-translate-y-0.5 transition-all duration-300 overflow-hidden group text-left">
-                                        <i class="fa-solid fa-tower-broadcast absolute -bottom-3 -right-3 text-[4.5rem] text-rose-500/15 dark:text-rose-400/10 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-500 pointer-events-none"></i>
-                                        <div class="flex items-center justify-between mb-2 relative z-10"><div class="flex items-center gap-1.5"><div class="w-6 h-6 rounded-lg bg-rose-500/15 text-rose-600 dark:text-rose-400 flex items-center justify-center text-[10px] shadow-sm border border-rose-200/80 dark:border-rose-500/30"><i class="fa-solid fa-bolt-lightning"></i></div><span class="text-[8.5px] font-mono font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest">ISP Line</span></div><span class="text-[7.5px] font-mono font-black px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 uppercase tracking-wider">Fiber</span></div>
-                                        <span class="text-[13px] sm:text-[14px] font-heading font-black text-slate-800 dark:text-white tracking-tight block relative z-10 truncate" x-text="ispName || 'Airtel Broadband'"></span>
-                                    </div>
-                                </div>
-                                <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm text-left">
-                                    <div class="flex justify-between items-center mb-4">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-9 h-9 rounded-[0.6rem] bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 text-emerald-500 flex items-center justify-center text-[15px] shadow-sm"><i class="fa-solid fa-download"></i></div>
-                                            <div>
-                                                <span class="block text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-0.5">Download Speed</span>
-                                                <span class="text-[16px] sm:text-[17px] font-black text-slate-800 dark:text-white leading-none tracking-tight" x-text="speedVal || '-- Mbps'"></span>
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center bg-slate-100 dark:bg-black/40 p-1 rounded-xl border border-slate-200/80 dark:border-slate-700/80 shadow-inner w-[110px]">
-                                            <button type="button" @click="speedSize = 20" class="flex-1 py-1 text-[9px] font-black rounded-lg transition-all text-center leading-none" :class="speedSize === 20 ? 'bg-brand text-white shadow-sm' : 'text-slate-500 dark:text-slate-400'">20 MB</button>
-                                            <button type="button" @click="speedSize = 50" class="flex-1 py-1 text-[9px] font-black rounded-lg transition-all text-center leading-none" :class="speedSize === 50 ? 'bg-brand text-white shadow-sm' : 'text-slate-500 dark:text-slate-400'">50 MB</button>
-                                        </div>
-                                    </div>
-                                    <button @click="runSpeedTest()" :disabled="isTestingSpeed" class="w-full py-3 px-4 rounded-2xl text-white font-extrabold text-[12px] uppercase tracking-wider shadow-md hover:shadow-lg flex items-center justify-center relative bg-brand hover:bg-blue-600 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
-                                        <div x-show="!isTestingSpeed" class="flex items-center justify-center gap-2"><i class="fa-solid fa-paper-plane text-xs"></i><span class="tracking-widest font-black">START TEST</span></div>
-                                        <div x-show="isTestingSpeed" class="flex items-center gap-2" x-cloak><i class="fa-solid fa-circle-notch fa-spin text-sm"></i> <span class="font-mono font-black" x-text="speedProgress + '%'"></span></div>
-                                    </button>
-                                </div>
+                                <button @click="runSpeedTest()" :disabled="isTestingSpeed" class="w-full py-3 px-4 rounded-2xl text-white font-extrabold text-[12px] uppercase tracking-wider shadow-md hover:shadow-lg flex items-center justify-center relative bg-brand hover:bg-blue-600 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <div x-show="!isTestingSpeed" class="flex items-center justify-center gap-2"><i class="fa-solid fa-paper-plane text-xs"></i><span class="tracking-widest font-black">START TEST</span></div>
+                                    <div x-show="isTestingSpeed" class="flex items-center gap-2" x-cloak><i class="fa-solid fa-circle-notch fa-spin text-sm"></i> <span class="font-mono font-black" x-text="speedProgress + '%'"></span></div>
+                                </button>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Theme Toggle -->
-                    <button @click="toggleTheme()" 
-                            class="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 text-slate-500 transition-all duration-300 hover:scale-105 active:scale-95 hover:shadow-md"
-                            :class="isDark ? 'hover:text-amber-400 hover:border-amber-400/30' : 'hover:text-indigo-500 hover:border-indigo-500/30'">
-                        <i class="fa-solid text-[13px] sm:text-[14px] pointer-events-none" :class="isDark ? 'fa-sun text-amber-400 drop-shadow-sm' : 'fa-moon'"></i>
+                <div class="w-px h-4 bg-slate-200 dark:bg-slate-700 shadow-[1px_0_0_rgba(255,255,255,1)] dark:shadow-[1px_0_0_rgba(255,255,255,0.05)]"></div>
+
+                <!-- Raised White Pill: Theme Toggle -->
+                <button @click="toggleTheme()" 
+                        class="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-white dark:bg-slate-800/90 shadow-[0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,1)] dark:shadow-[0_2px_4px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.15)] border border-slate-200/90 dark:border-slate-600/60 transition-all duration-300 active:scale-95 text-slate-500 hover:text-amber-500"
+                        :class="!isDark ? 'dark:text-slate-300' : ''">
+                    <i class="fa-solid text-[13px] pointer-events-none" :class="isDark ? 'fa-sun text-amber-500 drop-shadow-sm' : 'fa-moon'"></i>
+                </button>
+
+                <div class="w-px h-4 bg-slate-200 dark:bg-slate-700 shadow-[1px_0_0_rgba(255,255,255,1)] dark:shadow-[1px_0_0_rgba(255,255,255,0.05)]"></div>
+
+                <!-- Raised White Pill: Notification Bell -->
+                <div class="relative" x-data="{ showNotifs: false }" @click.outside="showNotifs = false">
+                    <button @click="showNotifs = !showNotifs" 
+                            class="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-white dark:bg-slate-800/90 shadow-[0_2px_5px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,1)] dark:shadow-[0_2px_4px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.15)] border border-slate-200/90 dark:border-slate-600/60 transition-all duration-300 active:scale-95 text-slate-500 hover:text-rose-500 relative"
+                            :class="showNotifs ? 'text-rose-500 ring-1 ring-slate-200 dark:ring-slate-500' : 'dark:text-slate-300'">
+                        <i class="fa-regular fa-bell text-[13px]" :class="notifications.length > 0 ? 'text-brand animate-pulse drop-shadow-md' : ''"></i>
+                        <span x-show="notifications.length > 0" class="absolute top-1.5 right-1.5 flex h-2 w-2" x-cloak>
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500 border-2 border-white dark:border-slate-800 shadow-sm"></span>
+                        </span>
                     </button>
-
-                    <!-- Global Notification Bell -->
-                    <div class="relative" x-data="{ showNotifs: false }" @click.outside="showNotifs = false">
-                        <button @click="showNotifs = !showNotifs" 
-                                class="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 text-slate-500 transition-all duration-300 hover:scale-105 active:scale-95 hover:text-rose-500 hover:border-rose-500/30 hover:shadow-md relative"
-                                :class="showNotifs ? 'ring-2 ring-rose-500/20 text-rose-500' : ''">
-                            <i class="fa-regular fa-bell text-[13px] sm:text-[14px]" :class="notifications.length > 0 ? 'text-brand animate-pulse drop-shadow-md' : ''"></i>
-                            <span x-show="notifications.length > 0" class="absolute top-1.5 right-1.5 flex h-2 w-2" x-cloak>
-                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500 border-2 border-white dark:border-slate-800 shadow-sm"></span>
-                            </span>
-                        </button>
-                        
-                        <!-- 🚀 NOTIFICATION POPOVER (Retained exactly as is) -->
-                        <div x-show="showNotifs" x-transition.origin.top.right class="absolute right-0 top-full mt-4 w-72 bg-white/95 dark:bg-dark_surface/95 backdrop-blur-xl rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.15),0_0_0_1px_rgba(0,0,0,0.05)] dark:shadow-[0_20px_40px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.1)] z-[100] overflow-hidden flex flex-col" style="display: none;">
-                            <div class="p-3 border-b border-slate-100 dark:border-white/10 font-bold text-xs text-slate-800 dark:text-white flex justify-between items-center bg-slate-50/80 dark:bg-black/20 shadow-sm">
-                                Notifications <span class="bg-brand/10 text-brand px-1.5 py-0.5 rounded text-[9px] shadow-sm" x-text="notifications.length + ' New'"></span>
-                            </div>
-                            <div class="max-h-64 overflow-y-auto custom-scroll">
-                                <template x-for="notif in notifications" :key="notif.title">
-                                    <div class="p-3 border-b border-slate-50 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 transition flex items-start gap-3 cursor-pointer">
-                                        <div class="text-xl mt-0.5" x-text="notif.emoji"></div>
-                                        <div class="flex-1 min-w-0">
-                                            <h4 class="text-xs font-bold text-slate-800 dark:text-white truncate" x-text="notif.title"></h4>
-                                            <p class="text-[10px] text-slate-500 leading-tight mt-0.5" x-text="notif.desc"></p>
-                                            <span class="text-[8px] font-black uppercase text-brand mt-1 block" x-text="notif.time"></span>
-                                        </div>
+                    
+                    <!-- 🚀 NOTIFICATION POPOVER (Intact) -->
+                    <div x-show="showNotifs" x-transition.origin.top.right class="absolute right-0 top-full mt-4 w-72 bg-white/95 dark:bg-dark_surface/95 backdrop-blur-xl rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.15),0_0_0_1px_rgba(0,0,0,0.05)] dark:shadow-[0_20px_40px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.1)] z-[100] overflow-hidden flex flex-col" style="display: none;">
+                        <div class="p-3 border-b border-slate-100 dark:border-white/10 font-bold text-xs text-slate-800 dark:text-white flex justify-between items-center bg-slate-50/80 dark:bg-black/20 shadow-sm">
+                            Notifications <span class="bg-brand/10 text-brand px-1.5 py-0.5 rounded text-[9px] shadow-sm" x-text="notifications.length + ' New'"></span>
+                        </div>
+                        <div class="max-h-64 overflow-y-auto custom-scroll">
+                            <template x-for="notif in notifications" :key="notif.title">
+                                <div class="p-3 border-b border-slate-50 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 transition flex items-start gap-3 cursor-pointer">
+                                    <div class="text-xl mt-0.5" x-text="notif.emoji"></div>
+                                    <div class="flex-1 min-w-0">
+                                        <h4 class="text-xs font-bold text-slate-800 dark:text-white truncate" x-text="notif.title"></h4>
+                                        <p class="text-[10px] text-slate-500 leading-tight mt-0.5" x-text="notif.desc"></p>
+                                        <span class="text-[8px] font-black uppercase text-brand mt-1 block" x-text="notif.time"></span>
                                     </div>
-                                </template>
-                                <div x-show="notifications.length === 0" class="p-6 text-center text-slate-400 text-xs">
-                                    <i class="fa-regular fa-bell-slash text-2xl mb-2 opacity-50"></i><br>No new notifications
                                 </div>
+                            </template>
+                            <div x-show="notifications.length === 0" class="p-6 text-center text-slate-400 text-xs">
+                                <i class="fa-regular fa-bell-slash text-2xl mb-2 opacity-50"></i><br>No new notifications
                             </div>
                         </div>
                     </div>
                 </div>
 
             </div>
+
+        </div>
     </header>
 
     <!-- MAIN DASHBOARD AREA -->
@@ -297,36 +314,30 @@
                 <!-- Dark Gradient Overlay for Text Readability -->
                 <div class="absolute inset-0 bg-gradient-to-r from-slate-900/80 via-slate-900/40 to-transparent dark:from-black/90 dark:via-black/50"></div>
 
-                <!-- Content Container -->
-                <div class="absolute inset-0 p-6 sm:p-8 flex flex-col justify-center w-full md:w-2/3 lg:w-1/2 z-10">
+                <!-- Content Container (Modern Glass & Gradient Typography) -->
+                                <div class="absolute inset-y-0 left-0 px-8 sm:px-12 py-6 flex flex-col justify-center w-full md:w-3/4 lg:w-[65%] z-10">
                     
-                    <!-- Dynamic Greeting Engine -->
-                    <div class="flex items-center gap-2 mb-2">
-                        <span class="px-2 py-0.5 rounded-full bg-brand/20 text-brand_glow font-mono font-black text-[9px] uppercase tracking-widest border border-brand/30 shadow-sm backdrop-blur-md">
-                            <span x-text="new Date().getHours() < 12 ? 'Good Morning' : (new Date().getHours() < 17 ? 'Good Afternoon' : 'Good Evening')"></span> 
+                    <!-- Premium Glowing Status Badge -->
+                    <div class="mt-0 inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-white/[0.05] border border-white/[0.12] backdrop-blur-md shadow-sm mb-4 w-max">
+                        <span class="flex h-2 w-2 relative">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand_glow opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-brand shadow-[0_0_8px_rgba(96,165,250,0.8)]"></span>
                         </span>
-                        <span class="text-slate-300 font-medium text-[10px] tracking-wide" x-text="currentDate"></span>
+                        <span class="text-[9px] font-black tracking-[0.2em] text-white/90 uppercase drop-shadow-sm" x-text="new Date().getHours() < 12 ? 'Good Morning' : (new Date().getHours() < 17 ? 'Good Afternoon' : 'Good Evening')"></span>
+                        <span class="w-px h-3 bg-white/20"></span>
+                        <span class="text-[9px] font-bold text-white/60 tracking-wider" x-text="currentDate"></span>
                     </div>
 
-                    <!-- Main Headline -->
-                    <h1 class="font-heading font-black text-3xl sm:text-4xl text-white tracking-tight leading-none mb-3 drop-shadow-lg">
-                        Welcome to <span class="text-brand_glow">PBL Connect</span>
+                    <!-- Main Headline (With Vibrant Text Gradient) -->
+                    <h1 class="font-heading font-black text-3xl sm:text-[40px] text-white tracking-tight leading-[1.15] mb-3 drop-shadow-lg">
+                        Welcome to <br class="sm:hidden" />
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400 drop-shadow-sm">PBL Connect</span>
                     </h1>
 
                     <!-- Subtitle / Tagline -->
-                    <p class="text-xs sm:text-[13px] text-slate-300 font-medium leading-relaxed max-w-md drop-shadow-md">
-                        Your central intranet hub. Access essential tools, daily workflows, HR policies, and company updates—all in one secure place.
+                    <p class="text-[12.5px] sm:text-[13px] text-slate-300/90 font-medium leading-relaxed max-w-lg mb-6 drop-shadow-md">
+                        Your central intranet portal to streamline your workday. Get instant access to essential tools, documents, and company news, all in one secure place.
                     </p>
-
-                    <!-- Quick Action Chips -->
-                    <div class="mt-4 flex items-center gap-3">
-                        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold tracking-wider hover:bg-white/20 transition-colors cursor-default">
-                            <i class="fa-solid fa-bolt text-amber-400"></i> Streamlined
-                        </div>
-                        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold tracking-wider hover:bg-white/20 transition-colors cursor-default">
-                            <i class="fa-solid fa-shield-halved text-emerald-400"></i> Secure Access
-                        </div>
-                    </div>
 
                 </div>
             </div>
