@@ -1,0 +1,1666 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PBL StreamStation | Enterprise Video Engine</title>
+    <!-- Brand Favicon & Icons -->
+    <link rel="icon" href="assets/images/pbl-logo.png" type="image/png">
+    <!-- 🚀 CDN Link (Same as index.html - Har network aur IIS server par 100% load hoga) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* === 1. DYNAMIC THEME SYSTEM (Light Mode Default) === */
+        :root[data-theme="light"] {
+            --primary: #1e826e;
+            --primary-glow: rgba(30, 130, 110, 0.25);
+            --bg-base: #f1f3f6;
+            --surface-panel: #ffffff;
+            --surface-card: #e8ecf1;
+            --border-line: rgba(0, 0, 0, 0.09);
+            --text-main: #1f2937;
+            --text-sub: #6b7280;
+            --track-hover: rgba(0, 0, 0, 0.04);
+            --badge-bg: rgba(30, 130, 110, 0.12);
+        }
+
+        :root[data-theme="dark"] {
+            --primary: #2b9e87;
+            --primary-glow: rgba(43, 158, 135, 0.4);
+            --bg-base: #0c0d10;
+            --surface-panel: #15171b;
+            --surface-card: #1d2026;
+            --border-line: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-sub: #9ca3af;
+            --track-hover: rgba(255, 255, 255, 0.04);
+            --badge-bg: rgba(43, 158, 135, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            user-select: none;
+            transition: background-color 0.25s ease, color 0.2s ease, border-color 0.2s ease;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* === 2. HEADER BAR === */
+        header {
+            height: 65px;
+            background-color: var(--surface-panel);
+            border-bottom: 1px solid var(--border-line);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            flex-shrink: 0;
+            z-index: 25;
+            gap: 15px;
+        }
+
+        .brand-cluster {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 220px;
+        }
+
+        .brand-logo {
+            height: 36px;
+        }
+
+        .brand-title {
+            font-size: 1.18rem;
+            font-weight: 700;
+        }
+
+        .brand-title span {
+            color: var(--primary);
+        }
+
+        /* Network Path Hub */
+        .network-path-hub {
+            flex: 1;
+            max-width: 550px;
+            background: var(--surface-card);
+            border: 1px solid var(--border-line);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            padding: 4px 10px;
+            gap: 8px;
+        }
+
+        .hub-icon {
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+
+        .path-display {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.76rem;
+            color: var(--text-sub);
+            border: none;
+            background: transparent;
+            width: 100%;
+            outline: none;
+        }
+
+        .path-display:focus {
+            color: var(--text-main);
+        }
+
+        .btn-copy-path {
+            background: none;
+            border: none;
+            color: var(--text-sub);
+            cursor: pointer;
+            font-size: 0.85rem;
+            padding: 4px 6px;
+            border-radius: 4px;
+        }
+
+        .btn-copy-path:hover {
+            color: var(--primary);
+            background: var(--badge-bg);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .utility-toggle-btn {
+            background: var(--surface-card);
+            border: 1px solid var(--border-line);
+            color: var(--text-main);
+            padding: 7px 12px;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .utility-toggle-btn:hover {
+            border-color: var(--primary);
+        }
+
+        .btn-folder {
+            background: linear-gradient(135deg, var(--primary), #1a6f5d);
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+
+        .btn-folder:hover {
+            transform: translateY(-2px);
+        }
+
+        #file-input { display: none; }
+
+        /* === 3. MAIN WORKSPACE === */
+        .workspace {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+            padding: 16px 20px;
+            gap: 18px;
+        }
+
+        /* Video Frame */
+        .video-box {
+            flex: 3;
+            background: #000000;
+            border-radius: 14px;
+            border: 1px solid var(--border-line);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            cursor: pointer;
+        }
+
+        /* Resume Toast Notification */
+        .resume-toast {
+            position: absolute;
+            bottom: 85px;
+            left: 25px;
+            background: rgba(18, 20, 24, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-family: 'Roboto Mono', monospace;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 30;
+            opacity: 0;
+            transform: translateY(10px);
+            pointer-events: none;
+            backdrop-filter: blur(8px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+        }
+
+        .resume-toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .resume-toast i {
+            color: var(--primary);
+        }
+
+        /* Custom Floating Player Overlay */
+        .custom-ui-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 40%, transparent 70%, rgba(0,0,0,0.7) 100%);
+            opacity: 1;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 15;
+        }
+
+        .custom-ui-overlay.idle-hidden {
+            opacity: 0;
+            cursor: none;
+        }
+
+        .custom-ui-overlay * { pointer-events: auto; }
+
+        .video-top-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .active-video-heading {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            max-width: 75%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .active-folder-tag {
+            font-size: 0.72rem;
+            font-family: 'Roboto Mono', monospace;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        /* Scrub Progress Bar */
+        .video-bottom-dock {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .scrub-container {
+            position: relative;
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: height 0.15s ease;
+        }
+
+        .scrub-container:hover { height: 10px; }
+
+        .buffer-progress {
+            position: absolute;
+            top: 0; left: 0;
+            height: 100%; width: 0%;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 4px;
+        }
+
+        .play-progress {
+            position: absolute;
+            top: 0; left: 0;
+            height: 100%; width: 0%;
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        .scrub-thumb {
+            position: absolute;
+            right: -6px; top: 50%;
+            transform: translateY(-50%) scale(0);
+            width: 14px; height: 14px;
+            background: #ffffff;
+            border-radius: 50%;
+            transition: transform 0.15s ease;
+        }
+
+        .scrub-container:hover .scrub-thumb { transform: translateY(-50%) scale(1); }
+
+        /* YouTube-Class Live Hover Thumbnail Card */
+		.scrub-preview-card {
+			position: absolute;
+			bottom: 24px;
+			transform: translateX(-50%);
+			background: var(--surface-panel);
+			border: 1px solid var(--border-line);
+			border-radius: 8px;
+			padding: 4px;
+			display: none;
+			flex-direction: column;
+			align-items: center;
+			pointer-events: none;
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+			z-index: 50;
+			transition: opacity 0.15s ease;
+		}
+
+		/* Modern High-Performance Canvas Thumbnail Box */
+		.preview-frame-box {
+			width: 160px;
+			height: 90px;
+			background: #0c0d10;
+			border-radius: 6px;
+			overflow: hidden;
+			position: relative;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			border: 1px solid var(--border-line);
+		}
+
+		#preview-canvas {
+			width: 100%;
+			height: 100%;
+			display: block;
+			object-fit: cover;
+		}
+
+		.preview-loading-spinner {
+			position: absolute;
+			color: var(--primary);
+			font-size: 1.1rem;
+			display: none;
+		}
+
+		/* Timestamp badge clearly visible in both light & dark mode */
+		.preview-timestamp {
+			font-family: 'Roboto Mono', monospace;
+			font-size: 0.74rem;
+			font-weight: 700;
+			color: var(--text-main);
+			background: var(--surface-card);
+			padding: 2px 8px;
+			border-radius: 4px;
+			margin-top: 4px;
+			border: 1px solid var(--border-line);
+		}
+
+		.preview-timestamp {
+			font-family: 'Roboto Mono', monospace;
+			font-size: 0.74rem;
+			font-weight: 700;
+			color: var(--text-main);
+			padding: 3px 6px;
+		}
+
+        .controls-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .controls-cluster {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .c-btn {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.15s, transform 0.1s;
+        }
+
+        .c-btn:hover { color: var(--primary); transform: scale(1.1); }
+
+        .time-monitor {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.82rem;
+            color: #d1d5db;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .time-monitor .live-elapsed { color: #ffffff; font-weight: 700; }
+        .time-monitor .live-remaining { color: var(--primary); font-size: 0.78rem; margin-left: 2px; }
+
+        .volume-assembly {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .volume-slider {
+            -webkit-appearance: none;
+            width: 70px;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+        }
+
+        /* Speed Control Menu */
+        .speed-dropdown { position: relative; }
+        .speed-tag {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 3px 6px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .speed-menu {
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--surface-card);
+            border: 1px solid var(--border-line);
+            border-radius: 8px;
+            padding: 6px;
+            display: none;
+            flex-direction: column;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            z-index: 30;
+        }
+
+        .speed-menu.show { display: flex; }
+        .speed-opt {
+            background: none;
+            border: none;
+            color: var(--text-main);
+            padding: 5px 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .speed-opt:hover, .speed-opt.active { background: var(--primary); color: #fff; }
+
+        /* === 4. MULTI-FOLDER PLAYLIST PANEL === */
+        .playlist-side {
+            flex: 1.1;
+            min-width: 340px;
+            max-width: 420px;
+            background: var(--surface-panel);
+            border-radius: 14px;
+            border: 1px solid var(--border-line);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+        }
+
+        .playlist-top {
+            padding: 14px;
+            border-bottom: 1px solid var(--border-line);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .pl-meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.92rem;
+            font-weight: 600;
+        }
+
+        .file-counter {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--primary);
+            background: var(--badge-bg);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .folder-filter-dropdown {
+            width: 100%;
+            background: var(--surface-card);
+            border: 1px solid var(--border-line);
+            color: var(--text-main);
+            padding: 7px 10px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .search-field {
+            width: 100%;
+            background: var(--surface-card);
+            border: 1px solid var(--border-line);
+            color: var(--text-main);
+            padding: 7px 12px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            outline: none;
+        }
+
+        .search-field:focus, .folder-filter-dropdown:focus { border-color: var(--primary); }
+
+        .queue-items {
+            flex: 1;
+            overflow-y: auto;
+            list-style: none;
+            padding: 8px;
+        }
+
+        .queue-items::-webkit-scrollbar { width: 5px; }
+        .queue-items::-webkit-scrollbar-thumb { background: rgba(150,150,150,0.25); border-radius: 4px; }
+
+        .queue-node {
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .queue-node:hover { background: var(--track-hover); }
+
+        .queue-node.playing {
+            background: var(--badge-bg);
+            border-left: 3px solid var(--primary);
+        }
+
+        .queue-num {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            width: 20px;
+        }
+
+        .queue-node.playing .queue-num { color: var(--primary); font-weight: 700; }
+
+        .queue-info-cell {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .queue-label {
+            font-size: 0.82rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text-main);
+        }
+
+        .queue-node.playing .queue-label { color: var(--primary); font-weight: 600; }
+
+        .queue-subfolder {
+            font-size: 0.68rem;
+            color: var(--text-sub);
+            font-family: 'Roboto Mono', monospace;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Saved Watch Indicator */
+        .watched-indicator {
+            font-size: 0.68rem;
+            color: var(--primary);
+            font-family: 'Roboto Mono', monospace;
+            margin-left: auto;
+            padding-left: 6px;
+        }
+
+        /* Initial Drag Drop Screen */
+        .dropzone-view {
+            position: absolute;
+            inset: 0;
+            background: var(--surface-panel);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 30px;
+            cursor: pointer;
+            z-index: 18;
+        }
+
+        .dropzone-view i {
+            font-size: 3.5rem;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+
+        .dropzone-view h3 { font-size: 1.15rem; margin-bottom: 4px; }
+        .dropzone-view p { font-size: 0.85rem; color: var(--text-sub); max-width: 380px; }
+		
+		/* Modern Shortcuts Modal System */
+.shortcuts-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(6px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.shortcuts-backdrop.show {
+    display: flex;
+    opacity: 1;
+}
+
+.shortcuts-card {
+    background: var(--surface-panel);
+    border: 1px solid var(--border-line);
+    border-radius: 14px;
+    width: 90%;
+    max-width: 520px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    padding: 24px;
+    transform: scale(0.95);
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.shortcuts-backdrop.show .shortcuts-card {
+    transform: scale(1);
+}
+
+.shortcuts-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border-line);
+}
+
+.shortcuts-head h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.close-shortcuts-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-sub);
+    cursor: pointer;
+    line-height: 1;
+}
+
+.close-shortcuts-btn:hover {
+    color: var(--primary);
+}
+
+.shortcuts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 20px;
+    margin: 18px 0;
+}
+
+.shortcut-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.8rem;
+    color: var(--text-main);
+}
+
+.shortcut-row span {
+    color: var(--text-sub);
+}
+
+kbd {
+    background: var(--surface-card);
+    border: 1px solid var(--border-line);
+    border-bottom: 2px solid var(--primary);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--text-main);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.shortcuts-footer {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-sub);
+    border-top: 1px solid var(--border-line);
+    padding-top: 12px;
+}
+
+/* Modern Audio Language Dropdown (Matches Speed Menu) */
+.audio-dropdown {
+    position: relative;
+}
+
+.audio-tag {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.audio-tag:hover {
+    background: var(--primary);
+}
+
+.audio-menu {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--surface-card);
+    border: 1px solid var(--border-line);
+    border-radius: 8px;
+    padding: 6px;
+    display: none;
+    flex-direction: column;
+    min-width: 130px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    z-index: 35;
+}
+
+.audio-menu.show {
+    display: flex;
+}
+
+.audio-opt {
+    background: none;
+    border: none;
+    color: var(--text-main);
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    border-radius: 4px;
+    text-align: left;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.audio-opt:hover, .audio-opt.active {
+    background: var(--primary);
+    color: #ffffff;
+}
+		
+		
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header>
+        <div class="brand-cluster">
+            <img src="assets/images/pbl-logo.png" alt="PBL Logo" class="brand-logo" onerror="this.style.display='none'">
+            <div class="brand-title">PBL <span>StreamStation</span></div>
+        </div>
+
+        <!-- Editable Default Network Path Hub -->
+        <div class="network-path-hub">
+            <i class="fas fa-network-wired hub-icon"></i>
+            <input type="text" id="network-path-input" class="path-display" value="\\192.168.0.14\01-GDP207-Generalli backup -29.12.2025" title="Network Directory Path">
+            <button class="btn-copy-path" id="btn-copy-path" title="Copy Path to Clipboard"><i class="fas fa-copy"></i></button>
+        </div>
+
+        <!-- Header actions mein "Shortcuts (?)" trigger button add hua -->
+		<div class="header-actions">
+			<button class="utility-toggle-btn" id="btn-shortcuts-modal" title="View Keyboard Shortcuts (?)">
+				<i class="fas fa-keyboard"></i> <span>Shortcuts (?)</span>
+			</button>
+
+			<button class="utility-toggle-btn" id="btn-theme-toggle" title="Switch Light/Dark Mode">
+				<i class="fas fa-sun" id="theme-icon"></i> <span id="lbl-theme-state">Light</span>
+			</button>
+
+			<label for="file-input" class="btn-folder">
+				<i class="fas fa-folder-open"></i> Select Video Folder
+			</label>
+			<input type="file" id="file-input" webkitdirectory directory multiple>
+		</div>
+
+		<!-- Modern Glassmorphic Keyboard Shortcuts Cheat Sheet Modal -->
+		<div class="shortcuts-backdrop" id="shortcuts-modal">
+			<div class="shortcuts-card">
+				<div class="shortcuts-head">
+					<h3><i class="fas fa-keyboard" style="color:var(--primary)"></i> Keyboard Shortcuts</h3>
+					<button class="close-shortcuts-btn" id="btn-close-shortcuts">&times;</button>
+				</div>
+				<div class="shortcuts-grid">
+				<div class="shortcut-row"><kbd>Space</kbd> / <kbd>K</kbd> <span>Play / Pause</span></div>
+				<div class="shortcut-row"><kbd>&larr;</kbd> / <kbd>&rarr;</kbd> <span>Rewind / Seek 5s</span></div>
+				<div class="shortcut-row"><kbd>0</kbd> - <kbd>9</kbd> <span>Jump to 0% - 90%</span></div>
+				<div class="shortcut-row"><kbd>&uarr;</kbd> / <kbd>&darr;</kbd> <span>Volume Up / Down (5%)</span></div>
+				<div class="shortcut-row"><kbd>F</kbd> <span>Toggle Fullscreen</span></div>
+				<div class="shortcut-row"><kbd>M</kbd> <span>Mute / Unmute Audio</span></div>
+				<div class="shortcut-row"><kbd>N</kbd> <span>Next Video Track</span></div>
+				<div class="shortcut-row"><kbd>P</kbd> <span>Previous Video Track</span></div>
+				<div class="shortcut-row"><kbd>&gt;</kbd> / <kbd>&lt;</kbd> <span>Increase / Decrease Speed</span></div>
+				<div class="shortcut-row"><kbd>?</kbd> / <kbd>H</kbd> <span>Toggle This Shortcuts Guide</span></div>
+			</div>
+				<div class="shortcuts-footer">Press <kbd>Esc</kbd> or click outside to close</div>
+			</div>
+		</div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="workspace">
+        <div class="video-box" id="video-frame">
+            <video id="core-video" preload="auto"></video>
+
+            <!-- Initial Select Overlay -->
+            <div class="dropzone-view" id="dropzone">
+                <i class="fas fa-folder-tree"></i>
+                <h3>Select Generali Backup Directory</h3>
+                <p>Click "Select Video Folder" above, paste the path in Windows File Explorer and hit Enter to index all subfolders.</p>
+            </div>
+
+            <!-- Resume Toast Notification -->
+            <div class="resume-toast" id="resume-toast">
+                <i class="fas fa-clock-rotate-left"></i>
+                <span id="resume-toast-msg">Resumed from 00:00</span>
+            </div>
+
+            <!-- Custom Clean Player Overlay -->
+            <div class="custom-ui-overlay" id="player-overlay">
+                <div class="video-top-details">
+                    <span class="active-video-heading" id="top-title">Ready to stream</span>
+                    <span class="active-folder-tag" id="top-folder-tag">Root</span>
+                </div>
+
+                <div class="video-bottom-dock">
+                    <!-- Progress / Scrub Bar -->
+                    <div class="scrub-container" id="scrub-bar">
+					<div class="buffer-progress" id="buffer-bar"></div>
+					<div class="play-progress" id="play-bar">
+						<div class="scrub-thumb"></div>
+					</div>
+					
+					<!-- Modern YouTube-Style Live Hover Frame Preview Card -->
+					<div class="scrub-preview-card" id="scrub-preview-card">
+					<div class="preview-frame-box">
+						<!-- Canvas hamesha live decoded frame dikhayega bina black screen ke -->
+						<canvas id="preview-canvas" width="160" height="90"></canvas>
+						<div class="preview-loading-spinner" id="preview-spinner"><i class="fas fa-circle-notch fa-spin"></i></div>
+					</div>
+					<div class="preview-timestamp" id="scrub-time-tooltip">00:00</div>
+				</div>
+
+				<!-- Background silent worker video (Screen se bahar hidden rahegi) -->
+				<video id="preview-video-engine" muted playsinline preload="auto" style="display:none;"></video>
+				</div>
+
+                    <!-- Bottom Buttons Cluster -->
+                    <div class="controls-row">
+                        <div class="controls-cluster">
+                            <button class="c-btn" id="btn-toggle-play" title="Play/Pause (Space)"><i class="fas fa-play" id="icon-play"></i></button>
+                            <button class="c-btn" id="btn-seek-back" title="Rewind 10s"><i class="fas fa-rotate-left"></i></button>
+                            <button class="c-btn" id="btn-seek-fwd" title="Forward 10s"><i class="fas fa-rotate-right"></i></button>
+
+                            <div class="volume-assembly">
+                                <button class="c-btn" id="btn-vol-mute" title="Mute (M)"><i class="fas fa-volume-high" id="icon-vol"></i></button>
+                                <input type="range" class="volume-slider" id="vol-slider" min="0" max="1" step="0.05" value="1">
+                            </div>
+
+                            <div class="time-monitor" id="time-toggle-box">
+                                <span class="live-elapsed" id="lbl-current-time">00:00</span>
+                                <span>/</span>
+                                <span id="lbl-total-duration">--:--</span>
+                                <span class="live-remaining" id="lbl-remaining-time"></span>
+                            </div>
+                        </div>
+
+                        <div class="controls-cluster">
+						<!-- Dynamic Audio Track Selector (Default: Hidden) -->
+						<div class="audio-dropdown" id="audio-track-box" style="display: none;">
+							<span class="audio-tag" id="btn-audio-track" title="Switch Audio Language">
+								<i class="fas fa-language"></i> <span id="lbl-current-audio">Audio</span>
+							</span>
+							<div class="audio-menu" id="audio-options">
+								<!-- Languages dynamically inject hongi (Hindi, Japanese, etc.) -->
+							</div>
+						</div>
+
+						<!-- Speed Controller -->
+						<div class="speed-dropdown">
+							<span class="speed-tag" id="btn-speed">1x</span>
+							<div class="speed-menu" id="speed-options">
+								<button class="speed-opt" data-spd="0.5">0.5x</button>
+								<button class="speed-opt" data-spd="0.75">0.75x</button>
+								<button class="speed-opt active" data-spd="1">Normal (1x)</button>
+								<button class="speed-opt" data-spd="1.25">1.25x</button>
+								<button class="speed-opt" data-spd="1.5">1.5x</button>
+								<button class="speed-opt" data-spd="2">2.0x</button>
+							</div>
+						</div>
+
+						<button class="c-btn" id="btn-pip" title="Picture in Picture"><i class="fas fa-clone"></i></button>
+						<button class="c-btn" id="btn-fullscreen" title="Fullscreen (F)"><i class="fas fa-expand"></i></button>
+					</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Playlist with Hierarchical Folder Filter -->
+        <aside class="playlist-side">
+            <div class="playlist-top">
+                <div class="pl-meta-row">
+                    <span><i class="fas fa-layer-group" style="color: var(--primary);"></i> Media Index</span>
+                    <span class="file-counter" id="lbl-count">0 Videos</span>
+                </div>
+
+                <select id="folder-filter" class="folder-filter-dropdown">
+                    <option value="ALL">📁 All Subfolders</option>
+                </select>
+
+                <input type="text" class="search-field" id="txt-search" placeholder="Search filtered videos...">
+            </div>
+            <ul class="queue-items" id="track-list"></ul>
+        </aside>
+    </main>
+
+    <script>
+	
+	// --- GATEKEEPER SECURITY CHECK ---
+    const REQUIRED_KEY = 'pbltraining';
+    if (sessionStorage.getItem('pbl_stream_auth') !== 'granted') {
+        // Direct access attempt detected!
+        const enteredPass = prompt("🔐 Restricted: Enter Password to access PBL StreamStation:");
+        if (enteredPass === REQUIRED_KEY) {
+            sessionStorage.setItem('pbl_stream_auth', 'granted');
+        } else {
+            alert("❌ Access Denied: Invalid Password!");
+            window.location.href = 'Index.html'; // Wapas Index page par bhej dega
+        }
+    }
+        const video = document.getElementById('core-video');
+        const videoFrame = document.getElementById('video-frame');
+        const overlay = document.getElementById('player-overlay');
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('file-input');
+        const trackList = document.getElementById('track-list');
+        const lblCount = document.getElementById('lbl-count');
+        const txtSearch = document.getElementById('txt-search');
+        const folderFilter = document.getElementById('folder-filter');
+        const topTitle = document.getElementById('top-title');
+        const topFolderTag = document.getElementById('top-folder-tag');
+        const resumeToast = document.getElementById('resume-toast');
+        const resumeToastMsg = document.getElementById('resume-toast-msg');
+
+        // Theme Elements
+        const btnTheme = document.getElementById('btn-theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const lblThemeState = document.getElementById('lbl-theme-state');
+
+        // Path Hub Elements
+        const networkPathInput = document.getElementById('network-path-input');
+        const btnCopyPath = document.getElementById('btn-copy-path');
+
+        // Controls Elements
+        const scrubBar = document.getElementById('scrub-bar');
+        const playBar = document.getElementById('play-bar');
+        const bufferBar = document.getElementById('buffer-bar');
+        const scrubTooltip = document.getElementById('scrub-time-tooltip');
+        const lblCurrentTime = document.getElementById('lbl-current-time');
+        const lblTotalDuration = document.getElementById('lbl-total-duration');
+        const lblRemainingTime = document.getElementById('lbl-remaining-time');
+        const btnPlay = document.getElementById('btn-toggle-play');
+        const iconPlay = document.getElementById('icon-play');
+        const btnBack = document.getElementById('btn-seek-back');
+        const btnFwd = document.getElementById('btn-seek-fwd');
+        const btnMute = document.getElementById('btn-vol-mute');
+        const iconVol = document.getElementById('icon-vol');
+        const volSlider = document.getElementById('vol-slider');
+        const btnSpeed = document.getElementById('btn-speed');
+        const speedOptions = document.getElementById('speed-options');
+        const btnPip = document.getElementById('btn-pip');
+        const btnFs = document.getElementById('btn-fullscreen');
+
+        let rawMediaData = []; 
+        let currentIndex = -1;
+        let idleTimer = null;
+        let toastTimer = null;
+
+        const supportedExtensions = ['.mp4', '.webm', '.ogg', '.m4v', '.mkv'];
+
+        // --- 1. THEME ENGINE (Default: Light) ---
+        const savedTheme = localStorage.getItem('pbl-theme') || 'light';
+        applyTheme(savedTheme);
+
+        btnTheme.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            applyTheme(next);
+        });
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('pbl-theme', theme);
+            lblThemeState.textContent = theme === 'dark' ? 'Dark' : 'Light';
+            themeIcon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+        }
+
+        // --- 2. NETWORK PATH HUB LOGIC ---
+        const savedPath = localStorage.getItem('pbl-network-path');
+        if (savedPath) networkPathInput.value = savedPath;
+
+        networkPathInput.addEventListener('change', () => {
+            localStorage.setItem('pbl-network-path', networkPathInput.value.trim());
+        });
+
+        btnCopyPath.addEventListener('click', () => {
+            navigator.clipboard.writeText(networkPathInput.value);
+            btnCopyPath.innerHTML = '<i class="fas fa-check" style="color:var(--primary)"></i>';
+            setTimeout(() => { btnCopyPath.innerHTML = '<i class="fas fa-copy"></i>'; }, 1500);
+        });
+
+        // --- 3. VIDEO TIME MEMORY (PERSISTENCE) ENGINE ---
+        function getStorageKey(item) {
+            return `pbl_pos_${item.subfolder}_${item.name}_${item.file.size}`;
+        }
+
+        function savePlaybackTime() {
+            if (currentIndex < 0 || currentIndex >= rawMediaData.length) return;
+            const currentItem = rawMediaData[currentIndex];
+            if (!video.duration || isNaN(video.duration)) return;
+
+            // If finished, reset progress
+            if (video.currentTime >= video.duration - 2) {
+                localStorage.removeItem(getStorageKey(currentItem));
+            } else if (video.currentTime > 3) {
+                localStorage.setItem(getStorageKey(currentItem), video.currentTime.toFixed(1));
+            }
+        }
+
+        function showResumeToast(timeStr) {
+            clearTimeout(toastTimer);
+            resumeToastMsg.textContent = `Resumed from ${timeStr}`;
+            resumeToast.classList.add('show');
+            toastTimer = setTimeout(() => {
+                resumeToast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Save position every 3 seconds and on pause
+        setInterval(savePlaybackTime, 3000);
+        video.addEventListener('pause', savePlaybackTime);
+
+        // --- 4. HIERARCHICAL FOLDER PARSER ---
+        fileInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            rawMediaData = [];
+            const subfolderSet = new Set();
+
+            files.forEach((file) => {
+                const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+                if (supportedExtensions.includes(ext) || file.type.startsWith('video/')) {
+                    let folderPath = 'Root';
+                    if (file.webkitRelativePath) {
+                        const segments = file.webkitRelativePath.split('/');
+                        if (segments.length > 2) {
+                            folderPath = segments.slice(1, -1).join('/');
+                        } else if (segments.length === 2) {
+                            folderPath = segments[0];
+                        }
+                    }
+                    subfolderSet.add(folderPath);
+
+                    rawMediaData.push({
+                        file: file,
+                        name: file.name,
+                        subfolder: folderPath
+                    });
+                }
+            });
+
+            rawMediaData.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
+
+            folderFilter.innerHTML = '<option value="ALL">📁 All Subfolders</option>';
+            Array.from(subfolderSet).sort().forEach(folder => {
+                const opt = document.createElement('option');
+                opt.value = folder;
+                opt.textContent = `📂 ${folder}`;
+                folderFilter.appendChild(opt);
+            });
+
+            lblCount.textContent = `${rawMediaData.length} Videos`;
+
+            if (rawMediaData.length > 0) {
+                dropzone.style.display = 'none';
+                renderQueue();
+                loadTrack(0);
+            }
+        });
+
+        folderFilter.addEventListener('change', renderQueue);
+        txtSearch.addEventListener('input', renderQueue);
+
+        function renderQueue() {
+            const q = txtSearch.value.toLowerCase().trim();
+            const selectedFolder = folderFilter.value;
+            trackList.innerHTML = '';
+
+            let matchCount = 0;
+            rawMediaData.forEach((item, idx) => {
+                const folderMatch = (selectedFolder === 'ALL' || item.subfolder === selectedFolder);
+                const nameMatch = item.name.toLowerCase().includes(q);
+
+                if (folderMatch && nameMatch) {
+                    matchCount++;
+                    const savedPos = localStorage.getItem(getStorageKey(item));
+                    const watchBadge = savedPos ? `<span class="watched-indicator"><i class="fas fa-bookmark"></i> ${formatClock(savedPos)}</span>` : '';
+
+                    const li = document.createElement('li');
+                    li.className = `queue-node ${idx === currentIndex ? 'playing' : ''}`;
+                    li.innerHTML = `
+                        <span class="queue-num">${String(matchCount).padStart(2, '0')}</span>
+                        <div class="queue-info-cell">
+                            <span class="queue-label" title="${item.name}">${item.name}</span>
+                            <span class="queue-subfolder"><i class="fas fa-folder-closed"></i> ${item.subfolder}</span>
+                        </div>
+                        ${watchBadge}
+                        <i class="fas fa-circle-play" style="color: var(--primary); font-size: 0.8rem; display: ${idx === currentIndex ? 'block' : 'none'};"></i>
+                    `;
+                    li.addEventListener('click', () => loadTrack(idx));
+                    trackList.appendChild(li);
+                }
+            });
+        }
+
+        // --- 5. TRACK LOADER & RESUME IMPLEMENTATION ---
+        function loadTrack(idx) {
+            if (idx < 0 || idx >= rawMediaData.length) return;
+            savePlaybackTime(); // Save previous video time before switching
+            currentIndex = idx;
+            const target = rawMediaData[idx];
+
+            if (video.src && video.src.startsWith('blob:')) {
+                URL.revokeObjectURL(video.src);
+            }
+
+            video.src = URL.createObjectURL(target.file);
+			syncWorkerPreview(target.file);
+            topTitle.textContent = target.name;
+            topFolderTag.textContent = target.subfolder;
+            renderQueue();
+
+            // Metadata & Resume Handling
+            video.addEventListener('loadedmetadata', function onMeta() {
+                // Read saved timestamp from persistence
+                const savedSec = parseFloat(localStorage.getItem(getStorageKey(target)));
+
+                if (video.duration === Infinity || isNaN(video.duration)) {
+                    video.currentTime = 1e101;
+                    video.addEventListener('timeupdate', function getRealDuration() {
+                        const targetTime = (savedSec && savedSec < video.currentTime - 5) ? savedSec : 0;
+                        video.currentTime = targetTime;
+                        video.removeEventListener('timeupdate', getRealDuration);
+                        updateTimeDisplay();
+                        if (targetTime > 0) showResumeToast(formatClock(targetTime));
+                    }, { once: true });
+                } else {
+                    if (savedSec && savedSec < video.duration - 5) {
+                        video.currentTime = savedSec;
+                        showResumeToast(formatClock(savedSec));
+                    }
+                    updateTimeDisplay();
+                }
+                video.removeEventListener('loadedmetadata', onMeta);
+            });
+
+            video.play();
+        }
+
+        function formatClock(seconds) {
+            if (isNaN(seconds) || seconds === Infinity || seconds < 0) return '00:00';
+            const hrs = Math.floor(seconds / 3600);
+            const mins = Math.floor((seconds % 3600) / 60);
+            const secs = Math.floor(seconds % 60);
+            if (hrs > 0) return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        video.addEventListener('timeupdate', () => {
+            updateTimeDisplay();
+            if (video.duration) {
+                const percent = (video.currentTime / video.duration) * 100;
+                playBar.style.width = `${percent}%`;
+            }
+            if (video.buffered.length > 0 && video.duration) {
+                const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+                bufferBar.style.width = `${(bufferedEnd / video.duration) * 100}%`;
+            }
+        });
+
+        function updateTimeDisplay() {
+            lblCurrentTime.textContent = formatClock(video.currentTime);
+            lblTotalDuration.textContent = formatClock(video.duration);
+            if (video.duration && !isNaN(video.duration)) {
+                lblRemainingTime.textContent = `(-${formatClock(video.duration - video.currentTime)})`;
+            } else {
+                lblRemainingTime.textContent = '';
+            }
+        }
+
+        // --- DOM ELEMENTS FOR PREVIEW FRAME ---
+		// --- CANVAS PREVIEW ENGINE DOM ELEMENTS ---
+		const scrubPreviewCard = document.getElementById('scrub-preview-card');
+		const previewVideoEngine = document.getElementById('preview-video-engine');
+		const previewCanvas = document.getElementById('preview-canvas');
+		const previewCtx = previewCanvas.getContext('2d');
+		const previewSpinner = document.getElementById('preview-spinner');
+
+		let isFrameSeeking = false;
+		let pendingSeekTime = null;
+
+		// 1. Frame Paint Logic: Jaise hi worker video frame seek karegi, canvas draw hoga
+		previewVideoEngine.addEventListener('seeked', () => {
+			try {
+				// Video frame ko canvas par draw karna
+				previewCtx.drawImage(previewVideoEngine, 0, 0, previewCanvas.width, previewCanvas.height);
+			} catch (err) {
+				console.error("Canvas draw error:", err);
+			}
+			previewSpinner.style.display = 'none';
+			isFrameSeeking = false;
+
+			// Agar mouse tezi se aage nikal gaya ho toh pending seek execute karna
+			if (pendingSeekTime !== null) {
+				const nextTime = pendingSeekTime;
+				pendingSeekTime = null;
+				requestFrameSeek(nextTime);
+			}
+		});
+
+		// 2. Safe Seek Request Handler
+		function requestFrameSeek(timeSec) {
+			if (previewVideoEngine.readyState < 1) return; // Metadata zaroori hai
+
+			if (isFrameSeeking) {
+				pendingSeekTime = timeSec;
+				return;
+			}
+
+			isFrameSeeking = true;
+			previewVideoEngine.currentTime = timeSec;
+		}
+
+		// 3. Automated Source Sync in loadTrack
+		// Aapke code ke loadTrack(idx) function ke andar jahan:
+		// "video.src = URL.createObjectURL(target.file);" likha hai,
+		// theek uske neeche ye 3 lines add karni hain:
+		function syncWorkerPreview(file) {
+			if (previewVideoEngine.src && previewVideoEngine.src.startsWith('blob:')) {
+				URL.revokeObjectURL(previewVideoEngine.src);
+			}
+			previewVideoEngine.src = URL.createObjectURL(file);
+			previewVideoEngine.load(); // Eager buffer initialization
+		}
+
+		// 4. Scrub Bar Mousemove (Edge-clamped and Canvas Driven)
+		scrubBar.addEventListener('mousemove', (e) => {
+			if (!video.duration || isNaN(video.duration)) return;
+
+			const rect = scrubBar.getBoundingClientRect();
+			const offsetX = e.clientX - rect.left;
+			const rawPos = offsetX / rect.width;
+			const clampedPos = Math.max(0, Math.min(1, rawPos));
+			const hoverSec = clampedPos * video.duration;
+
+			// Position clamping taaki screen border se cut na ho
+			const halfWidth = 85;
+			const clampedX = Math.max(halfWidth, Math.min(rect.width - halfWidth, offsetX));
+
+			scrubPreviewCard.style.left = `${clampedX}px`;
+			scrubTooltip.textContent = formatClock(hoverSec);
+			scrubPreviewCard.style.display = 'flex';
+
+			// Live frame seek request
+			requestFrameSeek(hoverSec);
+		});
+
+		scrubBar.addEventListener('mouseleave', () => {
+			scrubPreviewCard.style.display = 'none';
+			pendingSeekTime = null;
+		});
+
+		scrubBar.addEventListener('mouseleave', () => {
+			scrubPreviewCard.style.display = 'none';
+			clearTimeout(previewThrottleTimer);
+			isPreviewSeeking = false;
+		});
+
+		// --- RESTORING THE BROKEN SPEED BUTTON CLICK (BUG FIX) ---
+		btnSpeed.addEventListener('click', (e) => {
+			e.stopPropagation();
+			speedOptions.classList.toggle('show');
+			if (audioTrackBox) audioOptions.classList.remove('show');
+		});
+
+		// Window click par speed menu bhi close hoga
+		document.addEventListener('click', (e) => {
+			if (!btnSpeed.contains(e.target)) speedOptions.classList.remove('show');
+		});
+
+        scrubBar.addEventListener('mouseleave', () => scrubTooltip.style.display = 'none');
+        scrubBar.addEventListener('click', (e) => {
+            const rect = scrubBar.getBoundingClientRect();
+            if (video.duration) {
+                video.currentTime = ((e.clientX - rect.left) / rect.width) * video.duration;
+                savePlaybackTime();
+            }
+        });
+
+        // Controls Interactivity
+        function togglePlay() {
+            video.paused ? video.play() : video.pause();
+        }
+
+        video.addEventListener('play', () => { iconPlay.className = 'fas fa-pause'; });
+        video.addEventListener('pause', () => { iconPlay.className = 'fas fa-play'; });
+        btnPlay.addEventListener('click', togglePlay);
+        video.addEventListener('click', togglePlay);
+
+        btnBack.addEventListener('click', () => { video.currentTime -= 10; });
+        btnFwd.addEventListener('click', () => { video.currentTime += 10; });
+
+        // Volume
+        volSlider.addEventListener('input', (e) => {
+            video.volume = e.target.value;
+            video.muted = (video.volume === 0);
+            updateVolumeIcon();
+        });
+
+        btnMute.addEventListener('click', () => {
+            video.muted = !video.muted;
+            updateVolumeIcon();
+        });
+
+        function updateVolumeIcon() {
+            if (video.muted || video.volume === 0) iconVol.className = 'fas fa-volume-xmark';
+            else if (video.volume < 0.5) iconVol.className = 'fas fa-volume-low';
+            else iconVol.className = 'fas fa-volume-high';
+        }
+
+        // Speed Menu
+        // Multi-Audio DOM Elements
+const audioTrackBox = document.getElementById('audio-track-box');
+const btnAudioTrack = document.getElementById('btn-audio-track');
+const audioOptions = document.getElementById('audio-options');
+const lblCurrentAudio = document.getElementById('lbl-current-audio');
+
+// Audio Dropdown Toggle Event
+btnAudioTrack.addEventListener('click', (e) => {
+    e.stopPropagation();
+    audioOptions.classList.toggle('show');
+    speedOptions.classList.remove('show');
+});
+
+// Window click par menu close karna
+document.addEventListener('click', (e) => {
+    if (!audioTrackBox.contains(e.target)) audioOptions.classList.remove('show');
+});
+
+// Dynamic Audio Detection & Track Switcher Logic
+function checkAndRenderAudioTracks() {
+    // Check if browser exposed audioTracks API
+    if (video.audioTracks && video.audioTracks.length > 1) {
+        audioTrackBox.style.display = 'inline-block'; // 2 ya zyada tracks par button dikhega
+        audioOptions.innerHTML = '';
+
+        for (let i = 0; i < video.audioTracks.length; i++) {
+            const track = video.audioTracks[i];
+            const btn = document.createElement('button');
+            const trackName = track.label || track.language || `Audio Track ${i + 1}`;
+
+            btn.className = `audio-opt ${track.enabled ? 'active' : ''}`;
+            btn.innerHTML = `<i class="fas ${track.enabled ? 'fa-check' : 'fa-volume-low'}"></i> ${trackName}`;
+
+            btn.addEventListener('click', () => {
+                // Ek track enable karke baaki disable karna
+                for (let j = 0; j < video.audioTracks.length; j++) {
+                    video.audioTracks[j].enabled = (j === i);
+                }
+
+                document.querySelectorAll('.audio-opt').forEach((b, idx) => {
+                    b.classList.toggle('active', idx === i);
+                    b.querySelector('i').className = `fas ${idx === i ? 'fa-check' : 'fa-volume-low'}`;
+                });
+
+                lblCurrentAudio.textContent = track.language ? track.language.toUpperCase() : `Track ${i + 1}`;
+                audioOptions.classList.remove('show');
+            });
+
+            audioOptions.appendChild(btn);
+
+            if (track.enabled) {
+                lblCurrentAudio.textContent = track.language ? track.language.toUpperCase() : `Track ${i + 1}`;
+            }
+        }
+    } else {
+        // Agar single audio hai ya multiple audio nahi mili toh completely gayab
+        audioTrackBox.style.display = 'none';
+    }
+}
+
+// Video ke metadata load hone par automatically check karega
+video.addEventListener('loadedmetadata', checkAndRenderAudioTracks);
+        document.querySelectorAll('.speed-opt').forEach(opt => {
+            opt.addEventListener('click', () => {
+                document.querySelectorAll('.speed-opt').forEach(o => o.classList.remove('active'));
+                opt.classList.add('active');
+                video.playbackRate = parseFloat(opt.dataset.spd);
+                btnSpeed.textContent = `${opt.dataset.spd}x`;
+                speedOptions.classList.remove('show');
+            });
+        });
+
+        // PiP & Fullscreen
+        btnPip.addEventListener('click', () => {
+            document.pictureInPictureElement ? document.exitPictureInPicture() : video.requestPictureInPicture();
+        });
+
+        btnFs.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                videoFrame.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        video.addEventListener('ended', () => {
+            savePlaybackTime();
+            if (currentIndex + 1 < rawMediaData.length) loadTrack(currentIndex + 1);
+        });
+
+        // Idle Auto Hide Controls
+        function handleUserActivity() {
+            overlay.classList.remove('idle-hidden');
+            clearTimeout(idleTimer);
+            if (!video.paused) {
+                idleTimer = setTimeout(() => {
+                    overlay.classList.add('idle-hidden');
+                    speedOptions.classList.remove('show');
+                }, 2500);
+            }
+        }
+
+        videoFrame.addEventListener('mousemove', handleUserActivity);
+        videoFrame.addEventListener('mousedown', handleUserActivity);
+
+        // Keyboard Shortcuts
+			// Shortcuts Modal DOM elements
+		const shortcutsModal = document.getElementById('shortcuts-modal');
+		const btnOpenShortcuts = document.getElementById('btn-shortcuts-modal');
+		const btnCloseShortcuts = document.getElementById('btn-close-shortcuts');
+
+		function toggleShortcutsModal() {
+			shortcutsModal.classList.toggle('show');
+		}
+
+		btnOpenShortcuts.addEventListener('click', toggleShortcutsModal);
+		btnCloseShortcuts.addEventListener('click', toggleShortcutsModal);
+		shortcutsModal.addEventListener('click', (e) => {
+			if (e.target === shortcutsModal) toggleShortcutsModal();
+		});
+
+		// Full Enterprise-Grade Keyboard Controller
+		document.addEventListener('keydown', (e) => {
+		// Agar user kisi search bar ya text box mein type kar raha ho toh shortcuts execute nahi honge
+		if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+
+		// --- 0 se 9 Percent Seek Shortcut (Top Row & Numpad dono ke liye) ---
+		if (e.key >= '0' && e.key <= '9' && !e.ctrlKey && !e.altKey && !e.metaKey) {
+			if (video.duration && !isNaN(video.duration)) {
+				e.preventDefault();
+				const percentMultiplier = parseInt(e.key, 10) * 0.10; // 0=0%, 1=10%, 2=20% ... 9=90%
+				video.currentTime = video.duration * percentMultiplier;
+				savePlaybackTime(); // Naya timestamp foran memory mein save karega
+				showResumeToast(`Seeked to ${parseInt(e.key, 10) * 10}% (${formatClock(video.currentTime)})`);
+				return;
+			}
+		}
+
+		switch(e.code) {
+			case 'Space':
+			case 'KeyK':
+				e.preventDefault();
+				togglePlay();
+				break;
+			case 'ArrowRight':
+			case 'KeyL':
+				e.preventDefault();
+				video.currentTime = Math.min(video.duration, video.currentTime + 5);
+				break;
+			case 'ArrowLeft':
+			case 'KeyJ':
+				e.preventDefault();
+				video.currentTime = Math.max(0, video.currentTime - 5);
+				break;
+
+				// Volume Up & Down (5% increment)
+				case 'ArrowUp':
+					e.preventDefault();
+					video.volume = Math.min(1, video.volume + 0.05);
+					volSlider.value = video.volume;
+					video.muted = false;
+					updateVolumeIcon();
+					break;
+				case 'ArrowDown':
+					e.preventDefault();
+					video.volume = Math.max(0, video.volume - 0.05);
+					volSlider.value = video.volume;
+					video.muted = (video.volume === 0);
+					updateVolumeIcon();
+					break;
+
+				// Mute Toggle
+				case 'KeyM':
+					btnMute.click();
+					break;
+
+				// Fullscreen Toggle
+				case 'KeyF':
+					btnFs.click();
+					break;
+
+				// Next & Previous Video Tracks
+				case 'KeyN':
+					if (currentIndex + 1 < rawMediaData.length) loadTrack(currentIndex + 1);
+					break;
+				case 'KeyP':
+					if (currentIndex > 0) loadTrack(currentIndex - 1);
+					break;
+
+				// Speed Controller (< or > keys)
+				case 'Period': // Shift + > = Speed Up
+					if (e.shiftKey) {
+						video.playbackRate = Math.min(2.0, video.playbackRate + 0.25);
+						btnSpeed.textContent = `${video.playbackRate.toFixed(2)}x`;
+					}
+					break;
+				case 'Comma': // Shift + < = Speed Down
+					if (e.shiftKey) {
+						video.playbackRate = Math.max(0.5, video.playbackRate - 0.25);
+						btnSpeed.textContent = `${video.playbackRate.toFixed(2)}x`;
+					}
+					break;
+
+				// Help Modal Toggle (? or H)
+				case 'Slash':
+					if (e.shiftKey) toggleShortcutsModal(); // Shift + / = '?'
+					break;
+				case 'KeyH':
+					toggleShortcutsModal();
+					break;
+
+				// Escape Key to Close Modal
+				case 'Escape':
+					if (shortcutsModal.classList.contains('show')) toggleShortcutsModal();
+					break;
+			}
+		});
+    </script>
+</body>
+</html>
