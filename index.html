@@ -724,27 +724,29 @@
     </footer>
 
     <!-- 🚀 DYNAMIC IFRAME MODAL (SPA ENGINE) -->
-    <div x-show="showAppModal" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/80 backdrop-blur-md sm:p-4" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
-        
-        <!-- 🚀 FIXED: Added lg:[zoom:0.9091] to perfectly reverse the body's 1.1 zoom. Modal and Iframe content will now render at exactly 100% natural physical size on desktop! -->
-        <div class="bg-slate-50 dark:bg-[#020617] w-full h-full sm:h-[95vh] sm:w-[95vw] max-w-[1920px] sm:rounded-[2rem] shadow-2xl border border-slate-200 dark:border-dark_border overflow-hidden flex flex-col relative lg:[zoom:0.9091]">
-            
-            <div class="flex-1 w-full h-full relative bg-slate-100 dark:bg-[#020617]">
-                <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-0">
-                    <i class="fa-solid fa-circle-notch fa-spin text-brand text-4xl mb-4"></i>
-                    <span class="text-xs font-black uppercase tracking-widest text-slate-400 animate-pulse">Launching Module...</span>
-                </div>
-                <template x-if="appIframeSrc !== ''">
-                    <iframe :src="appIframeSrc" class="w-full h-full border-0 relative z-10 sm:rounded-[2rem] bg-white dark:bg-[#020617]" :title="appTitle"></iframe>
-                </template>
-            </div>
-            <div class="absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-[10010]">
-                <button @click="closeApp()" class="px-6 py-3 rounded-full bg-slate-900/95 dark:bg-white/95 text-white dark:text-slate-900 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] border border-slate-700 dark:border-white/20 text-[10px] sm:text-xs font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
-                    <i class="fa-solid fa-arrow-left"></i> Back to Hub
-                </button>
-            </div>
-        </div>
-    </div>
+	<div x-show="showAppModal" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/80 backdrop-blur-md sm:p-4" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
+		
+		<!-- 🚀 Smart Transparent Wrapper for Modern Popups -->
+	<div :class="['Raise IT Ticket', 'Apply for Leave'].includes(appTitle) ? 'bg-transparent border-none shadow-none' : 'bg-slate-50 dark:bg-[#020617] shadow-2xl border border-slate-200 dark:border-dark_border'" class="w-full h-full sm:h-[95vh] sm:w-[95vw] max-w-[1920px] sm:rounded-[2rem] overflow-hidden flex flex-col relative lg:[zoom:0.9091] transition-colors duration-300">
+		
+		<div class="flex-1 w-full h-full relative" :class="['Raise IT Ticket', 'Apply for Leave'].includes(appTitle) ? 'bg-transparent' : 'bg-slate-100 dark:bg-[#020617]'">
+			<div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-0">
+				<i class="fa-solid fa-circle-notch fa-spin text-brand text-4xl mb-4"></i>
+				<span class="text-xs font-black uppercase tracking-widest text-slate-400 animate-pulse">Launching Module...</span>
+			</div>
+			<template x-if="appIframeSrc !== ''">
+				<iframe :src="appIframeSrc" class="w-full h-full border-0 relative z-10 sm:rounded-[2rem]" :class="['Raise IT Ticket', 'Apply for Leave'].includes(appTitle) ? 'bg-transparent' : 'bg-white dark:bg-[#020617]'" :title="appTitle"></iframe>
+			</template>
+		</div>
+		
+		<!-- 🚀 Back to Hub Button (Dono Modern Apps ke liye Auto-Hide hoga) -->
+		<div class="absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-[10010]" x-show="!['Raise IT Ticket', 'Apply for Leave'].includes(appTitle)">
+				<button @click="closeApp()" class="px-6 py-3 rounded-full bg-slate-900/95 dark:bg-white/95 text-white dark:text-slate-900 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] border border-slate-700 dark:border-white/20 text-[10px] sm:text-xs font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
+					<i class="fa-solid fa-arrow-left"></i> Back to Hub
+				</button>
+			</div>
+		</div>
+	</div>
 
     <!-- 🎉 AUTO CELEBRATION POPUP HTML -->
     <div :class="showPopup ? 'show' : ''" class="celebration-popup" x-cloak>
@@ -1208,7 +1210,7 @@
                 },
 
                 async fetchPublicIP() {
-                    const lines = { '122.160.116.30': 'Airtel Broadband', '203.190.135.3': 'STPI Leased Line', '122.180.106.42': 'Airtel Leased Line' };
+                    const lines = { '182.64.233.237': 'Airtel Broadband', '203.190.135.3': 'STPI Leased Line', '122.180.106.42': 'Airtel Leased Line' };
                     try {
                         const r = await fetch('https://ipinfo.io/json');
                         if(!r.ok) throw new Error("limit");
