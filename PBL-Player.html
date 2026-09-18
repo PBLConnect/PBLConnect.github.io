@@ -14,31 +14,31 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
 
     <style>
-        /* === 1. DYNAMIC THEME SYSTEM (Light Mode Default) === */
+        /* === 1. DYNAMIC THEME SYSTEM (Royal Purple Engine) === */
         :root[data-theme="light"] {
-            --primary: #1e826e;
-            --primary-glow: rgba(30, 130, 110, 0.25);
+            --primary: #7c3aed;
+            --primary-glow: rgba(124, 58, 237, 0.25);
             --bg-base: #f1f3f6;
             --surface-panel: #ffffff;
             --surface-card: #e8ecf1;
             --border-line: rgba(0, 0, 0, 0.09);
             --text-main: #1f2937;
             --text-sub: #6b7280;
-            --track-hover: rgba(0, 0, 0, 0.04);
-            --badge-bg: rgba(30, 130, 110, 0.12);
+            --track-hover: rgba(124, 58, 237, 0.04);
+            --badge-bg: rgba(124, 58, 237, 0.12);
         }
 
         :root[data-theme="dark"] {
-            --primary: #2b9e87;
-            --primary-glow: rgba(43, 158, 135, 0.4);
+            --primary: #a855f7;
+            --primary-glow: rgba(168, 85, 247, 0.4);
             --bg-base: #0c0d10;
             --surface-panel: #15171b;
             --surface-card: #1d2026;
             --border-line: rgba(255, 255, 255, 0.08);
             --text-main: #ffffff;
             --text-sub: #9ca3af;
-            --track-hover: rgba(255, 255, 255, 0.04);
-            --badge-bg: rgba(43, 158, 135, 0.15);
+            --track-hover: rgba(168, 85, 247, 0.06);
+            --badge-bg: rgba(168, 85, 247, 0.15);
         }
 
         * {
@@ -165,7 +165,7 @@
         }
 
         .btn-folder {
-            background: linear-gradient(135deg, var(--primary), #1a6f5d);
+            background: linear-gradient(135deg, var(--primary), #5b21b6);
             color: #fff;
             border: none;
             padding: 8px 16px;
@@ -652,29 +652,200 @@
             padding-left: 6px;
         }
 
-        /* Initial Drag Drop Screen */
+        /* 🚀 ULTRA-MODERN INGEST WORKSTATION DROPZONE (OPAQUE ZERO-BLACK LEAK) */
         .dropzone-view {
             position: absolute;
             inset: 0;
-            background: var(--surface-panel);
+            /* 🛡️ SOLID OPAQUE BASE: Peeche ka black video background ab 100% block ho jayega */
+            background-color: var(--surface-panel);
+            background-image: radial-gradient(circle at 50% 35%, rgba(124, 58, 237, 0.07) 0%, rgba(124, 58, 237, 0.02) 50%, transparent 80%);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 30px;
-            cursor: pointer;
-            z-index: 18;
+            padding: 35px 25px;
+            z-index: 20;
+            overflow: hidden;
+            border: 2px dashed rgba(124, 58, 237, 0.3);
+            border-radius: 14px;
+            transition: all 0.3s ease;
         }
 
-        .dropzone-view i {
-            font-size: 3.5rem;
+        /* 🟣 Clean Ambient Glow (Solid blending, no black bleeding) */
+        .dropzone-glow-aura {
+            position: absolute;
+            width: 320px;
+            height: 320px;
+            background: radial-gradient(circle, rgba(124, 58, 237, 0.12) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: pulseGlow 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(0.9); opacity: 0.6; }
+            100% { transform: scale(1.15); opacity: 1; }
+        }
+
+        /* Hero Icon with Floating Ring */
+        .dropzone-icon-wrapper {
+            position: relative;
+            width: 82px;
+            height: 82px;
+            border-radius: 24px;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(168, 85, 247, 0.05));
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(124, 58, 237, 0.15);
+        }
+
+        .dropzone-pulse-ring {
+            position: absolute;
+            inset: -6px;
+            border-radius: 28px;
+            border: 1.5px solid rgba(124, 58, 237, 0.4);
+            opacity: 0.6;
+            animation: ringPulse 2.5s infinite;
+        }
+
+        @keyframes ringPulse {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 0.2; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+
+        .dropzone-hero-icon {
+            font-size: 2.2rem;
             color: var(--primary);
-            margin-bottom: 12px;
+            filter: drop-shadow(0 4px 10px rgba(124, 58, 237, 0.4));
         }
 
-        .dropzone-view h3 { font-size: 1.15rem; margin-bottom: 4px; }
-        .dropzone-view p { font-size: 0.85rem; color: var(--text-sub); max-width: 380px; }
+        .dropzone-text-group { margin-bottom: 22px; z-index: 10; }
+
+        .dropzone-badge-pill {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.68rem;
+            font-weight: 800;
+            color: var(--primary);
+            background: var(--badge-bg);
+            border: 1px solid rgba(124, 58, 237, 0.25);
+            padding: 4px 12px;
+            border-radius: 20px;
+            letter-spacing: 1px;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .dropzone-headline {
+            font-size: 1.45rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+        }
+
+        .dropzone-subline {
+            font-size: 0.84rem;
+            color: var(--text-sub);
+            max-width: 440px;
+            line-height: 1.5;
+        }
+
+        /* 3-Step Chips */
+        .dropzone-steps-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 25px;
+            z-index: 10;
+        }
+
+        .dropzone-step-chip {
+            background: var(--surface-card);
+            border: 1px solid var(--border-line);
+            padding: 6px 14px;
+            border-radius: 10px;
+            font-size: 0.74rem;
+            font-weight: 600;
+            color: var(--text-sub);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        }
+
+        .dropzone-step-chip .step-num {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--track-hover);
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.68rem;
+            font-weight: 800;
+        }
+
+        .dropzone-step-chip.active {
+            border-color: rgba(124, 58, 237, 0.35);
+            background: rgba(124, 58, 237, 0.06);
+            color: var(--primary);
+        }
+
+        .dropzone-step-chip.active .step-num {
+            background: var(--primary);
+            color: #ffffff;
+        }
+
+        .step-arrow {
+            font-size: 0.65rem;
+            color: var(--text-sub);
+            opacity: 0.5;
+        }
+
+        /* Center CTA Button */
+        .dropzone-cta-btn {
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            color: #ffffff;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 24px rgba(124, 58, 237, 0.35);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10;
+        }
+
+        .dropzone-cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(124, 58, 237, 0.45);
+        }
+
+        .dropzone-cta-btn:active { transform: translateY(0); }
+
+        .dropzone-formats-tag {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.68rem;
+            color: var(--text-sub);
+            margin-top: 20px;
+            opacity: 0.7;
+            z-index: 10;
+        }
+
+        .dropzone-formats-tag span {
+            color: var(--primary);
+            font-weight: 700;
+        }
 		
 		/* Modern Shortcuts Modal System */
 .shortcuts-backdrop {
@@ -908,11 +1079,51 @@ kbd {
         <div class="video-box" id="video-frame">
             <video id="core-video" preload="auto"></video>
 
-            <!-- Initial Select Overlay -->
+            <!-- 🚀 ULTRA-MODERN STREAMSTATION INGEST HERO OVERLAY -->
             <div class="dropzone-view" id="dropzone">
-                <i class="fas fa-folder-tree"></i>
-                <h3>Select Generali Backup Directory</h3>
-                <p>Click "Select Video Folder" above, paste the path in Windows File Explorer and hit Enter to index all subfolders.</p>
+                <!-- Ambient Violet Glow Core -->
+                <div class="dropzone-glow-aura"></div>
+
+                <!-- Floating Holographic Icon with Pulse Ring -->
+                <div class="dropzone-icon-wrapper">
+                    <div class="dropzone-pulse-ring"></div>
+                    <i class="fa-solid fa-photo-film dropzone-hero-icon"></i>
+                </div>
+
+                <div class="dropzone-text-group">
+                    <span class="dropzone-badge-pill"><i class="fa-solid fa-shield-halved"></i> SECURE INTRANET ENGINE</span>
+                    <h3 class="dropzone-headline">Generali Video Vault</h3>
+                    <p class="dropzone-subline">Instant offline indexing & multi-subfolder playback without server lag.</p>
+                </div>
+
+                <!-- 3-Step Interactive Workflow Guide -->
+                <div class="dropzone-steps-row">
+                    <div class="dropzone-step-chip">
+                        <span class="step-num">1</span>
+                        <span>Copy Network Path</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right step-arrow"></i>
+                    <div class="dropzone-step-chip">
+                        <span class="step-num">2</span>
+                        <span>Paste in Explorer</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right step-arrow"></i>
+                    <div class="dropzone-step-chip active">
+                        <span class="step-num">3</span>
+                        <span>Stream Instantly</span>
+                    </div>
+                </div>
+
+                <!-- Center One-Click Action Trigger -->
+                <button type="button" class="dropzone-cta-btn" onclick="document.getElementById('file-input').click()">
+                    <i class="fa-solid fa-folder-open"></i>
+                    <span>Select Directory to Ingest</span>
+                </button>
+
+                <!-- Supported File Types Badge Footer -->
+                <div class="dropzone-formats-tag">
+                    <span>SUPPORTED:</span> MP4 &bull; MKV &bull; WEBM &bull; M4V &bull; OGG
+                </div>
             </div>
 
             <!-- Resume Toast Notification -->
@@ -1101,7 +1312,7 @@ kbd {
             themeIcon.className = theme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
         }
 
-        // --- 2. NETWORK PATH HUB LOGIC ---
+        // --- 2. NETWORK PATH HUB LOGIC (UNIVERSAL CLIPBOARD COMPATIBILITY) ---
         const savedPath = localStorage.getItem('pbl-network-path');
         if (savedPath) networkPathInput.value = savedPath;
 
@@ -1109,10 +1320,42 @@ kbd {
             localStorage.setItem('pbl-network-path', networkPathInput.value.trim());
         });
 
+        // 📋 Robust Universal Copy Handler (Works on HTTP, HTTPS, IP & Local File)
         btnCopyPath.addEventListener('click', () => {
-            navigator.clipboard.writeText(networkPathInput.value);
-            btnCopyPath.innerHTML = '<i class="fas fa-check" style="color:var(--primary)"></i>';
-            setTimeout(() => { btnCopyPath.innerHTML = '<i class="fas fa-copy"></i>'; }, 1500);
+            const textToCopy = networkPathInput.value.trim();
+
+            const triggerSuccess = () => {
+                btnCopyPath.innerHTML = '<i class="fas fa-check" style="color:var(--primary)"></i>';
+                setTimeout(() => { 
+                    btnCopyPath.innerHTML = '<i class="fas fa-copy"></i>'; 
+                }, 1500);
+            };
+
+            // 1. Try Modern Clipboard API (If HTTPS/Secure)
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(textToCopy).then(triggerSuccess).catch(() => {
+                    executeFallbackCopy();
+                });
+            } else {
+                // 2. Guaranteed Fallback for HTTP / Intranet IPs
+                executeFallbackCopy();
+            }
+
+            function executeFallbackCopy() {
+                try {
+                    networkPathInput.focus();
+                    networkPathInput.select();
+                    networkPathInput.setSelectionRange(0, 99999); // Mobile & Desktop safe selection
+                    const successful = document.execCommand('copy');
+                    if (successful) {
+                        triggerSuccess();
+                    }
+                    window.getSelection().removeAllRanges();
+                    networkPathInput.blur(); // Remove focus outline after copying
+                } catch (err) {
+                    console.error("Fallback copy failed: ", err);
+                }
+            }
         });
 
         // --- 3. VIDEO TIME MEMORY (PERSISTENCE) ENGINE ---
