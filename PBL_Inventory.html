@@ -1135,189 +1135,531 @@
 			<div class="flex-1 overflow-y-auto custom-scroll p-4 sm:p-6 pb-8 sm:pb-6 bg-slate-50/50 dark:bg-[#020617]/50">
 				<form @submit.prevent="saveAsset" class="flex flex-col min-h-full space-y-4 pb-4 sm:pb-0">
                      
-                     <!-- 🖥️ HARDWARE TAB START -->
-                     <div x-show="currentTab === 'hardware'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 flex-1" x-cloak>
-                         
-                         <!-- 1. Deployment & Identity Card -->
-                         <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200/90 dark:border-white/5 shadow-sm h-full flex flex-col">
-                             <h3 class="text-[9.5px] font-black tracking-widest text-emerald-600 dark:text-emerald-400 uppercase mb-2 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-1.5 shrink-0"><i class="fa-solid fa-user-tag"></i> Deployment & Identity</h3>
-                             <div class="flex flex-col flex-1 justify-between text-xs">
-                                 <div class="flex justify-between items-start py-2 border-b border-slate-100 dark:border-white/5 gap-3">
-                                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Asset Tag</span> 
-                                     <span x-show="modalMode === 'view'" class="font-black text-indigo-600 dark:text-indigo-400 text-right" x-text="form.AssetID"></span>
-                                     <input x-show="modalMode !== 'view'" x-model="form.AssetID" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner" :readonly="modalMode === 'edit'">
-                                 </div>
-                                 <div class="flex justify-between items-start py-2 border-b border-slate-100 dark:border-white/5 gap-3">
-                                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Serial Number</span> 
-                                     <span x-show="modalMode === 'view'" class="font-mono font-bold text-slate-800 dark:text-white text-right" x-text="form.SerialNo || '-'"></span>
-                                     <input x-show="modalMode !== 'view'" x-model="form.SerialNo" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-mono font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner">
-                                 </div>
-                                 <div class="flex justify-between items-start py-2 border-b border-slate-100 dark:border-white/5 gap-3">
-                                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Status</span> 
-                                     <span x-show="modalMode === 'view'" class="font-black" :class="form.Status === 'In Use' ? 'text-emerald-600' : 'text-amber-500'" x-text="form.Status"></span>
-                                     <select x-show="modalMode !== 'view'" x-model="form.Status" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 font-bold outline-none w-full max-w-[150px] dark:text-white appearance-none cursor-pointer text-right shadow-inner"><option>In Use</option><option>Spare</option><option>Decommissioned</option><option>In Repair</option></select>
-                                 </div>
-                                 <div class="flex justify-between items-start py-2 border-b border-slate-100 dark:border-white/5 gap-3">
-                                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Assigned User</span> 
-                                     <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right" x-text="form.AssignedTo || 'Unassigned'"></span>
-                                     <input x-show="modalMode !== 'view'" x-model="form.AssignedTo" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner">
-                                 </div>
-                                 <div class="flex justify-between items-start py-2 border-b border-slate-100 dark:border-white/5 gap-3">
-                                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Floor Location</span> 
-                                     <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right flex items-center gap-1"><i class="fa-solid fa-map-pin text-rose-500 text-[10px]"></i> <span x-text="form.Location || '-'"></span></span>
-                                     <input x-show="modalMode !== 'view'" x-model="form.Location" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner">
-                                 </div>
-                             </div>
-                         </div>
+                     <!-- 🖥️ HARDWARE TAB START (POLYMORPHIC TELEMETRY CONSOLE) -->
+<div x-show="currentTab === 'hardware'" class="space-y-4 flex-1" x-cloak>
+    
+    <!-- ========================================================================= -->
+    <!-- 🎛️ VIEW 1: COMPUTING NODE (DESKTOP / LAPTOP / WORKSTATION)                -->
+    <!-- ========================================================================= -->
+    <template x-if="getDeviceCategory(form.DeviceType) === 'computing'">
+        <div class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
+                
+                <!-- 1. Deployment & Identity Card -->
+                <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200/90 dark:border-white/5 shadow-sm h-full flex flex-col">
+                    <h3 class="text-[9.5px] font-black tracking-widest text-emerald-600 dark:text-emerald-400 uppercase mb-2 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-1.5 shrink-0"><i class="fa-solid fa-user-tag"></i> Deployment & Identity</h3>
+                    <div class="flex flex-col flex-1 justify-between text-xs space-y-2">
+                        <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Asset Tag</span> 
+                            <span x-show="modalMode === 'view'" class="font-black text-indigo-600 dark:text-indigo-400 text-right font-mono" x-text="form.AssetID"></span>
+                            <input x-show="modalMode !== 'view'" x-model="form.AssetID" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-mono font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner" :readonly="modalMode === 'edit'">
+                        </div>
+                        <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Serial Number</span> 
+                            <span x-show="modalMode === 'view'" class="font-mono font-bold text-slate-800 dark:text-white text-right" x-text="form.SerialNo || '-'"></span>
+                            <input x-show="modalMode !== 'view'" x-model="form.SerialNo" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-mono font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner">
+                        </div>
+                        <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Status</span> 
+                            <span x-show="modalMode === 'view'" class="font-black text-right" :class="form.Status === 'In Use' ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-500'" x-text="form.Status"></span>
+                            <select x-show="modalMode !== 'view'" x-model="form.Status" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 font-bold outline-none w-full max-w-[150px] dark:text-white appearance-none cursor-pointer text-right shadow-inner"><option>In Use</option><option>Spare</option><option>Decommissioned</option><option>In Repair</option></select>
+                        </div>
+                        <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Assigned User</span> 
+                            <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right truncate" x-text="form.AssignedTo || 'Unassigned'"></span>
+                            <input x-show="modalMode !== 'view'" x-model="form.AssignedTo" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner">
+                        </div>
+                        <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Floor Location</span> 
+                            <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right flex items-center gap-1 justify-end"><i class="fa-solid fa-map-pin text-rose-500 text-[10px]"></i> <span x-text="form.Location || '-'"></span></span>
+                            <input x-show="modalMode !== 'view'" x-model="form.Location" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner">
+                        </div>
+                    </div>
+                </div>
 
-                         <!-- 2. Hardware Specs Card -->
-                         <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200/90 dark:border-white/5 shadow-sm h-full flex flex-col">
-                             <h3 class="text-[9.5px] font-black tracking-widest text-purple-600 dark:text-purple-400 uppercase mb-2 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-1.5 shrink-0"><i class="fa-solid fa-microchip"></i> Hardware Specs</h3>
-                             <div class="flex flex-col flex-1 justify-between text-xs">
-                                 <div class="flex justify-between items-start py-2 border-b border-slate-100 dark:border-white/5 gap-3">
-                                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Device Category</span> 
-                                     <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right" x-text="form.DeviceType || '-'"></span>
-                                     <select x-show="modalMode !== 'view'" x-model="form.DeviceType" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 font-bold outline-none w-full max-w-[150px] dark:text-white appearance-none cursor-pointer text-right shadow-inner"><template x-for="type in uniqueTypes" :key="type"><option :value="type" x-text="type"></option></template></select>
-                                 </div>
-                                 <div class="flex justify-between items-start py-2 border-b border-slate-100 dark:border-white/5 gap-3">
-                                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Make & Model</span> 
-                                     <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right" x-text="(form.Make||'') + ' ' + (form.Model||'')"></span>
-                                     <div x-show="modalMode !== 'view'" class="flex gap-1 w-full max-w-[150px]">
-                                        <input x-model="form.Make" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded px-1.5 py-0.5 text-[10px] font-bold outline-none text-center w-1/2 dark:text-white shadow-inner" placeholder="Make">
-                                        <input x-model="form.Model" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded px-1.5 py-0.5 text-[10px] font-bold outline-none text-center w-1/2 dark:text-white shadow-inner" placeholder="Model">
-                                     </div>
-                                 </div>
-                                 <div class="flex justify-between items-start py-2 border-b border-slate-100 dark:border-white/5 gap-3">
-                                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Processor (CPU)</span> 
-                                     <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right" x-text="form.CPU || '-'"></span>
-                                     <input x-show="modalMode !== 'view'" x-model="form.CPU" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner">
-                                 </div>
-                                 
-                                 <!-- 🚀 Silicon Dual Pods (RAM & Storage) -->
-                                 <div class="grid grid-cols-2 gap-2 mt-auto pt-2 shrink-0">
-                                     <div class="bg-purple-50 dark:bg-purple-950/40 p-2.5 rounded-xl border border-purple-200/90 dark:border-purple-500/30 text-center shadow-sm flex flex-col justify-center">
-                                         <span class="block text-[8px] font-black uppercase text-purple-600 dark:text-purple-400 tracking-wider mb-0.5">RAM CAPACITY</span>
-                                         <span x-show="modalMode === 'view'" class="text-base font-black font-mono text-purple-700 dark:text-purple-300 leading-none" x-text="form.RAM_GB ? form.RAM_GB + ' GB' : '-'"></span>
-                                         <input x-show="modalMode !== 'view'" x-model="form.RAM_GB" class="bg-white dark:bg-black/60 border border-purple-200 dark:border-purple-500/30 rounded px-1 py-0.5 text-xs font-bold outline-none text-center w-full text-purple-700 dark:text-purple-300">
-                                     </div>
-                                     <div class="bg-amber-50 dark:bg-amber-950/40 p-2.5 rounded-xl border border-amber-200/90 dark:border-amber-500/30 text-center shadow-sm flex flex-col justify-center">
-                                         <span class="block text-[8px] font-black uppercase text-amber-600 dark:text-amber-400 tracking-wider mb-0.5">STORAGE POOL</span>
-                                         <span x-show="modalMode === 'view'" class="text-base font-black font-mono text-amber-700 dark:text-amber-300 leading-none" x-text="form.Storage_GB ? form.Storage_GB + ' GB' : '-'"></span>
-                                         <input x-show="modalMode !== 'view'" x-model="form.Storage_GB" class="bg-white dark:bg-black/60 border border-amber-200 dark:border-amber-500/30 rounded px-1 py-0.5 text-xs font-bold outline-none text-center w-full text-amber-700 dark:text-amber-300">
-                                     </div>
-                                 </div>
-                             </div>
-                         </div>
+                <!-- 2. Computing Hardware Specs Card -->
+                <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200/90 dark:border-white/5 shadow-sm h-full flex flex-col">
+                    <h3 class="text-[9.5px] font-black tracking-widest text-purple-600 dark:text-purple-400 uppercase mb-2 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-1.5 shrink-0"><i class="fa-solid fa-microchip"></i> Hardware Architecture</h3>
+                    <div class="flex flex-col flex-1 justify-between text-xs space-y-2">
+                        <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Device Category</span> 
+                            <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right" x-text="form.DeviceType || '-'"></span>
+                            <select x-show="modalMode !== 'view'" x-model="form.DeviceType" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 font-bold outline-none w-full max-w-[150px] dark:text-white appearance-none cursor-pointer text-right shadow-inner"><template x-for="type in uniqueTypes" :key="type"><option :value="type" x-text="type"></option></template></select>
+                        </div>
+                        <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Make & Model</span> 
+                            <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right truncate" x-text="(form.Make||'') + ' ' + (form.Model||'')"></span>
+                            <div x-show="modalMode !== 'view'" class="flex gap-1 w-full max-w-[150px]">
+                                <input x-model="form.Make" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded px-1.5 py-0.5 text-[10px] font-bold outline-none text-center w-1/2 dark:text-white shadow-inner" placeholder="Make">
+                                <input x-model="form.Model" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded px-1.5 py-0.5 text-[10px] font-bold outline-none text-center w-1/2 dark:text-white shadow-inner" placeholder="Model">
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Processor (CPU)</span> 
+                            <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right truncate" x-text="form.CPU || '-'"></span>
+                            <input x-show="modalMode !== 'view'" x-model="form.CPU" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-2 mt-auto pt-2 shrink-0">
+                            <div class="bg-purple-50 dark:bg-purple-950/40 p-2.5 rounded-xl border border-purple-200/90 dark:border-purple-500/30 text-center shadow-sm">
+                                <span class="block text-[8px] font-black uppercase text-purple-600 dark:text-purple-400 tracking-wider mb-0.5">RAM CAPACITY</span>
+                                <span x-show="modalMode === 'view'" class="text-base font-black font-mono text-purple-700 dark:text-purple-300 leading-none" x-text="form.RAM_GB ? form.RAM_GB + ' GB' : '-'"></span>
+                                <input x-show="modalMode !== 'view'" x-model="form.RAM_GB" class="bg-white dark:bg-black/60 border border-purple-200 dark:border-purple-500/30 rounded px-1 py-0.5 text-xs font-bold outline-none text-center w-full text-purple-700 dark:text-purple-300">
+                            </div>
+                            <div class="bg-amber-50 dark:bg-amber-950/40 p-2.5 rounded-xl border border-amber-200/90 dark:border-amber-500/30 text-center shadow-sm">
+                                <span class="block text-[8px] font-black uppercase text-amber-600 dark:text-amber-400 tracking-wider mb-0.5">STORAGE POOL</span>
+                                <span x-show="modalMode === 'view'" class="text-base font-black font-mono text-amber-700 dark:text-amber-300 leading-none" x-text="form.Storage_GB ? form.Storage_GB + ' GB' : '-'"></span>
+                                <input x-show="modalMode !== 'view'" x-model="form.Storage_GB" class="bg-white dark:bg-black/60 border border-amber-200 dark:border-amber-500/30 rounded px-1 py-0.5 text-xs font-bold outline-none text-center w-full text-amber-700 dark:text-amber-300">
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                         <!-- 3. Network & Security Card -->
-                         <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200/90 dark:border-white/5 shadow-sm h-full flex flex-col">
-                             <h3 class="text-[9.5px] font-black tracking-widest text-brand uppercase mb-2 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-1.5 shrink-0"><i class="fa-solid fa-shield-halved"></i> Network & Telemetry</h3>
-                             <div class="flex flex-col flex-1 justify-between text-xs">
-                                 <div class="flex justify-between items-start py-2 border-b border-slate-100 dark:border-white/5 gap-3">
-                                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Live Allocation</span> 
-                                     <!-- Terminal Monospace IP Box -->
-                                     <span class="text-[10.5px] font-mono font-black px-2.5 py-0.5 rounded-lg border shadow-sm text-right" 
-                                           :class="getIpCarrierClass(form.Live_IP)"
-                                           x-text="form.Live_IP || 'Not Allocated'"></span>
-                                 </div>
-                                 <div class="flex justify-between items-start py-2 border-b border-slate-100 dark:border-white/5 gap-3">
-                                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Hostname</span> 
-                                     <span x-show="modalMode === 'view'" class="font-mono font-bold text-slate-800 dark:text-white text-right" x-text="form.Hostname || '-'"></span>
-                                     <input x-show="modalMode !== 'view'" x-model="form.Hostname" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-mono font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner">
-                                 </div>
-                                 <div class="flex justify-between items-start py-2 border-b border-slate-100 dark:border-white/5 gap-3">
-                                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Operating System</span> 
-                                     <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right flex items-center gap-1"><span x-text="getOSEmoji(form.OS)"></span> <span x-text="form.OS || '-'"></span></span>
-                                     <input x-show="modalMode !== 'view'" x-model="form.OS" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner">
-                                 </div>
-                                 <div class="flex justify-between items-start py-2 border-b border-slate-100 dark:border-white/5 gap-3">
-                                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Data Class</span> 
-                                     <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right" x-text="form.DataClass || '-'"></span>
-                                     <select x-show="modalMode !== 'view'" x-model="form.DataClass" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 font-bold outline-none w-full max-w-[150px] dark:text-white appearance-none cursor-pointer text-right shadow-inner"><option>Internal</option><option>Confidential</option><option>Public</option></select>
-                                 </div>
-                                 <div class="flex justify-between items-start py-2 border-b border-slate-100 dark:border-white/5 gap-3">
-                                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Antivirus Health</span> 
-                                     <span x-show="modalMode === 'view'" class="text-[9px] font-black uppercase px-2 py-0.5 rounded-md border shadow-sm text-right shrink-0" :class="(form.AntivirusStatus || '').includes('Active') ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30' : 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/30'" x-text="form.AntivirusStatus || 'Pending'"></span>
-                                     <select x-show="modalMode !== 'view'" x-model="form.AntivirusStatus" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 font-bold outline-none w-full max-w-[150px] dark:text-white appearance-none cursor-pointer text-right shadow-inner"><option>Active</option><option>Pending</option><option>Uninstalled</option></select>
-                                 </div>
-                             </div>
-                         </div>
+                <!-- 3. Network & Security Card -->
+                <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200/90 dark:border-white/5 shadow-sm h-full flex flex-col">
+                    <h3 class="text-[9.5px] font-black tracking-widest text-brand uppercase mb-2 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-1.5 shrink-0"><i class="fa-solid fa-shield-halved"></i> Network & Security</h3>
+                    <div class="flex flex-col flex-1 justify-between text-xs space-y-2">
+                        <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Live Allocation</span> 
+                            <span class="text-[10.5px] font-mono font-black px-2.5 py-0.5 rounded-lg border shadow-sm text-right" :class="getIpCarrierClass(form.Live_IP)" x-text="form.Live_IP || 'Not Allocated'"></span>
+                        </div>
+                        <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Hostname</span> 
+                            <span x-show="modalMode === 'view'" class="font-mono font-bold text-slate-800 dark:text-white text-right" x-text="form.Hostname || '-'"></span>
+                            <input x-show="modalMode !== 'view'" x-model="form.Hostname" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-mono font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner">
+                        </div>
+                        <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Operating System</span> 
+                            <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right flex items-center gap-1 justify-end"><span x-text="getOSEmoji(form.OS)"></span> <span x-text="form.OS || '-'"></span></span>
+                            <input x-show="modalMode !== 'view'" x-model="form.OS" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner">
+                        </div>
+                        <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Data Class</span> 
+                            <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right" x-text="form.DataClass || 'Internal'"></span>
+                            <select x-show="modalMode !== 'view'" x-model="form.DataClass" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 font-bold outline-none w-full max-w-[150px] dark:text-white appearance-none cursor-pointer text-right shadow-inner"><option>Internal</option><option>Confidential</option><option>Public</option></select>
+                        </div>
+                        <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Antivirus Status</span> 
+                            <span x-show="modalMode === 'view'" class="text-[9px] font-black uppercase px-2 py-0.5 rounded-md border shadow-sm text-right shrink-0" :class="(form.AntivirusStatus || '').includes('Active') ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/30' : 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/30'" x-text="form.AntivirusStatus || 'Pending'"></span>
+                            <select x-show="modalMode !== 'view'" x-model="form.AntivirusStatus" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 font-bold outline-none w-full max-w-[150px] dark:text-white appearance-none cursor-pointer text-right shadow-inner"><option>Active</option><option>Pending</option><option>Uninstalled</option></select>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                         <!-- 4. Lifecycle & Financials (Tactile Row) -->
-                         <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200/90 dark:border-white/5 shadow-sm md:col-span-2 lg:col-span-3 flex flex-col md:flex-row gap-3 items-stretch">
-                             <div class="flex-1 grid grid-cols-2 md:grid-cols-4 gap-2.5 w-full">
-                                 <div class="bg-slate-50 dark:bg-white/5 p-3 rounded-xl border border-slate-200/80 dark:border-white/5 shadow-inner flex flex-col justify-center">
-                                     <span class="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Purchase Date</span>
-                                     <span x-show="modalMode === 'view'" class="text-xs font-bold text-slate-800 dark:text-white flex items-center gap-1.5"><i class="fa-regular fa-calendar opacity-50"></i> <span x-text="formatDisplayDate(form.PurchaseDate)"></span></span>
-                                     <input x-show="modalMode !== 'view'" x-model="form.PurchaseDate" type="date" class="w-full bg-white dark:bg-black/60 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 text-xs font-bold outline-none dark:text-white">
-                                 </div>
-                                 <div class="bg-slate-50 dark:bg-white/5 p-3 rounded-xl border border-slate-200/80 dark:border-white/5 shadow-inner flex flex-col justify-center">
-                                     <span class="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Warranty End</span>
-                                     <span x-show="modalMode === 'view'" class="text-xs font-bold flex items-center gap-1.5" :class="isExpiring(form.WarrantyEnd) ? 'text-rose-500 animate-pulse' : 'text-slate-800 dark:text-white'"><i class="fa-solid fa-shield-check opacity-50"></i> <span x-text="formatDisplayDate(form.WarrantyEnd)"></span></span>
-                                     <input x-show="modalMode !== 'view'" x-model="form.WarrantyEnd" type="date" class="w-full bg-white dark:bg-black/60 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 text-xs font-bold outline-none dark:text-white">
-                                 </div>
-                                 <div class="bg-slate-50 dark:bg-white/5 p-3 rounded-xl border border-slate-200/80 dark:border-white/5 shadow-inner flex flex-col justify-center">
-                                     <span class="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Vendor</span>
-                                     <span x-show="modalMode === 'view'" class="text-xs font-bold text-slate-800 dark:text-white flex items-center gap-1.5 truncate"><i class="fa-solid fa-store opacity-50"></i> <span class="truncate" x-text="form.Vendor || '-'"></span></span>
-                                     <input x-show="modalMode !== 'view'" x-model="form.Vendor" type="text" class="w-full bg-white dark:bg-black/60 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 text-xs font-bold outline-none dark:text-white" placeholder="Vendor Name">
-                                 </div>
-                                 <div class="bg-slate-50 dark:bg-white/5 p-3 rounded-xl border border-slate-200/80 dark:border-white/5 shadow-inner flex flex-col justify-center">
-                                     <span class="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Cost (INR)</span>
-                                     <span x-show="modalMode === 'view'" class="text-xs font-mono font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-1"><i class="fa-solid fa-indian-rupee-sign opacity-50"></i> <span x-text="form.Cost_INR ? Number(form.Cost_INR).toLocaleString('en-IN') : '-'"></span></span>
-                                     <input x-show="modalMode !== 'view'" x-model="form.Cost_INR" type="number" class="w-full bg-white dark:bg-black/60 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 text-xs font-bold outline-none dark:text-white" placeholder="Amount">
-                                 </div>
-                             </div>
-                             
-                             <div class="w-full md:w-[32%] bg-amber-50/60 dark:bg-amber-950/20 p-3 rounded-xl border border-amber-200/80 dark:border-amber-500/20 shadow-inner flex flex-col justify-center">
-                                 <span class="block text-[8px] font-black text-amber-700 dark:text-amber-400 uppercase tracking-widest mb-1"><i class="fa-solid fa-note-sticky"></i> Remarks / Notes</span>
-                                 <span x-show="modalMode === 'view'" class="text-xs font-medium text-amber-900 dark:text-amber-300 leading-snug break-words" x-text="form.Notes || 'No additional remarks documented.'"></span>
-                                 <textarea x-show="modalMode !== 'view'" x-model="form.Notes" class="w-full bg-white dark:bg-black/60 border border-amber-200 dark:border-amber-500/30 rounded-lg px-2.5 py-1.5 text-xs font-medium outline-none dark:text-white resize-none" rows="2" placeholder="Any notes..."></textarea>
-                             </div>
-                         </div>
+            <!-- Installed Software Section (Only for Workstation Nodes) -->
+            <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200/90 dark:border-white/5 shadow-sm">
+                <div class="flex justify-between items-center mb-3 border-b border-slate-100 dark:border-white/5 pb-2">
+                    <h3 class="text-[9.5px] font-black tracking-widest text-purple-600 dark:text-purple-400 uppercase flex items-center gap-1.5"><i class="fa-solid fa-compact-disc"></i> Licensed Software Deployment</h3>
+                    <div x-show="modalMode !== 'view'" class="relative w-44" x-cloak>
+                        <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]"></i>
+                        <input type="text" x-model="swFilter" placeholder="Filter software..." class="w-full pl-7 pr-2.5 py-1 bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg text-[10px] font-bold outline-none focus:border-purple-500 transition text-slate-800 dark:text-white">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 max-h-56 overflow-y-auto custom-scroll p-1" x-show="modalMode !== 'view'">
+                    <template x-for="sw in softwareList.filter(s => !swFilter || s.SoftwareName.toLowerCase().includes(swFilter.toLowerCase()))" :key="sw.SoftwareID">
+                        <label class="flex items-start gap-2.5 p-2.5 border rounded-xl cursor-pointer transition-all select-none group shadow-sm" :class="form.InstalledSoftware.includes(sw.SoftwareID) ? 'bg-purple-50/90 border-purple-300 dark:bg-purple-950/40 dark:border-purple-500/40 shadow-inner' : 'bg-slate-50/60 dark:bg-black/30 border-slate-200/80 dark:border-white/5 hover:border-purple-200'">
+                            <input type="checkbox" :value="sw.SoftwareID" x-model="form.InstalledSoftware" class="custom-checkbox shrink-0 mt-0.5">
+                            <div class="flex flex-col min-w-0 flex-1">
+                                <span class="text-[11px] font-bold leading-tight break-words" :class="form.InstalledSoftware.includes(sw.SoftwareID) ? 'text-purple-900 dark:text-purple-300 font-black' : 'text-slate-700 dark:text-slate-300 group-hover:text-purple-600'" x-text="sw.SoftwareName"></span>
+                                <span class="text-[8px] font-mono text-slate-400 mt-1 uppercase" x-text="sw.Type || 'License'"></span>
+                            </div>
+                        </label>
+                    </template>
+                </div>
 
-                         <!-- 5. 🚀 UPGRADED: Installed Software Selector & Tagging Engine -->
-                         <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200/90 dark:border-white/5 shadow-sm md:col-span-2 lg:col-span-3">
-                             <div class="flex justify-between items-center mb-3 border-b border-slate-100 dark:border-white/5 pb-2">
-                                 <h3 class="text-[9.5px] font-black tracking-widest text-purple-600 dark:text-purple-400 uppercase flex items-center gap-1.5">
-                                     <i class="fa-solid fa-compact-disc"></i> Licensed Software Deployment
-                                 </h3>
-                                 <!-- Live Software Search in Edit Mode -->
-                                 <div x-show="modalMode !== 'view'" class="relative w-44" x-cloak>
-                                     <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]"></i>
-                                     <input type="text" x-model="swFilter" placeholder="Filter software..." 
-                                            class="w-full pl-7 pr-2.5 py-1 bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg text-[10px] font-bold outline-none focus:border-purple-500 transition text-slate-800 dark:text-white">
-                                 </div>
-                             </div>
-                             
-                             <!-- 🎛️ Interactive Selectable Cards (Edit Mode) -->
-                             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 max-h-64 overflow-y-auto custom-scroll p-1" x-show="modalMode !== 'view'">
-                                 <template x-for="sw in softwareList.filter(s => !swFilter || s.SoftwareName.toLowerCase().includes(swFilter.toLowerCase()))" :key="sw.SoftwareID">
-                                     <label class="flex items-start gap-2.5 p-2.5 border rounded-xl cursor-pointer transition-all select-none group shadow-sm"
-                                            :class="form.InstalledSoftware.includes(sw.SoftwareID) ? 'bg-purple-50/90 border-purple-300 dark:bg-purple-950/40 dark:border-purple-500/40 shadow-inner' : 'bg-slate-50/60 dark:bg-black/30 border-slate-200/80 dark:border-white/5 hover:border-purple-200'">
-                                         <input type="checkbox" :value="sw.SoftwareID" x-model="form.InstalledSoftware" class="custom-checkbox shrink-0 mt-0.5">
-                                         <div class="flex flex-col min-w-0 flex-1">
-                                             <span class="text-[11px] font-bold leading-tight break-words" 
-                                                   :class="form.InstalledSoftware.includes(sw.SoftwareID) ? 'text-purple-900 dark:text-purple-300 font-black' : 'text-slate-700 dark:text-slate-300 group-hover:text-purple-600'" 
-                                                   x-text="sw.SoftwareName"></span>
-                                             <span class="text-[8px] font-mono text-slate-400 mt-1 uppercase" x-text="sw.Type || 'License'"></span>
-                                         </div>
-                                     </label>
-                                 </template>
-                             </div>
+                <div x-show="modalMode === 'view'" class="flex flex-wrap gap-2">
+                    <template x-for="swId in form.InstalledSoftware" :key="swId">
+                        <span class="bg-purple-50 text-purple-700 border border-purple-200/90 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-500/30 px-3 py-1.5 rounded-xl text-[10px] font-bold shadow-sm flex items-center gap-2">
+                            <i class="fa-solid fa-compact-disc text-purple-500 text-xs"></i>
+                            <span x-text="softwareList.find(s => s.SoftwareID === swId)?.SoftwareName || swId"></span>
+                        </span>
+                    </template>
+                    <div x-show="!form.InstalledSoftware || form.InstalledSoftware.length === 0" class="text-[10px] text-slate-400 font-bold uppercase tracking-widest py-1.5">No Licensed Software Tagged to this Machine</div>
+                </div>
+            </div>
+        </div>
+    </template>
 
-                             <!-- View Mode: Tactile Badges -->
-                             <div x-show="modalMode === 'view'" class="flex flex-wrap gap-2">
-                                 <template x-for="swId in form.InstalledSoftware" :key="swId">
-                                     <span class="bg-purple-50 text-purple-700 border border-purple-200/90 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-500/30 px-3 py-1.5 rounded-xl text-[10px] font-bold shadow-sm flex items-center gap-2">
-                                         <i class="fa-solid fa-compact-disc text-purple-500 text-xs"></i>
-                                         <span x-text="softwareList.find(s => s.SoftwareID === swId)?.SoftwareName || swId"></span>
-                                     </span>
-                                 </template>
-                                 <div x-show="!form.InstalledSoftware || form.InstalledSoftware.length === 0" class="text-[10px] text-slate-400 font-bold uppercase tracking-widest py-2">No Licensed Software Tagged to this Machine</div>
-                             </div>
-                         </div>
-                     </div>
-                     <!-- 🖥️ HARDWARE TAB END -->
+    <!-- ========================================================================= -->
+    <!-- 🖥️ VIEW 2: DISPLAY NODE (TFT / MONITOR / DISPLAY)                          -->
+    <!-- ========================================================================= -->
+    <template x-if="getDeviceCategory(form.DeviceType) === 'display'">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
+            
+            <!-- 1. Display Identity & Mount Card -->
+            <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200/90 dark:border-white/5 shadow-sm h-full flex flex-col">
+                <h3 class="text-[9.5px] font-black tracking-widest text-indigo-600 dark:text-indigo-400 uppercase mb-2 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-1.5 shrink-0"><i class="fa-solid fa-desktop"></i> Display Profile</h3>
+                <div class="flex flex-col flex-1 justify-between text-xs space-y-2">
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Asset Tag</span> 
+                        <span x-show="modalMode === 'view'" class="font-black text-indigo-600 dark:text-indigo-400 font-mono text-right" x-text="form.AssetID"></span>
+                        <input x-show="modalMode !== 'view'" x-model="form.AssetID" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-mono font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner" :readonly="modalMode === 'edit'">
+                    </div>
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Serial Number</span> 
+                        <span x-show="modalMode === 'view'" class="font-mono font-bold text-slate-800 dark:text-white text-right" x-text="form.SerialNo || '-'"></span>
+                        <input x-show="modalMode !== 'view'" x-model="form.SerialNo" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-mono font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner">
+                    </div>
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Brand & Model</span> 
+                        <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right truncate" x-text="(form.Make||'') + ' ' + (form.Model||'')"></span>
+                        <div x-show="modalMode !== 'view'" class="flex gap-1 w-full max-w-[150px]">
+                            <input x-model="form.Make" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded px-1.5 py-0.5 text-[10px] font-bold outline-none text-center w-1/2 dark:text-white shadow-inner" placeholder="Make">
+                            <input x-model="form.Model" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded px-1.5 py-0.5 text-[10px] font-bold outline-none text-center w-1/2 dark:text-white shadow-inner" placeholder="Model">
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Screen Size</span> 
+                        <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right" x-text="form.CPU ? form.CPU + ' Inch' : (form.Model?.match(/\d{2}/) ? form.Model.match(/\d{2}/)[0] + ' Inch' : '22 Inch LED')"></span>
+                        <input x-show="modalMode !== 'view'" x-model="form.CPU" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner" placeholder="e.g. 21.5 / 24 Inch">
+                    </div>
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Condition State</span> 
+                        <span x-show="modalMode === 'view'" class="font-black text-right" :class="form.Status === 'In Use' ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-500'" x-text="form.Status"></span>
+                        <select x-show="modalMode !== 'view'" x-model="form.Status" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 font-bold outline-none w-full max-w-[150px] dark:text-white appearance-none cursor-pointer text-right shadow-inner"><option>In Use</option><option>Spare</option><option>Decommissioned</option><option>In Repair</option></select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Display Connectivity & Video Interfaces -->
+            <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200/90 dark:border-white/5 shadow-sm h-full flex flex-col">
+                <h3 class="text-[9.5px] font-black tracking-widest text-blue-600 dark:text-blue-400 uppercase mb-2 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-1.5 shrink-0"><i class="fa-solid fa-plug"></i> Video Interfaces & Power</h3>
+                <div class="flex flex-col flex-1 justify-between text-xs space-y-2">
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Video Port Type</span> 
+                        <span x-show="modalMode === 'view'" class="font-mono font-bold text-slate-800 dark:text-white text-right" x-text="form.OS || 'HDMI + VGA Dual Port'"></span>
+                        <input x-show="modalMode !== 'view'" x-model="form.OS" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 text-xs font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner" placeholder="HDMI / VGA / DP">
+                    </div>
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Native Resolution</span> 
+                        <span x-show="modalMode === 'view'" class="font-mono font-bold text-slate-800 dark:text-white text-right" x-text="form.DataClass || '1920 x 1080 (FHD)'"></span>
+                        <input x-show="modalMode !== 'view'" x-model="form.DataClass" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 text-xs font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner" placeholder="1920x1080 / 1366x768">
+                    </div>
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Mount / Stand</span> 
+                        <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right" x-text="form.Encryption === 'Yes' ? 'VESA Arm Mounted' : 'Original Desktop Stand'"></span>
+                        <select x-show="modalMode !== 'view'" x-model="form.Encryption" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 font-bold outline-none w-full max-w-[150px] dark:text-white appearance-none cursor-pointer text-right shadow-inner"><option value="No">Original Stand</option><option value="Yes">VESA Arm Wall Mount</option></select>
+                    </div>
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Power Supply</span> 
+                        <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right">Standard 230V AC Internal</span>
+                        <span x-show="modalMode !== 'view'" class="text-[10px] text-slate-500 font-mono text-right">Internal PSU (3-Pin)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Host Mapping & Floor Location -->
+            <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200/90 dark:border-white/5 shadow-sm h-full flex flex-col">
+                <h3 class="text-[9.5px] font-black tracking-widest text-teal-600 dark:text-teal-400 uppercase mb-2 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-1.5 shrink-0"><i class="fa-solid fa-link"></i> Mapped Host & Location</h3>
+                <div class="flex flex-col flex-1 justify-between text-xs space-y-2">
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Mapped Host PC</span> 
+                        <span x-show="modalMode === 'view'" class="font-mono font-black text-indigo-600 dark:text-indigo-400 text-right bg-indigo-50 dark:bg-indigo-950/40 px-2 py-0.5 rounded border border-indigo-200 dark:border-indigo-500/30" x-text="form.Hostname || form.ParentAssetID || 'Standalone Screen'"></span>
+                        <input x-show="modalMode !== 'view'" x-model="form.Hostname" placeholder="e.g. NOD-PRD-001" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-mono font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner">
+                    </div>
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Assigned User</span> 
+                        <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right truncate" x-text="form.AssignedTo || 'Unassigned'"></span>
+                        <input x-show="modalMode !== 'view'" x-model="form.AssignedTo" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner">
+                    </div>
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Floor Bay</span> 
+                        <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right flex items-center gap-1 justify-end"><i class="fa-solid fa-map-pin text-rose-500 text-[10px]"></i> <span x-text="form.Location || '-'"></span></span>
+                        <input x-show="modalMode !== 'view'" x-model="form.Location" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- ========================================================================= -->
+    <!-- 🗄️ VIEW 3: ENTERPRISE SERVER NODE (DC / BACKUP / VM HOST)                 -->
+    <!-- ========================================================================= -->
+    <template x-if="getDeviceCategory(form.DeviceType) === 'server'">
+        <div class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
+                
+                <!-- 1. Server Role & Chassis -->
+                <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200/90 dark:border-white/5 shadow-sm h-full flex flex-col">
+                    <h3 class="text-[9.5px] font-black tracking-widest text-indigo-600 dark:text-indigo-400 uppercase mb-2 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-1.5 shrink-0"><i class="fa-solid fa-server"></i> Server Role & Identity</h3>
+                    <div class="flex flex-col flex-1 justify-between text-xs space-y-2">
+                        <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Server Tag</span> 
+                            <span x-show="modalMode === 'view'" class="font-black text-indigo-600 dark:text-indigo-400 font-mono text-right" x-text="form.AssetID"></span>
+                            <input x-show="modalMode !== 'view'" x-model="form.AssetID" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-mono font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner" :readonly="modalMode === 'edit'">
+                        </div>
+                        <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Role & Hostname</span> 
+                            <span x-show="modalMode === 'view'" class="font-mono font-black text-slate-800 dark:text-white text-right" x-text="form.Hostname || 'Enterprise Host'"></span>
+                            <input x-show="modalMode !== 'view'" x-model="form.Hostname" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-mono font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner" placeholder="e.g. WinSvr100 / DC">
+                        </div>
+                        <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Chassis / Form Factor</span> 
+                            <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right" x-text="(form.Make||'') + ' ' + (form.Model||'')"></span>
+                            <div x-show="modalMode !== 'view'" class="flex gap-1 w-full max-w-[150px]">
+                                <input x-model="form.Make" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded px-1.5 py-0.5 text-[10px] font-bold outline-none text-center w-1/2 dark:text-white shadow-inner" placeholder="HPE/Dell">
+                                <input x-model="form.Model" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded px-1.5 py-0.5 text-[10px] font-bold outline-none text-center w-1/2 dark:text-white shadow-inner" placeholder="ProLiant 1U">
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Serial / Service Tag</span> 
+                            <span x-show="modalMode === 'view'" class="font-mono font-bold text-slate-800 dark:text-white text-right" x-text="form.SerialNo || '-'"></span>
+                            <input x-show="modalMode !== 'view'" x-model="form.SerialNo" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-mono font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Dual Xeon / ECC RAM & Storage Array -->
+                <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200/90 dark:border-white/5 shadow-sm h-full flex flex-col">
+                    <h3 class="text-[9.5px] font-black tracking-widest text-purple-600 dark:text-purple-400 uppercase mb-2 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-1.5 shrink-0"><i class="fa-solid fa-microchip"></i> Compute & Storage Array</h3>
+                    <div class="flex flex-col flex-1 justify-between text-xs space-y-2">
+                        <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Processors (Cores)</span> 
+                            <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right truncate" x-text="form.CPU || 'Intel Xeon Dual Socket'"></span>
+                            <input x-show="modalMode !== 'view'" x-model="form.CPU" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 text-xs font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner" placeholder="Dual Xeon Silver">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 mt-auto pt-2 shrink-0">
+                            <div class="bg-purple-50 dark:bg-purple-950/40 p-2.5 rounded-xl border border-purple-200/90 dark:border-purple-500/30 text-center shadow-sm">
+                                <span class="block text-[8px] font-black uppercase text-purple-600 dark:text-purple-400 tracking-wider mb-0.5">ECC RAM POOL</span>
+                                <span x-show="modalMode === 'view'" class="text-base font-black font-mono text-purple-700 dark:text-purple-300 leading-none" x-text="form.RAM_GB ? form.RAM_GB + ' GB' : '64 GB'"></span>
+                                <input x-show="modalMode !== 'view'" x-model="form.RAM_GB" class="bg-white dark:bg-black/60 border border-purple-200 dark:border-purple-500/30 rounded px-1 py-0.5 text-xs font-bold outline-none text-center w-full text-purple-700 dark:text-purple-300">
+                            </div>
+                            <div class="bg-amber-50 dark:bg-amber-950/40 p-2.5 rounded-xl border border-amber-200/90 dark:border-amber-500/30 text-center shadow-sm">
+                                <span class="block text-[8px] font-black uppercase text-amber-600 dark:text-amber-400 tracking-wider mb-0.5">RAID STORAGE</span>
+                                <span x-show="modalMode === 'view'" class="text-base font-black font-mono text-amber-700 dark:text-amber-300 leading-none" x-text="form.Storage_GB ? form.Storage_GB + ' GB' : 'RAID 5 / 2TB'"></span>
+                                <input x-show="modalMode !== 'view'" x-model="form.Storage_GB" class="bg-white dark:bg-black/60 border border-amber-200 dark:border-amber-500/30 rounded px-1 py-0.5 text-xs font-bold outline-none text-center w-full text-amber-700 dark:text-amber-300">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. iLO / IPMI & Primary Network Node -->
+                <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200/90 dark:border-white/5 shadow-sm h-full flex flex-col">
+                    <h3 class="text-[9.5px] font-black tracking-widest text-rose-600 dark:text-rose-400 uppercase mb-2 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-1.5 shrink-0"><i class="fa-solid fa-network-wired"></i> Remote IPMI & Production IP</h3>
+                    <div class="flex flex-col flex-1 justify-between text-xs space-y-2">
+                        <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Production IP</span> 
+                            <span class="text-[10.5px] font-mono font-black px-2.5 py-0.5 rounded-lg border shadow-sm text-right bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300" x-text="form.Live_IP || '192.168.0.250'"></span>
+                        </div>
+                        <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">iLO / IPMI Remote IP</span> 
+                            <span x-show="modalMode === 'view'" class="font-mono font-black text-rose-600 dark:text-rose-400 text-right bg-rose-50 dark:bg-rose-950/40 px-2 py-0.5 rounded border border-rose-200 dark:border-rose-500/30" x-text="form.BackupStatus?.includes('192.') ? form.BackupStatus : (form.Live_IP?.includes('.25') ? form.Live_IP : '192.168.0.250 (iLO)')"></span>
+                            <input x-show="modalMode !== 'view'" x-model="form.BackupStatus" placeholder="e.g. 192.168.0.250" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-mono font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner">
+                        </div>
+                        <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Rack Unit Location</span> 
+                            <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right" x-text="form.Location || 'Rack #1 - Unit 4U'"></span>
+                            <input x-show="modalMode !== 'view'" x-model="form.Location" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- ========================================================================= -->
+    <!-- 🖨️ VIEW 4: PRINTING & IMAGING (PRINTER / SCANNER / MFD)                   -->
+    <!-- ========================================================================= -->
+    <template x-if="getDeviceCategory(form.DeviceType) === 'printer'">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
+            
+            <!-- 1. Printer Profile & Model -->
+            <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200/90 dark:border-white/5 shadow-sm h-full flex flex-col">
+                <h3 class="text-[9.5px] font-black tracking-widest text-amber-600 dark:text-amber-400 uppercase mb-2 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-1.5 shrink-0"><i class="fa-solid fa-print"></i> Printer Specification</h3>
+                <div class="flex flex-col flex-1 justify-between text-xs space-y-2">
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Asset Tag</span> 
+                        <span x-show="modalMode === 'view'" class="font-black text-amber-600 dark:text-amber-400 font-mono text-right" x-text="form.AssetID"></span>
+                        <input x-show="modalMode !== 'view'" x-model="form.AssetID" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-mono font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner" :readonly="modalMode === 'edit'">
+                    </div>
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Printer Model</span> 
+                        <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right truncate" x-text="(form.Make||'') + ' ' + (form.Model||'')"></span>
+                        <div x-show="modalMode !== 'view'" class="flex gap-1 w-full max-w-[150px]">
+                            <input x-model="form.Make" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded px-1.5 py-0.5 text-[10px] font-bold outline-none text-center w-1/2 dark:text-white shadow-inner" placeholder="Canon/HP">
+                            <input x-model="form.Model" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded px-1.5 py-0.5 text-[10px] font-bold outline-none text-center w-1/2 dark:text-white shadow-inner" placeholder="LaserJet 1020">
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Print Technology</span> 
+                        <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right" x-text="form.CPU || 'Monochrome Laser / MFD'"></span>
+                        <input x-show="modalMode !== 'view'" x-model="form.CPU" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner" placeholder="Mono Laser / Color Tank">
+                    </div>
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Serial Number</span> 
+                        <span x-show="modalMode === 'view'" class="font-mono font-bold text-slate-800 dark:text-white text-right" x-text="form.SerialNo || '-'"></span>
+                        <input x-show="modalMode !== 'view'" x-model="form.SerialNo" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-mono font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Supplies & Cartridge Compatibility -->
+            <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200/90 dark:border-white/5 shadow-sm h-full flex flex-col">
+                <h3 class="text-[9.5px] font-black tracking-widest text-purple-600 dark:text-purple-400 uppercase mb-2 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-1.5 shrink-0"><i class="fa-solid fa-box-open"></i> Toner & Consumables</h3>
+                <div class="flex flex-col flex-1 justify-between text-xs space-y-2">
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Toner / Cartridge Model</span> 
+                        <span x-show="modalMode === 'view'" class="font-mono font-black text-purple-700 dark:text-purple-300 text-right bg-purple-50 dark:bg-purple-950/40 px-2.5 py-0.5 rounded border border-purple-200 dark:border-purple-500/30" x-text="form.OS || form.DataClass || 'HP 12A / Canon 303'"></span>
+                        <input x-show="modalMode !== 'view'" x-model="form.OS" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-mono font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner" placeholder="e.g. HP 12A / 88A">
+                    </div>
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Paper Trays</span> 
+                        <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right">Tray 1 (A4/Legal) Standard</span>
+                        <span x-show="modalMode !== 'view'" class="text-[10px] text-slate-500 font-mono text-right">Standard A4 / Letter</span>
+                    </div>
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Duplex Printing</span> 
+                        <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right" x-text="form.Encryption === 'Yes' ? 'Automatic Two-Sided' : 'Manual Duplex'"></span>
+                        <select x-show="modalMode !== 'view'" x-model="form.Encryption" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 font-bold outline-none w-full max-w-[150px] dark:text-white appearance-none cursor-pointer text-right shadow-inner"><option value="No">Manual</option><option value="Yes">Auto Duplex</option></select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Network Share & Direct Attachment -->
+            <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200/90 dark:border-white/5 shadow-sm h-full flex flex-col">
+                <h3 class="text-[9.5px] font-black tracking-widest text-emerald-600 dark:text-emerald-400 uppercase mb-2 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-1.5 shrink-0"><i class="fa-solid fa-network-wired"></i> Connection Mode & Floor</h3>
+                <div class="flex flex-col flex-1 justify-between text-xs space-y-2">
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Connection Protocol</span> 
+                        <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right" x-text="form.Live_IP && form.Live_IP !== 'Not Allocated' ? 'Direct Network (LAN/Ethernet)' : 'Local USB Share'"></span>
+                        <span x-show="modalMode !== 'view'" class="text-[10px] text-slate-500 font-mono text-right">LAN / USB Auto Detect</span>
+                    </div>
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Printer IP Address</span> 
+                        <span class="font-mono font-black text-emerald-600 dark:text-emerald-400 text-right" x-text="form.Live_IP || 'Shared via Host PC'"></span>
+                    </div>
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Attached Host PC</span> 
+                        <span x-show="modalMode === 'view'" class="font-mono font-bold text-slate-800 dark:text-white text-right" x-text="form.Hostname || 'Network Standalone'"></span>
+                        <input x-show="modalMode !== 'view'" x-model="form.Hostname" placeholder="e.g. NOD-ADM-002" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-mono font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner">
+                    </div>
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Placement Bay</span> 
+                        <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right flex items-center gap-1 justify-end"><i class="fa-solid fa-map-pin text-rose-500 text-[10px]"></i> <span x-text="form.Location || '-'"></span></span>
+                        <input x-show="modalMode !== 'view'" x-model="form.Location" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- ========================================================================= -->
+    <!-- 🖧 VIEW 5: NETWORK CORE (SWITCH / ROUTER / FIREWALL)                       -->
+    <!-- ========================================================================= -->
+    <template x-if="getDeviceCategory(form.DeviceType) === 'network'">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
+            
+            <!-- 1. Switch Topology & Ports Capacity -->
+            <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200/90 dark:border-white/5 shadow-sm h-full flex flex-col">
+                <h3 class="text-[9.5px] font-black tracking-widest text-teal-600 dark:text-teal-400 uppercase mb-2 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-1.5 shrink-0"><i class="fa-solid fa-network-wired"></i> Switch Topology & Chassis</h3>
+                <div class="flex flex-col flex-1 justify-between text-xs space-y-2">
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Switch Tag</span> 
+                        <span x-show="modalMode === 'view'" class="font-black text-teal-600 dark:text-teal-400 font-mono text-right" x-text="form.AssetID"></span>
+                        <input x-show="modalMode !== 'view'" x-model="form.AssetID" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-mono font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner" :readonly="modalMode === 'edit'">
+                    </div>
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Switch ID / Name</span> 
+                        <span x-show="modalMode === 'view'" class="font-mono font-black text-slate-800 dark:text-white text-right" x-text="form.Hostname || form.AssetID"></span>
+                        <input x-show="modalMode !== 'view'" x-model="form.Hostname" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-mono font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner" placeholder="e.g. PBL-NOD-IT-SWT-001">
+                    </div>
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Port Capacity</span> 
+                        <span x-show="modalMode === 'view'" class="font-mono font-black text-emerald-600 dark:text-emerald-400 text-right bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-500/30" x-text="(form.RAM_GB || form.Model?.match(/\d{2}/)?.[0] || '24') + ' RJ45 Ports'"></span>
+                        <input x-show="modalMode !== 'view'" x-model="form.RAM_GB" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner" placeholder="8 / 24 / 48 / 52 Ports">
+                    </div>
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Make & Model</span> 
+                        <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right truncate" x-text="(form.Make||'') + ' ' + (form.Model||'')"></span>
+                        <div x-show="modalMode !== 'view'" class="flex gap-1 w-full max-w-[150px]">
+                            <input x-model="form.Make" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded px-1.5 py-0.5 text-[10px] font-bold outline-none text-center w-1/2 dark:text-white shadow-inner" placeholder="D-Link/TP-Link">
+                            <input x-model="form.Model" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded px-1.5 py-0.5 text-[10px] font-bold outline-none text-center w-1/2 dark:text-white shadow-inner" placeholder="DGS-1210-52">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Management Layer & VLAN Routing -->
+            <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200/90 dark:border-white/5 shadow-sm h-full flex flex-col">
+                <h3 class="text-[9.5px] font-black tracking-widest text-sky-600 dark:text-sky-400 uppercase mb-2 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-1.5 shrink-0"><i class="fa-solid fa-route"></i> Management Layer & Uplink</h3>
+                <div class="flex flex-col flex-1 justify-between text-xs space-y-2">
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Switch Tier</span> 
+                        <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right" x-text="form.OS || 'Managed Layer 2 Gigabit'"></span>
+                        <input x-show="modalMode !== 'view'" x-model="form.OS" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 text-xs font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner" placeholder="Managed L2 / Unmanaged">
+                    </div>
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Management IP</span> 
+                        <span class="font-mono font-black text-sky-600 dark:text-sky-400 text-right" x-text="form.Live_IP || '192.168.0.X / Direct'"></span>
+                    </div>
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">SFP Uplink Trunk</span> 
+                        <span x-show="modalMode === 'view'" class="font-mono font-bold text-slate-800 dark:text-white text-right" x-text="form.DataClass || '2x Gigabit SFP Combo'"></span>
+                        <input x-show="modalMode !== 'view'" x-model="form.DataClass" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 text-xs font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner" placeholder="Fiber SFP / Copper Trunk">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Rack Elevation & Deployment -->
+            <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200/90 dark:border-white/5 shadow-sm h-full flex flex-col">
+                <h3 class="text-[9.5px] font-black tracking-widest text-emerald-600 dark:text-emerald-400 uppercase mb-2 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-1.5 shrink-0"><i class="fa-solid fa-server"></i> Rack Unit & Environment</h3>
+                <div class="flex flex-col flex-1 justify-between text-xs space-y-2">
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Rack Bay / Room</span> 
+                        <span x-show="modalMode === 'view'" class="font-bold text-slate-800 dark:text-white text-right flex items-center gap-1 justify-end"><i class="fa-solid fa-map-pin text-rose-500 text-[10px]"></i> <span x-text="form.Location || 'Server Room Rack#1'"></span></span>
+                        <input x-show="modalMode !== 'view'" x-model="form.Location" class="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 font-bold outline-none text-right w-full max-w-[150px] dark:text-white shadow-inner">
+                    </div>
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Branch Context</span> 
+                        <span class="font-mono font-bold text-slate-800 dark:text-white text-right uppercase" x-text="currentLocation"></span>
+                    </div>
+                    <div class="flex justify-between items-start py-1.5 border-b border-slate-100 dark:border-white/5 gap-3">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">Operational Status</span> 
+                        <span class="font-black text-right text-emerald-600 dark:text-emerald-400">ACTIVE PRODUCTION</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- ========================================================================= -->
+    <!-- 📦 COMMON FOOTER BAR: LIFECYCLE, FINANCIALS & REMARKS (UNIVERSAL FOR ALL)  -->
+    <!-- ========================================================================= -->
+    <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200/90 dark:border-white/5 shadow-sm flex flex-col md:flex-row gap-3 items-stretch">
+        <div class="flex-1 grid grid-cols-2 md:grid-cols-4 gap-2.5 w-full">
+            <div class="bg-slate-50 dark:bg-white/5 p-3 rounded-xl border border-slate-200/80 dark:border-white/5 shadow-inner flex flex-col justify-center">
+                <span class="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Purchase Date</span>
+                <span x-show="modalMode === 'view'" class="text-xs font-bold text-slate-800 dark:text-white flex items-center gap-1.5"><i class="fa-regular fa-calendar opacity-50"></i> <span x-text="formatDisplayDate(form.PurchaseDate)"></span></span>
+                <input x-show="modalMode !== 'view'" x-model="form.PurchaseDate" type="date" class="w-full bg-white dark:bg-black/60 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 text-xs font-bold outline-none dark:text-white">
+            </div>
+            <div class="bg-slate-50 dark:bg-white/5 p-3 rounded-xl border border-slate-200/80 dark:border-white/5 shadow-inner flex flex-col justify-center">
+                <span class="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Warranty End</span>
+                <span x-show="modalMode === 'view'" class="text-xs font-bold flex items-center gap-1.5" :class="isExpiring(form.WarrantyEnd) ? 'text-rose-500 animate-pulse' : 'text-slate-800 dark:text-white'"><i class="fa-solid fa-shield-check opacity-50"></i> <span x-text="formatDisplayDate(form.WarrantyEnd)"></span></span>
+                <input x-show="modalMode !== 'view'" x-model="form.WarrantyEnd" type="date" class="w-full bg-white dark:bg-black/60 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 text-xs font-bold outline-none dark:text-white">
+            </div>
+            <div class="bg-slate-50 dark:bg-white/5 p-3 rounded-xl border border-slate-200/80 dark:border-white/5 shadow-inner flex flex-col justify-center">
+                <span class="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Vendor</span>
+                <span x-show="modalMode === 'view'" class="text-xs font-bold text-slate-800 dark:text-white flex items-center gap-1.5 truncate"><i class="fa-solid fa-store opacity-50"></i> <span class="truncate" x-text="form.Vendor || '-'"></span></span>
+                <input x-show="modalMode !== 'view'" x-model="form.Vendor" type="text" class="w-full bg-white dark:bg-black/60 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 text-xs font-bold outline-none dark:text-white" placeholder="Vendor Name">
+            </div>
+            <div class="bg-slate-50 dark:bg-white/5 p-3 rounded-xl border border-slate-200/80 dark:border-white/5 shadow-inner flex flex-col justify-center">
+                <span class="block text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Cost (INR)</span>
+                <span x-show="modalMode === 'view'" class="text-xs font-mono font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-1"><i class="fa-solid fa-indian-rupee-sign opacity-50"></i> <span x-text="form.Cost_INR ? Number(form.Cost_INR).toLocaleString('en-IN') : '-'"></span></span>
+                <input x-show="modalMode !== 'view'" x-model="form.Cost_INR" type="number" class="w-full bg-white dark:bg-black/60 border border-slate-200 dark:border-slate-700 rounded px-2 py-1 text-xs font-bold outline-none dark:text-white" placeholder="Amount">
+            </div>
+        </div>
+        
+        <div class="w-full md:w-[32%] bg-amber-50/60 dark:bg-amber-950/20 p-3 rounded-xl border border-amber-200/80 dark:border-amber-500/20 shadow-inner flex flex-col justify-center">
+            <span class="block text-[8px] font-black text-amber-700 dark:text-amber-400 uppercase tracking-widest mb-1"><i class="fa-solid fa-note-sticky"></i> Remarks / Notes</span>
+            <span x-show="modalMode === 'view'" class="text-xs font-medium text-amber-900 dark:text-amber-300 leading-snug break-words" x-text="form.Notes || 'No additional remarks documented.'"></span>
+            <textarea x-show="modalMode !== 'view'" x-model="form.Notes" class="w-full bg-white dark:bg-black/60 border border-amber-200 dark:border-amber-500/30 rounded-lg px-2.5 py-1.5 text-xs font-medium outline-none dark:text-white resize-none" rows="2" placeholder="Any notes..."></textarea>
+        </div>
+    </div>
+
+</div>
+<!-- 🖥️ HARDWARE TAB END -->
 
                      <!-- 💿 SOFTWARE TELEMETRY & DEPLOYMENT VAULT START -->
                      <div x-show="currentTab === 'software'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4 flex-1" x-cloak>
@@ -2146,10 +2488,25 @@ Expiry Date: ${this.formatDisplayDate(item.ExpiryDate) || 'Lifetime / N/A'}`;
                         setTimeout(() => this.haptic('success'), 500);
                     },
 
-                    showToast(title, message, type) { const id = Date.now(); this.toasts.push({ id, title, message, type, visible: true }); setTimeout(() => { this.toasts = this.toasts.filter(t => t.id !== id); }, 3000); }
-                };
-            });
-        });
+                    // 🚀 1. Polymorphic Hardware Category Classifier (YAHAN ANDAR HONA CHAHIYE):
+                    getDeviceCategory(type) {
+                        const t = String(type || '').toLowerCase();
+                        if (t.includes('monitor') || t.includes('tft') || t.includes('display')) return 'display';
+                        if (t.includes('server')) return 'server';
+                        if (t.includes('printer') || t.includes('scanner') || t.includes('xerox')) return 'printer';
+                        if (t.includes('switch') || t.includes('router') || t.includes('firewall')) return 'network';
+                        return 'computing'; // Default Desktop / Laptop
+                    },
+
+                    // 🚀 2. showToast function iske baad aayega:
+                    showToast(title, message, type) { 
+                        const id = Date.now(); 
+                        this.toasts.push({ id, title, message, type, visible: true }); 
+                        setTimeout(() => { this.toasts = this.toasts.filter(t => t.id !== id); }, 3000); 
+                    }
+                }; // 👈 inventorySystem object close
+            }); // 👈 Alpine.data close
+        }); // 👈 DOMContentLoaded / alpine:init close
     </script>
 </body>
 </html>
