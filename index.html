@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <!-- 🚀 GLOBAL APP CONFIGURATION -->
+    <!-- 🚀 GLOBAL CONFIGURATION (Sabse Upar) -->
+    <script src="config.js"></script>
     <script>
         const PBL_APP_VERSION = "v1.0";
-        const API_URL = "https://script.google.com/macros/s/AKfycbxLuVpd5zOUJMwjnJsI9aRVEMTJNNfiizVFAAuxPiHMf7Tv144pq4uNsEgn_hCy6qx18g/exec";
     </script>
+
     <title>PBL Connect | Employee Intranet</title>
     
     <link rel="icon" type="image/x-icon" href="assets/images/pbl-logo.png">
@@ -17,6 +18,7 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
 
     <script>
         tailwind.config = {
@@ -36,13 +38,19 @@
         body { background-color: #f1f5f9; transition: background-color 0.2s; overflow: hidden; }
         .dark body { background-color: #020617; }
         
-        /* 🚀 MAGIC SCALING: Forces Desktop UI to render at exactly 110% zoom natively */
-        @media (min-width: 1024px) {
+        /* 🚀 SMART DUAL-RESOLUTION SCALING (1280x1024 & 1980x1280 Optimized) */
+        @media (min-width: 1024px) and (max-width: 1599px) {
             body {
-                zoom: 1.1;
-                /* 🚀 MATH COMPENSATOR: Reduces the container bounds so the enlarged content doesn't get cut off or push the footer out of the screen */
-                height: calc(100dvh / 1.1) !important;
-                width: calc(100vw / 1.1) !important;
+                zoom: 1;
+                height: 100dvh !important;
+                width: 100vw !important;
+            }
+        }
+        @media (min-width: 1600px) {
+            body {
+                zoom: 1.08;
+                height: calc(100dvh / 1.08) !important;
+                width: calc(100vw / 1.08) !important;
             }
         }
         
@@ -85,19 +93,39 @@
         .popup-timer-bar { height: 4px; background: linear-gradient(90deg, #3b82f6, #ec4899, #f59e0b); width: 100%; transform-origin: left; transform: scaleX(1); transition: transform 5s linear; }
         .celebration-popup.show .popup-timer-bar { transform: scaleX(0); }
 
-        /* 🚀 KPI Smart Focus Hover Effect */
+        /* 🚀 PROFESSIONAL CORPORATE BENTO KPI CARDS (No Icon Rotation) */
         .kpi-grid:hover > .kpi-card:not(:hover) {
-            filter: blur(2px); /* 🚀 Reduced from 4px for better legibility */
-            transform: scale(0.95); /* 🚀 Less aggressive shrink */
-            opacity: 0.75; /* 🚀 Retain some visibility */
+            opacity: 0.75;
+            filter: grayscale(20%);
+            transform: scale(0.985);
         }
         .kpi-card {
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), filter 0.4s ease, opacity 0.4s ease, box-shadow 0.3s ease !important;
-            will-change: transform, filter; 
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            will-change: transform, box-shadow, opacity;
         }
         .kpi-card:hover {
-            transform: scale(1.05);
+            transform: translateY(-3px);
+            box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(59, 130, 246, 0.25) inset !important;
             z-index: 20;
+        }
+        .dark .kpi-card:hover {
+            box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(96, 165, 250, 0.35) inset !important;
+        }
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transform: skewX(-25deg);
+            transition: 0.6s ease;
+            pointer-events: none;
+            z-index: 25;
+        }
+        .dark .kpi-card::before {
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent);
+        }
+        .kpi-card:hover::before {
+            left: 150%;
         }
 
         /* 🚀 Footer Quick Links Smart Focus Effect */
@@ -344,138 +372,266 @@
 
             </div>
 
-            <!-- 🎯 2. COMPLETE 8 KPI CARDS (Safe & Intact - Live hone par turant show hoga) -->
-            <div x-show="modulesLive" x-cloak class="cards-container kpi-grid grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-3 sm:mb-4 transition-all">
-                
-                <!-- Card 1: IT Ticket -->
-                <div @click="openApp('submit-ticket.html', 'Raise IT Ticket')" class="kpi-card relative p-3 rounded-[1.25rem] cursor-pointer overflow-hidden group flex flex-col justify-between min-h-[80px] sm:min-h-[95px] bg-gradient-to-br from-amber-50/80 to-white/80 border border-amber-200/60 shadow-md hover:shadow-2xl hover:border-amber-400/50 dark:from-amber-900/10 dark:to-dark_surface/80 dark:border-amber-800/30">
-                    <i class="fa-solid fa-headset absolute -bottom-3 -right-2 text-5xl sm:text-6xl text-amber-500/20 dark:text-amber-500/10 group-hover:scale-110 transition-transform"></i>
-                    <div class="flex items-center justify-between relative z-10 mb-1">
-                        <div class="flex items-center gap-2">
-                            <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-amber-500 text-[10px] sm:text-[11px] shrink-0 border border-amber-100 dark:border-white/5"><i class="fa-solid fa-ticket"></i></div>
-                            <span class="hidden sm:inline-block text-[9px] sm:text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest leading-none mt-px">HELP</span>
-                        </div>
-                        <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-amber-100/50 dark:bg-amber-900/30 text-amber-500 flex items-center justify-center group-hover:bg-amber-500 group-hover:text-white transition-all shrink-0"><i class="fa-solid fa-arrow-right text-[9px] group-hover:translate-x-1 transition-transform"></i></div>
-                    </div>
-                    <div class="relative z-10 mt-auto">
-                        <h3 class="text-[16px] sm:text-lg font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">IT Ticket</h3>
-                        <div class="mt-0.5 flex flex-col justify-start w-full"><span class="text-[9px] sm:text-[10px] font-bold text-slate-500 dark:text-slate-400">Report issues 🛠️</span></div>
-                    </div>
-                </div>
-
-                <!-- Card 2: Leave Hub -->
-                <div @click="openApp('apply-leave.html', 'Apply for Leave')" class="kpi-card relative p-3 rounded-[1.25rem] cursor-pointer overflow-hidden group flex flex-col justify-between min-h-[80px] sm:min-h-[95px] bg-gradient-to-br from-emerald-50/80 to-white/80 border border-emerald-200/60 shadow-md hover:shadow-2xl hover:border-emerald-400/50 dark:from-emerald-900/10 dark:to-dark_surface/80 dark:border-emerald-800/30">
-                    <i class="fa-solid fa-umbrella-beach absolute -bottom-3 -right-2 text-5xl sm:text-6xl text-emerald-500/20 dark:text-emerald-500/10 group-hover:scale-110 transition-transform"></i>
-                    <div class="flex items-center justify-between relative z-10 mb-1">
-                        <div class="flex items-center gap-2">
-                            <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-emerald-500 text-[10px] sm:text-[11px] shrink-0 border border-emerald-100 dark:border-white/5"><i class="fa-regular fa-calendar-check"></i></div>
-                            <span class="hidden sm:inline-block text-[9px] sm:text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest leading-none mt-px">HR OPS</span>
-                        </div>
-                        <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-emerald-100/50 dark:bg-emerald-900/30 text-emerald-500 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-all shrink-0"><i class="fa-solid fa-arrow-right text-[9px] group-hover:translate-x-1 transition-transform"></i></div>
-                    </div>
-                    <div class="relative z-10 mt-auto">
-                        <h3 class="text-[16px] sm:text-lg font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">Leave Hub</h3>
-                        <div class="mt-0.5 flex flex-col justify-start w-full"><span class="text-[9px] sm:text-[10px] font-bold text-slate-500 dark:text-slate-400">Apply & Track 🌴</span></div>
-                    </div>
-                </div>
-
-                <!-- Card 3: Production -->
-                <div @click="openApp('production-hub.html', 'Production Hub')" class="kpi-card relative p-3 rounded-[1.25rem] cursor-pointer overflow-hidden group flex flex-col justify-between min-h-[80px] sm:min-h-[95px] bg-gradient-to-br from-indigo-50/80 to-white/80 border border-indigo-200/60 shadow-md hover:shadow-2xl hover:border-indigo-400/50 dark:from-indigo-900/10 dark:to-dark_surface/80 dark:border-indigo-800/30">
-                    <i class="fa-solid fa-cogs absolute -bottom-3 -right-2 text-5xl sm:text-6xl text-indigo-500/20 dark:text-indigo-500/10 group-hover:scale-110 transition-transform"></i>
-                    <div class="flex items-center justify-between relative z-10 mb-1">
-                        <div class="flex items-center gap-2">
-                            <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-indigo-500 text-[10px] sm:text-[11px] shrink-0 border border-indigo-100 dark:border-white/5"><i class="fa-solid fa-industry"></i></div>
-                            <span class="hidden sm:inline-block text-[9px] sm:text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest leading-none mt-px">PROJECTS</span>
-                        </div>
-                        <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-indigo-100/50 dark:bg-indigo-900/30 text-indigo-500 flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-all shrink-0"><i class="fa-solid fa-arrow-right text-[9px] group-hover:translate-x-1 transition-transform"></i></div>
-                    </div>
-                    <div class="relative z-10 mt-auto">
-                        <h3 class="text-[16px] sm:text-lg font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">Production</h3>
-                        <div class="mt-0.5 flex flex-col justify-start w-full"><span class="text-[9px] sm:text-[10px] font-bold text-slate-500 dark:text-slate-400">Tools & Updates ⚙️</span></div>
-                    </div>
-                </div>
-
-                <!-- Card 4: IT Dept -->
-                <div @click="openApp('it-hub.html', 'IT Dept Hub')" class="kpi-card relative p-3 rounded-[1.25rem] cursor-pointer overflow-hidden group flex flex-col justify-between min-h-[80px] sm:min-h-[95px] bg-gradient-to-br from-blue-50/80 to-white/80 border border-blue-200/60 shadow-md hover:shadow-2xl hover:border-blue-400/50 dark:from-blue-900/10 dark:to-dark_surface/80 dark:border-blue-800/30">
-                    <i class="fa-solid fa-server absolute -bottom-3 -right-2 text-5xl sm:text-6xl text-blue-500/20 dark:text-blue-500/10 group-hover:scale-110 transition-transform"></i>
-                    <div class="flex items-center justify-between relative z-10 mb-1">
-                        <div class="flex items-center gap-2">
-                            <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-blue-500 text-[10px] sm:text-[11px] shrink-0 border border-blue-100 dark:border-white/5"><i class="fa-solid fa-computer"></i></div>
-                            <span class="hidden sm:inline-block text-[9px] sm:text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest leading-none mt-px">SYS OPS</span>
-                        </div>
-                        <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-blue-100/50 dark:bg-blue-900/30 text-blue-500 flex items-center justify-center group-hover:bg-blue-500 group-hover:text-white transition-all shrink-0"><i class="fa-solid fa-arrow-right text-[9px] group-hover:translate-x-1 transition-transform"></i></div>
-                    </div>
-                    <div class="relative z-10 mt-auto">
-                        <h3 class="text-[16px] sm:text-lg font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">IT Dept</h3>
-                        <div class="mt-0.5 flex flex-col justify-start w-full"><span class="text-[9px] sm:text-[10px] font-bold text-slate-500 dark:text-slate-400">Status & SOPs 🖥️</span></div>
-                    </div>
-                </div>
-
-                <!-- Card 5: Holidays -->
-                <div @click="openApp('holidays.html', 'Holiday List')" class="kpi-card relative p-3 rounded-[1.25rem] cursor-pointer overflow-hidden group flex flex-col justify-between min-h-[80px] sm:min-h-[95px] bg-gradient-to-br from-purple-50/80 to-white/80 border border-purple-200/60 shadow-md hover:shadow-2xl hover:border-purple-400/50 dark:from-purple-900/10 dark:to-dark_surface/80 dark:border-purple-800/30">
-                    <i class="fa-solid fa-calendar-days absolute -bottom-3 -right-2 text-5xl sm:text-6xl text-purple-500/20 dark:text-purple-500/10 group-hover:scale-110 transition-transform"></i>
-                    <div class="flex items-center justify-between relative z-10 mb-1">
-                        <div class="flex items-center gap-2">
-                            <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-purple-500 text-[10px] sm:text-[11px] shrink-0 border border-purple-100 dark:border-white/5"><i class="fa-regular fa-flag"></i></div>
-                            <span class="hidden sm:inline-block text-[9px] sm:text-[10px] font-black text-purple-600 dark:text-purple-400 uppercase tracking-widest leading-none mt-px">CALENDAR</span>
-                        </div>
-                        <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-purple-100/50 dark:bg-purple-900/30 text-purple-500 flex items-center justify-center group-hover:bg-purple-500 group-hover:text-white transition-all shrink-0"><i class="fa-solid fa-arrow-right text-[9px] group-hover:translate-x-1 transition-transform"></i></div>
-                    </div>
-                    <div class="relative z-10 mt-auto">
-                        <h3 class="text-[16px] sm:text-lg font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">Holidays</h3>
-                        <div class="mt-0.5 flex flex-col justify-start w-full"><span class="text-[9px] sm:text-[10px] font-bold text-slate-500 dark:text-slate-400">Official Schedule 🗓️</span></div>
-                    </div>
-                </div>
-
-                <!-- Card 6: Suggestion Box -->
-                <div @click="openApp('suggestion-box.html', 'Suggestion Box')" class="kpi-card relative p-3 rounded-[1.25rem] cursor-pointer overflow-hidden group flex flex-col justify-between min-h-[80px] sm:min-h-[95px] bg-gradient-to-br from-sky-50/80 to-white/80 border border-sky-200/60 shadow-md hover:shadow-2xl hover:border-sky-400/50 dark:from-sky-900/10 dark:to-dark_surface/80 dark:border-sky-800/30">
-                    <i class="fa-solid fa-lightbulb absolute -bottom-3 -right-2 text-5xl sm:text-6xl text-sky-500/20 dark:text-sky-500/10 group-hover:scale-110 transition-transform"></i>
-                    <div class="flex items-center justify-between relative z-10 mb-1">
-                        <div class="flex items-center gap-2">
-                            <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-sky-500 text-[10px] sm:text-[11px] shrink-0 border border-sky-100 dark:border-white/5"><i class="fa-regular fa-comment-dots"></i></div>
-                            <span class="hidden sm:inline-block text-[9px] sm:text-[10px] font-black text-sky-600 dark:text-sky-400 uppercase tracking-widest leading-none mt-px">IDEAS</span>
-                        </div>
-                        <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-sky-100/50 dark:bg-sky-900/30 text-sky-500 flex items-center justify-center group-hover:bg-sky-500 group-hover:text-white transition-all shrink-0"><i class="fa-solid fa-arrow-right text-[9px] group-hover:translate-x-1 transition-transform"></i></div>
-                    </div>
-                    <div class="relative z-10 mt-auto">
-                        <h3 class="text-[16px] sm:text-lg font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">Suggestion Box</h3>
-                        <div class="mt-0.5 flex flex-col justify-start w-full"><span class="text-[9px] sm:text-[10px] font-bold text-slate-500 dark:text-slate-400">Share thoughts 💡</span></div>
-                    </div>
-                </div>
-
-                <!-- Card 7: Leave Policy -->
-                <div @click="openApp('leave-policy.html', 'Leave Policy')" class="kpi-card relative p-3 rounded-[1.25rem] cursor-pointer overflow-hidden group flex flex-col justify-between min-h-[80px] sm:min-h-[95px] bg-gradient-to-br from-rose-50/80 to-white/80 border border-rose-200/60 shadow-md hover:shadow-2xl hover:border-rose-400/50 dark:from-rose-900/10 dark:to-dark_surface/80 dark:border-rose-800/30">
-                    <i class="fa-solid fa-scale-balanced absolute -bottom-3 -right-2 text-5xl sm:text-6xl text-rose-500/20 dark:text-rose-500/10 group-hover:scale-110 transition-transform"></i>
-                    <div class="flex items-center justify-between relative z-10 mb-1">
-                        <div class="flex items-center gap-2">
-                            <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-rose-500 text-[10px] sm:text-[11px] shrink-0 border border-rose-100 dark:border-white/5"><i class="fa-solid fa-file-contract"></i></div>
-                            <span class="hidden sm:inline-block text-[9px] sm:text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest leading-none mt-px">RULES</span>
-                        </div>
-                        <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-rose-100/50 dark:bg-rose-900/30 text-rose-500 flex items-center justify-center group-hover:bg-rose-500 group-hover:text-white transition-all shrink-0"><i class="fa-solid fa-arrow-right text-[9px] group-hover:translate-x-1 transition-transform"></i></div>
-                    </div>
-                    <div class="relative z-10 mt-auto">
-                        <h3 class="text-[16px] sm:text-lg font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">Leave Policy</h3>
-                        <div class="mt-0.5 flex flex-col justify-start w-full"><span class="text-[9px] sm:text-[10px] font-bold text-slate-500 dark:text-slate-400">Guidelines 📄</span></div>
-                    </div>
-                </div>
-
-                <!-- Card 8: Training Center -->
-                <div @click="openApp('training-and-policies-center.html', 'Training Center')" class="kpi-card relative p-3 rounded-[1.25rem] cursor-pointer overflow-hidden group flex flex-col justify-between min-h-[80px] sm:min-h-[95px] bg-gradient-to-br from-teal-50/80 to-white/80 border border-teal-200/60 shadow-md hover:shadow-2xl hover:border-teal-400/50 dark:from-teal-900/10 dark:to-dark_surface/80 dark:border-teal-800/30">
-                    <i class="fa-solid fa-graduation-cap absolute -bottom-3 -right-2 text-5xl sm:text-6xl text-teal-500/20 dark:text-teal-500/10 group-hover:scale-110 transition-transform"></i>
-                    <div class="flex items-center justify-between relative z-10 mb-1">
-                        <div class="flex items-center gap-2">
-                            <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-teal-500 text-[10px] sm:text-[11px] shrink-0 border border-teal-100 dark:border-white/5"><i class="fa-solid fa-book-open"></i></div>
-                            <span class="hidden sm:inline-block text-[9px] sm:text-[10px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-widest leading-none mt-px">LEARN</span>
-                        </div>
-                        <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-xl bg-teal-100/50 dark:bg-teal-900/30 text-teal-500 flex items-center justify-center group-hover:bg-teal-500 group-hover:text-white transition-all shrink-0"><i class="fa-solid fa-arrow-right text-[9px] group-hover:translate-x-1 transition-transform"></i></div>
-                    </div>
-                    <div class="relative z-10 mt-auto">
-                        <h3 class="text-[16px] sm:text-lg font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">Training</h3>
-                        <div class="mt-0.5 flex flex-col justify-start w-full"><span class="text-[9px] sm:text-[10px] font-bold text-slate-500 dark:text-slate-400">Company SOPs 🎓</span></div>
-                    </div>
-                </div>
-
+            <!-- 🎯 2. PROFESSIONAL CORPORATE BENTO KPI CARDS (Full Space Utilization with Interactive Action Pills) -->
+<div x-show="modulesLive" x-cloak class="cards-container kpi-grid grid grid-cols-2 lg:grid-cols-4 gap-3 xl:gap-4 mb-2 xl:mb-3 transition-all">
+    
+    <!-- Card 1: IT Ticket (Amber Theme) -->
+    <div @click="openApp('submit-ticket.html', 'Raise IT Ticket')" 
+         class="kpi-card relative p-3.5 xl:p-4 rounded-2xl cursor-pointer overflow-hidden group flex items-center justify-between gap-3 min-h-[82px] xl:min-h-[94px] 
+                bg-gradient-to-br from-amber-50/90 via-white to-amber-100/60 hover:from-amber-100/90 hover:via-amber-50/90 hover:to-amber-200/80 
+                dark:from-slate-900 dark:via-amber-950/30 dark:to-amber-900/40 dark:hover:to-amber-900/60
+                border border-amber-300/90 hover:!border-amber-500 dark:border-amber-500/50 dark:hover:!border-amber-400
+                shadow-[0_6px_20px_-4px_rgba(245,158,11,0.18),0_0_16px_rgba(245,158,11,0.14)] 
+                hover:!shadow-[0_14px_34px_-4px_rgba(245,158,11,0.35),0_0_26px_rgba(245,158,11,0.25)]
+                transition-all duration-300">
+        <div class="absolute left-0 inset-y-0 w-1.5 bg-amber-500 shadow-[0_0_8px_#f59e0b] group-hover:shadow-[0_0_16px_#f59e0b] transition-all duration-300"></div>
+        <i class="fa-solid fa-ticket absolute -right-3 -bottom-4 text-[78px] xl:text-[90px] text-amber-500/[0.14] dark:text-amber-400/[0.10] group-hover:text-amber-500/[0.25] group-hover:scale-110 group-hover:-rotate-3 pointer-events-none transition-all duration-300"></i>
+        
+        <div class="relative z-10 flex items-center gap-3.5 min-w-0 flex-1">
+            <div class="w-11 h-11 xl:w-12 xl:h-12 rounded-xl bg-amber-500/15 text-amber-600 dark:bg-amber-500/25 dark:text-amber-400 flex items-center justify-center shrink-0 border border-amber-500/30 shadow-sm group-hover:scale-105 group-hover:bg-amber-500/25 transition-all">
+                <i class="fa-solid fa-ticket text-base xl:text-lg"></i>
             </div>
+            <div class="flex flex-col justify-center min-w-0">
+                <span class="text-[8.5px] font-mono font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-0.5">HELP DESK</span>
+                <h3 class="text-[15px] xl:text-[17px] font-black font-heading tracking-tight text-slate-800 dark:text-white leading-tight truncate group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">IT Ticket</h3>
+                <span class="text-[10.5px] font-medium text-slate-500 dark:text-slate-400 truncate mt-0.5">Report issues 🛠️</span>
+            </div>
+        </div>
+
+        <!-- 🚀 Interactive Action Pill (Light Normal -> Dark Active on Hover) -->
+        <div class="relative z-10 w-8 h-8 rounded-full flex items-center justify-center 
+                    bg-amber-100/90 text-amber-600 dark:bg-amber-500/20 dark:text-amber-300 border border-amber-200/80 dark:border-amber-500/30
+                    group-hover:bg-amber-600 group-hover:text-white group-hover:border-amber-600 group-hover:shadow-[0_0_14px_rgba(245,158,11,0.6)] group-hover:scale-110 
+                    transition-all duration-300 shrink-0">
+            <i class="fa-solid fa-arrow-right text-[10px] -rotate-45 group-hover:rotate-0 group-hover:translate-x-0.5 transition-all duration-300"></i>
+        </div>
+    </div>
+
+    <!-- Card 2: Leave Hub (Emerald Theme) -->
+    <div @click="openApp('apply-leave.html', 'Apply for Leave')" 
+         class="kpi-card relative p-3.5 xl:p-4 rounded-2xl cursor-pointer overflow-hidden group flex items-center justify-between gap-3 min-h-[82px] xl:min-h-[94px] 
+                bg-gradient-to-br from-emerald-50/90 via-white to-emerald-100/60 hover:from-emerald-100/90 hover:via-emerald-50/90 hover:to-emerald-200/80 
+                dark:from-slate-900 dark:via-emerald-950/30 dark:to-emerald-900/40 dark:hover:to-emerald-900/60
+                border border-emerald-300/90 hover:!border-emerald-500 dark:border-emerald-500/50 dark:hover:!border-emerald-400
+                shadow-[0_6px_20px_-4px_rgba(16,185,129,0.18),0_0_16px_rgba(16,185,129,0.14)] 
+                hover:!shadow-[0_14px_34px_-4px_rgba(16,185,129,0.35),0_0_26px_rgba(16,185,129,0.25)]
+                transition-all duration-300">
+        <div class="absolute left-0 inset-y-0 w-1.5 bg-emerald-500 shadow-[0_0_8px_#10b981] group-hover:shadow-[0_0_16px_#10b981] transition-all duration-300"></div>
+        <i class="fa-regular fa-calendar-check absolute -right-3 -bottom-4 text-[78px] xl:text-[90px] text-emerald-500/[0.14] dark:text-emerald-400/[0.10] group-hover:text-emerald-500/[0.25] group-hover:scale-110 group-hover:-rotate-3 pointer-events-none transition-all duration-300"></i>
+        
+        <div class="relative z-10 flex items-center gap-3.5 min-w-0 flex-1">
+            <div class="w-11 h-11 xl:w-12 xl:h-12 rounded-xl bg-emerald-500/15 text-emerald-600 dark:bg-emerald-500/25 dark:text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-500/30 shadow-sm group-hover:scale-105 group-hover:bg-emerald-500/25 transition-all">
+                <i class="fa-regular fa-calendar-check text-base xl:text-lg"></i>
+            </div>
+            <div class="flex flex-col justify-center min-w-0">
+                <span class="text-[8.5px] font-mono font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-0.5">HR OPS</span>
+                <h3 class="text-[15px] xl:text-[17px] font-black font-heading tracking-tight text-slate-800 dark:text-white leading-tight truncate group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">Leave Hub</h3>
+                <span class="text-[10.5px] font-medium text-slate-500 dark:text-slate-400 truncate mt-0.5">Apply & Track 🌴</span>
+            </div>
+        </div>
+
+        <!-- 🚀 Interactive Action Pill (Light Normal -> Dark Active on Hover) -->
+        <div class="relative z-10 w-8 h-8 rounded-full flex items-center justify-center 
+                    bg-emerald-100/90 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-500/30
+                    group-hover:bg-emerald-600 group-hover:text-white group-hover:border-emerald-600 group-hover:shadow-[0_0_14px_rgba(16,185,129,0.6)] group-hover:scale-110 
+                    transition-all duration-300 shrink-0">
+            <i class="fa-solid fa-arrow-right text-[10px] -rotate-45 group-hover:rotate-0 group-hover:translate-x-0.5 transition-all duration-300"></i>
+        </div>
+    </div>
+
+    <!-- Card 3: Production (Indigo Theme) -->
+    <div @click="openApp('production-hub.html', 'Production Hub')" 
+         class="kpi-card relative p-3.5 xl:p-4 rounded-2xl cursor-pointer overflow-hidden group flex items-center justify-between gap-3 min-h-[82px] xl:min-h-[94px] 
+                bg-gradient-to-br from-indigo-50/90 via-white to-indigo-100/60 hover:from-indigo-100/90 hover:via-indigo-50/90 hover:to-indigo-200/80 
+                dark:from-slate-900 dark:via-indigo-950/30 dark:to-indigo-900/40 dark:hover:to-indigo-900/60
+                border border-indigo-300/90 hover:!border-indigo-500 dark:border-indigo-500/50 dark:hover:!border-indigo-400
+                shadow-[0_6px_20px_-4px_rgba(99,102,241,0.18),0_0_16px_rgba(99,102,241,0.14)] 
+                hover:!shadow-[0_14px_34px_-4px_rgba(99,102,241,0.35),0_0_26px_rgba(99,102,241,0.25)]
+                transition-all duration-300">
+        <div class="absolute left-0 inset-y-0 w-1.5 bg-indigo-500 shadow-[0_0_8px_#6366f1] group-hover:shadow-[0_0_16px_#6366f1] transition-all duration-300"></div>
+        <i class="fa-solid fa-industry absolute -right-3 -bottom-4 text-[78px] xl:text-[90px] text-indigo-500/[0.14] dark:text-indigo-400/[0.10] group-hover:text-indigo-500/[0.25] group-hover:scale-110 group-hover:-rotate-3 pointer-events-none transition-all duration-300"></i>
+        
+        <div class="relative z-10 flex items-center gap-3.5 min-w-0 flex-1">
+            <div class="w-11 h-11 xl:w-12 xl:h-12 rounded-xl bg-indigo-500/15 text-indigo-600 dark:bg-indigo-500/25 dark:text-indigo-400 flex items-center justify-center shrink-0 border border-indigo-500/30 shadow-sm group-hover:scale-105 group-hover:bg-indigo-500/25 transition-all">
+                <i class="fa-solid fa-industry text-base xl:text-lg"></i>
+            </div>
+            <div class="flex flex-col justify-center min-w-0">
+                <span class="text-[8.5px] font-mono font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 mb-0.5">PROJECTS</span>
+                <h3 class="text-[15px] xl:text-[17px] font-black font-heading tracking-tight text-slate-800 dark:text-white leading-tight truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Production</h3>
+                <span class="text-[10.5px] font-medium text-slate-500 dark:text-slate-400 truncate mt-0.5">Tools & Updates ⚙️</span>
+            </div>
+        </div>
+
+        <!-- 🚀 Interactive Action Pill (Light Normal -> Dark Active on Hover) -->
+        <div class="relative z-10 w-8 h-8 rounded-full flex items-center justify-center 
+                    bg-indigo-100/90 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-500/30
+                    group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600 group-hover:shadow-[0_0_14px_rgba(99,102,241,0.6)] group-hover:scale-110 
+                    transition-all duration-300 shrink-0">
+            <i class="fa-solid fa-arrow-right text-[10px] -rotate-45 group-hover:rotate-0 group-hover:translate-x-0.5 transition-all duration-300"></i>
+        </div>
+    </div>
+
+    <!-- Card 4: IT Dept (Blue Theme) -->
+    <div @click="openApp('it-hub.html', 'IT Dept Hub')" 
+         class="kpi-card relative p-3.5 xl:p-4 rounded-2xl cursor-pointer overflow-hidden group flex items-center justify-between gap-3 min-h-[82px] xl:min-h-[94px] 
+                bg-gradient-to-br from-blue-50/90 via-white to-blue-100/60 hover:from-blue-100/90 hover:via-blue-50/90 hover:to-blue-200/80 
+                dark:from-slate-900 dark:via-blue-950/30 dark:to-blue-900/40 dark:hover:to-blue-900/60
+                border border-blue-300/90 hover:!border-blue-500 dark:border-blue-500/50 dark:hover:!border-blue-400
+                shadow-[0_6px_20px_-4px_rgba(59,130,246,0.18),0_0_16px_rgba(59,130,246,0.14)] 
+                hover:!shadow-[0_14px_34px_-4px_rgba(59,130,246,0.35),0_0_26px_rgba(59,130,246,0.25)]
+                transition-all duration-300">
+        <div class="absolute left-0 inset-y-0 w-1.5 bg-blue-500 shadow-[0_0_8px_#3b82f6] group-hover:shadow-[0_0_16px_#3b82f6] transition-all duration-300"></div>
+        <i class="fa-solid fa-computer absolute -right-3 -bottom-4 text-[78px] xl:text-[90px] text-blue-500/[0.14] dark:text-blue-400/[0.10] group-hover:text-blue-500/[0.25] group-hover:scale-110 group-hover:-rotate-3 pointer-events-none transition-all duration-300"></i>
+        
+        <div class="relative z-10 flex items-center gap-3.5 min-w-0 flex-1">
+            <div class="w-11 h-11 xl:w-12 xl:h-12 rounded-xl bg-blue-500/15 text-blue-600 dark:bg-blue-500/25 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-500/30 shadow-sm group-hover:scale-105 group-hover:bg-blue-500/25 transition-all">
+                <i class="fa-solid fa-computer text-base xl:text-lg"></i>
+            </div>
+            <div class="flex flex-col justify-center min-w-0">
+                <span class="text-[8.5px] font-mono font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-0.5">SYS OPS</span>
+                <h3 class="text-[15px] xl:text-[17px] font-black font-heading tracking-tight text-slate-800 dark:text-white leading-tight truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">IT Dept</h3>
+                <span class="text-[10.5px] font-medium text-slate-500 dark:text-slate-400 truncate mt-0.5">Status & SOPs 🖥️</span>
+            </div>
+        </div>
+
+        <!-- 🚀 Interactive Action Pill (Light Normal -> Dark Active on Hover) -->
+        <div class="relative z-10 w-8 h-8 rounded-full flex items-center justify-center 
+                    bg-blue-100/90 text-blue-600 dark:bg-blue-500/20 dark:text-blue-300 border border-blue-200/80 dark:border-blue-500/30
+                    group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 group-hover:shadow-[0_0_14px_rgba(59,130,246,0.6)] group-hover:scale-110 
+                    transition-all duration-300 shrink-0">
+            <i class="fa-solid fa-arrow-right text-[10px] -rotate-45 group-hover:rotate-0 group-hover:translate-x-0.5 transition-all duration-300"></i>
+        </div>
+    </div>
+
+    <!-- Card 5: Holidays (Purple Theme) -->
+    <div @click="openApp('holidays.html', 'Holiday List')" 
+         class="kpi-card relative p-3.5 xl:p-4 rounded-2xl cursor-pointer overflow-hidden group flex items-center justify-between gap-3 min-h-[82px] xl:min-h-[94px] 
+                bg-gradient-to-br from-purple-50/90 via-white to-purple-100/60 hover:from-purple-100/90 hover:via-purple-50/90 hover:to-purple-200/80 
+                dark:from-slate-900 dark:via-purple-950/30 dark:to-purple-900/40 dark:hover:to-purple-900/60
+                border border-purple-300/90 hover:!border-purple-500 dark:border-purple-500/50 dark:hover:!border-purple-400
+                shadow-[0_6px_20px_-4px_rgba(168,85,247,0.18),0_0_16px_rgba(168,85,247,0.14)] 
+                hover:!shadow-[0_14px_34px_-4px_rgba(168,85,247,0.35),0_0_26px_rgba(168,85,247,0.25)]
+                transition-all duration-300">
+        <div class="absolute left-0 inset-y-0 w-1.5 bg-purple-500 shadow-[0_0_8px_#a855f7] group-hover:shadow-[0_0_16px_#a855f7] transition-all duration-300"></div>
+        <i class="fa-regular fa-flag absolute -right-3 -bottom-4 text-[78px] xl:text-[90px] text-purple-500/[0.14] dark:text-purple-400/[0.10] group-hover:text-purple-500/[0.25] group-hover:scale-110 group-hover:-rotate-3 pointer-events-none transition-all duration-300"></i>
+        
+        <div class="relative z-10 flex items-center gap-3.5 min-w-0 flex-1">
+            <div class="w-11 h-11 xl:w-12 xl:h-12 rounded-xl bg-purple-500/15 text-purple-600 dark:bg-purple-500/25 dark:text-purple-400 flex items-center justify-center shrink-0 border border-purple-500/30 shadow-sm group-hover:scale-105 group-hover:bg-purple-500/25 transition-all">
+                <i class="fa-regular fa-flag text-base xl:text-lg"></i>
+            </div>
+            <div class="flex flex-col justify-center min-w-0">
+                <span class="text-[8.5px] font-mono font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 mb-0.5">CALENDAR</span>
+                <h3 class="text-[15px] xl:text-[17px] font-black font-heading tracking-tight text-slate-800 dark:text-white leading-tight truncate group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">Holidays</h3>
+                <span class="text-[10.5px] font-medium text-slate-500 dark:text-slate-400 truncate mt-0.5">Official Schedule 🗓️</span>
+            </div>
+        </div>
+
+        <!-- 🚀 Interactive Action Pill (Light Normal -> Dark Active on Hover) -->
+        <div class="relative z-10 w-8 h-8 rounded-full flex items-center justify-center 
+                    bg-purple-100/90 text-purple-600 dark:bg-purple-500/20 dark:text-purple-300 border border-purple-200/80 dark:border-purple-500/30
+                    group-hover:bg-purple-600 group-hover:text-white group-hover:border-purple-600 group-hover:shadow-[0_0_14px_rgba(168,85,247,0.6)] group-hover:scale-110 
+                    transition-all duration-300 shrink-0">
+            <i class="fa-solid fa-arrow-right text-[10px] -rotate-45 group-hover:rotate-0 group-hover:translate-x-0.5 transition-all duration-300"></i>
+        </div>
+    </div>
+
+    <!-- Card 6: Suggestion Box (Sky Theme) -->
+    <div @click="openApp('suggestion-box.html', 'Suggestion Box')" 
+         class="kpi-card relative p-3.5 xl:p-4 rounded-2xl cursor-pointer overflow-hidden group flex items-center justify-between gap-3 min-h-[82px] xl:min-h-[94px] 
+                bg-gradient-to-br from-sky-50/90 via-white to-sky-100/60 hover:from-sky-100/90 hover:via-sky-50/90 hover:to-sky-200/80 
+                dark:from-slate-900 dark:via-sky-950/30 dark:to-sky-900/40 dark:hover:to-sky-900/60
+                border border-sky-300/90 hover:!border-sky-500 dark:border-sky-500/50 dark:hover:!border-sky-400
+                shadow-[0_6px_20px_-4px_rgba(14,165,233,0.18),0_0_16px_rgba(14,165,233,0.14)] 
+                hover:!shadow-[0_14px_34px_-4px_rgba(14,165,233,0.35),0_0_26px_rgba(14,165,233,0.25)]
+                transition-all duration-300">
+        <div class="absolute left-0 inset-y-0 w-1.5 bg-sky-500 shadow-[0_0_8px_#0ea5e9] group-hover:shadow-[0_0_16px_#0ea5e9] transition-all duration-300"></div>
+        <i class="fa-regular fa-comment-dots absolute -right-3 -bottom-4 text-[78px] xl:text-[90px] text-sky-500/[0.14] dark:text-sky-400/[0.10] group-hover:text-sky-500/[0.25] group-hover:scale-110 group-hover:-rotate-3 pointer-events-none transition-all duration-300"></i>
+        
+        <div class="relative z-10 flex items-center gap-3.5 min-w-0 flex-1">
+            <div class="w-11 h-11 xl:w-12 xl:h-12 rounded-xl bg-sky-500/15 text-sky-600 dark:bg-sky-500/25 dark:text-sky-400 flex items-center justify-center shrink-0 border border-sky-500/30 shadow-sm group-hover:scale-105 group-hover:bg-sky-500/25 transition-all">
+                <i class="fa-regular fa-comment-dots text-base xl:text-lg"></i>
+            </div>
+            <div class="flex flex-col justify-center min-w-0">
+                <span class="text-[8.5px] font-mono font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400 mb-0.5">IDEAS</span>
+                <h3 class="text-[15px] xl:text-[17px] font-black font-heading tracking-tight text-slate-800 dark:text-white leading-tight truncate group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">Suggestion Box</h3>
+                <span class="text-[10.5px] font-medium text-slate-500 dark:text-slate-400 truncate mt-0.5">Share thoughts 💡</span>
+            </div>
+        </div>
+
+        <!-- 🚀 Interactive Action Pill (Light Normal -> Dark Active on Hover) -->
+        <div class="relative z-10 w-8 h-8 rounded-full flex items-center justify-center 
+                    bg-sky-100/90 text-sky-600 dark:bg-sky-500/20 dark:text-sky-300 border border-sky-200/80 dark:border-sky-500/30
+                    group-hover:bg-sky-600 group-hover:text-white group-hover:border-sky-600 group-hover:shadow-[0_0_14px_rgba(14,165,233,0.6)] group-hover:scale-110 
+                    transition-all duration-300 shrink-0">
+            <i class="fa-solid fa-arrow-right text-[10px] -rotate-45 group-hover:rotate-0 group-hover:translate-x-0.5 transition-all duration-300"></i>
+        </div>
+    </div>
+
+    <!-- Card 7: Leave Policy (Rose Theme) -->
+    <div @click="openApp('leave-policy.html', 'Leave Policy')" 
+         class="kpi-card relative p-3.5 xl:p-4 rounded-2xl cursor-pointer overflow-hidden group flex items-center justify-between gap-3 min-h-[82px] xl:min-h-[94px] 
+                bg-gradient-to-br from-rose-50/90 via-white to-rose-100/60 hover:from-rose-100/90 hover:via-rose-50/90 hover:to-rose-200/80 
+                dark:from-slate-900 dark:via-rose-950/30 dark:to-rose-900/40 dark:hover:to-rose-900/60
+                border border-rose-300/90 hover:!border-rose-500 dark:border-rose-500/50 dark:hover:!border-rose-400
+                shadow-[0_6px_20px_-4px_rgba(244,63,94,0.18),0_0_16px_rgba(244,63,94,0.14)] 
+                hover:!shadow-[0_14px_34px_-4px_rgba(244,63,94,0.35),0_0_26px_rgba(244,63,94,0.25)]
+                transition-all duration-300">
+        <div class="absolute left-0 inset-y-0 w-1.5 bg-rose-500 shadow-[0_0_8px_#f43f5e] group-hover:shadow-[0_0_16px_#f43f5e] transition-all duration-300"></div>
+        <i class="fa-solid fa-file-contract absolute -right-3 -bottom-4 text-[78px] xl:text-[90px] text-rose-500/[0.14] dark:text-rose-400/[0.10] group-hover:text-rose-500/[0.25] group-hover:scale-110 group-hover:-rotate-3 pointer-events-none transition-all duration-300"></i>
+        
+        <div class="relative z-10 flex items-center gap-3.5 min-w-0 flex-1">
+            <div class="w-11 h-11 xl:w-12 xl:h-12 rounded-xl bg-rose-500/15 text-rose-600 dark:bg-rose-500/25 dark:text-rose-400 flex items-center justify-center shrink-0 border border-rose-500/30 shadow-sm group-hover:scale-105 group-hover:bg-rose-500/25 transition-all">
+                <i class="fa-solid fa-file-contract text-base xl:text-lg"></i>
+            </div>
+            <div class="flex flex-col justify-center min-w-0">
+                <span class="text-[8.5px] font-mono font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 mb-0.5">RULES</span>
+                <h3 class="text-[15px] xl:text-[17px] font-black font-heading tracking-tight text-slate-800 dark:text-white leading-tight truncate group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">Leave Policy</h3>
+                <span class="text-[10.5px] font-medium text-slate-500 dark:text-slate-400 truncate mt-0.5">Guidelines 📄</span>
+            </div>
+        </div>
+
+        <!-- 🚀 Interactive Action Pill (Light Normal -> Dark Active on Hover) -->
+        <div class="relative z-10 w-8 h-8 rounded-full flex items-center justify-center 
+                    bg-rose-100/90 text-rose-600 dark:bg-rose-500/20 dark:text-rose-300 border border-rose-200/80 dark:border-rose-500/30
+                    group-hover:bg-rose-600 group-hover:text-white group-hover:border-rose-600 group-hover:shadow-[0_0_14px_rgba(244,63,94,0.6)] group-hover:scale-110 
+                    transition-all duration-300 shrink-0">
+            <i class="fa-solid fa-arrow-right text-[10px] -rotate-45 group-hover:rotate-0 group-hover:translate-x-0.5 transition-all duration-300"></i>
+        </div>
+    </div>
+
+    <!-- Card 8: Training Center (Teal Theme) -->
+    <div @click="openApp('training-and-policies-center.html', 'Training Center')" 
+         class="kpi-card relative p-3.5 xl:p-4 rounded-2xl cursor-pointer overflow-hidden group flex items-center justify-between gap-3 min-h-[82px] xl:min-h-[94px] 
+                bg-gradient-to-br from-teal-50/90 via-white to-teal-100/60 hover:from-teal-100/90 hover:via-teal-50/90 hover:to-teal-200/80 
+                dark:from-slate-900 dark:via-teal-950/30 dark:to-teal-900/40 dark:hover:to-teal-900/60
+                border border-teal-300/90 hover:!border-teal-500 dark:border-teal-500/50 dark:hover:!border-teal-400
+                shadow-[0_6px_20px_-4px_rgba(20,184,166,0.18),0_0_16px_rgba(20,184,166,0.14)] 
+                hover:!shadow-[0_14px_34px_-4px_rgba(20,184,166,0.35),0_0_26px_rgba(20,184,166,0.25)]
+                transition-all duration-300">
+        <div class="absolute left-0 inset-y-0 w-1.5 bg-teal-500 shadow-[0_0_8px_#14b8a6] group-hover:shadow-[0_0_16px_#14b8a6] transition-all duration-300"></div>
+        <i class="fa-solid fa-book-open absolute -right-3 -bottom-4 text-[78px] xl:text-[90px] text-teal-500/[0.14] dark:text-teal-400/[0.10] group-hover:text-teal-500/[0.25] group-hover:scale-110 group-hover:-rotate-3 pointer-events-none transition-all duration-300"></i>
+        
+        <div class="relative z-10 flex items-center gap-3.5 min-w-0 flex-1">
+            <div class="w-11 h-11 xl:w-12 xl:h-12 rounded-xl bg-teal-500/15 text-teal-600 dark:bg-teal-500/25 dark:text-teal-400 flex items-center justify-center shrink-0 border border-teal-500/30 shadow-sm group-hover:scale-105 group-hover:bg-teal-500/25 transition-all">
+                <i class="fa-solid fa-book-open text-base xl:text-lg"></i>
+            </div>
+            <div class="flex flex-col justify-center min-w-0">
+                <span class="text-[8.5px] font-mono font-bold uppercase tracking-wider text-teal-600 dark:text-teal-400 mb-0.5">LEARN</span>
+                <h3 class="text-[15px] xl:text-[17px] font-black font-heading tracking-tight text-slate-800 dark:text-white leading-tight truncate group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">Training</h3>
+                <span class="text-[10.5px] font-medium text-slate-500 dark:text-slate-400 truncate mt-0.5">Company SOPs 🎓</span>
+            </div>
+        </div>
+
+        <!-- 🚀 Interactive Action Pill (Light Normal -> Dark Active on Hover) -->
+        <div class="relative z-10 w-8 h-8 rounded-full flex items-center justify-center 
+                    bg-teal-100/90 text-teal-600 dark:bg-teal-500/20 dark:text-teal-300 border border-teal-200/80 dark:border-teal-500/30
+                    group-hover:bg-teal-600 group-hover:text-white group-hover:border-teal-600 group-hover:shadow-[0_0_14px_rgba(20,184,166,0.6)] group-hover:scale-110 
+                    transition-all duration-300 shrink-0">
+            <i class="fa-solid fa-arrow-right text-[10px] -rotate-45 group-hover:rotate-0 group-hover:translate-x-0.5 transition-all duration-300"></i>
+        </div>
+    </div>
+
+</div>
         </section>
 
         <!-- 🚀 SECTION 2: WIDGETS (Glowing Border Aura Edition) -->
@@ -552,73 +708,74 @@
                     <span class="text-[9px] font-bold px-2.5 py-0.5 rounded-full bg-brand/10 text-brand border border-brand/20 dark:bg-brand/20 shadow-sm">4 PORTALS</span>
                 </div>
                 
-                <div class="flex-1 overflow-hidden p-3.5 flex flex-col justify-center gap-2.5 relative z-10">
+                <!-- 🚀 FIXED: Added p-4, justify-between & flex-1 on cards so top & bottom align with Notice Board & Events -->
+                <div class="flex-1 overflow-hidden p-4 flex flex-col justify-between gap-3 relative z-10">
                     <!-- App 1: PBL Global Portal (🟠 Normally Warm Orange) -->
                     <a href="https://www.panbusiness.net/eng/index.php" target="_blank" 
-                       class="p-3 rounded-2xl bg-orange-50/60 dark:bg-orange-950/20 backdrop-blur-sm border border-orange-200/80 dark:border-orange-500/30 shadow-[0_4px_15px_rgba(249,115,22,0.06)] hover:shadow-[0_8px_22px_rgba(249,115,22,0.18)] hover:bg-orange-100/70 dark:hover:bg-orange-900/30 hover:border-orange-300 hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-3.5 group/link">
-                        <div class="w-10 h-10 rounded-full bg-orange-100/80 text-orange-600 ring-1 ring-orange-200/60 dark:bg-orange-500/20 dark:ring-orange-500/30 dark:text-orange-400 flex items-center justify-center text-[16px] shrink-0 group-hover/link:scale-105 transition-transform shadow-sm">
+                       class="flex-1 px-4 py-3 rounded-2xl bg-orange-50/60 dark:bg-orange-950/20 backdrop-blur-sm border border-orange-200/80 dark:border-orange-500/30 shadow-[0_4px_15px_rgba(249,115,22,0.06)] hover:shadow-[0_8px_22px_rgba(249,115,22,0.18)] hover:bg-orange-100/70 dark:hover:bg-orange-900/30 hover:border-orange-300 hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-3.5 group/link">
+                        <div class="w-11 h-11 rounded-2xl bg-orange-100/80 text-orange-600 ring-1 ring-orange-200/60 dark:bg-orange-500/20 dark:ring-orange-500/30 dark:text-orange-400 flex items-center justify-center text-[17px] shrink-0 group-hover/link:scale-105 transition-transform shadow-sm">
                             <i class="fa-solid fa-globe"></i>
                         </div>
-                        <div class="flex flex-col flex-1 min-w-0">
-                            <h4 class="font-bold text-[13px] text-slate-800 dark:text-white leading-tight group-hover/link:text-orange-600 dark:group-hover/link:text-orange-400 transition-colors">PBL Global Portal</h4>
-                            <span class="text-[9.5px] text-slate-500 dark:text-slate-400 mt-0.5">Corporate Website & Directory</span>
+                        <div class="flex flex-col flex-1 min-w-0 justify-center">
+                            <h4 class="font-bold text-[13.5px] text-slate-800 dark:text-white leading-tight group-hover/link:text-orange-600 dark:group-hover/link:text-orange-400 transition-colors">PBL Global Portal</h4>
+                            <span class="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Corporate Website & Directory</span>
                         </div>
                         <!-- Active Themed Action Button -->
-                        <div class="w-7 h-7 rounded-full flex items-center justify-center bg-orange-100/90 text-orange-600 dark:bg-orange-500/20 dark:text-orange-300 group-hover/link:bg-orange-500 group-hover/link:text-white transition-all shadow-sm">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center bg-orange-100/90 text-orange-600 dark:bg-orange-500/20 dark:text-orange-300 group-hover/link:bg-orange-500 group-hover/link:text-white transition-all shadow-sm shrink-0">
                             <i class="fa-solid fa-arrow-right -rotate-45 text-[10px]"></i>
                         </div>
                     </a>
 
                     <!-- App 2: Citrix Workspace (🔵 Normally Sky Blue) -->
                     <a href="https://ede.dp-ds.de/vpn/index.html" target="_blank" 
-                       class="p-3 rounded-2xl bg-sky-50/60 dark:bg-sky-950/20 backdrop-blur-sm border border-sky-200/80 dark:border-sky-500/30 shadow-[0_4px_15px_rgba(14,165,233,0.06)] hover:shadow-[0_8px_22px_rgba(14,165,233,0.18)] hover:bg-sky-100/70 dark:hover:bg-sky-900/30 hover:border-sky-300 hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-3.5 group/link">
-                        <div class="w-10 h-10 rounded-full bg-sky-100/80 text-sky-600 ring-1 ring-sky-200/60 dark:bg-sky-500/20 dark:ring-sky-500/30 dark:text-sky-400 flex items-center justify-center text-[16px] shrink-0 group-hover/link:scale-105 transition-transform shadow-sm">
+                       class="flex-1 px-4 py-3 rounded-2xl bg-sky-50/60 dark:bg-sky-950/20 backdrop-blur-sm border border-sky-200/80 dark:border-sky-500/30 shadow-[0_4px_15px_rgba(14,165,233,0.06)] hover:shadow-[0_8px_22px_rgba(14,165,233,0.18)] hover:bg-sky-100/70 dark:hover:bg-sky-900/30 hover:border-sky-300 hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-3.5 group/link">
+                        <div class="w-11 h-11 rounded-2xl bg-sky-100/80 text-sky-600 ring-1 ring-sky-200/60 dark:bg-sky-500/20 dark:ring-sky-500/30 dark:text-sky-400 flex items-center justify-center text-[17px] shrink-0 group-hover/link:scale-105 transition-transform shadow-sm">
                             <i class="fa-solid fa-desktop"></i>
                         </div>
-                        <div class="flex flex-col flex-1 min-w-0">
+                        <div class="flex flex-col flex-1 min-w-0 justify-center">
                             <div class="flex items-center gap-1.5">
-                                <h4 class="font-bold text-[13px] text-slate-800 dark:text-white leading-tight group-hover/link:text-sky-600 dark:group-hover/link:text-sky-400 transition-colors">Citrix Workspace</h4>
+                                <h4 class="font-bold text-[13.5px] text-slate-800 dark:text-white leading-tight group-hover/link:text-sky-600 dark:group-hover/link:text-sky-400 transition-colors">Citrix Workspace</h4>
                                 <span class="px-1.5 py-0.5 rounded text-[7px] font-bold bg-sky-100 text-sky-600 border border-sky-200 shadow-sm dark:bg-sky-500/20 dark:border-sky-500/30 dark:text-sky-300">SECURE</span>
                             </div>
-                            <span class="text-[9.5px] text-slate-500 dark:text-slate-400 mt-0.5">Remote Desktop Gateway</span>
+                            <span class="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Remote Desktop Gateway</span>
                         </div>
                         <!-- Active Themed Action Button -->
-                        <div class="w-7 h-7 rounded-full flex items-center justify-center bg-sky-100/90 text-sky-600 dark:bg-sky-500/20 dark:text-sky-300 group-hover/link:bg-sky-500 group-hover/link:text-white transition-all shadow-sm">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center bg-sky-100/90 text-sky-600 dark:bg-sky-500/20 dark:text-sky-300 group-hover/link:bg-sky-500 group-hover/link:text-white transition-all shadow-sm shrink-0">
                             <i class="fa-solid fa-arrow-right -rotate-45 text-[10px]"></i>
                         </div>
                     </a>
 
                     <!-- App 3: Generali Portal (🟢 True Emerald Green) -->
                     <a href="https://workplace.generali.de/logon/LogonPoint/tmindex.html" target="_blank" 
-                       class="p-3 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/20 backdrop-blur-sm border border-emerald-200/80 dark:border-emerald-500/30 shadow-[0_4px_15px_rgba(16,185,129,0.08)] hover:shadow-[0_8px_22px_rgba(16,185,129,0.20)] hover:bg-emerald-100/80 dark:hover:bg-emerald-900/30 hover:border-emerald-300 hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-3.5 group/link">
-                        <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 ring-1 ring-emerald-200 dark:bg-emerald-500/20 dark:ring-emerald-500/30 dark:text-emerald-400 flex items-center justify-center text-[16px] shrink-0 group-hover/link:scale-105 transition-transform shadow-sm">
+                       class="flex-1 px-4 py-3 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/20 backdrop-blur-sm border border-emerald-200/80 dark:border-emerald-500/30 shadow-[0_4px_15px_rgba(16,185,129,0.08)] hover:shadow-[0_8px_22px_rgba(16,185,129,0.20)] hover:bg-emerald-100/80 dark:hover:bg-emerald-900/30 hover:border-emerald-300 hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-3.5 group/link">
+                        <div class="w-11 h-11 rounded-2xl bg-emerald-100 text-emerald-600 ring-1 ring-emerald-200 dark:bg-emerald-500/20 dark:ring-emerald-500/30 dark:text-emerald-400 flex items-center justify-center text-[17px] shrink-0 group-hover/link:scale-105 transition-transform shadow-sm">
                             <i class="fa-solid fa-briefcase"></i>
                         </div>
-                        <div class="flex flex-col flex-1 min-w-0">
-                            <h4 class="font-bold text-[13px] text-slate-800 dark:text-white leading-tight group-hover/link:text-emerald-600 dark:group-hover/link:text-emerald-400 transition-colors">Generali Portal</h4>
-                            <span class="text-[9.5px] text-slate-500 dark:text-slate-400 mt-0.5">Client Production Workflows</span>
+                        <div class="flex flex-col flex-1 min-w-0 justify-center">
+                            <h4 class="font-bold text-[13.5px] text-slate-800 dark:text-white leading-tight group-hover/link:text-emerald-600 dark:group-hover/link:text-emerald-400 transition-colors">Generali Portal</h4>
+                            <span class="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Client Production Workflows</span>
                         </div>
                         <!-- Green Action Pill -->
-                        <div class="w-7 h-7 rounded-full flex items-center justify-center bg-emerald-100/90 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300 group-hover/link:bg-emerald-500 group-hover/link:text-white transition-all shadow-sm">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center bg-emerald-100/90 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300 group-hover/link:bg-emerald-500 group-hover/link:text-white transition-all shadow-sm shrink-0">
                             <i class="fa-solid fa-arrow-right -rotate-45 text-[10px]"></i>
                         </div>
                     </a>
 
                     <!-- App 4: PBL StreamStation (🟣 Royal Purple Media Theme - 100% Distinct) -->
                     <div @click="triggerStreamModal()" 
-                         class="p-3 rounded-2xl bg-purple-50/70 dark:bg-purple-950/20 backdrop-blur-sm border border-purple-200/80 dark:border-purple-500/30 shadow-[0_4px_15px_rgba(168,85,247,0.08)] hover:shadow-[0_8px_22px_rgba(168,85,247,0.22)] hover:bg-purple-100/80 dark:hover:bg-purple-900/30 hover:border-purple-300 hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-3.5 group/link cursor-pointer">
-                        <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-600 ring-1 ring-purple-200 dark:bg-purple-500/20 dark:ring-purple-500/30 dark:text-purple-400 flex items-center justify-center text-[16px] shrink-0 group-hover/link:scale-105 transition-transform shadow-sm">
+                         class="flex-1 px-4 py-3 rounded-2xl bg-purple-50/70 dark:bg-purple-950/20 backdrop-blur-sm border border-purple-200/80 dark:border-purple-500/30 shadow-[0_4px_15px_rgba(168,85,247,0.08)] hover:shadow-[0_8px_22px_rgba(168,85,247,0.22)] hover:bg-purple-100/80 dark:hover:bg-purple-900/30 hover:border-purple-300 hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-3.5 group/link cursor-pointer">
+                        <div class="w-11 h-11 rounded-2xl bg-purple-100 text-purple-600 ring-1 ring-purple-200 dark:bg-purple-500/20 dark:ring-purple-500/30 dark:text-purple-400 flex items-center justify-center text-[17px] shrink-0 group-hover/link:scale-105 transition-transform shadow-sm">
                             <i class="fa-solid fa-play ml-0.5"></i>
                         </div>
-                        <div class="flex flex-col flex-1 min-w-0">
+                        <div class="flex flex-col flex-1 min-w-0 justify-center">
                             <div class="flex items-center gap-1.5">
-                                <h4 class="font-bold text-[13px] text-slate-800 dark:text-white leading-tight group-hover/link:text-purple-600 dark:group-hover/link:text-purple-400 transition-colors">PBL StreamStation</h4>
+                                <h4 class="font-bold text-[13.5px] text-slate-800 dark:text-white leading-tight group-hover/link:text-purple-600 dark:group-hover/link:text-purple-400 transition-colors">PBL StreamStation</h4>
                                 <span class="px-1.5 py-0.5 rounded text-[7px] font-bold bg-purple-100 text-purple-700 border border-purple-200 shadow-sm dark:bg-purple-500/20 dark:border-purple-500/30 dark:text-purple-300"><i class="fa-solid fa-lock text-[6px]"></i> LOCK</span>
                             </div>
-                            <span class="text-[9.5px] text-slate-500 dark:text-slate-400 mt-0.5">Media Training & Video Hub</span>
+                            <span class="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Media Training & Video Hub</span>
                         </div>
                         <!-- Purple Action Pill -->
-                        <div class="w-7 h-7 rounded-full flex items-center justify-center bg-purple-100/90 text-purple-600 dark:bg-purple-500/20 dark:text-purple-300 group-hover/link:bg-purple-600 group-hover/link:text-white transition-all shadow-sm">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center bg-purple-100/90 text-purple-600 dark:bg-purple-500/20 dark:text-purple-300 group-hover/link:bg-purple-600 group-hover/link:text-white transition-all shadow-sm shrink-0">
                             <i class="fa-solid fa-shield-halved text-[10px]"></i>
                         </div>
                     </div>
@@ -644,10 +801,10 @@
                     <span class="text-[9px] font-bold px-2.5 py-0.5 rounded-full bg-white/80 text-rose-500 border border-rose-200/50 shadow-sm dark:bg-rose-500/10 dark:border-rose-500/20">CELEBRATIONS</span>
                 </div>
                 
-                <div class="flex-1 overflow-hidden p-3.5 flex flex-col justify-center gap-2.5 relative z-10">
+                <div class="flex-1 overflow-hidden p-4 flex flex-col justify-between gap-2.5 relative z-10">
                     <template x-for="event in upcomingEvents.slice(0, 5)" :key="event.title + event.date">
                         <!-- 🌟 CLEAN HIGHLIGHT: Soft ambient background wash bina kisi border distortion ke -->
-                        <div class="relative p-3 rounded-2xl border transition-all duration-300 backdrop-blur-md group/card overflow-hidden flex items-center gap-4 cursor-default hover:-translate-y-[2px]" 
+                        <div class="flex-1 relative px-3.5 py-2.5 rounded-2xl border transition-all duration-300 backdrop-blur-md group/card overflow-hidden flex items-center gap-4 cursor-default hover:-translate-y-[2px]"
                              :class="[
                                  event.cardTheme,
                                  event.isToday 
@@ -797,23 +954,23 @@
     </footer>
 
     <!-- 🚀 DYNAMIC IFRAME MODAL (SPA ENGINE) -->
-	<div x-show="showAppModal" x-cloak class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/80 backdrop-blur-md sm:p-4" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
+	<div x-show="showAppModal" x-cloak @click.self="closeApp()" @keydown.escape.window="if(showAppModal) closeApp()" class="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/80 backdrop-blur-md sm:p-4" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
 		
 		<!-- 🚀 Smart Transparent Wrapper for Modern Popups -->
-	<div :class="['Raise IT Ticket', 'Apply for Leave'].includes(appTitle) ? 'bg-transparent border-none shadow-none' : 'bg-slate-50 dark:bg-[#020617] shadow-2xl border border-slate-200 dark:border-dark_border'" class="w-full h-full sm:h-[95vh] sm:w-[95vw] max-w-[1920px] sm:rounded-[2rem] overflow-hidden flex flex-col relative lg:[zoom:0.9091] transition-colors duration-300">
+	<div :class="['ticket', 'leave', 'holiday', 'suggestion', 'policy', 'training', 'production', 'it-hub', 'it dept'].some(k => (appTitle + appIframeSrc).toLowerCase().includes(k)) ? 'bg-transparent border-none shadow-none' : 'bg-slate-50 dark:bg-[#020617] shadow-2xl border border-slate-200 dark:border-dark_border'" class="w-full h-full sm:h-[95vh] sm:w-[95vw] max-w-[1920px] sm:rounded-[2rem] overflow-hidden flex flex-col relative lg:[zoom:0.9091] transition-colors duration-300">
 		
-		<div class="flex-1 w-full h-full relative" :class="['Raise IT Ticket', 'Apply for Leave'].includes(appTitle) ? 'bg-transparent' : 'bg-slate-100 dark:bg-[#020617]'">
+		<div class="flex-1 w-full h-full relative" :class="['ticket', 'leave', 'holiday', 'suggestion', 'policy', 'training', 'production', 'it-hub', 'it dept'].some(k => (appTitle + appIframeSrc).toLowerCase().includes(k)) ? 'bg-transparent' : 'bg-slate-100 dark:bg-[#020617]'">
 			<div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-0">
 				<i class="fa-solid fa-circle-notch fa-spin text-brand text-4xl mb-4"></i>
 				<span class="text-xs font-black uppercase tracking-widest text-slate-400 animate-pulse">Launching Module...</span>
 			</div>
 			<template x-if="appIframeSrc !== ''">
-				<iframe :src="appIframeSrc" class="w-full h-full border-0 relative z-10 sm:rounded-[2rem]" :class="['Raise IT Ticket', 'Apply for Leave'].includes(appTitle) ? 'bg-transparent' : 'bg-white dark:bg-[#020617]'" :title="appTitle"></iframe>
+				<iframe :src="appIframeSrc" class="w-full h-full border-0 relative z-10 sm:rounded-[2rem]" :class="['ticket', 'leave', 'holiday', 'suggestion', 'policy', 'training', 'production', 'it-hub', 'it dept'].some(k => (appTitle + appIframeSrc).toLowerCase().includes(k)) ? 'bg-transparent' : 'bg-white dark:bg-[#020617]'" :title="appTitle"></iframe>
 			</template>
 		</div>
 		
-		<!-- 🚀 Back to Hub Button (Dono Modern Apps ke liye Auto-Hide hoga) -->
-		<div class="absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-[10010]" x-show="!['Raise IT Ticket', 'Apply for Leave'].includes(appTitle)">
+		<!-- 🚀 Back to Hub Button (Modern Apps ke liye Auto-Hide hoga) -->
+		<div class="absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-[10010]" x-show="!['ticket', 'leave', 'holiday', 'suggestion', 'policy', 'training', 'production', 'it-hub', 'it dept'].some(k => (appTitle + appIframeSrc).toLowerCase().includes(k))">
 				<button @click="closeApp()" class="px-6 py-3 rounded-full bg-slate-900/95 dark:bg-white/95 text-white dark:text-slate-900 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] border border-slate-700 dark:border-white/20 text-[10px] sm:text-xs font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
 					<i class="fa-solid fa-arrow-left"></i> Back to Hub
 				</button>
@@ -873,7 +1030,7 @@
 				 // 🚩 FEATURE FLAG ENGINE: Restore Old
                 // false = Abhi elegant Welcome Banner dikhega (No ugly blur)
                 // true  = Saare 8 KPI cards instantly live ho jayenge!
-                modulesLive: false, // 👈 JAB LIVE KARNA HO, SIRF ISSE TRUE KAR DENA!
+                modulesLive: true, // 👈 JAB LIVE KARNA HO, SIRF ISSE TRUE KAR DENA!
                 
                 // Network Status State
                 publicIp: 'Fetching...', 
@@ -957,6 +1114,13 @@
 
                     // ⚡ CIPHER SCRAMBLE ENGINE TRIGGER (FROM IMAGE 2)
                     this.setupCipherDecryption();
+
+                    // 🚀 Cross-Origin / Local File Iframe Close Listener
+                    window.addEventListener('message', (event) => {
+                        if (event.data && event.data.action === 'closePblModal') {
+                            this.closeApp();
+                        }
+                    });
                 },
 
                 // 🪄 The Iconic Text Decryption Algorithm
@@ -1263,7 +1427,10 @@
                     this.appTitle = title; 
                     let currentPath = window.location.pathname;
                     if (!currentPath.endsWith('/') && !currentPath.toLowerCase().endsWith('.html')) { currentPath += '/'; }
-                    this.appIframeSrc = new URL(url, window.location.origin + currentPath).href; 
+                    const targetUrl = new URL(url, window.location.origin + currentPath);
+                    // 🚀 Cache-Buster: Hamesha latest modified file load karega, purana cache nahi!
+                    targetUrl.searchParams.set('v', new Date().getTime());
+                    this.appIframeSrc = targetUrl.href; 
                     this.showAppModal = true; 
                 },
                 
@@ -1388,9 +1555,9 @@
                     document.body.appendChild(ring);
                     document.addEventListener('mousemove', (e) => { 
                         // 🚀 FIXED: Math Compensator for CSS Zoom.
-                        // Dividing the mouse coordinates by 1.1 on desktop completely eliminates the zoom offset discrepancy.
-                        const zoomFactor = window.innerWidth >= 1024 ? 1.1 : 1;
-                        ring.style.transform = `translate3d(${e.clientX / zoomFactor}px, ${e.clientY / zoomFactor}px, 0) translate(-50%, -50%)`; 
+                        // Smart zoom factor matching 1280x1024 (1.0) and 1980x1280 (1.08)
+                        const zoomFactor = window.innerWidth >= 1600 ? 1.08 : 1;
+                        ring.style.transform = `translate3d(${e.clientX / zoomFactor}px, ${e.clientY / zoomFactor}px, 0) translate(-50%, -50%)`;
                     });
                 }
             }));
