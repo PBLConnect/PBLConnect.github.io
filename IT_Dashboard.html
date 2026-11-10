@@ -116,11 +116,53 @@
         .dark .custom-scroll::-webkit-scrollbar-thumb:hover { background-color: rgba(71, 85, 105, 0.8); }
         .ticket-open { border-left: 3px solid #ef4444 !important; }
         .ticket-resolved { border-left: 3px solid #10b981 !important; opacity: 0.75; }
-        .cards-container > a { transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) !important; }
-        @media (hover: hover) { 
-            .cards-container > a:hover { transform: translateY(-5px) scale(1.03); box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.15); z-index: 20; }
-            .cards-container:hover > a:not(:hover) { filter: blur(2px) grayscale(0.5); transform: scale(0.96); opacity: 0.6; } 
+        /* 🚀 NEXT-GEN CSS HOUDINI @PROPERTY FOR ROTATING LASER BORDERS */
+        @property --border-angle {
+            syntax: "<angle>";
+            inherits: true;
+            initial-value: 0turn;
         }
+        @keyframes border-spin {
+            to { --border-angle: 1turn; }
+        }
+
+        .cards-container { perspective: 1200px; }
+        .cards-container > a { 
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important; 
+            transform-style: preserve-3d;
+        }
+        
+        @media (hover: hover) { 
+            .cards-container > a:hover { 
+                transform: translateY(-6px) scale(1.03) rotateX(4deg) rotateY(-3deg); 
+                box-shadow: 0 25px 50px -12px rgba(59, 130, 246, 0.25), 0 0 25px 2px var(--card-glow, rgba(59, 130, 246, 0.15)); 
+                z-index: 30; 
+            }
+            /* Focus Mode: Dim & slightly recede non-hovered sibling cards */
+            .cards-container:hover > a:not(:hover) { 
+                filter: blur(1.5px) saturate(0.6); 
+                transform: scale(0.96) translateZ(-20px); 
+                opacity: 0.65; 
+            } 
+        }
+
+        /* 🌈 Holographic Specular Glare Overlay for all Bento Cards */
+        .bento-glare {
+            pointer-events: none; position: absolute; inset: -1px; border-radius: 1.5rem;
+            opacity: 0; transition: opacity 0.35s ease; z-index: 25;
+            background: radial-gradient(320px circle at var(--x, 50%) var(--y, 50%), var(--glare-color, rgba(255,255,255,0.25)), transparent 70%);
+        }
+        .cards-container > a:hover .bento-glare { opacity: 1; }
+
+        /* ⚡ Animated Conic Border for Active Alert Containers */
+        .cyber-border-active {
+            border: 2px solid transparent !important;
+            background: 
+                linear-gradient(var(--bg-surface, #ffffff), var(--bg-surface, #ffffff)) padding-box,
+                conic-gradient(from var(--border-angle), transparent 25%, #f43f5e, #fb923c, #f43f5e 95%, transparent) border-box !important;
+            animation: border-spin 4s linear infinite;
+        }
+        .dark .cyber-border-active { --bg-surface: #0f172a; }
         .loader { position: relative; width: 60px; height: 80px; }
         .loader__bar { position: absolute; bottom: 0; width: 8px; height: 50%; background: #cbd5e1; transform-origin: center bottom; border-radius: 4px; }
         .dark .loader__bar { background: #334155; }
@@ -315,7 +357,9 @@
 
 <body class="text-slate-800 dark:text-slate-200 h-[100dvh] flex flex-col overflow-hidden selection:bg-brand selection:text-white" 
       x-data="dashboard()" 
-      @keydown.escape.window="closeAllModals()"
+      @keydown.escape.window="closeAllModals(); showCmdPalette = false"
+      @keydown.window.ctrl.k.prevent="showCmdPalette = !showCmdPalette; haptic('light'); if(showCmdPalette) $nextTick(() => $refs.cmdInput?.focus())"
+      @keydown.window.meta.k.prevent="showCmdPalette = !showCmdPalette; haptic('light'); if(showCmdPalette) $nextTick(() => $refs.cmdInput?.focus())"
       @refresh-dashboard.window="fetchTickets(true)">
 
     <!-- NAVBAR (ULTRA-MODERN COHESIVE REDESIGN) -->
@@ -381,6 +425,16 @@
                         </span>
                         <span class="text-[8.5px] font-black uppercase tracking-widest leading-none pt-px" x-text="myShiftInfo.timeLeft"></span>
                     </div>
+
+                    <div class="w-px h-3.5 bg-slate-200 dark:bg-slate-700 mx-0.5"></div>
+
+                    <!-- ⌘K Quick Command Launcher Pill -->
+                    <button type="button" @click="showCmdPalette = true; haptic('light'); $nextTick(() => $refs.cmdInput?.focus())"
+                            class="flex items-center gap-1.5 bg-white dark:bg-dark_surface hover:bg-brand/5 dark:hover:bg-brand/15 px-2.5 py-1 rounded-full border border-slate-200/90 dark:border-slate-700/80 hover:border-brand/40 shadow-sm transition-all active:scale-95 group"
+                            title="Open Command Palette (Ctrl + K)">
+                        <i class="fa-solid fa-magnifying-glass text-[9px] text-slate-400 group-hover:text-brand transition-colors"></i>
+                        <kbd class="text-[8.5px] font-mono font-black text-slate-500 dark:text-slate-400 group-hover:text-brand">CTRL+K</kbd>
+                    </button>
 
                 </div>
 			</div>
@@ -723,116 +777,147 @@
         <!-- 🚀 Fixed: Mobile Natural Scroll Enabled (pb-28 clears the fixed footer dock) -->
         <div class="max-w-[1920px] mx-auto w-full flex flex-col gap-4 sm:gap-6 min-h-full h-auto lg:h-full pb-28 lg:pb-0">
 
-            <!-- APPS GRID -->
+            <!-- APPS GRID (CALIBRATED FOR 1280x1024, 1920x1080 & MOBILE — ZERO TEXT CUTTING & SINGLE LINE) -->
             <section class="shrink-0 relative z-20">
-                <div class="cards-container grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-5 mb-3 sm:mb-4 relative"
+                <div class="cards-container grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2.5 lg:gap-3 2xl:gap-5 mb-3 sm:mb-4 relative"
                      @mousemove="
                         const rect = $el.getBoundingClientRect();
                         $el.style.setProperty('--spot-x', `${$event.clientX - rect.left}px`);
                         $el.style.setProperty('--spot-y', `${$event.clientY - rect.top}px`);
                      ">
-                    <!-- 🧲 macOS Magnetic Spotlight Aura (Follows cursor across all 6 bento cards) -->
-                    <div class="pointer-events-none absolute -inset-3 rounded-[2rem] opacity-0 group-hover/cards:opacity-100 transition-opacity duration-300 z-0 hidden lg:block"
-                         style="background: radial-gradient(400px circle at var(--spot-x, -999px) var(--spot-y, -999px), rgba(59, 130, 246, 0.16), transparent 70%);"></div>
                     
+                    <!-- 1. 💻 IT INVENTORY CARD -->
                     <a href="PBL_Inventory.html" @click="haptic('light')" 
-                       @mousemove="
-                          const r = $el.getBoundingClientRect();
-                          $el.style.setProperty('--x', `${(($event.clientX - r.left) / r.width) * 100}%`);
-                          $el.style.setProperty('--y', `${(($event.clientY - r.top) / r.height) * 100}%`);
-                       "
-                       class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 ease-out group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-indigo-50/80 to-white/80 border border-indigo-200/60 shadow-[0_4px_15px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_40px_-10px_rgba(99,102,241,0.3)] hover:-translate-y-1.5 hover:scale-[1.02] hover:border-indigo-400/90 dark:from-indigo-900/10 dark:to-dark_surface/80 dark:border-indigo-800/30">
-                        <!-- Cursor reactive glass refraction light -->
-                        <div class="pointer-events-none absolute -inset-px rounded-[1.5rem] opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20"
-                             style="background: radial-gradient(350px circle at var(--x, 50%) var(--y, 50%), rgba(99,102,241,0.22), transparent 70%);"></div>
-                        <i class="fa-solid fa-laptop absolute -bottom-4 -right-3 text-7xl sm:text-9xl text-indigo-500/20 dark:text-indigo-500/10 group-hover:scale-110 transition-transform duration-500"></i>
+                       @mousemove="const r = $el.getBoundingClientRect(); $el.style.setProperty('--x', `${(($event.clientX - r.left)/r.width)*100}%`); $el.style.setProperty('--y', `${(($event.clientY - r.top)/r.height)*100}%`);"
+                       style="--card-glow: rgba(99, 102, 241, 0.25); --glare-color: rgba(99, 102, 241, 0.20);"
+                       class="relative p-3.5 lg:p-3.5 2xl:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 ease-out group flex flex-col justify-between min-h-[110px] sm:min-h-[135px] 2xl:min-h-[142px] bg-gradient-to-br from-indigo-50/80 to-white/80 border border-indigo-200/60 shadow-md hover:border-indigo-400 dark:from-indigo-900/10 dark:to-dark_surface/80 dark:border-indigo-800/30">
+                        <div class="bento-glare"></div>
+                        <i class="fa-solid fa-laptop absolute -bottom-4 -right-3 text-6xl lg:text-7xl 2xl:text-9xl text-indigo-500/20 dark:text-indigo-500/10 group-hover:scale-110 transition-transform duration-500 pointer-events-none"></i>
+                        
                         <div class="flex items-center justify-between relative z-10 mb-2">
-                            <div class="flex items-center gap-2">
-                                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-indigo-500 text-[12px] shrink-0 border border-indigo-100 dark:border-white/5"><i class="fa-solid fa-database"></i></div>
-                                <span class="hidden sm:inline-block text-[11px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest leading-none">Database</span>
+                            <div class="flex items-center gap-1.5 2xl:gap-2">
+                                <div class="w-7 h-7 2xl:w-8 2xl:h-8 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-indigo-500 text-[11px] 2xl:text-[12px] shrink-0 border border-indigo-100 dark:border-white/5"><i class="fa-solid fa-database"></i></div>
+                                <span class="hidden sm:inline-block text-[9.5px] lg:text-[10px] 2xl:text-[11px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-wider 2xl:tracking-widest leading-none">Database</span>
                             </div>
-                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-indigo-100/50 dark:bg-indigo-900/30 text-indigo-500 flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-all duration-300 shrink-0"><i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i></div>
+                            <div class="w-6 h-6 2xl:w-8 2xl:h-8 rounded-xl bg-indigo-100/50 dark:bg-indigo-900/30 text-indigo-500 flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-all duration-300 shrink-0"><i class="fa-solid fa-arrow-right text-[9px] 2xl:text-[10px] group-hover:translate-x-0.5 transition-transform"></i></div>
                         </div>
+                        
                         <div class="relative z-10 mt-auto">
-                            <h3 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">IT Inventory</h3>
-                            <div class="mt-1 h-[28px] sm:h-[34px] flex flex-col justify-start w-full">
-                                <span class="text-[11px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 truncate">Assets & Users 💻</span>
+                            <h3 class="text-[16px] sm:text-lg lg:text-[17px] xl:text-[19px] 2xl:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none whitespace-nowrap">IT Inventory</h3>
+                            <div class="mt-1.5 h-[28px] sm:h-[34px] flex items-center justify-between w-full">
+                                <span class="text-[10.5px] lg:text-[10.5px] 2xl:text-[12px] font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap">Assets & Users 💻</span>
                             </div>
                         </div>
                     </a>
 
-                    <a href="PBL_Switch_Map.html" @click="haptic('light')" class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-teal-50/80 to-white/80 border border-teal-200/60 shadow-md hover:shadow-2xl hover:border-teal-400/50 dark:from-teal-900/10 dark:to-dark_surface/80 dark:border-teal-800/30 dark:hover:border-teal-400/50">
-                        <i class="fa-solid fa-network-wired absolute -bottom-4 -right-3 text-7xl sm:text-9xl text-teal-500/20 dark:text-teal-500/10 group-hover:scale-110 transition-transform duration-500"></i>
+                    <!-- 2. 🔌 SWITCH MAP CARD -->
+                    <a href="PBL_Switch_Map.html" @click="haptic('light')"
+                       @mousemove="const r = $el.getBoundingClientRect(); $el.style.setProperty('--x', `${(($event.clientX - r.left)/r.width)*100}%`); $el.style.setProperty('--y', `${(($event.clientY - r.top)/r.height)*100}%`);"
+                       style="--card-glow: rgba(20, 184, 166, 0.25); --glare-color: rgba(20, 184, 166, 0.20);"
+                       class="relative p-3.5 lg:p-3.5 2xl:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[135px] 2xl:min-h-[142px] bg-gradient-to-br from-teal-50/80 to-white/80 border border-teal-200/60 shadow-md hover:border-teal-400 dark:from-teal-900/10 dark:to-dark_surface/80 dark:border-teal-800/30">
+                        <div class="bento-glare"></div>
+                        <i class="fa-solid fa-network-wired absolute -bottom-4 -right-3 text-6xl lg:text-7xl 2xl:text-9xl text-teal-500/20 dark:text-teal-500/10 group-hover:scale-110 transition-transform duration-500 pointer-events-none"></i>
+                        
                         <div class="flex items-center justify-between relative z-10 mb-2">
-                            <div class="flex items-center gap-2">
-                                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-teal-500 text-[12px] shrink-0 border border-teal-100 dark:border-white/5"><i class="fa-solid fa-plug"></i></div>
-                                <span class="hidden sm:inline-block text-[11px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-widest leading-none">Network</span>
+                            <div class="flex items-center gap-1.5 2xl:gap-2">
+                                <div class="w-7 h-7 2xl:w-8 2xl:h-8 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-teal-500 text-[11px] 2xl:text-[12px] shrink-0 border border-teal-100 dark:border-white/5"><i class="fa-solid fa-plug"></i></div>
+                                <span class="hidden sm:inline-block text-[9.5px] lg:text-[10px] 2xl:text-[11px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-wider 2xl:tracking-widest leading-none">Network</span>
                             </div>
-                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-teal-100/50 dark:bg-teal-900/30 text-teal-500 flex items-center justify-center group-hover:bg-teal-500 group-hover:text-white transition-all duration-300 shrink-0"><i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i></div>
+                            <div class="w-6 h-6 2xl:w-8 2xl:h-8 rounded-xl bg-teal-100/50 dark:bg-teal-900/30 text-teal-500 flex items-center justify-center group-hover:bg-teal-500 group-hover:text-white transition-all duration-300 shrink-0"><i class="fa-solid fa-arrow-right text-[9px] 2xl:text-[10px] group-hover:translate-x-0.5 transition-transform"></i></div>
                         </div>
+                        
                         <div class="relative z-10 mt-auto">
-                            <h3 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">Switch Map</h3>
-                            <div class="mt-1 h-[28px] sm:h-[34px] flex flex-col justify-start w-full">
-                                <span class="text-[11px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 truncate">Network Ports 🔌</span>
+                            <h3 class="text-[16px] sm:text-lg lg:text-[17px] xl:text-[19px] 2xl:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none whitespace-nowrap">Switch Map</h3>
+                            <div class="mt-1.5 h-[28px] sm:h-[34px] flex items-center justify-between w-full">
+                                <span class="text-[10.5px] lg:text-[10.5px] 2xl:text-[12px] font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap">Network Ports 🔌</span>
                             </div>
                         </div>
                     </a>
 
-                    <a href="PBL_WAN_Monitor.html" @click="haptic('light')" class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-amber-50/80 to-white/80 border border-amber-200/60 shadow-md hover:shadow-2xl hover:border-amber-400/50 dark:from-amber-900/10 dark:to-dark_surface/80 dark:border-amber-800/30 dark:hover:border-amber-400/50">
-                        <i class="fa-solid fa-satellite-dish absolute -bottom-4 -right-3 text-7xl sm:text-9xl text-amber-500/20 dark:text-amber-500/10 group-hover:scale-110 transition-transform duration-500"></i>
+                    <!-- 3. 📡 WAN LOGS CARD -->
+                    <a href="PBL_WAN_Monitor.html" @click="haptic('light')"
+                       @mousemove="const r = $el.getBoundingClientRect(); $el.style.setProperty('--x', `${(($event.clientX - r.left)/r.width)*100}%`); $el.style.setProperty('--y', `${(($event.clientY - r.top)/r.height)*100}%`);"
+                       style="--card-glow: rgba(245, 158, 11, 0.25); --glare-color: rgba(245, 158, 11, 0.20);"
+                       class="relative p-3.5 lg:p-3.5 2xl:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[135px] 2xl:min-h-[142px] bg-gradient-to-br from-amber-50/80 to-white/80 border border-amber-200/60 shadow-md hover:border-amber-400 dark:from-amber-900/10 dark:to-dark_surface/80 dark:border-amber-800/30">
+                        <div class="bento-glare"></div>
+                        <i class="fa-solid fa-satellite-dish absolute -bottom-4 -right-3 text-6xl lg:text-7xl 2xl:text-9xl text-amber-500/20 dark:text-amber-500/10 group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-500 pointer-events-none"></i>
+                        
                         <div class="flex items-center justify-between relative z-10 mb-2">
-                            <div class="flex items-center gap-2">
-                                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-amber-500 text-[12px] shrink-0 border border-amber-100 dark:border-white/5"><i class="fa-solid fa-tower-broadcast"></i></div>
-                                <span class="hidden sm:inline-block text-[11px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest leading-none">Links</span>
+                            <div class="flex items-center gap-1.5 2xl:gap-2">
+                                <div class="w-7 h-7 2xl:w-8 2xl:h-8 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-amber-500 text-[11px] 2xl:text-[12px] shrink-0 border border-amber-100 dark:border-white/5"><i class="fa-solid fa-tower-broadcast"></i></div>
+                                <span class="hidden sm:inline-block text-[9.5px] lg:text-[10px] 2xl:text-[11px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-wider 2xl:tracking-widest leading-none">Links</span>
                             </div>
-                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-amber-100/50 dark:bg-amber-900/30 text-amber-500 flex items-center justify-center group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shrink-0"><i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i></div>
+                            <div class="w-6 h-6 2xl:w-8 2xl:h-8 rounded-xl bg-amber-100/50 dark:bg-amber-900/30 text-amber-500 flex items-center justify-center group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shrink-0"><i class="fa-solid fa-arrow-right text-[9px] 2xl:text-[10px] group-hover:translate-x-0.5 transition-transform"></i></div>
                         </div>
+                        
                         <div class="relative z-10 mt-auto">
-                            <h3 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">WAN Logs</h3>
-                            <div class="mt-1 h-[28px] sm:h-[34px] flex flex-col justify-start w-full">
-                                <span class="text-[11px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 truncate">ISP Tracking 📡</span>
+                            <h3 class="text-[16px] sm:text-lg lg:text-[17px] xl:text-[19px] 2xl:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none whitespace-nowrap">WAN Logs</h3>
+                            <div class="mt-1.5 h-[28px] sm:h-[34px] flex items-center justify-between gap-1 w-full">
+                                <span class="text-[10px] lg:text-[10px] 2xl:text-[12px] font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap">ISP Tracking <span class="hidden 2xl:inline">📡</span></span>
+                                <span class="px-1.5 2xl:px-2 py-0.5 rounded-md font-mono text-[8px] 2xl:text-[8.5px] font-black uppercase border shadow-sm shrink-0"
+                                      :class="openTickets.filter(t => /\[WAN_ID/i.test(t.desc)).length > 0 ? 'bg-rose-500 text-white border-rose-600 animate-pulse' : 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30'"
+                                      x-text="openTickets.filter(t => /\[WAN_ID/i.test(t.desc)).length > 0 ? openTickets.filter(t => /\[WAN_ID/i.test(t.desc)).length + ' Down' : '3/3 Up'"></span>
                             </div>
                         </div>
                     </a>
 
-                    <a href="PBL_Hardware_RMA.html" @click="haptic('light')" class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-purple-50/80 to-white/80 border border-purple-200/60 shadow-md hover:shadow-2xl hover:border-purple-400/50 dark:from-purple-900/10 dark:to-dark_surface/80 dark:border-purple-800/30 dark:hover:border-purple-400/50">
-                        <i class="fa-solid fa-screwdriver-wrench absolute -bottom-4 -right-3 text-7xl sm:text-9xl text-purple-500/20 dark:text-purple-500/10 group-hover:scale-110 transition-transform duration-500"></i>
+                    <!-- 4. 🛠️ RMA TRACKER CARD (SINGLE INSTANCE - DUPLICATE REMOVED) -->
+                    <a href="PBL_Hardware_RMA.html" @click="haptic('light')"
+                       @mousemove="const r = $el.getBoundingClientRect(); $el.style.setProperty('--x', `${(($event.clientX - r.left)/r.width)*100}%`); $el.style.setProperty('--y', `${(($event.clientY - r.top)/r.height)*100}%`);"
+                       style="--card-glow: rgba(168, 85, 247, 0.25); --glare-color: rgba(168, 85, 247, 0.20);"
+                       class="relative p-3.5 lg:p-3.5 2xl:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[135px] 2xl:min-h-[142px] bg-gradient-to-br from-purple-50/80 to-white/80 border border-purple-200/60 shadow-md hover:border-purple-400 dark:from-purple-900/10 dark:to-dark_surface/80 dark:border-purple-800/30">
+                        <div class="bento-glare"></div>
+                        <i class="fa-solid fa-screwdriver-wrench absolute -bottom-4 -right-3 text-6xl lg:text-7xl 2xl:text-9xl text-purple-500/20 dark:text-purple-500/10 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500 pointer-events-none"></i>
+                        
                         <div class="flex items-center justify-between relative z-10 mb-2">
-                            <div class="flex items-center gap-2">
-                                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-purple-500 text-[12px] shrink-0 border border-purple-100 dark:border-white/5"><i class="fa-solid fa-boxes-packing"></i></div>
-                                <span class="hidden sm:inline-block text-[11px] font-black text-purple-600 dark:text-purple-400 uppercase tracking-widest leading-none">Support</span>
+                            <div class="flex items-center gap-1.5 2xl:gap-2">
+                                <div class="w-7 h-7 2xl:w-8 2xl:h-8 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-purple-500 text-[11px] 2xl:text-[12px] shrink-0 border border-purple-100 dark:border-white/5"><i class="fa-solid fa-boxes-packing"></i></div>
+                                <span class="hidden sm:inline-block text-[9.5px] lg:text-[10px] 2xl:text-[11px] font-black text-purple-600 dark:text-purple-400 uppercase tracking-wider 2xl:tracking-widest leading-none">Support</span>
                             </div>
-                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-purple-100/50 dark:bg-purple-900/30 text-purple-500 flex items-center justify-center group-hover:bg-purple-500 group-hover:text-white transition-all duration-300 shrink-0"><i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i></div>
+                            <div class="w-6 h-6 2xl:w-8 2xl:h-8 rounded-xl bg-purple-100/50 dark:bg-purple-900/30 text-purple-500 flex items-center justify-center group-hover:bg-purple-500 group-hover:text-white transition-all duration-300 shrink-0"><i class="fa-solid fa-arrow-right text-[9px] 2xl:text-[10px] group-hover:translate-x-0.5 transition-transform"></i></div>
                         </div>
+                        
                         <div class="relative z-10 mt-auto">
-                            <h3 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">RMA Tracker</h3>
-                            <div class="mt-1 h-[28px] sm:h-[34px] flex flex-col justify-start w-full">
-                                <span class="text-[11px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 truncate">Repair & Vendor 🛠️</span>
+                            <h3 class="text-[16px] sm:text-lg lg:text-[17px] xl:text-[19px] 2xl:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none whitespace-nowrap">RMA Tracker</h3>
+                            <div class="mt-1.5 h-[28px] sm:h-[34px] flex items-center justify-between gap-1 w-full">
+                                <span class="text-[10px] lg:text-[10px] 2xl:text-[12px] font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap">Repair & Vendor <span class="hidden 2xl:inline">🛠️</span></span>
+                                <span class="px-1.5 2xl:px-2 py-0.5 rounded-md font-mono text-[8px] 2xl:text-[8.5px] font-black uppercase border shadow-sm shrink-0"
+                                      :class="openTickets.filter(t => /\[RMA_ID/i.test(t.desc)).length > 0 ? 'bg-purple-600 text-white border-purple-500 animate-pulse' : 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-white/5 dark:text-slate-400 dark:border-white/10'"
+                                      x-text="openTickets.filter(t => /\[RMA_ID/i.test(t.desc)).length + ' Open'"></span>
                             </div>
                         </div>
                     </a>
 
-                    <a href="PBL_IP_Manager.html" @click="haptic('light')" class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-rose-50/80 to-white/80 border border-rose-200/60 shadow-md hover:shadow-2xl hover:border-rose-400/50 dark:from-rose-900/10 dark:to-dark_surface/80 dark:border-rose-800/30 dark:hover:border-rose-400/50">
-                        <i class="fa-solid fa-globe absolute -bottom-4 -right-3 text-7xl sm:text-9xl text-rose-500/20 dark:text-rose-500/10 group-hover:scale-110 transition-transform duration-500"></i>
+                    <!-- 5. 🌐 IP MANAGER CARD -->
+                    <a href="PBL_IP_Manager.html" @click="haptic('light')"
+                       @mousemove="const r = $el.getBoundingClientRect(); $el.style.setProperty('--x', `${(($event.clientX - r.left)/r.width)*100}%`); $el.style.setProperty('--y', `${(($event.clientY - r.top)/r.height)*100}%`);"
+                       style="--card-glow: rgba(244, 63, 94, 0.25); --glare-color: rgba(244, 63, 94, 0.20);"
+                       class="relative p-3.5 lg:p-3.5 2xl:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[135px] 2xl:min-h-[142px] bg-gradient-to-br from-rose-50/80 to-white/80 border border-rose-200/60 shadow-md hover:border-rose-400 dark:from-rose-900/10 dark:to-dark_surface/80 dark:border-rose-800/30">
+                        <div class="bento-glare"></div>
+                        <i class="fa-solid fa-globe absolute -bottom-4 -right-3 text-6xl lg:text-7xl 2xl:text-9xl text-rose-500/20 dark:text-rose-500/10 group-hover:scale-110 transition-transform duration-500 pointer-events-none"></i>
+                        
                         <div class="flex items-center justify-between relative z-10 mb-2">
-                            <div class="flex items-center gap-2">
-                                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-rose-500 text-[12px] shrink-0 border border-rose-100 dark:border-white/5"><i class="fa-solid fa-route"></i></div>
-                                <span class="hidden sm:inline-block text-[11px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest leading-none">Routing</span>
+                            <div class="flex items-center gap-1.5 2xl:gap-2">
+                                <div class="w-7 h-7 2xl:w-8 2xl:h-8 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-rose-500 text-[11px] 2xl:text-[12px] shrink-0 border border-rose-100 dark:border-white/5"><i class="fa-solid fa-route"></i></div>
+                                <span class="hidden sm:inline-block text-[9.5px] lg:text-[10px] 2xl:text-[11px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-wider 2xl:tracking-widest leading-none">Routing</span>
                             </div>
-                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-rose-100/50 dark:bg-rose-900/30 text-rose-500 flex items-center justify-center group-hover:bg-rose-500 group-hover:text-white transition-all duration-300 shrink-0"><i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i></div>
+                            <div class="w-6 h-6 2xl:w-8 2xl:h-8 rounded-xl bg-rose-100/50 dark:bg-rose-900/30 text-rose-500 flex items-center justify-center group-hover:bg-rose-500 group-hover:text-white transition-all duration-300 shrink-0"><i class="fa-solid fa-arrow-right text-[9px] 2xl:text-[10px] group-hover:translate-x-0.5 transition-transform"></i></div>
                         </div>
+                        
                         <div class="relative z-10 mt-auto">
-                            <h3 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate">IP Manager</h3>
-                            <div class="mt-1 h-[28px] sm:h-[34px] flex flex-col justify-start w-full">
-                                <span class="text-[11px] sm:text-[12px] font-bold text-slate-500 dark:text-slate-400 truncate">Network Routing 🌐</span>
+                            <h3 class="text-[16px] sm:text-lg lg:text-[17px] xl:text-[19px] 2xl:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none whitespace-nowrap">IP Manager</h3>
+                            <div class="mt-1.5 h-[28px] sm:h-[34px] flex items-center justify-between w-full">
+                                <span class="text-[10.5px] lg:text-[10.5px] 2xl:text-[12px] font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap">Network Routing 🌐</span>
                             </div>
                         </div>
                     </a>
 
-                   <!-- 🚀 IT SEC AUDIT CARD -->
-                   <a x-show="currentLocation === 'Noida' ? ['vikas', 'anil', 'ashok'].some(n => (currentUser?.name || '').toLowerCase().includes(n)) : ['vikas', 'deependra'].some(n => (currentUser?.name || '').toLowerCase().includes(n))" 
-                      @click.prevent="haptic('light'); openAuditModal()" 
-                      class="relative p-4 sm:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[140px] bg-gradient-to-br from-indigo-50/80 to-white/80 border dark:from-indigo-900/10 dark:to-dark_surface/80"
+                    <!-- 6. 🛡️ IT SEC AUDIT CARD -->
+                    <a x-show="currentLocation === 'Noida' ? ['vikas', 'anil', 'ashok'].some(n => (currentUser?.name || '').toLowerCase().includes(n)) : ['vikas', 'deependra'].some(n => (currentUser?.name || '').toLowerCase().includes(n))" 
+                       @click.prevent="haptic('light'); openAuditModal()" 
+                       @mousemove="const r = $el.getBoundingClientRect(); $el.style.setProperty('--x', `${(($event.clientX - r.left)/r.width)*100}%`); $el.style.setProperty('--y', `${(($event.clientY - r.top)/r.height)*100}%`);"
+                       style="--card-glow: rgba(16, 185, 129, 0.25); --glare-color: rgba(16, 185, 129, 0.20);"
+                       class="relative p-3.5 lg:p-3.5 2xl:p-5 rounded-[1.5rem] cursor-pointer overflow-hidden transition-all duration-300 group flex flex-col justify-between min-h-[110px] sm:min-h-[135px] 2xl:min-h-[142px] bg-gradient-to-br from-indigo-50/80 to-white/80 border dark:from-indigo-900/10 dark:to-dark_surface/80"
                        :class="
                             auditMeta.status === 'Overdue' 
                             ? '!border-red-500 shadow-[0_0_30px_rgba(239,68,68,0.65)] ring-1 ring-red-400/50' 
@@ -840,59 +925,51 @@
                                 ? '!border-indigo-500 shadow-[0_0_30px_rgba(99,102,241,0.6)] ring-1 ring-indigo-400/50'
                                 : '!border-emerald-400 shadow-[0_0_25px_4px_rgba(16,185,129,0.4)] ring-2 ring-emerald-400/40 hover:shadow-[0_0_35px_6px_rgba(16,185,129,0.55)]')
                        ">
-                        
-                        <!-- Dynamic Background Glowing Aura (Removed from Submitted State) -->
+                        <div class="bento-glare"></div>
                         <div x-show="auditMeta.status !== 'Submitted' && auditMeta.status !== 'Overdue'" class="absolute -inset-2 bg-indigo-500/35 blur-xl animate-pulse pointer-events-none" x-cloak></div>
                         <div x-show="auditMeta.status === 'Overdue'" class="absolute -inset-2 bg-red-500/35 blur-xl animate-pulse pointer-events-none" x-cloak></div>
                         
-                        <!-- Watermark Icon (Remains Indigo) -->
-                        <i class="fa-solid fa-shield-halved absolute -bottom-4 -right-3 text-7xl sm:text-9xl group-hover:scale-110 transition-transform duration-500 text-indigo-500/20 dark:text-indigo-500/10"
+                        <i class="fa-solid fa-shield-halved absolute -bottom-4 -right-3 text-6xl lg:text-7xl 2xl:text-9xl group-hover:scale-110 transition-transform duration-500 text-indigo-500/20 dark:text-indigo-500/10 pointer-events-none"
                            :class="auditMeta.status === 'Overdue' ? '!text-red-500/20' : ''"></i>
                         
                         <div class="flex items-center justify-between relative z-10 mb-2">
-                            <div class="flex items-center gap-2">
-                                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-[12px] shrink-0 border border-indigo-100 dark:border-white/5 text-indigo-500 transition-colors duration-300"
+                            <div class="flex items-center gap-1.5 2xl:gap-2">
+                                <div class="w-7 h-7 2xl:w-8 2xl:h-8 rounded-xl bg-white/90 dark:bg-dark_surface shadow-sm flex items-center justify-center text-[11px] 2xl:text-[12px] shrink-0 border border-indigo-100 dark:border-white/5 text-indigo-500 transition-colors duration-300"
                                      :class="auditMeta.status === 'Overdue' ? '!border-red-200 !text-red-500' : ''">
                                     <i class="fa-solid" :class="auditMeta.status === 'Overdue' ? 'fa-triangle-exclamation animate-pulse' : 'fa-user-shield'"></i>
                                 </div>
-                                <span class="hidden sm:inline-block text-[11px] font-black uppercase tracking-widest leading-none text-indigo-600 dark:text-indigo-400"
+                                <span class="hidden sm:inline-block text-[9.5px] lg:text-[10px] 2xl:text-[11px] font-black uppercase tracking-wider 2xl:tracking-widest leading-none text-indigo-600 dark:text-indigo-400"
                                       :class="auditMeta.status === 'Overdue' ? '!text-red-600 dark:!text-red-400' : ''">Security</span>
                             </div>
                             
-                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-indigo-100/50 dark:bg-indigo-900/30 text-indigo-500 flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-all duration-300 shrink-0"
+                            <div class="w-6 h-6 2xl:w-8 2xl:h-8 rounded-xl bg-indigo-100/50 dark:bg-indigo-900/30 text-indigo-500 flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition-all duration-300 shrink-0"
                                  :class="auditMeta.status === 'Overdue' ? '!bg-red-100/50 !text-red-500 group-hover:!bg-red-500 group-hover:!text-white' : ''">
-                                <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i>
+                                <i class="fa-solid fa-arrow-right text-[9px] 2xl:text-[10px] group-hover:translate-x-0.5 transition-transform"></i>
                             </div>
                         </div>
                         
                         <div class="relative z-10 mt-auto w-full">
-                            <h3 class="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none truncate mb-1">IT Sec Audit</h3>
+                            <h3 class="text-[16px] sm:text-lg lg:text-[17px] xl:text-[19px] 2xl:text-2xl font-black font-heading tracking-tight text-slate-800 dark:text-white leading-none whitespace-nowrap mb-1">IT Sec Audit</h3>
                             
-                            <!-- 🚀 Symmetrical Matrix: Auto-Breathing Height (Zero Clipping on Mobile) -->
-                            <div class="min-h-[38px] sm:min-h-[42px] h-auto flex flex-col justify-center w-full py-0.5">
-                                
-                                <!-- State: Open / Draft / Overdue with Ergonomic Anti-Clipping Gauge Ring -->
+                            <div class="min-h-[34px] sm:min-h-[38px] h-auto flex flex-col justify-center w-full py-0.5">
+                                <!-- State: Open / Draft / Overdue -->
                                 <div x-show="auditMeta.status !== 'Submitted'" class="flex items-center justify-between w-full gap-1.5 py-0.5" x-cloak>
                                     <div class="flex flex-col justify-center min-w-0 flex-1 pr-1">
-                                        <!-- Clean Title with Slim Vector Icon -->
-                                        <div class="flex items-center gap-1.5 text-[11px] sm:text-[11.5px] font-black tracking-tight leading-none mb-1.5 truncate"
+                                        <div class="flex items-center gap-1 text-[10px] 2xl:text-[11.5px] font-black tracking-tight leading-none mb-1 whitespace-nowrap"
                                              :class="auditMeta.status === 'Overdue' ? 'text-rose-600 dark:text-rose-400' : (auditMeta.status === 'Draft' ? 'text-amber-600 dark:text-amber-400' : 'text-indigo-600 dark:text-indigo-300')">
-                                            <i class="fa-solid text-[9.5px] shrink-0" 
+                                            <i class="fa-solid text-[9px] shrink-0" 
                                                :class="auditMeta.status === 'Overdue' ? 'fa-circle-exclamation text-rose-500 animate-pulse' : (auditMeta.status === 'Draft' ? 'fa-pen-to-square text-amber-500' : 'fa-shield-halved text-indigo-500')"></i>
-                                            <span class="truncate" x-text="auditMeta.status === 'Overdue' ? 'Action Required' : (auditMeta.status === 'Draft' ? 'In Progress' : 'Audit Open')"></span>
+                                            <span x-text="auditMeta.status === 'Overdue' ? 'Action Req.' : (auditMeta.status === 'Draft' ? 'In Progress' : 'Audit Open')"></span>
                                         </div>
-                                        
-                                        <!-- Single-Line Counter Pill -->
-                                        <div class="flex items-center gap-1 font-mono text-[10px] sm:text-[10.5px] font-bold text-slate-500 dark:text-slate-400 leading-none whitespace-nowrap">
+                                        <div class="flex items-center gap-1 font-mono text-[9.5px] 2xl:text-[10.5px] font-bold text-slate-500 dark:text-slate-400 leading-none whitespace-nowrap">
                                             <span class="text-slate-900 dark:text-white font-black" x-text="auditProgress.completed"></span>
                                             <span class="opacity-40">/</span>
                                             <span>15</span>
-                                            <span class="font-sans text-[8.5px] uppercase tracking-wider font-extrabold text-slate-400 ml-0.5">Done</span>
+                                            <span class="font-sans text-[8px] uppercase tracking-wider font-extrabold text-slate-400 ml-0.5">Done</span>
                                         </div>
                                     </div>
                                     
-                                    <!-- Ergonomic Compact Radial Ring -->
-                                    <div class="relative w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center shrink-0">
+                                    <div class="relative w-7 h-7 2xl:w-9 2xl:h-9 flex items-center justify-center shrink-0">
                                         <svg class="w-full h-full transform -rotate-90 drop-shadow-sm" viewBox="0 0 36 36">
                                             <circle cx="18" cy="18" r="14" stroke="currentColor" stroke-width="3" fill="transparent" class="text-slate-200/80 dark:text-slate-700/60" />
                                             <circle cx="18" cy="18" r="14" stroke="currentColor" stroke-width="3" fill="transparent" 
@@ -902,17 +979,14 @@
                                                     stroke-linecap="round" 
                                                     class="transition-all duration-700 ease-out" />
                                         </svg>
-                                        <span class="absolute text-[8.5px] sm:text-[9px] font-mono font-black text-slate-800 dark:text-white" x-text="auditProgress.percent + '%'"></span>
+                                        <span class="absolute text-[8px] 2xl:text-[9px] font-mono font-black text-slate-800 dark:text-white" x-text="auditProgress.percent + '%'"></span>
                                     </div>
                                 </div>
 
-                                <!-- State: Submitted (Smart Zero-Collision Executive Matrix) -->
-                                <div x-show="auditMeta.status === 'Submitted'" x-cloak class="flex flex-col w-full justify-center gap-1.5 pt-0.5">
-                                    
-                                    <!-- 1. ROW 1: Cycle Tag (Left) + High-Density Compliant Pill (Zero Right Clipping) -->
+                                <!-- State: Submitted -->
+                                <div x-show="auditMeta.status === 'Submitted'" x-cloak class="flex flex-col w-full justify-center gap-1 pt-0.5">
                                     <div class="flex items-center justify-between gap-1 w-full leading-none">
-                                        <!-- Cycle Badge: Compact Padding & Tight Typography -->
-                                        <span class="px-1.5 py-0.5 rounded text-[7.5px] sm:text-[8px] font-mono font-black uppercase tracking-tight border shadow-sm shrink-0 leading-none"
+                                        <span class="px-1.5 py-0.5 rounded text-[7.5px] 2xl:text-[8px] font-mono font-black uppercase tracking-tight border shadow-sm shrink-0 leading-none"
                                               :class="(currentLocation === 'Dehradun' || (auditMeta.cycle || '').toLowerCase().includes('dehradun'))
                                                   ? 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/40 dark:text-violet-300 dark:border-violet-500/30'
                                                   : 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-500/30'"
@@ -920,41 +994,34 @@
                                                   ? 'Monthly' 
                                                   : ((auditMeta.cycle || '').includes('01') || (auditMeta.cycle || '').includes('Cycle 1') ? 'Cycle 1' : 'Cycle 2')"></span>
 
-                                        <!-- 🚀 Fixed: High-Density font-sans saves 30px width and stops edge cutting completely -->
-                                        <span class="font-sans text-[8px] sm:text-[8.5px] font-black tracking-tight px-1.5 py-0.5 rounded-md border shadow-sm shrink-0 leading-none flex items-center gap-1"
+                                        <span class="font-sans text-[7.5px] 2xl:text-[8.5px] font-black tracking-tight px-1.5 py-0.5 rounded-md border shadow-sm shrink-0 leading-none flex items-center gap-0.5"
                                               :class="(auditMeta.fails || 0) > 0 
                                                   ? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/15 dark:text-rose-300 dark:border-rose-500/30 animate-pulse' 
                                                   : 'bg-emerald-50 text-emerald-700 border-emerald-200/90 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30'">
-                                            <span x-text="(auditMeta.score || 100) + '%'"></span>
+                                            <span x-text="(auditMeta.fails || 0) + '%'"></span>
                                             <span class="opacity-40">•</span>
-                                            <span x-text="(auditMeta.fails || 0) > 0 ? (auditMeta.fails + ' Fail ⚠️') : 'Compliant ✅'"></span>
+                                            <span x-text="(auditMeta.fails || 0) > 0 ? (auditMeta.fails + ' Fail') : 'OK ✅'"></span>
                                         </span>
                                     </div>
 
-                                    <!-- 2. ROW 2: First Name Only (Zero Truncation) + Compact Date Badge -->
                                     <div class="flex items-center justify-between gap-1 w-full leading-none">
-                                        <!-- 🚀 Fixed: First name only (.split(' ')[0]) with whitespace-nowrap - No 'Deepend...' cutting -->
-                                        <div class="flex items-center gap-1.5 min-w-0">
-                                            <span class="w-3.5 h-3.5 rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400 flex items-center justify-center text-[7.5px] shrink-0 border border-emerald-200 dark:border-emerald-500/30 shadow-sm">
+                                        <div class="flex items-center gap-1 min-w-0">
+                                            <span class="w-3 h-3 rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400 flex items-center justify-center text-[7px] shrink-0 border border-emerald-200 dark:border-emerald-500/30">
                                                 <i class="fa-solid fa-check"></i>
                                             </span>
-                                            <span class="font-sans font-black text-[11px] sm:text-[11.5px] text-slate-800 dark:text-slate-100 tracking-tight leading-none whitespace-nowrap" 
-                                                  x-text="(auditMeta.auditor || 'IT Operations').split(' ')[0]"></span>
+                                            <span class="font-sans font-black text-[10px] 2xl:text-[11.5px] text-slate-800 dark:text-slate-100 tracking-tight leading-none whitespace-nowrap" 
+                                                  x-text="(auditMeta.auditor || 'IT Ops').split(' ')[0]"></span>
                                         </div>
 
-                                        <!-- Ultra-Compact Monospace Date -->
-                                        <span class="font-mono text-[8px] sm:text-[8.5px] font-bold text-slate-400 dark:text-slate-500 shrink-0 flex items-center gap-1 leading-none">
-                                            <i class="fa-regular fa-calendar text-[7px] opacity-70"></i>
-                                            <span x-text="auditMeta.date ? auditMeta.date.split(',')[0].trim().replace('-20', '-') : 'Archived'"></span>
+                                        <span class="font-mono text-[7.5px] 2xl:text-[8.5px] font-bold text-slate-400 dark:text-slate-500 shrink-0 flex items-center gap-0.5 leading-none">
+                                            <span x-text="auditMeta.date ? auditMeta.date.split(',')[0].trim().replace('-20', '-') : 'Done'"></span>
                                         </span>
                                     </div>
-
                                 </div>
-                                
                             </div>
                         </div>
                     </a>
-					
+
                 </div>
             </section>
 			
@@ -1009,11 +1076,23 @@
                             </button>
                         </div>
 
-                        <!-- 3. Refresh Action -->
-                        <button @click="fetchTickets(true)" class="order-2 sm:order-3 text-[10px] font-bold text-slate-500 hover:text-brand transition flex items-center gap-1 bg-white dark:bg-black/20 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-white/10 shadow-sm active:scale-95 shrink-0 ml-auto sm:ml-0">
-                            <i class="fa-solid fa-rotate-right text-[10px]" :class="loading ? 'fa-spin' : ''"></i> 
-                            <span class="hidden sm:inline">Sync</span>
-                        </button>
+                        <!-- 3. Quick Search + Refresh Action -->
+                        <div class="order-2 sm:order-3 flex items-center gap-1.5 ml-auto sm:ml-0">
+                            <!-- 🔍 Instant Ticket Search Pill -->
+                            <div class="relative flex items-center">
+                                <i class="fa-solid fa-magnifying-glass absolute left-2.5 text-[10px] text-slate-400 pointer-events-none"></i>
+                                <input type="search" x-model="ticketSearch" placeholder="Filter host, user, ID..." 
+                                       class="w-28 sm:w-36 focus:w-44 sm:focus:w-52 transition-all duration-300 pl-7 pr-6 py-1 bg-slate-100/90 dark:bg-black/40 border border-slate-200/80 dark:border-white/10 rounded-lg text-[10px] font-bold text-slate-800 dark:text-white outline-none focus:border-brand focus:bg-white dark:focus:bg-slate-900 shadow-inner">
+                                <button x-show="ticketSearch" @click="ticketSearch = ''; haptic('light')" class="absolute right-1.5 text-slate-400 hover:text-rose-500 text-[10px]" x-cloak>
+                                    <i class="fa-solid fa-circle-xmark"></i>
+                                </button>
+                            </div>
+
+                            <button @click="fetchTickets(true)" class="text-[10px] font-bold text-slate-500 hover:text-brand transition flex items-center gap-1 bg-white dark:bg-black/20 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-white/10 shadow-sm active:scale-95 shrink-0">
+                                <i class="fa-solid fa-rotate-right text-[10px]" :class="loading ? 'fa-spin' : ''"></i> 
+                                <span class="hidden xl:inline">Sync</span>
+                            </button>
+                        </div>
                     </div>
                     
                     <div class="overflow-y-auto custom-scroll flex-1 p-0 relative bg-white dark:bg-transparent">
@@ -2613,8 +2692,8 @@
                         <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest bg-white/20 border border-white/20 shadow-sm px-2.5 py-1 rounded-md mb-3 inline-block flex items-center gap-1.5 w-max">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Production Release
                         </span>
-                        <h3 class="text-2xl sm:text-3xl font-heading font-black leading-tight drop-shadow-md">What's New in v3.5 💎</h3>
-                        <p class="text-[11px] font-medium opacity-80 mt-1.5 font-mono">Executive Telemetry, RMA Pipeline & Dynamic Carrier NOC • Sep 08, 2026</p>
+                        <h3 class="text-2xl sm:text-3xl font-heading font-black leading-tight drop-shadow-md">What's New in v3.6 💎</h3>
+						<p class="text-[11px] font-medium opacity-80 mt-1.5 font-mono">Responsive Bento Grid & Single-Line Precision • Nov 10, 2026</p>
                     </div>
                     <button @click="showChangelogModal = false" class="w-8 h-8 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/40 text-white transition shadow-sm active:scale-95" title="Close Notes">
                         <i class="fa-solid fa-xmark text-sm"></i>
@@ -2623,6 +2702,52 @@
             </div>
 
             <!-- Scrollable Content -->
+			<div class="p-5 sm:p-6 overflow-y-auto custom-scroll flex-1 bg-slate-50/50 dark:bg-transparent space-y-6 relative z-10">
+
+                <!-- === VERSION 3.6 (CURRENT STABLE RELEASE) === -->
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="px-2.5 py-0.5 rounded bg-brand text-white font-black text-[10px] uppercase tracking-widest shadow-sm">v3.6 STABLE</span>
+                        <h4 class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-widest">Responsive Bento Grid & Single-Line Precision</h4>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+                        
+                        <!-- Block 1: Single-Line Precision Across Resolutions -->
+                        <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition">
+                            <h4 class="text-[11px] font-black text-brand uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-desktop"></i> Multi-Resolution Precision
+                            </h4>
+                            <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-brand shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>1280x1024 & 1920x1080 Optimization:</strong> Calibrated card padding and font scaling to guarantee all 6 Bento modules fit on a single horizontal line without truncation.</span>
+                                </li>
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-brand shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Duplicate Cleanup:</strong> Purged redundant card declarations to ensure clean rendering.</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Block 2: Enhanced Glare & Micro-Interactions -->
+                        <div class="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-md transition">
+                            <h4 class="text-[11px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-3 border-b border-slate-100 dark:border-white/5 pb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Specular Glare & Polish
+                            </h4>
+                            <ul class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 space-y-2 font-medium">
+                                <li class="flex items-start gap-1.5">
+                                    <span class="text-indigo-500 shrink-0"><i class="fa-solid fa-circle-check text-[10px] mt-0.5"></i></span> 
+                                    <span><strong>Unified 3D Specular Lighting:</strong> All 6 application cards now feature cursor-tracking reactive glass refractions and smooth hover physics.</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- === VERSION 3.5 (PRESERVED) === -->
+                <div class="pt-5 border-t border-slate-200 dark:border-white/10">
             <div class="p-5 sm:p-6 overflow-y-auto custom-scroll flex-1 bg-slate-50/50 dark:bg-transparent space-y-6 relative z-10">
 
                 <!-- === VERSION 3.5 (ACTIVE OPERATIONAL UPGRADE) === -->
@@ -3223,7 +3348,8 @@
 
     <!-- SCRIPT -->
     <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbxLuVpd5zOUJMwjnJsI9aRVEMTJNNfiizVFAAuxPiHMf7Tv144pq4uNsEgn_hCy6qx18g/exec";
+    // ✅ AB YEH pbl-config.js SE NAYA URL DYNAMIC UTHAYEGA:
+var API_URL = window.PBL_MASTER_API_URL || (typeof API_URL !== 'undefined' ? API_URL : "https://script.google.com/macros/s/AKfycbzS9ap4lNjf14O7rVPqKGIF6HeySpEfQUQ1UEG7qdP-BdIeouWaf5nyKHhB8jERTHlGtg/exec");
 
     document.addEventListener('alpine:init', () => {
         Alpine.data('dashboard', () => {
@@ -3292,6 +3418,36 @@
                 showLogoutModal: false, showProfileModal: false, showSettingsModal: false,
                 showGuide: false, showStaffModal: false, showOpenTicketsModal: false, showChangelogModal: false, showAuditModal: false, showLeaveAppModal: false,
                 
+                // ⌘K SPOTLIGHT COMMAND PALETTE STATE & FUNCTIONS
+                showCmdPalette: false,
+                cmdQuery: '',
+                get commandList() {
+                    return [
+                        { title: 'Open IT Inventory (AssetDB)', sub: 'Manage hardware fleet & software licenses', icon: 'fa-laptop', color: 'text-indigo-500', tag: 'MODULE', action: () => window.location.href = 'PBL_Inventory.html' },
+                        { title: 'Open Switch Port Mapper', sub: 'Live 52-port chassis & VLAN topology', icon: 'fa-network-wired', color: 'text-teal-500', tag: 'MODULE', action: () => window.location.href = 'PBL_Switch_Map.html' },
+                        { title: 'Open WAN & ISP Monitor', sub: 'Airtel LL, STPI & Broadband outage logs', icon: 'fa-satellite-dish', color: 'text-amber-500', tag: 'MODULE', action: () => window.location.href = 'PBL_WAN_Monitor.html' },
+                        { title: 'Open Hardware RMA Tracker', sub: 'Vendor repair claims & serial tracking', icon: 'fa-screwdriver-wrench', color: 'text-purple-500', tag: 'MODULE', action: () => window.location.href = 'PBL_Hardware_RMA.html' },
+                        { title: 'Open IP Allocation Master', sub: 'Subnet routing & gateway switchover', icon: 'fa-globe', color: 'text-rose-500', tag: 'MODULE', action: () => window.location.href = 'PBL_IP_Manager.html' },
+                        { title: 'Launch IT Security Audit (15-Point)', sub: 'Bi-monthly & monthly compliance checklist', icon: 'fa-shield-halved', color: 'text-emerald-500', tag: 'SECURITY', action: () => this.openAuditModal() },
+                        { title: 'Open HR Leave Hub', sub: 'Apply CL/ML/PL & view holiday calendar', icon: 'fa-calendar-check', color: 'text-indigo-500', tag: 'HR OPS', action: () => this.showLeaveAppModal = true },
+                        { title: 'Switch Branch (Noida ⇋ Dehradun)', sub: 'Toggle active operational branch context', icon: 'fa-location-dot', color: 'text-rose-500', tag: 'ACTION', action: () => this.toggleLocation() },
+                        { title: 'Toggle Dark / Light Theme', sub: 'Switch visual interface appearance', icon: 'fa-moon', color: 'text-amber-400', tag: 'UI', action: () => this.toggleTheme() },
+                        { title: 'Force Cloud Database Sync', sub: 'Fetch latest tickets, audits & leave data', icon: 'fa-rotate', color: 'text-brand', tag: 'SYNC', action: () => this.manualSync() },
+                        { title: 'Gateway: SonicWall TZ270 Firewall', sub: '192.168.231.1 Security Appliance', icon: 'fa-shield-virus', color: 'text-blue-500', tag: 'GATEWAY', action: () => window.open('http://192.168.231.1/sonicui/7/login/#/', '_blank') }
+                    ];
+                },
+                get filteredCommands() {
+                    if (!this.cmdQuery) return this.commandList;
+                    const q = this.cmdQuery.toLowerCase().trim();
+                    return this.commandList.filter(c => c.title.toLowerCase().includes(q) || c.sub.toLowerCase().includes(q) || c.tag.toLowerCase().includes(q));
+                },
+                executeCommand(cmd) {
+                    this.haptic('light');
+                    this.showCmdPalette = false;
+                    this.cmdQuery = '';
+                    cmd.action();
+                },
+
                 // 🔥 NAYA: RESOLVE MODAL VARIABLES (CONTEXT AWARE)
                 showResolveModal: false,
                 
@@ -3581,8 +3737,7 @@
                 async fetchPublicIP() {
                     // 🌐 Exact IP Mapping + Smart Regex for Airtel Lines
                     const lines = { 
-                        '27.57.19.69': 'Airtel Broadband',
-                        '122.160.116.30': 'Airtel Broadband', 
+                        '182.64.233.237': 'Airtel Broadband',
                         '203.190.135.3': 'STPI Leased Line', 
                         '122.180.106.42': 'Airtel Leased Line' 
                     };
@@ -3919,36 +4074,37 @@
                 toggleLocation() {
                     if (!this.isGlobal) return;
                     this.haptic('light');
-                    this.currentLocation = this.currentLocation === 'Noida' ? 'Dehradun' : 'Noida';
-                    localStorage.setItem('pbl_loc_pref', this.currentLocation);
+                    this.currentLocation = (this.currentLocation === 'Noida') ? 'Dehradun' : 'Noida';
+                    try { localStorage.setItem('pbl_loc_pref', this.currentLocation); } catch(e){}
                     
-                    // Update Tickets & KPIs
                     this.updateKPIs();
-                    
-                    // 🚀 SMART FIX: Instantly recalculate & load Audit Status/Cycle for the new location
                     this.checkAuditStatus();
 
-                    // 🚀 Smart Fix: Wait 50ms for Alpine to update the DOM container dimensions before drawing
                     setTimeout(() => { 
-						this.renderChart(); 
-						this.renderInfraChart(); 
-					}, 50);
-                }, // 👈 FIX: Yeh closing brace '},' lagte hi saare 200+ console errors khatam ho jayenge!
-				
-				// 🚀 Dual-Branch Telemetry Helper for Vikas Rawat
+                        if (typeof this.renderChart === 'function') this.renderChart(); 
+                        if (typeof this.renderInfraChart === 'function') this.renderInfraChart(); 
+                    }, 50);
+                },
+
+                // 🚀 Dual-Branch Telemetry Helper
                 getBranchPendingCount(branchName) {
                     if (!Array.isArray(this.tickets)) return 0;
                     return this.tickets.filter(t => t.location === branchName && t.status === 'Open').length;
                 },
 
-                // 📍 SMART LOCATION FILTERING LOGIC
+                // 📍 SMART LOCATION FILTERING (Case-Insensitive + Fallback)
                 get filteredTickets() {
                     if (!Array.isArray(this.tickets)) return [];
-                    return this.tickets.filter(t => t.location === this.currentLocation);
+                    const curLoc = (this.currentLocation || 'Noida').toLowerCase().trim();
+                    return this.tickets.filter(t => {
+                        const tLoc = (t.location || 'Noida').toLowerCase().trim();
+                        return tLoc === curLoc;
+                    });
                 },
 
-                // 🚀 Ticket History Segmented Filter State ('all' | 'open' | 'resolved')
+                // Ticket History Segmented Filter + Instant Search State
                 ticketFilter: 'all',
+                ticketSearch: '',
                 get displayedTickets() {
                     let list = this.filteredTickets;
                     if (this.ticketFilter === 'open') {
@@ -3956,11 +4112,21 @@
                     } else if (this.ticketFilter === 'resolved') {
                         list = list.filter(t => t.status === 'Resolved' || t.status === 'Closed');
                     }
+                    if (this.ticketSearch && this.ticketSearch.trim() !== '') {
+                        const q = this.ticketSearch.toLowerCase().trim();
+                        list = list.filter(t => 
+                            (t.id && String(t.id).toLowerCase().includes(q)) ||
+                            (t.name && String(t.name).toLowerCase().includes(q)) ||
+                            (t.asset && String(t.asset).toLowerCase().includes(q)) ||
+                            (t.issue && String(t.issue).toLowerCase().includes(q)) ||
+                            (t.desc && String(t.desc).toLowerCase().includes(q))
+                        );
+                    }
                     return list;
                 },
 
-                // Ab openTickets directly filteredTickets se banega, toh galat branch ki ticket kabhi dikhegi hi nahi!
                 get openTickets() { 
+                    if (!Array.isArray(this.filteredTickets)) return [];
                     return this.filteredTickets.filter(t => t.status === 'Open').sort((a, b) => new Date(a.date) - new Date(b.date)); 
                 },
                 
@@ -4722,5 +4888,46 @@
     }); 
     
     </script>
+	
+	<!-- ⌘K SPOTLIGHT COMMAND PALETTE MODAL -->
+    <div x-show="showCmdPalette" x-cloak class="fixed inset-0 z-[10020] flex items-start justify-center pt-16 sm:pt-24 p-4" x-transition.opacity>
+        <div class="fixed inset-0 bg-slate-950/60 backdrop-blur-md" @click="showCmdPalette = false"></div>
+        
+        <div class="w-full max-w-xl bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-3xl rounded-[1.75rem] border border-slate-200/90 dark:border-white/10 shadow-[0_25px_70px_-15px_rgba(0,0,0,0.5)] overflow-hidden relative z-10">
+            <!-- Search Input -->
+            <div class="px-5 py-4 border-b border-slate-100 dark:border-white/10 flex items-center gap-3 bg-slate-50/50 dark:bg-black/20">
+                <i class="fa-solid fa-terminal text-brand text-sm animate-pulse"></i>
+                <input type="text" x-ref="cmdInput" x-model="cmdQuery" placeholder="Type a command or jump to module (e.g. 'switch', 'rma', 'audit', 'sonicwall')..." 
+                       class="w-full bg-transparent border-none outline-none text-xs sm:text-sm font-bold text-slate-800 dark:text-white placeholder-slate-400">
+                <kbd class="px-2 py-0.5 rounded bg-slate-200/70 dark:bg-white/10 text-[9px] font-mono font-black text-slate-500 dark:text-slate-400">ESC</kbd>
+            </div>
+
+            <!-- Command List -->
+            <div class="p-3 max-h-[60vh] overflow-y-auto custom-scroll space-y-1">
+                <template x-for="(cmd, idx) in filteredCommands" :key="idx">
+                    <button @click="executeCommand(cmd)" 
+                            class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-brand/10 dark:hover:bg-brand/20 group transition-all text-left">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-xs shadow-sm border border-slate-200/60 dark:border-white/10 bg-white dark:bg-slate-800 group-hover:scale-110 transition-transform" :class="cmd.color">
+                                <i class="fa-solid" :class="cmd.icon"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs font-black text-slate-800 dark:text-white group-hover:text-brand transition-colors" x-text="cmd.title"></div>
+                                <div class="text-[9.5px] font-bold text-slate-400" x-text="cmd.sub"></div>
+                            </div>
+                        </div>
+                        <span class="text-[8.5px] font-mono font-black uppercase tracking-widest px-2 py-1 rounded bg-slate-100 dark:bg-white/5 text-slate-400 group-hover:bg-brand group-hover:text-white transition-colors" x-text="cmd.tag"></span>
+                    </button>
+                </template>
+            </div>
+
+            <!-- Footer Shortcut Hint -->
+            <div class="px-5 py-2.5 bg-slate-50 dark:bg-black/40 border-t border-slate-100 dark:border-white/5 flex justify-between items-center text-[9.5px] font-mono text-slate-400">
+                <span>Pro Tip: Press <strong class="text-brand">CTRL + K</strong> anytime to open NOC Launcher</span>
+                <span x-text="currentLocation + ' Context'"></span>
+            </div>
+        </div>
+    </div>
+	
 </body>
 </html>
