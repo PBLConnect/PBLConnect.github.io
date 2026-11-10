@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>IT Department Hub - PBL Connect</title>
+    <script src="config.js"></script>
+    <link rel="icon" type="image/x-icon" href="assets/images/pbl-logo.png">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    },
+                    colors: {
+                        brand: '#2563eb',
+                        brand_glow: '#60a5fa',
+                        dark_surface: '#0f172a',
+                        dark_card: '#1e293b'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- FontAwesome & Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- Particles.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
+    <style>
+        /* Transparent body for parent iframe blending */
+        body {
+            background-color: transparent !important;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark .custom-scroll::-webkit-scrollbar-thumb { background: #334155; }
+
+        /* Floating Particles Canvas */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            pointer-events: none;
+            background: transparent !important;
+        }
+
+        /* Live status badge animations */
+        .duty-onduty {
+            background-color: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .duty-offduty {
+            background-color: rgba(148, 163, 184, 0.1);
+            color: #94a3b8;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+        }
+    </style>
+</head>
+
+<body onclick="if(event.target === this) closeModalWindow()" class="min-h-screen flex items-center justify-center p-2 sm:p-4 text-slate-800 dark:text-slate-100 antialiased select-none cursor-pointer relative">
+
+    <!-- 🌌 Floating Electric Blue Particles -->
+    <div id="particles-js"></div>
+
+    <!-- 🌟 MODAL CARD CONTAINER (EXACT IT TICKET STANDARD) -->
+    <div onclick="event.stopPropagation()" class="w-full max-w-5xl bg-white dark:bg-[#0c1322] rounded-[2rem] border border-slate-200/90 dark:border-white/10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)] dark:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)] overflow-hidden flex flex-col relative z-10 transition-all duration-300 cursor-default">
+        
+        <!-- 🔹 HEADER SECTION -->
+        <div class="px-5 sm:px-8 py-5 border-b border-slate-100 dark:border-white/10 flex items-center justify-between bg-gradient-to-r from-blue-50/70 via-white to-sky-50/40 dark:from-[#0f172a] dark:via-[#0c1322] dark:to-[#0f1c38] relative shrink-0">
+            
+            <!-- Left: Icon & Title -->
+            <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-blue-500 via-indigo-600 to-sky-500 text-white flex items-center justify-center text-xl shadow-[0_8px_16px_rgba(37,99,235,0.3)] shrink-0">
+                    <i class="fa-solid fa-server"></i>
+                </div>
+                <div class="flex flex-col">
+                    <div class="flex items-center gap-2">
+                        <h2 class="font-heading font-black text-xl sm:text-2xl tracking-tight text-slate-900 dark:text-white leading-none">
+                            IT Department <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-sky-500 dark:from-blue-400 dark:to-sky-300">Hub</span>
+                        </h2>
+                        <span class="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 uppercase">
+                            SYS OPS & SUPPORT
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
+                        Infrastructure health, on-duty engineers, troubleshooting steps & live IT broadcasts.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Right: Close Button -->
+            <button onclick="closeModalWindow()" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/20 dark:hover:text-rose-300 text-slate-400 flex items-center justify-center transition-all duration-200 active:scale-95 border border-slate-200/60 dark:border-slate-700 shrink-0" title="Close">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+        </div>
+
+        <!-- 🔹 QUICK TELEMETRY RIBBON -->
+        <div class="px-5 sm:px-8 py-3 bg-slate-50/70 dark:bg-slate-900/40 border-b border-slate-100 dark:border-white/5 grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 shrink-0 text-xs">
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse"></span>
+                <span class="text-slate-500 dark:text-slate-400 font-medium">NOC Monitoring:</span>
+                <span class="font-bold font-mono text-slate-800 dark:text-white">Active (24x7)</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></span>
+                <span class="text-slate-500 dark:text-slate-400 font-medium">Primary Desk:</span>
+                <span class="font-bold font-mono text-slate-800 dark:text-white">Noida HQ</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]"></span>
+                <span class="text-slate-500 dark:text-slate-400 font-medium">Ticketing SLA:</span>
+                <span class="font-bold font-mono text-indigo-600 dark:text-indigo-400">&lt; 15 Mins</span>
+            </div>
+            <div class="flex items-center gap-2 justify-end">
+                <span class="text-[10.5px] font-mono text-slate-500 dark:text-slate-400" id="live-ist-clock">
+                    <i class="fa-regular fa-clock text-blue-500 mr-1"></i> IST: --:--
+                </span>
+            </div>
+        </div>
+
+        <!-- 🔹 MAIN BODY CONTENT -->
+        <div class="p-5 sm:p-8 flex-1 overflow-y-auto max-h-[calc(88vh-140px)] custom-scroll">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                
+                <!-- 👈 LEFT SECTION (7 COLS): IT TEAM, DUTY TRACKER & FAQS -->
+                <div class="lg:col-span-7 flex flex-col gap-4">
+                    
+                    <!-- 1. IT LEADERSHIP CARD (Vikas Rawat) -->
+                    <div class="p-3.5 rounded-2xl bg-gradient-to-r from-blue-50/80 via-white to-indigo-50/50 dark:from-blue-950/30 dark:via-slate-800/60 dark:to-slate-900 border border-blue-200/80 dark:border-blue-500/30 shadow-sm flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-full border-2 border-blue-500 shadow-md overflow-hidden bg-slate-200 shrink-0">
+                                <img src="assets/images/vikas-rawat.jpg" alt="Vikas Rawat" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👨‍💻</text></svg>';">
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h4 class="font-heading font-black text-sm text-slate-800 dark:text-white leading-tight">Vikas Rawat</h4>
+                                    <span class="px-1.5 py-0.5 rounded text-[8px] font-mono font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">LEAD</span>
+                                </div>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Head of IT - All Locations</p>
+                            </div>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-full text-[9px] font-mono font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Available
+                        </span>
+                    </div>
+
+                    <!-- 2. ENGINEERS & REAL-TIME DUTY TRACKER -->
+                    <div class="flex flex-col gap-2.5">
+                        <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                            <i class="fa-solid fa-users-gear text-blue-500"></i> Active Service Hours & Duty Roster
+                        </span>
+
+                        <!-- Noida Roster -->
+                        <div class="p-3.5 rounded-2xl bg-white dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 flex flex-col gap-2.5">
+                            <div class="flex items-center justify-between text-xs pb-1.5 border-b border-slate-100 dark:border-slate-800">
+                                <span class="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5"><i class="fa-solid fa-building-columns text-slate-400"></i> Noida HQ</span>
+                                <span class="text-[10px] font-mono text-slate-400">08:00 AM - 09:30 PM</span>
+                            </div>
+
+                            <!-- Anil Singh -->
+                            <div class="flex items-center justify-between gap-3 text-xs">
+                                <div class="flex items-center gap-2.5 min-w-0">
+                                    <div class="w-8 h-8 rounded-full overflow-hidden border border-slate-300 dark:border-slate-700 shrink-0 bg-slate-100">
+                                        <img src="assets/images/anil-singh.jpg" alt="Anil Singh" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👨‍💻</text></svg>';">
+                                    </div>
+                                    <div class="flex flex-col min-w-0">
+                                        <h5 class="font-bold text-slate-800 dark:text-white truncate">Anil Singh</h5>
+                                        <span class="text-[10px] text-slate-400 truncate">Networking & Security</span>
+                                    </div>
+                                </div>
+                                <span class="duty-badge px-2 py-0.5 rounded-full text-[9px] font-mono font-bold uppercase transition" data-engineer-id="anil">Checking...</span>
+                            </div>
+
+                            <!-- Ashok Singh -->
+                            <div class="flex items-center justify-between gap-3 text-xs">
+                                <div class="flex items-center gap-2.5 min-w-0">
+                                    <div class="w-8 h-8 rounded-full overflow-hidden border border-slate-300 dark:border-slate-700 shrink-0 bg-slate-100">
+                                        <img src="assets/images/ashok-singh.jpg" alt="Ashok Singh" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👨‍💻</text></svg>';">
+                                    </div>
+                                    <div class="flex flex-col min-w-0">
+                                        <h5 class="font-bold text-slate-800 dark:text-white truncate">Ashok Singh</h5>
+                                        <span class="text-[10px] text-slate-400 truncate">Hardware & Peripherals</span>
+                                    </div>
+                                </div>
+                                <span class="duty-badge px-2 py-0.5 rounded-full text-[9px] font-mono font-bold uppercase transition" data-engineer-id="ashok">Checking...</span>
+                            </div>
+                        </div>
+
+                        <!-- Dehradun Roster -->
+                        <div class="p-3.5 rounded-2xl bg-white dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 flex flex-col gap-2.5">
+                            <div class="flex items-center justify-between text-xs pb-1.5 border-b border-slate-100 dark:border-slate-800">
+                                <span class="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5"><i class="fa-solid fa-mountain text-slate-400"></i> Dehradun Office</span>
+                                <span class="text-[10px] font-mono text-slate-400">09:30 AM - 05:30 PM</span>
+                            </div>
+
+                            <!-- Deependra Singh -->
+                            <div class="flex items-center justify-between gap-3 text-xs">
+                                <div class="flex items-center gap-2.5 min-w-0">
+                                    <div class="w-8 h-8 rounded-full overflow-hidden border border-slate-300 dark:border-slate-700 shrink-0 bg-slate-100">
+                                        <img src="assets/images/deependra-singh.jpg" alt="Deependra Singh" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👨‍💻</text></svg>';">
+                                    </div>
+                                    <div class="flex flex-col min-w-0">
+                                        <h5 class="font-bold text-slate-800 dark:text-white truncate">Deependra Singh</h5>
+                                        <span class="text-[10px] text-slate-400 truncate">Network & User Support</span>
+                                    </div>
+                                </div>
+                                <span class="duty-badge px-2 py-0.5 rounded-full text-[9px] font-mono font-bold uppercase transition" data-engineer-id="deependra">Checking...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. HOW TO GET HELP & FAQS -->
+                    <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 flex flex-col gap-2.5">
+                        <span class="text-[10px] font-mono font-bold uppercase text-slate-400 tracking-wider">Troubleshooting Protocol</span>
+                        <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                            <div class="p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700">
+                                <span class="font-mono font-bold text-blue-500 block mb-0.5">STEP 1</span>
+                                <span class="text-[10.5px] text-slate-600 dark:text-slate-300">Check Live System Status</span>
+                            </div>
+                            <div class="p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700">
+                                <span class="font-mono font-bold text-blue-500 block mb-0.5">STEP 2</span>
+                                <span class="text-[10.5px] text-slate-600 dark:text-slate-300">Submit IT Ticket</span>
+                            </div>
+                            <div class="p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/60 dark:border-slate-700">
+                                <span class="font-mono font-bold text-blue-500 block mb-0.5">STEP 3</span>
+                                <span class="text-[10.5px] text-slate-600 dark:text-slate-300">Emergency Direct Escalation</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- 👉 RIGHT SECTION (5 COLS): SYSTEM HEALTH, ANNOUNCEMENTS & ACTIONS -->
+                <div class="lg:col-span-5 flex flex-col gap-4">
+                    
+                    <!-- 📡 LIVE SYSTEM STATUS TELEMETRY -->
+                    <div class="p-5 rounded-3xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col gap-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-xs">
+                                    <i class="fa-solid fa-satellite-dish"></i>
+                                </div>
+                                <h3 class="font-heading font-black text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300">Live Infrastructure Status</h3>
+                            </div>
+                            <span class="text-[9px] font-mono text-emerald-500 font-bold flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> Real-time
+                            </span>
+                        </div>
+
+                        <!-- Status List -->
+                        <ul id="system-status-list" class="flex flex-col gap-2 pt-1 text-xs">
+                            <li class="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/70 dark:border-slate-700/60 flex items-center gap-2 text-slate-400">
+                                <i class="fa-solid fa-circle-notch fa-spin text-xs"></i> Loading system status...
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- 📢 IT ANNOUNCEMENTS & OUTAGE ALERTS -->
+                    <div class="p-5 rounded-3xl bg-white dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 flex flex-col gap-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-7 h-7 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center text-xs">
+                                    <i class="fa-solid fa-bullhorn"></i>
+                                </div>
+                                <h3 class="font-heading font-black text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300">IT Bulletins</h3>
+                            </div>
+                            <span class="text-[9px] font-mono text-slate-400">Broadcasts</span>
+                        </div>
+
+                        <div id="it-announcements-list" class="flex flex-col gap-2 max-h-48 overflow-y-auto custom-scroll pr-1 text-xs">
+                            <p class="text-slate-400 text-[11px]">Loading announcements...</p>
+                        </div>
+                    </div>
+
+                    <!-- 🎫 QUICK ACTION: RAISE TICKET SHORTCUT -->
+                    <div class="p-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md flex items-center justify-between">
+                        <div>
+                            <h5 class="font-bold text-xs leading-tight">Need tech support?</h5>
+                            <p class="text-[11px] text-blue-100">Raise a direct ticket to on-duty staff</p>
+                        </div>
+                        <button onclick="openItTicket()" class="px-3.5 py-1.5 rounded-xl bg-white text-blue-600 font-bold text-xs transition active:scale-95 shadow-sm">
+                            Open Ticket
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 🔹 SCRIPT LOGIC -->
+    <script>
+        // Sync theme with parent
+        function syncTheme() {
+            if (localStorage.getItem('theme') === 'dark' || 
+                (window.parent && window.parent.document && window.parent.document.documentElement.classList.contains('dark'))) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            syncTheme();
+
+            // 🌌 Initialize Floating Electric Blue Particles
+            if (window.particlesJS) {
+                particlesJS("particles-js", {
+                    "particles": {
+                        "number": { "value": 75, "density": { "enable": true, "value_area": 800 } },
+                        "color": { "value": "#3b82f6" },
+                        "shape": { "type": "circle" },
+                        "opacity": { "value": 0.45, "random": false },
+                        "size": { "value": 3, "random": true },
+                        "line_linked": { "enable": true, "distance": 140, "color": "#3b82f6", "opacity": 0.35, "width": 1 },
+                        "move": { "enable": true, "speed": 2.2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false }
+                    },
+                    "interactivity": {
+                        "detect_on": "window",
+                        "events": { "onhover": { "enable": true, "mode": "repulse" }, "onclick": { "enable": true, "mode": "push" }, "resize": true },
+                        "modes": { "repulse": { "distance": 120, "duration": 0.4 }, "push": { "particles_nb": 4 } }
+                    },
+                    "retina_detect": true
+                });
+            }
+
+            const updateSystemStatus = async () => {
+                const el = document.getElementById('system-status-list');
+                if (!el) return;
+                try {
+                    let response = await fetch('data/system-status.json?v=' + new Date().getTime());
+                    if (!response.ok) response = await fetch('/data/system-status.json?v=' + new Date().getTime());
+                    if (!response.ok) throw new Error('Network error');
+                    const data = await response.json();
+                    
+                    const templates = data.templates || {
+                        ok: { icon: "fa-solid fa-circle-check", cssClass: "text-emerald-500", message: "Operational" },
+                        warn: { icon: "fa-solid fa-triangle-exclamation", cssClass: "text-amber-500", message: "Degraded" },
+                        down: { icon: "fa-solid fa-circle-xmark", cssClass: "text-rose-500", message: "Offline" },
+                        default: { icon: "fa-solid fa-circle", cssClass: "text-slate-400", message: "Checking..." }
+                    };
+
+                    el.innerHTML = (data.systems || []).map(sys => {
+                        const t = templates[sys.status] || templates.default;
+                        const msg = sys.message || t.message;
+                        return `
+                            <li class="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/70 dark:border-slate-700/60 flex items-center justify-between text-xs">
+                                <div class="flex items-center gap-2">
+                                    <i class="${t.icon} ${t.cssClass} text-xs"></i>
+                                    <strong class="text-slate-800 dark:text-slate-200">${sys.name}</strong>
+                                </div>
+                                <span class="font-mono text-[10px] text-slate-400">${msg}</span>
+                            </li>`;
+                    }).join('');
+                } catch (e) {
+                    el.innerHTML = `
+                        <li class="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/70 dark:border-slate-700/60 flex items-center justify-between text-xs text-emerald-500">
+                            <span class="flex items-center gap-2"><i class="fa-solid fa-circle-check"></i> Core Infrastructure</span>
+                            <span class="font-mono text-[10px] text-slate-400">Operational</span>
+                        </li>`;
+                }
+            };
+
+            const updateAnnouncements = async () => {
+                const el = document.getElementById('it-announcements-list');
+                if (!el) return;
+                try {
+                    let response = await fetch('data/it-announcements.json?v=' + new Date().getTime());
+                    if (!response.ok) response = await fetch('/data/it-announcements.json?v=' + new Date().getTime());
+                    if (!response.ok) throw new Error('Network error');
+                    const data = await response.json();
+
+                    el.innerHTML = (data.announcements || []).map(item => {
+                        const dateStr = new Date(item.date).toLocaleDateString("en-GB", { day: 'numeric', month: 'short' });
+                        const isAlert = item.type === 'alert';
+                        return `
+                            <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700 flex flex-col gap-1">
+                                <div class="flex items-center justify-between">
+                                    <h5 class="font-bold text-slate-800 dark:text-white truncate">${item.title}</h5>
+                                    <span class="text-[9px] font-mono text-slate-400">${dateStr}</span>
+                                </div>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">${item.content}</p>
+                            </div>`;
+                    }).join('');
+                } catch (e) {
+                    el.innerHTML = `<p class="text-slate-400 text-[11px]">No active IT maintenance broadcasts.</p>`;
+                }
+            };
+
+            // Real-Time Duty Status Calculator (IST)
+            const updateDutyStatus = () => {
+                const shifts = {
+                    anil: { start: 8, end: 14.5 },
+                    ashok: { start: 14.51, end: 21.5 },
+                    deependra: { start: 9.5, end: 17.5 }
+                };
+
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('en-GB', { timeZone: 'Asia/Kolkata' });
+                const [h, m] = timeString.split(':').map(Number);
+                const cur = h + (m / 60);
+
+                const clockEl = document.getElementById('live-ist-clock');
+                if (clockEl) clockEl.innerHTML = `<i class="fa-regular fa-clock text-blue-500 mr-1"></i> IST: ${timeString.slice(0, 5)}`;
+
+                document.querySelectorAll('.duty-badge').forEach(badge => {
+                    const id = badge.dataset.engineerId;
+                    const shift = shifts[id];
+                    badge.classList.remove('duty-onduty', 'duty-offduty');
+
+                    if (shift && cur >= shift.start && cur <= shift.end) {
+                        badge.classList.add('duty-onduty');
+                        badge.textContent = 'ON DUTY';
+                    } else {
+                        badge.classList.add('duty-offduty');
+                        badge.textContent = 'OFF DUTY';
+                    }
+                });
+            };
+
+            updateSystemStatus();
+            updateAnnouncements();
+            updateDutyStatus();
+
+            setInterval(() => {
+                updateDutyStatus();
+            }, 30000);
+        });
+
+        function openItTicket() {
+            try {
+                if (window.parent && window.parent.Alpine) {
+                    const parentApp = window.parent.Alpine.$data(window.parent.document.querySelector('[x-data]'));
+                    if (parentApp && typeof parentApp.openApp === 'function') {
+                        parentApp.openApp('submit-ticket.html', 'Raise IT Ticket');
+                        return;
+                    }
+                }
+            } catch(e) {}
+            window.location.href = 'submit-ticket.html';
+        }
+
+        function closeModalWindow() {
+            try {
+                if (window.parent && window.parent.Alpine) {
+                    const parentApp = window.parent.Alpine.$data(window.parent.document.querySelector('[x-data]'));
+                    if (parentApp && typeof parentApp.closeApp === 'function') {
+                        parentApp.closeApp();
+                        return;
+                    }
+                }
+            } catch (e) {}
+            window.close();
+        }
+    </script>
+</body>
+</html>

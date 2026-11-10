@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PBL Leave Policy - PBL Connect</title>
+    <script src="config.js"></script>
+    <link rel="icon" type="image/x-icon" href="assets/images/pbl-logo.png">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    },
+                    colors: {
+                        brand: '#e11d48',
+                        brand_glow: '#fb7185',
+                        dark_surface: '#0f172a',
+                        dark_card: '#1e293b'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- FontAwesome & Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- Particles.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
+    <style>
+        /* Transparent body for iframe blending */
+        body {
+            background-color: transparent !important;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark .custom-scroll::-webkit-scrollbar-thumb { background: #334155; }
+
+        /* Floating Particles Canvas */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            pointer-events: none;
+            background: transparent !important;
+        }
+
+        /* Accordion Smooth Height Transition */
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .accordion-item.active .accordion-content {
+            max-height: 450px;
+        }
+        .accordion-item.active .arrow-icon {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+
+<body onclick="if(event.target === this) closeModalWindow()" class="min-h-screen flex items-center justify-center p-2 sm:p-4 text-slate-800 dark:text-slate-100 antialiased select-none cursor-pointer relative">
+
+    <!-- 🌌 Floating Particles Canvas -->
+    <div id="particles-js"></div>
+
+    <!-- 🌟 MODAL CONTAINER (MATCHES EXACT IT TICKET POPUP STYLE) -->
+    <div onclick="event.stopPropagation()" class="w-full max-w-5xl bg-white dark:bg-[#0c1322] rounded-[2rem] border border-slate-200/90 dark:border-white/10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)] dark:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)] overflow-hidden flex flex-col relative z-10 transition-all duration-300 cursor-default">
+        
+        <!-- 🔹 HEADER SECTION -->
+        <div class="px-5 sm:px-8 py-5 border-b border-slate-100 dark:border-white/10 flex items-center justify-between bg-gradient-to-r from-rose-50/70 via-white to-amber-50/40 dark:from-[#0f172a] dark:via-[#0c1322] dark:to-[#1a1325] relative shrink-0">
+            
+            <!-- Left: Icon & Title -->
+            <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-rose-500 via-pink-600 to-amber-500 text-white flex items-center justify-center text-xl shadow-[0_8px_16px_rgba(225,29,72,0.3)] shrink-0">
+                    <i class="fa-solid fa-file-contract"></i>
+                </div>
+                <div class="flex flex-col">
+                    <div class="flex items-center gap-2">
+                        <h2 class="font-heading font-black text-xl sm:text-2xl tracking-tight text-slate-900 dark:text-white leading-none">
+                            PBL Leave Policy <span class="text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-amber-500 dark:from-rose-400 dark:to-amber-300">Guidelines</span>
+                        </h2>
+                        <span class="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800 uppercase">
+                            OFFICIAL SOP
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
+                        Leave entitlements, carry-over limits, emergency protocols, and instant balance checker.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Right: Close Button -->
+            <button onclick="closeModalWindow()" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/20 dark:hover:text-rose-300 text-slate-400 flex items-center justify-center transition-all duration-200 active:scale-95 border border-slate-200/60 dark:border-slate-700 shrink-0" title="Close">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+        </div>
+
+        <!-- 🔹 QUICK POLICY PILL RIBBON -->
+        <div class="px-5 sm:px-8 py-3 bg-slate-50/70 dark:bg-slate-900/40 border-b border-slate-100 dark:border-white/5 grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 shrink-0 text-xs">
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+                <span class="text-slate-500 dark:text-slate-400 font-medium">Casual Leave (CL):</span>
+                <span class="font-bold font-mono text-slate-800 dark:text-white">7 Days/Yr</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]"></span>
+                <span class="text-slate-500 dark:text-slate-400 font-medium">Sick Leave (SL):</span>
+                <span class="font-bold font-mono text-slate-800 dark:text-white">7 Days/Yr</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"></span>
+                <span class="text-slate-500 dark:text-slate-400 font-medium">Paid Leave (PL):</span>
+                <span class="font-bold font-mono text-slate-800 dark:text-white">18 Days/Yr</span>
+            </div>
+            <div class="flex items-center gap-2 justify-end">
+                <span class="text-[10.5px] font-mono text-slate-500 dark:text-slate-400">
+                    <i class="fa-solid fa-shield-halved text-rose-500 mr-1"></i> Max PL Cap: <strong>45 Days</strong>
+                </span>
+            </div>
+        </div>
+
+        <!-- 🔹 MAIN BODY CONTENT -->
+        <div class="p-5 sm:p-8 flex-1 overflow-y-auto max-h-[calc(88vh-140px)] custom-scroll">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                
+                <!-- 👈 LEFT SECTION (7 COLS): INTERACTIVE POLICY ACCORDION -->
+                <div class="lg:col-span-7 flex flex-col gap-3">
+                    
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
+                            <i class="fa-solid fa-book-open-reader text-rose-500"></i> Policy Clauses & FAQs
+                        </span>
+                        <span class="text-[10px] font-mono text-slate-400">Click to expand</span>
+                    </div>
+
+                    <div class="flex flex-col gap-2.5" id="policy-accordion">
+                        
+                        <!-- Item 1 -->
+                        <div class="accordion-item active rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800/40 overflow-hidden transition-all duration-200">
+                            <button type="button" class="accordion-header w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-800/70 transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400 flex items-center justify-center text-sm shrink-0">
+                                        <i class="fa-solid fa-umbrella-beach"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-xs sm:text-sm text-slate-800 dark:text-white leading-tight">Types of Leaves & Quotas</h4>
+                                        <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">CL, SL, and PL entitlements per calendar year</p>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-chevron-down arrow-icon text-xs text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="accordion-content">
+                                <div class="p-4 pt-1 border-t border-slate-100 dark:border-slate-800/80 text-xs text-slate-600 dark:text-slate-300 leading-relaxed space-y-2">
+                                    <p>Every confirmed employee is entitled to the following leaves per calendar year (Apr 1st to Mar 31st):</p>
+                                    <ul class="space-y-1.5 pl-2 text-[11.5px]">
+                                        <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-emerald-500 mt-1 text-[10px]"></i> <span><strong>Casual Leave (CL):</strong> 7 Days for unforeseen personal reasons or short, planned breaks.</span></li>
+                                        <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-emerald-500 mt-1 text-[10px]"></i> <span><strong>Sick Leave (SL):</strong> 7 Days for personal illness. Medical certificate required for 3+ consecutive days.</span></li>
+                                        <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-emerald-500 mt-1 text-[10px]"></i> <span><strong>Paid Leave (PL):</strong> 18 Days for planned vacations. Credited at 1.5 days per completed month.</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Item 2 -->
+                        <div class="accordion-item rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800/40 overflow-hidden transition-all duration-200">
+                            <button type="button" class="accordion-header w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-800/70 transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400 flex items-center justify-center text-sm shrink-0">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-xs sm:text-sm text-slate-800 dark:text-white leading-tight">Notice Periods & Application Flow</h4>
+                                        <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Prior intimations and manager approval workflow</p>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-chevron-down arrow-icon text-xs text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="accordion-content">
+                                <div class="p-4 pt-1 border-t border-slate-100 dark:border-slate-800/80 text-xs text-slate-600 dark:text-slate-300 leading-relaxed space-y-2">
+                                    <ul class="space-y-1.5 pl-2 text-[11.5px]">
+                                        <li class="flex items-start gap-2"><i class="fa-solid fa-arrow-right text-blue-500 mt-1 text-[10px]"></i> <span><strong>Short Breaks (1-3 Days):</strong> Submit intranet leave form at least <strong>3 working days</strong> in advance.</span></li>
+                                        <li class="flex items-start gap-2"><i class="fa-solid fa-arrow-right text-blue-500 mt-1 text-[10px]"></i> <span><strong>Long Vacations (> 3 Days):</strong> Formal notice of <strong>15 days</strong> is mandatory for resource alignment.</span></li>
+                                        <li class="flex items-start gap-2"><i class="fa-solid fa-arrow-right text-blue-500 mt-1 text-[10px]"></i> <span><strong>Sick Leave Notice:</strong> Inform reporting manager & HR via call/email on Day 1 before 10:00 AM.</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Item 3 -->
+                        <div class="accordion-item rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800/40 overflow-hidden transition-all duration-200">
+                            <button type="button" class="accordion-header w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-800/70 transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400 flex items-center justify-center text-sm shrink-0">
+                                        <i class="fa-solid fa-person-breastfeeding"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-xs sm:text-sm text-slate-800 dark:text-white leading-tight">Special Leaves (Maternity, Paternity & LWP)</h4>
+                                        <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Statutory benefits and exceptional absences</p>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-chevron-down arrow-icon text-xs text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="accordion-content">
+                                <div class="p-4 pt-1 border-t border-slate-100 dark:border-slate-800/80 text-xs text-slate-600 dark:text-slate-300 leading-relaxed space-y-2">
+                                    <ul class="space-y-1.5 pl-2 text-[11.5px]">
+                                        <li class="flex items-start gap-2"><i class="fa-solid fa-heart text-purple-500 mt-1 text-[10px]"></i> <span><strong>Maternity Benefit:</strong> 26 weeks paid leave for female colleagues as per statutory regulations.</span></li>
+                                        <li class="flex items-start gap-2"><i class="fa-solid fa-heart text-purple-500 mt-1 text-[10px]"></i> <span><strong>Paternity Leave:</strong> 5 days paid leave for confirmed male staff within 1 month of delivery.</span></li>
+                                        <li class="flex items-start gap-2"><i class="fa-solid fa-triangle-exclamation text-amber-500 mt-1 text-[10px]"></i> <span><strong>Leave Without Pay (LWP):</strong> Subject to management approval only after all balances lapse.</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Item 4 -->
+                        <div class="accordion-item rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800/40 overflow-hidden transition-all duration-200">
+                            <button type="button" class="accordion-header w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-800/70 transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400 flex items-center justify-center text-sm shrink-0">
+                                        <i class="fa-solid fa-coins"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-xs sm:text-sm text-slate-800 dark:text-white leading-tight">Encashment & Year-End Rollover</h4>
+                                        <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Rules for accumulated leaves and lapsing</p>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-chevron-down arrow-icon text-xs text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="accordion-content">
+                                <div class="p-4 pt-1 border-t border-slate-100 dark:border-slate-800/80 text-xs text-slate-600 dark:text-slate-300 leading-relaxed space-y-2">
+                                    <ul class="space-y-1.5 pl-2 text-[11.5px]">
+                                        <li class="flex items-start gap-2"><i class="fa-solid fa-xmark text-rose-500 mt-1 text-[10px]"></i> <span><strong>CL & SL Lapsing:</strong> Unused Casual & Sick leaves lapse on 31st March (no carry forward or cash-out).</span></li>
+                                        <li class="flex items-start gap-2"><i class="fa-solid fa-piggy-bank text-amber-500 mt-1 text-[10px]"></i> <span><strong>PL Carryover:</strong> A maximum cap of <strong>45 PL days</strong> can roll over into next financial year.</span></li>
+                                        <li class="flex items-start gap-2"><i class="fa-solid fa-money-bill-wave text-emerald-500 mt-1 text-[10px]"></i> <span><strong>PL Cashout:</strong> Leaves accumulating beyond 45 days are encashed as per payroll formula.</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 👉 RIGHT SECTION (5 COLS): LIVE LEAVE BALANCE CHECKER -->
+                <div class="lg:col-span-5 flex flex-col gap-4">
+                    
+                    <!-- 💳 INTERACTIVE PF BALANCE CHECKER -->
+                    <div class="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-slate-900 to-slate-800 text-white shadow-xl border border-slate-700/80 relative overflow-hidden flex flex-col justify-between min-h-[260px]">
+                        
+                        <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-rose-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-7 h-7 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center text-xs">
+                                        <i class="fa-solid fa-id-card-clip"></i>
+                                    </div>
+                                    <h3 class="font-heading font-black text-xs uppercase tracking-wider text-rose-400">Balance Telemetry</h3>
+                                </div>
+                                <span class="text-[9px] font-mono text-slate-400">Live DB Lookup</span>
+                            </div>
+
+                            <!-- Input Form State -->
+                            <div id="checker-form-box">
+                                <p class="text-xs text-slate-300 font-medium mb-3 leading-relaxed">Enter your registered PF Code to retrieve your remaining leave balance.</p>
+                                <form id="leave-balance-form" class="flex flex-col gap-2.5">
+                                    <div class="relative">
+                                        <i class="fa-solid fa-key absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                                        <input type="text" id="pf-code-input" placeholder="e.g. DL/25629/143" required class="w-full pl-9 pr-3 py-2.5 text-xs rounded-xl bg-slate-800/80 border border-slate-700 text-white font-mono placeholder-slate-500 focus:outline-none focus:border-rose-500 transition-colors">
+                                    </div>
+                                    <button type="submit" id="check-balance-btn" class="w-full py-2.5 px-4 rounded-xl text-white font-bold text-xs uppercase tracking-wider bg-rose-600 hover:bg-rose-700 transition active:scale-95 shadow-md flex items-center justify-center gap-2">
+                                        <i class="fa-solid fa-magnifying-glass text-[11px]"></i>
+                                        <span>Check Balance</span>
+                                    </button>
+                                </form>
+                            </div>
+
+                            <!-- Result Display State -->
+                            <div id="checker-result-box" class="hidden flex flex-col pt-1">
+                                <div class="flex items-center justify-between border-b border-slate-700/80 pb-2 mb-3">
+                                    <div>
+                                        <h4 class="font-bold text-sm text-white truncate" id="res-emp-name">--</h4>
+                                        <span class="text-[9px] font-mono text-slate-400" id="res-pf-code">--</span>
+                                    </div>
+                                    <button onclick="resetBalanceChecker()" class="text-[10px] text-rose-400 hover:text-rose-300 font-bold underline">Re-check</button>
+                                </div>
+
+                                <!-- Balance Numbers Grid -->
+                                <div class="grid grid-cols-3 gap-2 text-center my-1">
+                                    <div class="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700">
+                                        <span class="font-mono font-black text-xl text-emerald-400 block leading-tight" id="res-cl">0</span>
+                                        <span class="text-[8.5px] uppercase font-bold text-slate-400 tracking-wider">Casual</span>
+                                    </div>
+                                    <div class="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700">
+                                        <span class="font-mono font-black text-xl text-rose-400 block leading-tight" id="res-sl">0</span>
+                                        <span class="text-[8.5px] uppercase font-bold text-slate-400 tracking-wider">Sick</span>
+                                    </div>
+                                    <div class="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700">
+                                        <span class="font-mono font-black text-xl text-amber-400 block leading-tight" id="res-pl">0</span>
+                                        <span class="text-[8.5px] uppercase font-bold text-slate-400 tracking-wider">Paid (PL)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer Pill -->
+                        <div class="text-[9.5px] text-slate-400 border-t border-slate-700/60 pt-2.5 mt-3 flex items-center justify-between">
+                            <span>Status: Verified</span>
+                            <span class="font-mono text-emerald-400"><i class="fa-solid fa-circle text-[6px] mr-1"></i>Active Server</span>
+                        </div>
+                    </div>
+
+                    <!-- 🚀 QUICK ACTION SHORTCUT -->
+                    <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
+                        <div class="flex items-center gap-3 text-xs">
+                            <div class="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-500 flex items-center justify-center text-sm">
+                                <i class="fa-solid fa-plane-departure"></i>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-slate-800 dark:text-white leading-tight">Need time off?</h5>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400">Launch the official leave hub</p>
+                            </div>
+                        </div>
+                        <button onclick="openApplyLeave()" class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[11px] transition shadow-sm active:scale-95">
+                            Apply Now
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 🔹 SCRIPT LOGIC -->
+    <script>
+        // SCRIPT_URL ab config.js se auto-load hoga
+
+        // Sync theme with parent
+        function syncTheme() {
+            if (localStorage.getItem('theme') === 'dark' || 
+                (window.parent && window.parent.document && window.parent.document.documentElement.classList.contains('dark'))) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            syncTheme();
+
+            // 🌌 Initialize Particles (Rose Pink Glow)
+            if (window.particlesJS) {
+                particlesJS("particles-js", {
+                    "particles": {
+                        "number": { "value": 75, "density": { "enable": true, "value_area": 800 } },
+                        "color": { "value": "#f43f5e" },
+                        "shape": { "type": "circle" },
+                        "opacity": { "value": 0.45, "random": false },
+                        "size": { "value": 3, "random": true },
+                        "line_linked": { "enable": true, "distance": 140, "color": "#f43f5e", "opacity": 0.3, "width": 1 },
+                        "move": { "enable": true, "speed": 2.2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false }
+                    },
+                    "interactivity": {
+                        "detect_on": "window",
+                        "events": { "onhover": { "enable": true, "mode": "repulse" }, "onclick": { "enable": true, "mode": "push" }, "resize": true },
+                        "modes": { "repulse": { "distance": 120, "duration": 0.4 }, "push": { "particles_nb": 4 } }
+                    },
+                    "retina_detect": true
+                });
+            }
+
+            setupAccordion();
+            setupLeaveBalanceChecker();
+        });
+
+        // Accordion Mechanism
+        function setupAccordion() {
+            const items = document.querySelectorAll('.accordion-item');
+            items.forEach(item => {
+                const header = item.querySelector('.accordion-header');
+                header.addEventListener('click', () => {
+                    const isActive = item.classList.contains('active');
+                    items.forEach(other => other.classList.remove('active'));
+                    if (!isActive) item.classList.add('active');
+                });
+            });
+        }
+
+        // Live Balance Checker
+        function setupLeaveBalanceChecker() {
+            const form = document.getElementById('leave-balance-form');
+            const checkBtn = document.getElementById('check-balance-btn');
+            const pfInput = document.getElementById('pf-code-input');
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const pfCode = pfInput.value.trim();
+                if (!pfCode) return;
+
+                checkBtn.disabled = true;
+                checkBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Checking...</span>';
+
+                try {
+                    const response = await fetch(`${SCRIPT_URL}?pfcode=${encodeURIComponent(pfCode)}`);
+                    const result = await response.json();
+
+                    document.getElementById('checker-form-box').classList.add('hidden');
+                    document.getElementById('checker-result-box').classList.remove('hidden');
+
+                    if (result.success) {
+                        const d = result.data;
+                        document.getElementById('res-emp-name').textContent = d.Employee_Name;
+                        document.getElementById('res-pf-code').textContent = `PF: ${d.PF_Code}`;
+                        animateNumber('res-cl', d.CL_Remaining);
+                        animateNumber('res-sl', d.SL_Remaining);
+                        animateNumber('res-pl', d.PL_Remaining);
+                    } else {
+                        document.getElementById('res-emp-name').textContent = 'Not Found';
+                        document.getElementById('res-pf-code').textContent = result.error || 'Invalid PF Code';
+                        document.getElementById('res-cl').textContent = '0';
+                        document.getElementById('res-sl').textContent = '0';
+                        document.getElementById('res-pl').textContent = '0';
+                    }
+                } catch (err) {
+                    document.getElementById('checker-form-box').classList.add('hidden');
+                    document.getElementById('checker-result-box').classList.remove('hidden');
+                    document.getElementById('res-emp-name').textContent = 'Connection Error';
+                    document.getElementById('res-pf-code').textContent = 'Could not reach server';
+                } finally {
+                    checkBtn.disabled = false;
+                    checkBtn.innerHTML = '<i class="fa-solid fa-magnifying-glass text-[11px]"></i> <span>Check Balance</span>';
+                }
+            });
+        }
+
+        function resetBalanceChecker() {
+            document.getElementById('checker-result-box').classList.add('hidden');
+            document.getElementById('checker-form-box').classList.remove('hidden');
+            document.getElementById('pf-code-input').value = '';
+            document.getElementById('pf-code-input').focus();
+        }
+
+        function animateNumber(id, endVal) {
+            const el = document.getElementById(id);
+            const target = parseInt(endVal, 10) || 0;
+            let current = 0;
+            const step = Math.max(1, Math.floor(target / 10));
+            const timer = setInterval(() => {
+                current += step;
+                if (current >= target) {
+                    el.textContent = target;
+                    clearInterval(timer);
+                } else {
+                    el.textContent = current;
+                }
+            }, 30);
+        }
+
+        // Open Apply Leave Form inside Intranet
+        function openApplyLeave() {
+            try {
+                if (window.parent && window.parent.Alpine) {
+                    const parentApp = window.parent.Alpine.$data(window.parent.document.querySelector('[x-data]'));
+                    if (parentApp && typeof parentApp.openApp === 'function') {
+                        parentApp.openApp('apply-leave.html', 'Apply for Leave');
+                        return;
+                    }
+                }
+            } catch(e) {}
+            window.location.href = 'apply-leave.html';
+        }
+
+        // Close Modal Window Handshake
+        function closeModalWindow() {
+            try {
+                if (window.parent && window.parent.Alpine) {
+                    const parentApp = window.parent.Alpine.$data(window.parent.document.querySelector('[x-data]'));
+                    if (parentApp && typeof parentApp.closeApp === 'function') {
+                        parentApp.closeApp();
+                        return;
+                    }
+                }
+            } catch (e) {}
+            window.close();
+        }
+    </script>
+</body>
+</html>

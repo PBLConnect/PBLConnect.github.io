@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Production Hub - PBL Connect</title>
+    <script src="config.js"></script>
+    <link rel="icon" type="image/x-icon" href="assets/images/pbl-logo.png">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    },
+                    colors: {
+                        brand: '#4f46e5',
+                        brand_glow: '#818cf8',
+                        dark_surface: '#0f172a',
+                        dark_card: '#1e293b'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- FontAwesome & Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- Canvas Confetti & Particles.js -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
+    <style>
+        /* Transparent body for iframe blending */
+        body {
+            background-color: transparent !important;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark .custom-scroll::-webkit-scrollbar-thumb { background: #334155; }
+
+        /* Floating Particles Canvas */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            pointer-events: none;
+            background: transparent !important;
+        }
+
+        /* Leaderboard rank glowing badges */
+        .rank-gold { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); color: #fff; }
+        .rank-silver { background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%); color: #fff; }
+        .rank-bronze { background: linear-gradient(135deg, #fb923c 0%, #c2410c 100%); color: #fff; }
+    </style>
+</head>
+
+<body onclick="if(event.target === this) closeModalWindow()" class="min-h-screen flex items-center justify-center p-2 sm:p-4 text-slate-800 dark:text-slate-100 antialiased select-none cursor-pointer relative">
+
+    <!-- 🌌 Floating Indigo Particles -->
+    <div id="particles-js"></div>
+
+    <!-- 🌟 MODAL CARD CONTAINER (EXACT IT TICKET STANDARD) -->
+    <div onclick="event.stopPropagation()" class="w-full max-w-5xl bg-white dark:bg-[#0c1322] rounded-[2rem] border border-slate-200/90 dark:border-white/10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)] dark:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)] overflow-hidden flex flex-col relative z-10 transition-all duration-300 cursor-default">
+        
+        <!-- 🔹 HEADER SECTION -->
+        <div class="px-5 sm:px-8 py-5 border-b border-slate-100 dark:border-white/10 flex items-center justify-between bg-gradient-to-r from-indigo-50/70 via-white to-blue-50/40 dark:from-[#0f172a] dark:via-[#0c1322] dark:to-[#171b38] relative shrink-0">
+            
+            <!-- Left: Icon & Title -->
+            <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-indigo-500 via-blue-600 to-purple-600 text-white flex items-center justify-center text-xl shadow-[0_8px_16px_rgba(99,102,241,0.35)] shrink-0">
+                    <i class="fa-solid fa-industry"></i>
+                </div>
+                <div class="flex flex-col">
+                    <div class="flex items-center gap-2">
+                        <h2 class="font-heading font-black text-xl sm:text-2xl tracking-tight text-slate-900 dark:text-white leading-none">
+                            Production Hub <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-500 dark:from-indigo-400 dark:to-blue-300">Mission Control</span>
+                        </h2>
+                        <span class="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 uppercase">
+                            OPERATIONS
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
+                        Workflow directives, quality SOPs, live team metrics, and top performer rankings.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Right: Close Button -->
+            <button onclick="closeModalWindow()" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/20 dark:hover:text-rose-300 text-slate-400 flex items-center justify-center transition-all duration-200 active:scale-95 border border-slate-200/60 dark:border-slate-700 shrink-0" title="Close">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+        </div>
+
+        <!-- 🔹 QUICK TELEMETRY RIBBON -->
+        <div class="px-5 sm:px-8 py-3 bg-slate-50/70 dark:bg-slate-900/40 border-b border-slate-100 dark:border-white/5 grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 shrink-0 text-xs">
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+                <span class="text-slate-500 dark:text-slate-400 font-medium">Reporting Day:</span>
+                <span class="font-bold font-mono text-slate-800 dark:text-white" id="ribbon-date">Loading...</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]"></span>
+                <span class="text-slate-500 dark:text-slate-400 font-medium">Output Volume:</span>
+                <span class="font-bold font-mono text-slate-800 dark:text-white" id="ribbon-records">-- Recs</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-sky-500 shadow-[0_0_8px_rgba(14,165,233,0.5)]"></span>
+                <span class="text-slate-500 dark:text-slate-400 font-medium">Team RPH:</span>
+                <span class="font-bold font-mono text-indigo-600 dark:text-indigo-400" id="ribbon-rph">-- RPH</span>
+            </div>
+            <div class="flex items-center gap-2 justify-end">
+                <span class="text-[10.5px] font-mono text-slate-500 dark:text-slate-400">
+                    <i class="fa-solid fa-satellite-dish text-emerald-500 mr-1"></i> Live DB Sync
+                </span>
+            </div>
+        </div>
+
+        <!-- 🔹 MAIN BODY CONTENT -->
+        <div class="p-5 sm:p-8 flex-1 overflow-y-auto max-h-[calc(88vh-140px)] custom-scroll">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                
+                <!-- 👈 LEFT SECTION (7 COLS): ANNOUNCEMENTS, PROJECT FOCUS & SOP LIBRARY -->
+                <div class="lg:col-span-7 flex flex-col gap-4">
+                    
+                    <!-- 1. PRODUCTION ANNOUNCEMENTS -->
+                    <div class="p-4 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/20 border border-indigo-200/80 dark:border-indigo-900/40 flex flex-col gap-2">
+                        <div class="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
+                            <i class="fa-solid fa-bullhorn text-xs"></i>
+                            <h4 class="font-heading font-black text-xs uppercase tracking-wider">Production Announcements</h4>
+                        </div>
+                        <div id="production-announcements" class="flex flex-col gap-1.5 text-xs text-slate-700 dark:text-slate-300">
+                            <div class="flex items-center gap-2 text-slate-400"><i class="fa-solid fa-circle-notch fa-spin text-xs"></i> Fetching announcements...</div>
+                        </div>
+                    </div>
+
+                    <!-- 2. TODAY'S PROJECT FOCUS -->
+                    <div class="flex flex-col gap-2">
+                        <div class="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+                            <i class="fa-solid fa-crosshairs text-xs text-rose-500"></i>
+                            <h4 class="font-heading font-black text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300">Priority Project Directives</h4>
+                        </div>
+                        <div id="project-focus-area" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-800 text-xs text-slate-400">
+                                Loading focus items...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. SOP & GUIDELINES REPOSITORY -->
+                    <div class="flex flex-col gap-3 pt-1">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-book-bookmark text-xs text-indigo-500"></i>
+                                <h4 class="font-heading font-black text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300">SOP & Guidelines Repository</h4>
+                            </div>
+                            <span class="text-[9px] font-mono text-slate-400">Quality Verified</span>
+                        </div>
+
+                        <!-- Search and Filter Bar -->
+                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                            <div class="relative flex-1">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                                <input type="text" id="sop-search-input" placeholder="Search guidelines..." class="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-indigo-500 text-slate-800 dark:text-slate-200 font-medium">
+                            </div>
+                            <!-- Dynamic Filter Pills -->
+                            <div id="sop-filters" class="flex items-center gap-1 overflow-x-auto custom-scroll pb-1 shrink-0">
+                                <button class="filter-btn px-2.5 py-1 rounded-lg text-[10.5px] font-bold bg-indigo-600 text-white shadow-sm transition-all" data-category="all">All</button>
+                            </div>
+                        </div>
+
+                        <!-- Documents List -->
+                        <div id="sop-library-content" class="flex flex-col gap-2 max-h-[300px] overflow-y-auto custom-scroll pr-1">
+                            <div class="text-center py-6 text-slate-400 text-xs"><i class="fa-solid fa-circle-notch fa-spin text-sm mb-1"></i><br>Loading documents...</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- 👉 RIGHT SECTION (5 COLS): METRICS SNAPSHOT & LEADERBOARD -->
+                <div class="lg:col-span-5 flex flex-col gap-4">
+                    
+                    <!-- 📊 PERFORMANCE SNAPSHOT GAUGE CARD -->
+                    <div class="p-5 rounded-3xl bg-gradient-to-br from-indigo-900 to-slate-900 text-white shadow-xl border border-indigo-700/60 relative overflow-hidden flex flex-col justify-between">
+                        <div class="flex items-center justify-between mb-3 relative z-10">
+                            <div class="flex items-center gap-2">
+                                <div class="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs">
+                                    <i class="fa-solid fa-chart-line"></i>
+                                </div>
+                                <h3 class="font-heading font-black text-xs uppercase tracking-wider text-indigo-300">Performance Snapshot</h3>
+                            </div>
+                            <span class="text-[9px] font-mono px-2 py-0.5 rounded-full bg-white/10 text-white/80" id="snapshot-date">--</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3 text-center my-1 relative z-10">
+                            <div class="p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
+                                <span class="font-mono font-black text-2xl sm:text-3xl text-emerald-400 block leading-tight" id="today-records-total">0</span>
+                                <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider">Total Records</span>
+                            </div>
+                            <div class="p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
+                                <span class="font-mono font-black text-2xl sm:text-3xl text-sky-400 block leading-tight" id="today-team-rph">0.0</span>
+                                <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider">Team RPH</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 🏆 TOP PERFORMERS LEADERBOARD -->
+                    <div class="p-5 rounded-3xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col gap-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-7 h-7 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center text-xs">
+                                    <i class="fa-solid fa-trophy"></i>
+                                </div>
+                                <h3 class="font-heading font-black text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300">Daily Champions</h3>
+                            </div>
+                            <span class="text-[10px] font-mono text-slate-400" id="performers-date-badge">--</span>
+                        </div>
+
+                        <!-- Top 3 List (Clickable Confetti) -->
+                        <div id="top-performers-list" class="flex flex-col gap-2">
+                            <div class="p-3 text-center text-slate-400 text-xs"><i class="fa-solid fa-circle-notch fa-spin text-sm mb-1"></i><br>Calculating rankings...</div>
+                        </div>
+                    </div>
+
+                    <!-- ⚡ ONE-CLICK ACCESS LAUNCHPAD -->
+                    <div class="p-4 rounded-2xl bg-white dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 flex flex-col gap-2">
+                        <span class="text-[10px] font-mono font-bold uppercase text-slate-400 tracking-wider mb-0.5">Quick Tools</span>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <a href="https://ede.dp-ds.de/vpn/index.html" target="_blank" class="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-slate-200/60 dark:border-slate-700 flex items-center gap-2 text-slate-700 dark:text-slate-200 transition font-medium">
+                                <i class="fa-solid fa-desktop text-sky-500 text-[11px]"></i> <span>Citrix VPN</span>
+                            </a>
+                            <a href="output-form.html" target="_blank" class="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-slate-200/60 dark:border-slate-700 flex items-center gap-2 text-slate-700 dark:text-slate-200 transition font-medium">
+                                <i class="fa-solid fa-pen-to-square text-emerald-500 text-[11px]"></i> <span>Daily Output</span>
+                            </a>
+                            <a href="leader-dashboard.html" target="_blank" class="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-slate-200/60 dark:border-slate-700 flex items-center gap-2 text-slate-700 dark:text-slate-200 transition font-medium">
+                                <i class="fa-solid fa-chart-pie text-purple-500 text-[11px]"></i> <span>Team Output</span>
+                            </a>
+                            <button onclick="openItTicket()" class="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-slate-200/60 dark:border-slate-700 flex items-center gap-2 text-slate-700 dark:text-slate-200 transition font-medium text-left">
+                                <i class="fa-solid fa-bug text-rose-500 text-[11px]"></i> <span>Report Bug</span>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 🔹 SCRIPT LOGIC -->
+    <script>
+        // SCRIPT_URL ab config.js se auto-load hoga
+
+        // Sync theme with parent
+        function syncTheme() {
+            if (localStorage.getItem('theme') === 'dark' || 
+                (window.parent && window.parent.document && window.parent.document.documentElement.classList.contains('dark'))) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            syncTheme();
+
+            // 🌌 Initialize Floating Indigo Constellation Particles
+            if (window.particlesJS) {
+                particlesJS("particles-js", {
+                    "particles": {
+                        "number": { "value": 75, "density": { "enable": true, "value_area": 800 } },
+                        "color": { "value": "#6366f1" },
+                        "shape": { "type": "circle" },
+                        "opacity": { "value": 0.45, "random": false },
+                        "size": { "value": 3, "random": true },
+                        "line_linked": { "enable": true, "distance": 140, "color": "#6366f1", "opacity": 0.35, "width": 1 },
+                        "move": { "enable": true, "speed": 2.2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false }
+                    },
+                    "interactivity": {
+                        "detect_on": "window",
+                        "events": { "onhover": { "enable": true, "mode": "repulse" }, "onclick": { "enable": true, "mode": "push" }, "resize": true },
+                        "modes": { "repulse": { "distance": 120, "duration": 0.4 }, "push": { "particles_nb": 4 } }
+                    },
+                    "retina_detect": true
+                });
+            }
+
+            loadProductionData();
+            loadAnnouncementsAndFocus();
+            loadSopLibrary();
+            setupEasterEgg();
+
+            // Auto-refresh data every 2 mins
+            setInterval(loadProductionData, 120000);
+        });
+
+        // Helper: Calculate last working day (Mon-Sat)
+        function getLastWorkingDay() {
+            const today = new Date();
+            const dayOfWeek = today.getDay(); 
+            const lastWorkingDay = new Date(today);
+
+            if (dayOfWeek === 1) { 
+                lastWorkingDay.setDate(today.getDate() - 3); 
+            } else if (dayOfWeek === 0) { 
+                lastWorkingDay.setDate(today.getDate() - 1);
+            } else { 
+                lastWorkingDay.setDate(today.getDate() - 1);
+            }
+            return lastWorkingDay;
+        }
+
+        function parseHours(timeStr) {
+            if (!timeStr) return 0;
+            const t = String(timeStr);
+            const h = t.match(/(\d+)\s*hr/);
+            const m = t.match(/(\d+)\s*min/);
+            return (h ? parseInt(h[1], 10) : 0) + (m ? parseInt(m[1], 10) / 60 : 0);
+        }
+
+        function formatHours(decimalHours) {
+            if (isNaN(decimalHours) || decimalHours < 0) return '0 min';
+            const hours = Math.floor(decimalHours);
+            const minutes = Math.round((decimalHours - hours) * 60);
+            if (hours === 0) return `${minutes} min`;
+            if (minutes === 0) return `${hours} hr`;
+            return `${hours} hr ${minutes} min`;
+        }
+
+        // Live Production Performance Fetcher
+        async function loadProductionData() {
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getOutputs`);
+                if (!response.ok) throw new Error('Network error');
+                const data = await response.json();
+
+                const targetDate = getLastWorkingDay();
+                const targetDateString = targetDate.toDateString();
+                const formattedDate = targetDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+                
+                document.getElementById('ribbon-date').textContent = formattedDate;
+                document.getElementById('snapshot-date').textContent = formattedDate;
+                document.getElementById('performers-date-badge').textContent = formattedDate;
+
+                const targetDateData = data.filter(r => new Date(r.Timestamp).toDateString() === targetDateString);
+                
+                const totalRecords = targetDateData.reduce((sum, r) => sum + (Number(r.RecordsCompleted) || 0), 0);
+                const totalHours = targetDateData.reduce((sum, r) => sum + parseHours(r.HoursWorked), 0);
+                const teamRph = totalHours > 0 ? (totalRecords / totalHours) : 0;
+
+                document.getElementById('ribbon-records').textContent = totalRecords.toLocaleString() + ' Recs';
+                document.getElementById('ribbon-rph').textContent = teamRph.toFixed(1) + ' RPH';
+                document.getElementById('today-records-total').textContent = totalRecords.toLocaleString();
+                document.getElementById('today-team-rph').textContent = teamRph.toFixed(1);
+                
+                // Aggregate User Performance
+                const userPerformance = targetDateData.reduce((acc, r) => {
+                    const name = r.UserName;
+                    if (!name) return acc;
+                    if (!acc[name]) acc[name] = { totalRecords: 0, totalHours: 0, projects: new Set() };
+                    acc[name].totalRecords += Number(r.RecordsCompleted) || 0;
+                    acc[name].totalHours += parseHours(r.HoursWorked);
+                    if (r.ProjectName) acc[name].projects.add(r.ProjectName);
+                    return acc;
+                }, {});
+
+                const sortedPerformers = Object.entries(userPerformance)
+                    .map(([name, d]) => ({
+                        name,
+                        ...d,
+                        projects: Array.from(d.projects),
+                        rph: d.totalHours > 0 ? (d.totalRecords / d.totalHours) : 0
+                    }))
+                    .sort((a, b) => b.totalRecords - a.totalRecords)
+                    .slice(0, 3);
+
+                const performersContainer = document.getElementById('top-performers-list');
+                performersContainer.innerHTML = '';
+                const rankClasses = ['rank-gold', 'rank-silver', 'rank-bronze'];
+                const rankLabels = ['1st', '2nd', '3rd'];
+
+                if (sortedPerformers.length > 0) {
+                    sortedPerformers.forEach((perf, index) => {
+                        const div = document.createElement('div');
+                        div.className = "p-2.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-between gap-3 cursor-pointer hover:shadow-md transition active:scale-95";
+                        
+                        div.innerHTML = `
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <div class="w-7 h-7 rounded-full flex items-center justify-center font-black text-xs shrink-0 ${rankClasses[index]}">
+                                    ${rankLabels[index]}
+                                </div>
+                                <div class="flex flex-col min-w-0">
+                                    <h5 class="font-bold text-xs text-slate-800 dark:text-white truncate">${perf.name}</h5>
+                                    <span class="text-[9.5px] text-slate-400 truncate">${perf.projects.join(', ') || 'Production'}</span>
+                                </div>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <span class="font-mono font-bold text-xs text-indigo-600 dark:text-indigo-400 block">${perf.totalRecords.toLocaleString()}</span>
+                                <span class="text-[9.5px] font-mono text-emerald-500 font-semibold">${perf.rph.toFixed(1)} RPH</span>
+                            </div>
+                        `;
+
+                        // Confetti Celebration Trigger
+                        div.addEventListener('click', (e) => {
+                            confetti({ particleCount: 70, spread: 60, origin: { y: 0.7 } });
+                        });
+                        
+                        performersContainer.appendChild(div);
+                    });
+                } else {
+                    performersContainer.innerHTML = `<div class="p-3 text-center text-slate-400 text-xs">No outputs submitted for ${formattedDate}.</div>`;
+                }
+
+            } catch (error) {
+                console.error("Error loading production data:", error);
+                document.getElementById('today-records-total').textContent = "--";
+                document.getElementById('today-team-rph').textContent = "--";
+                document.getElementById('top-performers-list').innerHTML = '<div class="p-3 text-center text-rose-500 text-xs">Data sync pending...</div>';
+            }
+        }
+
+        // Announcements and Project Focus
+        async function loadAnnouncementsAndFocus() {
+            try {
+                let response = await fetch(`data/production-announcements.json?v=${new Date().getTime()}`);
+                if (!response.ok) response = await fetch(`/data/production-announcements.json?v=${new Date().getTime()}`);
+                if (!response.ok) throw new Error("File not found");
+                const data = await response.json();
+
+                const annContainer = document.getElementById('production-announcements');
+                annContainer.innerHTML = '';
+                if (data.announcements && data.announcements.length > 0) {
+                    data.announcements.forEach(item => {
+                        annContainer.innerHTML += `
+                            <div class="flex items-start gap-2 leading-relaxed">
+                                <i class="${item.icon || 'fa-solid fa-angle-right'} text-[10px] mt-1 text-indigo-500"></i>
+                                <span>${item.text}</span>
+                            </div>`;
+                    });
+                } else {
+                    annContainer.innerHTML = '<span class="text-slate-400 text-[11px]">No active announcements.</span>';
+                }
+
+                const focusContainer = document.getElementById('project-focus-area');
+                focusContainer.innerHTML = '';
+                if (data.projectFocus && data.projectFocus.length > 0) {
+                    data.projectFocus.forEach(item => {
+                        focusContainer.innerHTML += `
+                            <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-800 flex flex-col justify-between">
+                                <h5 class="font-bold text-xs text-slate-800 dark:text-white mb-0.5">${item.title}</h5>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">${item.description}</p>
+                            </div>`;
+                    });
+                } else {
+                    focusContainer.innerHTML = '<div class="p-3 text-xs text-slate-400 col-span-2">Standard operational workflows in focus.</div>';
+                }
+
+            } catch (error) {
+                document.getElementById('production-announcements').innerHTML = '<span class="text-slate-400 text-[11px]">Announcements synchronized.</span>';
+                document.getElementById('project-focus-area').innerHTML = '<div class="p-3 text-xs text-slate-400 col-span-2">Regular production pipeline active.</div>';
+            }
+        }
+
+        // SOP Library
+        async function loadSopLibrary() {
+            const container = document.getElementById('sop-library-content');
+            const filters = document.getElementById('sop-filters');
+            const search = document.getElementById('sop-search-input');
+
+            try {
+                let response = await fetch(`data/sop-library.json?v=${new Date().getTime()}`);
+                if (!response.ok) response = await fetch(`/data/sop-library.json?v=${new Date().getTime()}`);
+                if (!response.ok) throw new Error("File not found");
+                const data = await response.json();
+
+                container.innerHTML = '';
+                filters.innerHTML = '<button class="filter-btn px-2.5 py-1 rounded-lg text-[10.5px] font-bold bg-indigo-600 text-white shadow-sm transition-all" data-category="all">All</button>';
+
+                data.categories.forEach(category => {
+                    const btn = document.createElement('button');
+                    btn.className = 'filter-btn px-2.5 py-1 rounded-lg text-[10.5px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition-all';
+                    btn.dataset.category = category.name;
+                    btn.textContent = category.name;
+                    filters.appendChild(btn);
+
+                    category.documents.forEach(doc => {
+                        const lastUpdated = new Date(doc.lastUpdated);
+                        const isNew = (new Date() - lastUpdated) / (1000 * 60 * 60 * 24) < 20;
+
+                        const a = document.createElement('a');
+                        a.href = doc.link || '#';
+                        a.target = '_blank';
+                        a.className = 'sop-item p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-800 hover:border-indigo-300 flex items-center justify-between text-xs transition duration-150';
+                        a.dataset.category = category.name;
+                        a.dataset.title = doc.title.toLowerCase();
+
+                        a.innerHTML = `
+                            <div class="flex items-center gap-2 min-w-0">
+                                <i class="fa-regular fa-file-lines text-indigo-500 text-sm"></i>
+                                <span class="font-bold text-slate-800 dark:text-slate-200 truncate">${doc.title}</span>
+                                ${isNew ? '<span class="px-1.5 py-0.5 rounded text-[8px] font-bold bg-emerald-100 text-emerald-700">NEW</span>' : ''}
+                            </div>
+                            <span class="text-[9px] font-mono text-slate-400 shrink-0">v${doc.version || '1.0'}</span>
+                        `;
+                        container.appendChild(a);
+                    });
+                });
+
+                // Filter button triggers
+                filters.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('filter-btn')) {
+                        const cat = e.target.dataset.category;
+                        filters.querySelectorAll('.filter-btn').forEach(b => {
+                            b.classList.remove('bg-indigo-600', 'text-white', 'shadow-sm');
+                            b.classList.add('bg-slate-100', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-300');
+                        });
+                        e.target.classList.add('bg-indigo-600', 'text-white', 'shadow-sm');
+
+                        document.querySelectorAll('.sop-item').forEach(item => {
+                            item.style.display = (cat === 'all' || item.dataset.category === cat) ? 'flex' : 'none';
+                        });
+                    }
+                });
+
+                // Search trigger
+                search.addEventListener('input', () => {
+                    const q = search.value.toLowerCase();
+                    document.querySelectorAll('.sop-item').forEach(item => {
+                        item.style.display = item.dataset.title.includes(q) ? 'flex' : 'none';
+                    });
+                });
+
+            } catch (e) {
+                container.innerHTML = '<div class="p-3 text-center text-slate-400 text-xs">SOP guidelines updated in direct client workflows.</div>';
+            }
+        }
+
+        // Easter Egg (Typing 'v-i-k-a-s' opens leader dashboard)
+        function setupEasterEgg() {
+            const secret = ['v', 'i', 'k', 'a', 's'];
+            let seq = [];
+            window.addEventListener('keydown', (e) => {
+                seq.push(e.key.toLowerCase());
+                seq = seq.slice(-secret.length);
+                if (seq.join('') === secret.join('')) {
+                    window.location.href = 'leader-dashboard.html';
+                }
+            });
+        }
+
+        // Open IT Ticket Handshake
+        function openItTicket() {
+            try {
+                if (window.parent && window.parent.Alpine) {
+                    const parentApp = window.parent.Alpine.$data(window.parent.document.querySelector('[x-data]'));
+                    if (parentApp && typeof parentApp.openApp === 'function') {
+                        parentApp.openApp('submit-ticket.html', 'Raise IT Ticket');
+                        return;
+                    }
+                }
+            } catch(e) {}
+            window.location.href = 'submit-ticket.html';
+        }
+
+        // Close Modal Window Handshake
+        function closeModalWindow() {
+            try {
+                if (window.parent && window.parent.Alpine) {
+                    const parentApp = window.parent.Alpine.$data(window.parent.document.querySelector('[x-data]'));
+                    if (parentApp && typeof parentApp.closeApp === 'function') {
+                        parentApp.closeApp();
+                        return;
+                    }
+                }
+            } catch (e) {}
+            window.close();
+        }
+    </script>
+</body>
+</html>

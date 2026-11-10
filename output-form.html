@@ -1,0 +1,2126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Output Form | PBL Connect</title>
+    <script src="config.js"></script>
+    <link rel="icon" href="assets/images/pbl-logo.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css"> 
+    
+    <style>
+    /* =================================================================== */
+    /* |                  Basic Layout & Page Structure                  | */
+    /* |       Yeh page ka main structure, width, aur padding set karta hai     | */
+    /* =================================================================== */
+    .container { 
+        max-width: none !important; /* Page ko poori width lene deta hai */
+        padding: 0 20px; 
+    }
+    .main-content { 
+        padding: 30px 0; /* Upar aur neeche se space deta hai */
+    }
+    .form-wrapper { 
+        display: flex; 
+        justify-content: center; /* Form ko page ke center mein rakhta hai */
+        margin-top: 30px; 
+    }
+
+    /* =================================================================== */
+    /* |                       Page Hero Section                         | */
+    /* |         Page ka top banner jismein background image hai         | */
+    /* =================================================================== */
+    .page-hero {
+        padding: 50px 30px;
+        text-align: center;
+        color: #fff;
+        background: linear-gradient(rgba(44,62,80,.25),rgba(44,62,80,.9)),url(assets/images/production-bg.jpg) no-repeat center center/cover;
+        border-radius: 25px;
+        margin: 25px auto 0;
+        box-shadow: 0 10px 30px rgba(0,0,0,.2);
+        max-width: 1200px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .page-hero h1 {
+        font-size: 2.5em;
+        font-weight: 700;
+    }
+    .page-hero p {
+        font-size: 1.1em;
+        max-width: 600px;
+        margin: 10px auto 0;
+        color: rgba(255,255,255,.9);
+    }
+
+    /* =================================================================== */
+    /* |                 Main Form Card (Neumorphic)                     | */
+    /* |        Yeh 3D jaisa look (uthha hua) form ko deta hai         | */
+    /* =================================================================== */
+    .neumorphic-card { 
+        padding: 35px 45px;
+        border-radius: 30px;
+        background-color: var(--surface-color);
+        border: 1px solid var(--border-color);
+        /* Yeh box-shadow hi 3D effect banata hai */
+        box-shadow: 12px 12px 24px var(--neumorphic-shadow-dark), -12px -12px 24px var(--neumorphic-shadow-light);
+    }
+    #output-form.neumorphic-card { 
+        max-width: 700px; 
+        width: 100%; 
+        margin-left: auto; 
+        margin-right: auto; 
+    }
+    
+    /* Form ke andar ki general styling */
+    .output-form .form-grid { 
+        display: grid; 
+        grid-template-columns: 1fr 1fr; /* Form ko do columns mein baant ta hai */
+        gap: 25px 30px; 
+        align-items: end; 
+    }
+    .form-group { 
+        position: relative; 
+    }
+    .full-width { 
+        grid-column: 1 / -1; /* Element ko poori width deta hai */
+    }
+    .center-content { 
+        display: flex; 
+        justify-content: center; 
+        margin-top: 20px; 
+    }
+    .field-label { 
+        font-size: 1.1em; 
+        font-weight: 600; 
+        color: var(--text-dark); 
+        margin-bottom: 12px; 
+        display: flex; 
+        align-items: center; 
+        gap: 8px; 
+    }
+    .field-label .fas { 
+        color: var(--primary-color); 
+        opacity: 0.8; 
+    }
+    .form-input, .dropdown-selected-option { 
+        height: 48px; 
+        box-sizing: border-box; 
+    }
+    .form-input { 
+        width: 100%; 
+        padding: 12px 15px; 
+        font-size: 1rem; 
+        background-color: var(--input-bg); 
+        color: var(--input-text); 
+        border: 1px solid var(--border-color); 
+        border-radius: 8px; 
+        outline: none; 
+        transition: all 0.3s ease; 
+    }
+    .form-input:focus { 
+        border-color: var(--primary-color); 
+    }
+
+    /* =================================================================== */
+    /* |                    Custom Dropdown Menu                         | */
+    /* |          User aur Project ke searchable dropdown ki styling       | */
+    /* =================================================================== */
+    .custom-dropdown-container { 
+        position: relative; 
+        width: 100%; 
+        user-select: none; 
+    }
+    .dropdown-selected-option { 
+        display: flex; 
+        align-items: center; 
+        justify-content: space-between; 
+        padding: 12px 15px; 
+        background-color: var(--input-bg); 
+        border: 1px solid var(--border-color); 
+        border-radius: 8px; 
+        cursor: pointer; 
+    }
+    .dropdown-options-list { 
+        position: absolute; 
+        top: calc(100% + 8px); 
+        left: 0; 
+        width: 100%; 
+        background-color: var(--surface-color); 
+        border-radius: 12px; 
+        border: 1px solid var(--border-color); 
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+        z-index: 10; 
+        max-height: 250px; 
+        overflow-y: auto; 
+        /* Shuru mein options list chhupi rehti hai */
+        opacity: 0; 
+        visibility: hidden; 
+        transform: translateY(-10px); 
+        transition: all 0.3s ease; 
+    }
+    /* Jab 'open' class lagti hai, tab options list dikhti hai */
+    .custom-dropdown-container.open .dropdown-options-list { 
+        opacity: 1; 
+        visibility: visible; 
+        transform: translateY(0); 
+    }
+    .dropdown-category-header { 
+        padding: 12px 18px; 
+        font-size: 0.9em; 
+        font-weight: 600; 
+        background-color: var(--bg-light); 
+        position: sticky; /* Taaki scroll karne par header upar chipka rahe */
+        top: 0; 
+        z-index: 1; 
+        border-bottom: 1px solid var(--border-color); 
+        display: flex; 
+        align-items: center; 
+        gap: 10px; 
+        transition: all 0.3s ease; 
+        color: var(--primary-color); 
+    }
+    .dropdown-option-item { 
+        font-weight: 500; 
+        border-left: 4px solid transparent; 
+        transition: all 0.2s ease-in-out; 
+        padding: 12px 18px; 
+        cursor: pointer; 
+    }
+    .dropdown-option-item:not(.selected):hover { 
+        border-left-color: var(--primary-color); 
+        background-color: color-mix(in srgb, var(--primary-color) 8%, var(--surface-color)); 
+        padding-left: 22px; 
+        color: var(--text-dark) !important; 
+    }
+    .dropdown-option-item.selected { 
+        border-left-color: var(--primary-color); 
+        background-color: color-mix(in srgb, var(--primary-color) 12%, var(--surface-color)); 
+        color: var(--primary-color); 
+        font-weight: 700; 
+        padding-left: 22px; 
+    }
+
+    /* =================================================================== */
+    /* |                    Shift Selection Cards                        | */
+    /* |         Morning aur Evening shift ke sundar cards ki styling        | */
+    /* =================================================================== */
+    .radio-input-wrapper { 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        padding-top: 10px; 
+    }
+    .radio-input { 
+        display: flex; 
+        gap: 1.5rem; 
+        font-family: 'Poppins', sans-serif; 
+    }
+    .radio-input input[type="radio"] {
+        /* Asli radio button ko chhupa dete hain */
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    .radio-input input[type="radio"]:focus-visible + .card {
+        outline: 3px solid var(--primary-color);
+        outline-offset: 4px;
+        box-shadow: 0 0 15px rgba(var(--primary-color-rgb), 0.5);
+    }
+    .radio-input .card { 
+        width: 300px; 
+        height: 130px; 
+        border-radius: 20px; 
+        background: var(--input-bg); 
+        border: 2px solid var(--border-color); 
+        box-shadow: 6px 6px 12px var(--neumorphic-shadow-dark), -6px -6px 12px var(--neumorphic-shadow-light); 
+        display: flex; 
+        flex-direction: column; 
+        justify-content: center; 
+        align-items: center; 
+        cursor: pointer; 
+        transition: all 0.3s ease; 
+        color: var(--text-light); 
+        padding: 15px; 
+        gap: 5px; 
+    }
+    .radio-input .logo { 
+        font-size: 2.5em; 
+        transition: transform 0.3s ease; 
+        margin-bottom: 5px; 
+    }
+    .radio-input .title { 
+        font-size: 1.1em; 
+        font-weight: 600; 
+        line-height: 1.2; 
+    }
+    .radio-input .subtitle { 
+        font-size: 0.75em; 
+        color: var(--text-light); 
+    }
+    .radio-input .card:hover { 
+        transform: translateY(-5px); 
+        border-color: var(--primary-color); 
+        box-shadow: 10px 10px 20px var(--neumorphic-shadow-dark), -10px -10px 20px var(--neumorphic-shadow-light); 
+    }
+    html[data-design="flat"] .radio-input .card { 
+        box-shadow: 0 4px 12px -2px rgba(var(--secondary-color-rgb), 0.08) !important; 
+    }
+    html[data-design="flat"] .radio-input .card:hover { 
+        box-shadow: 0 8px 20px -4px rgba(var(--primary-color-rgb), 0.15) !important; 
+    }
+    /* Jab radio button select hota hai (checked) */
+    .radio-input input[type="radio"]:checked + .card { 
+        transform: scale(0.95); 
+        box-shadow: inset 4px 4px 8px var(--neumorphic-shadow-dark), inset -4px -4px 8px var(--neumorphic-shadow-light) !important; 
+    }
+    /* Morning shift select hone par pink color */
+    .radio-input input[value="Morning"]:checked + .card, 
+    .radio-input input[value="Morning"]:checked + .card .subtitle { 
+        border-color: #e74c8c; 
+        color: #e74c8c; 
+        background-color: color-mix(in srgb, #fce4ec 90%, var(--surface-color)); 
+    }
+    /* Evening shift select hone par purple color */
+    .radio-input input[value="Evening"]:checked + .card, 
+    .radio-input input[value="Evening"]:checked + .card .subtitle { 
+        border-color: #8e44ad;
+        color: #8e44ad;
+        background-color: color-mix(in srgb, #f3f0ff 90%, var(--surface-color));
+    }
+    .radio-input input[type="radio"]:checked + .card .logo { 
+        transform: scale(1.1); 
+    }
+
+    /* =================================================================== */
+    /* |                        Submit Button                            | */
+    /* |           Form ka main submit button aur uska animation           | */
+    /* =================================================================== */
+    #submit-btn.btn {
+        position: relative;
+        font-size: 17px;
+        text-transform: uppercase;
+        text-decoration: none;
+        padding: 1em 2.5em;
+        display: inline-block;
+        cursor: pointer;
+        border-radius: 6em;
+        transition: all 0.2s;
+        border: none;
+        font-family: inherit;
+        font-weight: 500;
+        color: #fff;
+        background-color: var(--primary-color);
+    }
+    #submit-btn.btn:hover {
+        transform: translateY(-3px); /* Hover par button upar uthta hai */
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    #submit-btn.btn:active {
+        transform: translateY(-1px); /* Click par thoda neeche jaata hai */
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    }
+    /* Yeh ::after element hover par ripple effect banata hai */
+    #submit-btn.btn::after {
+        content: "";
+        display: inline-block;
+        height: 100%;
+        width: 100%;
+        border-radius: 100px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: -1;
+        transition: all 0.4s;
+        background-color: var(--primary-color);
+    }
+    #submit-btn.btn:hover::after {
+        transform: scaleX(1.4) scaleY(1.6);
+        opacity: 0;
+    }
+    /* Jab button disable ho (submit karte waqt) */
+    #submit-btn.btn:disabled {
+        cursor: not-allowed;
+        transform: translateY(0);
+        box-shadow: none;
+        background-color: #bdc3c7; /* Grey color */
+    }
+    #submit-btn.btn:disabled::after {
+        background-color: #bdc3c7;
+    }
+    #submit-btn.btn .fa-spinner {
+        margin-right: 8px;
+    }
+
+    /* =================================================================== */
+    /* |                Work Duration Stepper (Time Input)               | */
+    /* |         Ghante aur minute enter karne wala animated input         | */
+    /* =================================================================== */
+    .unified-stepper-container {
+        position: relative;
+        margin-top: 10px;
+    }
+    .unified-stepper {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: var(--bg-light);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 8px;
+        transition: box-shadow 0.3s ease;
+    }
+    .unified-stepper:hover {
+        box-shadow: 0 0 20px rgba(var(--primary-color-rgb), 0.1);
+    }
+    .adjust-btn {
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        font-size: 1.5em;
+        font-weight: 300;
+        color: var(--text-light);
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .adjust-btn:active {
+        transform: scale(0.95);
+        box-shadow: inset 2px 2px 5px var(--neumorphic-shadow-dark);
+    }
+    .time-group {
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        gap: 2px;
+        font-weight: 600;
+        min-width: 60px;
+    }
+    .stepper-divider {
+        width: 1px;
+        height: 30px;
+        background-color: var(--border-color);
+        margin: 0 10px;
+    }
+    .animated-digit {
+        height: 1.8em; /* Ek number ki height */
+        overflow: hidden; /* Yeh baaki numbers ko chhupa deta hai */
+        font-size: 1.8em;
+        line-height: 1.8em;
+        transition: color 0.4s ease;
+    }
+    /* Yeh number strip (reel) ko slide karne ke liye hai */
+    .digit-reel {
+        transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .digit-reel > span {
+        display: block; /* Saare numbers ko vertical line mein rakhta hai */
+    }
+    .time-label {
+        font-size: 1.1em;
+        color: var(--text-light);
+        margin-left: 5px;
+    }
+    .live-rph-preview {
+        text-align: center;
+        font-weight: 600;
+        font-size: 0.9em;
+        margin-top: 10px;
+        padding: 6px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    /* Shift ke hisab se time input ke colors */
+    .project-entry.morning-mode .animated-digit,
+    .project-entry.morning-mode .live-rph-preview,
+    .project-entry.morning-mode .time-label {
+        color: #e74c8c; /* Morning Pink */
+    }
+    .project-entry.evening-mode .animated-digit,
+    .project-entry.evening-mode .live-rph-preview,
+    .project-entry.evening-mode .time-label {
+        color: #8e44ad; /* Evening Purple */
+    }
+    .project-entry.morning-mode .unified-stepper {
+        background-color: color-mix(in srgb, #e74c8c 10%, var(--surface-color));
+    }
+    .project-entry.evening-mode .unified-stepper {
+        background-color: color-mix(in srgb, #8e44ad 20%, var(--surface-color));
+    }
+
+    /* =================================================================== */
+    /* |                   Project Entry & Other Cards                   | */
+    /* =================================================================== */
+    .message-box { margin-top: 20px; padding: 15px; border-radius: 12px; text-align: center; display: none; font-weight: 500; }
+    .message-box.success { background-color: rgba(46, 204, 113, 0.1); color: #155724; border: 1px solid #c3e6cb;}
+    .message-box.error { background-color: rgba(231, 76, 60, 0.1); color: #721c24; border: 1px solid #f5c6cb;}
+    .project-entry { border: 1px solid var(--border-color); border-radius: 15px; padding: 25px; margin-top: 20px; position: relative; }
+    .project-entry:first-child { margin-top: 0; }
+    .remove-project-btn { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 1.2em; color: var(--text-light); cursor: pointer; opacity: 0.7; transition: opacity 0.2s; }
+    .remove-project-btn:hover { opacity: 1; color: #e74c3c; }
+    .add-project-btn { display: flex; align-items: center; gap: 8px; margin: 20px auto 0; padding: 10px 20px; border-radius: 8px; border: 1px dashed var(--primary-color); color: var(--primary-color); background: none; cursor: pointer; transition: background-color 0.2s, color 0.2s; }
+    .add-project-btn:hover { background-color: var(--primary-color); color: #fff; }
+
+    /* Personal Stats Card (Welcome back, ...) ki styling */
+    .personal-stats-card { background-color: var(--bg-light); border-radius: 15px; padding: 20px; margin-bottom: 30px; display: none; animation: fadeIn 0.5s ease; transition: background-color 0.4s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    .personal-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: center; }
+    .stat-item .value { font-size: 1.8em; font-weight: 700; color: var(--primary-color); transition: color 0.4s ease; }
+    .stat-item .label { font-size: 0.9em; color: var(--text-light); }
+    #welcome-message { transition: color 0.4s ease; }
+
+    /* Shift ke hisab se Personal Stats Card ke colors */
+    #output-form.morning-mode .personal-stats-card { background-color: color-mix(in srgb, #e74c8c 8%, var(--surface-color)); }
+    #output-form.evening-mode .personal-stats-card { background-color: color-mix(in srgb, #8e44ad 8%, var(--surface-color)); }
+    #output-form.morning-mode #welcome-message,
+    #output-form.morning-mode .personal-stats-card .value { color: #e74c8c; }
+    #output-form.evening-mode #welcome-message,
+    #output-form.evening-mode .personal-stats-card .value { color: #8e44ad; }
+
+    /* =================================================================== */
+    /* |               Confirmation & Success Modals (Pop-ups)             | */
+    /* =================================================================== */
+    .confirmation-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 2000; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+    .confirmation-modal-overlay.visible { opacity: 1; visibility: visible; }
+    .confirmation-modal-content { background: var(--surface-color); width: 90%; max-width: 600px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); transform: scale(0.95); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); overflow: hidden; }
+    .confirmation-modal-overlay.visible .confirmation-modal-content { transform: scale(1); }
+    .confirmation-modal-header { padding: 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid var(--border-color); }
+    .confirmation-modal-header img { height: 30px; }
+    .confirmation-modal-header h3 { font-size: 1.3em; margin: 0; color: var(--secondary-color); }
+    .confirmation-modal-body { padding: 25px; max-height: 50vh; overflow-y: auto; }
+    #summary-list { display: flex; flex-direction: column; gap: 15px; }
+    .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .summary-item {background: var(--bg-light); padding: 15px; border-radius: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px;}
+    .summary-label { display: flex; align-items: center; gap: 8px; font-size: 0.8em; font-weight: 500; color: var(--text-light); margin-bottom: 5px; text-transform: uppercase; }
+    .summary-value { font-size: 1.1em; font-weight: 600; color: var(--text-dark); }
+    .summary-divider { border: none; border-top: 1px solid var(--border-color); margin: 5px 0; }
+    .summary-list-title { font-size: 1em; font-weight: 600; color: var(--primary-color); text-align: center; margin: 0 0 10px 0; }
+    .summary-project-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+    .summary-project-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 5px; border-bottom: 1px solid var(--border-color); transition: background-color 0.2s; }
+    .summary-project-list li:last-child { border-bottom: none; }
+    .summary-project-item .project-name { font-weight: 600; }
+    .summary-project-item .project-details { font-size: 0.9em; color: var(--text-light); font-weight: 500; }
+    .summary-project-item.low-rph { background-color: rgba(231, 76, 60, 0.05); border-left: 4px solid #e74c3c; padding-left: 15px;}
+    .summary-warning { margin-top: 10px; padding: 10px; background-color: rgba(231, 76, 60, 0.1); color: #c0392b; border-radius: 8px; text-align: center; font-weight: 500; font-size: 0.9em; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .confirmation-modal-footer { padding: 20px; background-color: var(--bg-light); display: flex; gap: 15px; }
+    .modal-btn { flex: 1; padding: 12px; border-radius: 10px; font-size: 1em; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; }
+    .btn-confirm { background-color: var(--primary-color); color: #fff; }
+    .btn-cancel { background-color: var(--border-color); color: var(--text-dark); }
+    .modal-btn .fa-spinner { margin-right: 8px; }
+
+    /* =================================================================== */
+    /* |       "Your Last Entry" / "Quick Add" Card Styling              | */
+    /* =================================================================== */
+    .quick-add-card {
+        background-color: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 20px;
+        margin-top: 10px;
+        animation: fadeIn 0.5s ease;
+        transition: background-color 0.4s ease;
+    }
+    #output-form.morning-mode .quick-add-card {
+        background-color: color-mix(in srgb, #e74c8c 10%, var(--surface-color));
+    }
+    #output-form.evening-mode .quick-add-card {
+        background-color: color-mix(in srgb, #8e44ad 10%, var(--surface-color));
+    }
+    #pick-up-title {
+        font-size: 1.1em;
+        font-weight: 600;
+        color: var(--text-dark);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0 0 15px 0;
+    }
+    .last-project-feature {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+    }
+    .last-project-info .project-name {
+        font-size: 1.3em;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+    .add-again-btn {
+        font-family: inherit;
+        font-weight: 600;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        flex-shrink: 0;
+        color: #fff;
+    }
+    .add-again-btn i { margin-right: 8px; }
+    .add-again-btn.added {
+        background-color: #2ecc71 !important; /* Green color, !important to override shift colors */
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+    }
+    .quick-add-divider {
+        border: none;
+        height: 1px;
+        background-color: var(--border-color);
+        margin: 20px 0;
+    }
+    .other-projects-label {
+        font-size: 0.85em;
+        font-weight: 500;
+        color: var(--text-light);
+    }
+    /* "Your Last Entry" card ke stats ki final, correct styling */
+    .last-project-info .project-stats { display: flex; align-items: baseline; gap: 18px; font-size: 0.9em; color: var(--text-light); }
+    .project-stats > span { display: inline-flex; align-items: baseline; gap: 6px; }
+    .project-stats i { color: var(--text-light); }
+    #last-project-records, #last-project-time, #last-project-date { font-weight: 600; color: var(--text-dark); }
+    .stat-unit { font-weight: 500; color: var(--text-light); }
+    
+    /* "Your Last Entry" card ke elements par shift colors */
+    #pick-up-title i, .last-project-info .project-name, .add-again-btn { transition: color 0.4s ease, background-color 0.4s ease, box-shadow 0.4s ease; }
+    #output-form.morning-mode #pick-up-title i, #output-form.morning-mode .last-project-info .project-name { color: #e74c8c; }
+    #output-form.morning-mode .add-again-btn { background-color: #e74c8c; }
+    #output-form.morning-mode .add-again-btn:hover { box-shadow: 0 4px 15px rgba(231, 76, 140, 0.4); }
+    #output-form.evening-mode #pick-up-title i, #output-form.evening-mode .last-project-info .project-name { color: #8e44ad; }
+    #output-form.evening-mode .add-again-btn { background-color: #8e44ad; }
+    #output-form.evening-mode .add-again-btn:hover { box-shadow: 0 4px 15px rgba(142, 68, 173, 0.4); }
+
+    /* Secondary Quick Add Buttons ki styling */
+    .quick-project-btn {
+        background-color: var(--surface-color); /* White background */
+        border: 1px solid var(--border-color);
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-family: inherit;
+        font-size: 0.9em;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+    }
+    /* In buttons ka shift-aware hover effect */
+    #output-form.morning-mode .quick-project-btn:hover { border-color: #e74c8c; color: #e74c8c; transform: translateY(-2px); }
+    #output-form.evening-mode .quick-project-btn:hover { border-color: #8e44ad; color: #8e44ad; transform: translateY(-2px); }
+
+    /* =================================================================== */
+    /* |                Live Shift Timer HUD Styling                     | */
+    /* =================================================================== */
+    .dynamic-shift-timer-hud { margin-top: 25px; padding: 16px; border-radius: 16px; border: 1px solid var(--border-color); animation: fadeInTimer 0.6s cubic-bezier(0.25, 1, 0.5, 1); transition: background-color 0.4s ease; overflow: hidden; }
+    .dynamic-shift-timer-hud.morning-mode { background-color: color-mix(in srgb, #e74c8c 10%, var(--surface-color)); }
+    .dynamic-shift-timer-hud.evening-mode { background-color: color-mix(in srgb, #8e44ad 10%, var(--surface-color)); }
+    @keyframes fadeInTimer { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    .timer-hud-top-line { display: flex; justify-content: space-between; align-items: baseline; padding: 0 5px; }
+    .timer-hud-label { font-size: 0.8em; font-weight: 500; color: var(--text-light); }
+    .timer-hud-value { margin: 0; line-height: 1.1; font-weight: 700; font-size: 2.2em; transition: color 0.4s ease; }
+    .timer-hud-value.secondary { font-size: 1.6em; font-weight: 600; color: var(--text-light); }
+    .timer-hud-time-left { text-align: right; }
+    .timer-hud-progress-container { position: relative; width: 100%; height: 20px; background-color: color-mix(in srgb, var(--text-dark) 8%, transparent); border-radius: 10px; margin-top: 12px; overflow: hidden; }
+    .timer-hud-progress-fill { position: relative; width: 0%; height: 100%; border-radius: 10px; transition: width 1s linear, background-color 0.4s ease; overflow: hidden; }
+    .timer-hud-progress-fill::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%); animation: shimmer-animation 2s infinite linear; }
+    @keyframes shimmer-animation { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+    .timer-hud-progress-info { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0 12px; font-size: 0.8em; font-weight: 600; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.4); }
+    .dynamic-shift-timer-hud.morning-mode .timer-hud-value { color: #e74c8c; }
+    .dynamic-shift-timer-hud.morning-mode .timer-hud-progress-fill { background: linear-gradient(90deg, #e74c8c, #ff7ab8); }
+    .dynamic-shift-timer-hud.evening-mode .timer-hud-value { color: #8e44ad; }
+    .dynamic-shift-timer-hud.evening-mode .timer-hud-progress-fill { background: linear-gradient(90deg, #8e44ad, #a569bd); }
+
+    /* =================================================================== */
+/* |               Live/Training Work Mode Switch                    | */
+/* =================================================================== */
+.work-mode-switch-container { display: flex; justify-content: center; align-items: center; gap: 20px; padding: 12px; border-radius: 30px; margin-top: 10px; transition: background-color 0.4s ease; background-color: color-mix(in srgb, var(--good-color) 10%, var(--surface-color)); }
+
+/* Training mode active hone par (Naya Dark Grey Color) */
+.work-mode-switch-container.training-active { 
+    background-color: color-mix(in srgb, #34495e 10%, var(--surface-color)); 
+}
+html[data-theme="dark"] .work-mode-switch-container.training-active {
+    background-color: color-mix(in srgb, #bdc3c7 10%, var(--surface-color));
+}
+
+.mode-label { font-weight: 600; font-size: 1.1em; color: var(--text-light); transition: color 0.4s ease; }
+.mode-label.live.active { color: var(--good-color); }
+
+/* Training label active hone par (Naya Dark Grey Color) */
+.mode-label.training.active { 
+    color: #34495e; 
+} 
+html[data-theme="dark"] .mode-label.training.active {
+    color: #bdc3c7;
+}
+
+.switch-modern { position: relative; display: inline-block; width: 60px; height: 34px; }
+.switch-modern input { display: none; }
+.slider-modern { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; transition: .4s; border-radius: 34px; background-color: var(--good-color); }
+.slider-modern:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+
+/* Switch active hone par (Naya Dark Grey Color) */
+.switch-modern input:checked + .slider-modern { 
+    background-color: #34495e; 
+}
+html[data-theme="dark"] .switch-modern input:checked + .slider-modern {
+    background-color: #bdc3c7;
+}
+
+.switch-modern input:checked + .slider-modern:before { transform: translateX(26px); }
+/* ============================================================= */
+/* |      NEW: Shift-Aware Styling for Work Mode Switch        | */
+/* | Yeh switch ko Morning (Pink) aur Evening (Purple) look dega | */
+/* ============================================================= */
+
+/* --- Morning Shift (Pink Theme) --- */
+
+/* Jab Morning Shift chuni ho aur Live Mode active ho */
+#output-form.morning-mode .work-mode-switch-container:not(.training-active) {
+    background-color: color-mix(in srgb, #e74c8c 10%, var(--surface-color)); /* Container ko halka gulabi banata hai */
+}
+
+/* "Live" label ka text gulabi ho jayega */
+#output-form.morning-mode .mode-label.live.active {
+    color: #e74c8c;
+}
+
+/* Switch ka slider bhi gulabi ho jayega */
+#output-form.morning-mode .switch-modern input:not(:checked) + .slider-modern {
+    background-color: #e74c8c;
+}
+
+
+/* --- Evening Shift (Purple Theme) --- */
+
+/* Jab Evening Shift chuni ho aur Live Mode active ho */
+#output-form.evening-mode .work-mode-switch-container:not(.training-active) {
+    background-color: color-mix(in srgb, #8e44ad 10%, var(--surface-color)); /* Container ko halka baingani banata hai */
+}
+
+/* "Live" label ka text baingani ho jayega */
+#output-form.evening-mode .mode-label.live.active {
+    color: #8e44ad;
+}
+
+/* Switch ka slider bhi baingani ho jayega */
+#output-form.evening-mode .switch-modern input:not(:checked) + .slider-modern {
+    background-color: #8e44ad;
+}
+    /* ============================================================= */
+    /* |         FINAL, GUARANTEED FIX for Shift-Aware Modal Colors    | */
+    /* ============================================================= */
+    .confirmation-modal-content { transition: background-color 0.4s ease; }
+    /* Morning Shift: Pink Theme */
+    #confirmation-modal-overlay.morning-mode .confirmation-modal-content,
+    #summary-modal-overlay.morning-mode .confirmation-modal-content { background-color: color-mix(in srgb, #e74c8c 5%, var(--surface-color)); }
+    #confirmation-modal-overlay.morning-mode h3,
+    #confirmation-modal-overlay.morning-mode .summary-list-title,
+    #summary-modal-overlay.morning-mode h2 { color: #e74c8c; }
+    .confirmation-modal-overlay.morning-mode .summary-value { color: #e74c8c; }
+    .confirmation-modal-overlay.morning-mode .btn-confirm { background-color: #e74c8c; }
+    /* Evening Shift: Purple Theme */
+    #confirmation-modal-overlay.evening-mode .confirmation-modal-content,
+    #summary-modal-overlay.evening-mode .confirmation-modal-content { background-color: color-mix(in srgb, #8e44ad 5%, var(--surface-color)); }
+    #confirmation-modal-overlay.evening-mode h3,
+    #confirmation-modal-overlay.evening-mode .summary-list-title,
+    #summary-modal-overlay.evening-mode h2 { color: #8e44ad; }
+    .confirmation-modal-overlay.evening-mode .summary-value { color: #8e44ad; }
+    .confirmation-modal-overlay.evening-mode .btn-confirm { background-color: #8e44ad; }
+
+    /* =================================================================== */
+    /* |                   Responsive Design (Mobile)                    | */
+    /* |              Chhoti screen par layout aesa dikhega              | */
+    /* =================================================================== */
+    @media (max-width: 768px) {
+        .neumorphic-card { padding: 30px 20px; border-radius: 20px; }
+        .page-hero h1 { font-size: 1.8em; }
+        .radio-input { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .radio-input .card { width: 100%; height: 120px; padding: 10px; }
+        .radio-input .logo { font-size: 2em; }
+        .radio-input .title { font-size: 1em; }
+        .radio-input .subtitle { font-size: 0.7em; }
+        .output-form .form-grid { grid-template-columns: 1fr; }
+        .summary-grid { grid-template-columns: 1fr; }
+    }
+	async function submitData() {
+    if (isSubmitting) return;
+    isSubmitting = true;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+    
+    try {
+        const response = await fetch(SCRIPT_URL, { method: 'POST', mode: 'cors', body: JSON.stringify(formDataToSubmit) });
+        if (!response.ok) throw new Error(`Server responded with status: ${response.status}`);
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            let totalRecords = 0, totalHours = 0, projects = [];
+            formDataToSubmit.forEach(entry => {
+                totalRecords += Number(entry.recordsCompleted);
+                totalHours += parseHours(entry.hoursWorked);
+                if (!projects.includes(entry.projectName)) projects.push(entry.projectName);
+            });
+            
+            const avgRph = totalHours > 0 ? (totalRecords / totalHours).toFixed(1) : '0.0';
+            const totalHoursFormatted = `${Math.floor(totalHours)} hr ${Math.round((totalHours % 1) * 60)} min`;
+            
+            const shiftMode = formDataToSubmit[0].shift === 'Morning' ? 'morning-mode' : 'evening-mode';
+            summaryModal.classList.remove('morning-mode', 'evening-mode');
+            summaryModal.classList.add(shiftMode);
+
+            // Step 1: Check karo ki yeh training entry thi ya nahi.
+            const isTraining = formDataToSubmit[0].comments.includes('-- Training Entry --');
+
+            // Step 2: Ek naya training message taiyyar karo.
+            const trainingMessageHtml = isTraining
+                ? `<p class="training-notice"><i class="fas fa-vial"></i> Your training entry has been recorded.</p>`
+                : '';
+
+            // Step 3: Ab summary banate waqt is message ko add kar do.
+            summaryBody.innerHTML = `
+                <h2 style="margin-top:0;">Great Work, ${formDataToSubmit[0].userName.split(' ')[0]}! 🔥</h2>
+                <p style="font-size: 1.1em;">Your entry has been submitted successfully.</p>
+                ${trainingMessageHtml}
+                <div class="summary-grid" style="grid-template-columns: repeat(3, 1fr); margin-top: 20px;">
+                    <div class="summary-item"><span class="summary-label">Total Records</span><span class="summary-value">${totalRecords.toLocaleString()}</span></div>
+                    <div class="summary-item"><span class="summary-label">Total Hours</span><span class="summary-value">${totalHoursFormatted}</span></div>
+                    <div class="summary-item"><span class="summary-label">Average RPH</span><span class="summary-value">${avgRph}</span></div>
+                </div>
+                <div style="margin-top: 15px; font-size: 0.9em; color: var(--text-light);">
+                    <strong>Projects Worked On:</strong> ${projects.join(', ')}
+                </div>
+                <p style="margin-top: 20px; color: var(--text-light);">Keep up the excellent work!</p>
+            `;
+            
+            summaryModal.classList.add('visible');
+            setTimeout(() => {
+                confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 }, zIndex: 3000 });
+            }, 100);
+
+            function closeSummaryPopup() {
+                summaryModal.classList.remove('visible');
+                summaryModal.classList.remove('morning-mode', 'evening-mode');
+                document.removeEventListener('keydown', handleEscKey);
+                document.removeEventListener('keydown', handleEnterKey);
+                outputForm.reset();
+                entriesContainer.innerHTML = '';
+                addProjectEntry(true);
+                userNameDropdown.querySelector('span').textContent = '-- Select Your Name --';
+                delete userNameDropdown.dataset.selectedValue;
+                document.getElementById('personal-stats-card').style.display = 'none';
+                document.getElementById('quick-add-card').style.display = 'none';
+                const timerContainer = document.getElementById('dynamic-shift-timer-hud');
+                if(timerContainer) timerContainer.style.display = 'none';
+            }
+
+            function handleEscKey(e) { if (e.key === 'Escape') { e.preventDefault(); closeSummaryPopup(); } }
+            function handleEnterKey(e) { if (e.key === 'Enter' && !confirmationModal.classList.contains('visible')) { e.preventDefault(); closeSummaryPopup(); } }
+
+            summaryCloseBtn.onclick = closeSummaryPopup;
+            document.addEventListener('keydown', handleEscKey);
+            document.addEventListener('keydown', handleEnterKey);
+        } else { 
+            throw new Error(result.message || "Unknown error occurred."); 
+        }
+    } catch (error) {
+        messageBox.className = 'message-box error';
+        messageBox.textContent = `⚠️ An error occurred: ${error.message}`;
+        messageBox.style.display = 'block';
+        setTimeout(() => { messageBox.style.display = 'none'; }, 6000);
+    } finally {
+        isSubmitting = false; 
+        confirmationModal.classList.remove('visible');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Submit Output!';
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = 'Confirm & Submit';
+    }
+}
+/* ============================================================= */
+/* |       NAYA, IMPROVED Training Mode Indicators Styling       | */
+/* ============================================================= */
+
+/* ============================================================= */
+/* |       NAYA, IMPROVED Training Mode Indicators Styling       | */
+/* ============================================================= */
+
+/* Review Modal ka banner (Naya Dark Grey Theme) */
+.modal-training-banner {
+    background-color: color-mix(in srgb, #34495e 8%, var(--surface-color));
+    border: 1px solid color-mix(in srgb, #34495e 20%, transparent);
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 15px;
+    text-align: center;
+}
+html[data-theme="dark"] .modal-training-banner {
+    background-color: color-mix(in srgb, #bdc3c7 8%, var(--surface-color));
+    border-color: color-mix(in srgb, #bdc3c7 20%, transparent);
+}
+
+
+/* Banner ke andar ka "TRAINING MODE" text (Naya Dark Grey Color) */
+.modal-training-banner .banner-title {
+    color: #34495e;
+    font-weight: 700;
+    font-size: 0.9em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+html[data-theme="dark"] .modal-training-banner .banner-title {
+    color: #bdc3c7;
+}
+
+/* Banner ke neeche waala chhota text */
+.modal-training-banner .banner-subtitle {
+    font-size: 0.9em;
+    color: var(--text-light);
+}
+
+/* Success Modal ka text (Naya Dark Grey Color) */
+.training-notice-success {
+    font-weight: 700; /* Bold text */
+    color: #34495e !important; /* Dark Grey color */
+    margin-top: 15px;
+    font-size: 1em;
+}
+html[data-theme="dark"] .training-notice-success {
+    color: #bdc3c7 !important;
+}
+
+.training-notice-success i {
+    margin-right: 8px;
+}
+
+/* BONUS: Scrollbar aane ke chance kam karne ke liye modal ki max-height badha di */
+.confirmation-modal-body {
+    padding: 25px;
+    max-height: 70vh; /* Pehle yeh 50vh tha */
+    overflow-y: auto;
+}
+</style>
+</head>
+<body data-theme="light"> 
+    
+    <div id="page-loader"><div class="wrapper"><div class="circle"></div><div class="circle"></div><div class="circle"></div><div class="shadow"></div><div class="shadow"></div><div class="shadow"></div></div></div>
+    
+    <header class="header">
+		<a href="index.html" class="logo"><img src="assets/images/pbl-logo.png" alt="PBL Logo"><span class="logo-text-connect">Connect</span></a>
+        <div class="header-center">
+            <a href="https://www.panbusiness.net/eng/index.php" target="_blank" class="header-icon-button color-orange" data-tooltip="PBL Global Website"><i class="fas fa-globe"></i></a>
+            <a href="https://ede.dp-ds.de/vpn/index.html" target="_blank" class="header-icon-button color-skyblue" data-tooltip="Citrix Website"><i class="fas fa-desktop"></i></a>
+            <a href="https://translate.google.com/" target="_blank" class="header-icon-button color-green" data-tooltip="Google Translate"><i class="fas fa-language"></i></a>
+            <a href="#" id="notification-bell-wrapper" class="header-icon-button" aria-label="View notifications" data-tooltip="Notifications"><svg viewBox="0 0 24 24" fill="none" height="24" width="24"><path d="M12 5.365V3m0 2.365a5.338 5.338 0 0 1 5.133 5.368v1.8c0 2.386 1.867 2.982 1.867 4.175 0 .593 0 1.292-.538 1.292H5.538C5 18 5 17.301 5 16.708c0-1.193 1.867-1.789 1.867-4.175v-1.8A5.338 5.338 0 0 1 12 5.365ZM8.733 18c.094.852.306 1.54.944 2.112a3.48 3.48 0 0 0 4.646 0c.638-.572 1.236-1.26 1.33-2.112h-6.92Z" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke="currentColor"></path></svg><div id="notification-badge"></div></a>
+        </div>
+        <div class="clock-container">
+            <div class="location-clock-wrapper" id="india-clock-wrapper"><div class="location-clock" id="india-clock"><div class="clock-flag"></div><div class="clock-details"><div class="time"><span id="india-hour">--</span>:<span id="india-minute">--</span> <span id="india-ampm">--</span></div><div class="date">----------</div></div></div></div>
+            <div class="location-clock-wrapper" id="german-clock-wrapper"><div class="location-clock" id="german-clock"><div class="clock-flag"></div><div class="clock-details"><div class="time"><span id="german-hour">--</span>:<span id="german-minute">--</span> <span id="german-ampm">--</span></div><div class="date">----------</div></div></div></div>
+        </div>
+    </header>
+
+    <main class="container main-content">
+        <div class="page-hero animate-on-load">
+            <h1><i class="fas fa-pencil-alt"></i> Daily Output Form</h1>
+            <p>Please fill in your details for today's work.</p>
+        </div>
+        
+        <div class="form-wrapper">
+            <form id="output-form" class="output-form card neumorphic-card animate-on-load">
+                
+                <div id="personal-stats-card" class="personal-stats-card">
+                    <h3 id="welcome-message" style="text-align: center; margin-top: 0;">Welcome!</h3>
+                    <div class="personal-stats-grid">
+                        <div class="stat-item"><div id="best-rph" class="value">0.0</div><div class="label">Best RPH (This Week)</div></div>
+                        <div class="stat-item"><div id="avg-rph" class="value">0.0</div><div class="label">Average RPH (This Week)</div></div>
+                    </div>
+                </div>
+
+                <fieldset id="form-fieldset" style="border:none; padding: 0; margin: 0;">
+                    
+                    <div class="form-group full-width">
+                        <label class="field-label"><i class="fas fa-user"></i> Your Name</label>
+                        <div class="custom-dropdown-container" id="user-name-dropdown">
+                            <div class="dropdown-selected-option"><span>Loading Names...</span><i class="fas fa-chevron-down"></i></div>
+                            <div class="dropdown-options-list"></div>
+                        </div>
+                    </div>
+					<!-- =================================================================== -->
+<!-- |      FINAL: Interactive "Pick Up Where You Left Off" Card     | -->
+<!-- =================================================================== -->
+<div id="quick-add-card" class="quick-add-card" style="display: none;">
+    
+    <h4 id="pick-up-title" class="quick-add-title">
+        <!-- Title will be set by JavaScript -->
+    </h4>
+
+    <!-- Featured project section -->
+    <div id="last-project-feature" class="last-project-feature">
+        <div class="last-project-info">
+            <div id="last-project-name" class="project-name"></div>
+            <div class="project-stats">
+    <!-- Stat 1: Date -->
+    <span><i class="fas fa-calendar-alt"></i><span id="last-project-date">On 2 Aug</span></span>
+
+    <!-- Stat 2: Records (The one we are fixing) -->
+    <span>
+        <i class="fas fa-chart-bar"></i>
+        <span id="last-project-records">158</span>
+        <span class="stat-unit">records</span>
+    </span>
+
+    <!-- Stat 3: Time -->
+    <span><i class="fas fa-stopwatch"></i><span id="last-project-time">3 hr 18 min</span></span>
+</div>
+        </div>
+        <button type="button" id="add-again-btn" class="add-again-btn" title="Add this project to a new entry">
+            <i class="fas fa-redo-alt"></i> Add Again
+        </button>
+    </div>
+
+    <hr class="quick-add-divider">
+
+    <!-- Secondary projects section -->
+    <div id="other-projects-wrapper" class="other-projects-wrapper" style="display: none;">
+        <span class="other-projects-label">Or, add another recent project:</span>
+        <div id="quick-projects-list" class="quick-projects-list" style="margin-top: 10px;"></div>
+    </div>
+
+</div>
+
+                    <hr style="border: none; border-top: 1px solid var(--border-color); margin: 30px 0;">
+
+                    <div class="form-group full-width">
+                        <label class="field-label"><i class="fas fa-clock"></i> Select Your Shift</label>
+                        <div class="radio-input-wrapper">
+                            <div class="radio-input">
+                                <label>
+                                    <input type="radio" name="Shift" value="Morning" required>
+                                    <div class="card morning">
+                                        <i class="fas fa-sun logo"></i>
+                                        <div class="title">Morning</div>
+                                        <span class="subtitle">8:30am to 4:30pm</span>
+                                    </div>
+                                </label>
+                                <label>
+                                    <input type="radio" name="Shift" value="Evening" required>
+                                    <div class="card evening">
+                                        <i class="fas fa-moon logo"></i>
+                                        <div class="title">Evening</div>
+                                        <span class="subtitle">2:15pm to 9:30pm</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+						<!-- ======================================================= -->
+						<!-- === NEW, MODERN "HUD" STYLE SHIFT TIMER           === -->
+						<!-- ======================================================= -->
+						<div id="dynamic-shift-timer-hud" class="dynamic-shift-timer-hud" style="display: none;">
+							<!-- Line 1: Timers -->
+							<div class="timer-hud-top-line">
+								<div class="timer-hud-time-spent">
+									<span class="timer-hud-label">Time Spent</span>
+									<p id="timer-hud-spent-value" class="timer-hud-value">00:00:00</p>
+								</div>
+								<div class="timer-hud-time-left">
+									<span class="timer-hud-label">Time Left</span>
+									<p id="timer-hud-left-value" class="timer-hud-value secondary">00:00:00</p>
+								</div>
+							</div>
+							<!-- Line 2: Progress Bar with Info -->
+							<div class="timer-hud-progress-container">
+								<div id="timer-hud-progress-fill" class="timer-hud-progress-fill"></div>
+								<div id="timer-hud-break-markers" class="timer-hud-break-markers"></div>
+								<div class="timer-hud-progress-info">
+									<span id="timer-hud-emoji"></span>
+									<span id="timer-hud-end-time"></span>
+								</div>
+							</div>
+						</div>
+						<!-- ======================================================= -->
+						<!-- ============================================= -->
+                    </div>
+
+                    <!-- ================================= -->
+					 <!-- === NEW WORK MODE SWITCH HERE === -->
+					 <!-- ================================= -->
+					 <div class="form-group full-width" style="margin-top: 20px;">
+						 <label class="field-label"><i class="fas fa-vial"></i> Work Mode</label>
+						 <div class="work-mode-switch-container">
+							 <span class="mode-label live active">Live</span>
+							 <label class="switch-modern">
+								 <input type="checkbox" id="work-mode-toggle">
+								 <span class="slider-modern round"></span>
+							 </label>
+							 <span class="mode-label training">Training</span>
+						 </div>
+					 </div>
+					 <!-- ================================= -->
+                    
+                    <hr style="border: none; border-top: 1px solid var(--border-color); margin: 30px 0;">
+                    
+                    <div id="project-entries-container">
+                        <!-- Project entries are dynamically added here by JavaScript -->
+                    </div>
+                    
+                    <button type="button" id="add-project-btn" class="add-project-btn"><i class="fas fa-plus"></i> Add Another Project</button>
+                    
+                    <hr style="border: none; border-top: 1px solid var(--border-color); margin: 30px 0;">
+
+                    <div class="form-group full-width">
+                        <label for="comments" class="field-label"><i class="fas fa-comment-dots"></i> Comments (Optional)</label>
+                        <textarea id="comments" class="form-input" placeholder="Any issues or notes?"></textarea>
+                    </div>
+
+                </fieldset>
+
+                <div class="form-group full-width center-content">
+                    <button type="submit" id="submit-btn" class="btn">Submit Output!</button>
+                </div>
+                <div id="message-box" class="message-box"></div>
+            </form>
+        </div>
+    </main>
+    
+    <footer class="footer">© <span id="currentYear"></span> <strong>Pan Business Lists Pvt. Ltd.</strong><small>This is a private internal portal. All access is logged as per our security policies.</small><div class="credit">Portal developed & maintained by Vikas Rawat</div></footer>
+    
+    <div id="confirmation-modal-overlay" class="confirmation-modal-overlay">
+        <div class="confirmation-modal-content">
+            <div class="confirmation-modal-header">
+                <img src="assets/images/pbl-logo.png" alt="PBL Logo">
+                <h3>Please Review Your Entry</h3>
+            </div>
+            <div class="confirmation-modal-body">
+                <div id="summary-list"></div>
+            </div>
+            <div class="confirmation-modal-footer">
+                <button type="button" id="cancel-submit-btn" class="modal-btn btn-cancel">Cancel</button>
+                <button type="button" id="confirm-submit-btn" class="modal-btn btn-confirm">Confirm & Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="theme-switcher" id="theme-switcher">
+        <button class="theme-fab" id="theme-fab-btn"><i class="fas fa-palette"></i></button>
+        <div class="theme-options" id="theme-options-panel">
+            <h4>Color Palette</h4>
+            <div class="color-bar-container" id="color-bar-container"></div>
+            <div class="mode-toggle">
+                <span id="mode-toggle-label">Light Mode</span>
+                <label class="switch"><span class="sun"><svg viewBox="0 0 24 24"><g fill="#ffd43b"><circle r="5" cy="12" cx="12"></circle><path d="m21 13h-1a1 1 0 0 1 0-2h1a1 1 0 0 1 0 2zm-17 0h-1a1 1 0 0 1 0-2h1a1 1 0 0 1 0 2zm13.66-5.66a1 1 0 0 1-.66-.29 1 1 0 0 1 0-1.41l.71-.71a1 1 0 1 1 1.41 1.41l-.71.71a1 1 0 0 1-.75.29zm-12.02 12.02a1 1 0 0 1-.71-.29 1 1 0 0 1 0-1.41l.71-.66a1 1 0 0 1 1.41 1.41l-.71.71a1 1 0 0 1-.7.24zm6.36-14.36a1 1 0 0 1-1-1v-1a1 1 0 0 1 2 0v1a1 1 0 0 1-1 1zm0 17a1 1 0 0 1-1-1v-1a1 1 0 0 1 2 0v1a1 1 0 0 1-1 1zm-5.66-14.66a1 1 0 0 1 -.7-.29l-.71-.71a1 1 0 0 1 1.41-1.41l.71.71a1 1 0 0 1 0 1.41 1 1 0 0 1-.71.29zm12.02 12.02a1 1 0 0 1-.7-.29l-.66-.71a1 1 0 0 1 1.36-1.36l.71.71a1 1 0 0 1 0 1.41 1 1 0 0 1-.71.24z"></path></g></svg></span><span class="moon"><svg viewBox="0 0 384 512"><path d="m223.5 32c-123.5 0-223.5 100.3-223.5 224s100 224 223.5 224c60.6 0 115.5-24.2 155.8-63.4 5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6-96.9 0-175.5-78.8-175.5-176 0-65.8 36-123.1 89.3-153.3 6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.5c-6.3-.5-12.6-.8-19-.8z"></path></svg></span><input type="checkbox" class="input" id="dark-mode-toggle"><span class="slider"></span></label></div><div class="mode-toggle" style="margin-top:15px"><span id="flat-mode-label">Neumorphic</span><label class="switch"><input type="checkbox" class="input" id="flat-mode-toggle"><span class="slider"></span></label></div></div></div>
+				
+			<!-- ===== YEH NAYA PERFORMANCE SUMMARY MODAL YAHAAN ADD KAREIN ===== -->
+<div id="summary-modal-overlay" class="confirmation-modal-overlay">
+    <div class="confirmation-modal-content" style="text-align: center; padding: 30px;">
+        <div id="summary-modal-body">
+            <!-- Content will be generated by JS -->
+        </div>
+        <div style="margin-top: 25px;">
+            <button id="summary-modal-close-btn" class="modal-btn btn-confirm">Got It!</button>
+        </div>
+    </div>
+</div>	
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/script.js"></script> 
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    // SCRIPT_URL ab config.js se auto-load hoga
+    
+    const outputForm = document.getElementById('output-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const messageBox = document.getElementById('message-box');
+    const entriesContainer = document.getElementById('project-entries-container');
+    const addProjectBtn = document.getElementById('add-project-btn');
+    const userNameDropdown = document.getElementById('user-name-dropdown');
+    
+    // Dono Modals (Pop-ups)
+    const confirmationModal = document.getElementById('confirmation-modal-overlay');
+    const confirmBtn = document.getElementById('confirm-submit-btn');
+    const cancelBtn = document.getElementById('cancel-submit-btn');
+    const summaryList = document.getElementById('summary-list');
+    
+    const summaryModal = document.getElementById('summary-modal-overlay');
+    const summaryBody = document.getElementById('summary-modal-body');
+    const summaryCloseBtn = document.getElementById('summary-modal-close-btn');
+
+    // Data store karne ke liye variables
+    let projectEntryTemplate = '';
+    let employeeOptionsCache = [];
+    let projectOptionsCache = { citrix: [], nonCitrix: [] };
+    let allUserOutputs = [];
+    let formDataToSubmit = [];
+    let isSubmitting = false;
+
+    // ===================================================================
+    // |                      Helper Functions                         |
+    // |     Chhote-chhote kaam karne waale functions jo baar-baar use honge    |
+    // ===================================================================
+
+    /**
+     * Yeh function '4 hr 30 min' jaise text ko decimal hours (4.5) mein convert karta hai.
+     * Calculation ke liye zaroori hai.
+     */
+    function parseHours(timeStr) {
+        if (!timeStr) return 0;
+        const t = String(timeStr);
+        const h = t.match(/(\d+)\s*hr/);
+        const m = t.match(/(\d+)\s*min/);
+        return (h ? parseInt(h[1], 10) : 0) + (m ? parseInt(m[1], 10) / 60 : 0);
+    }
+    
+    /**
+     * Yeh function numbers ko animate karke count up karta hai.
+     * Ise RPH aur 'Last Entry' stats ko animate karne ke liye use karte hain.
+     * Yeh decimal points (jaise 87.5) aur time format (hr min) dono handle kar sakta hai.
+     */
+    function animateCountUp(element, endValue, isTime = false, decimalPlaces = 0) {
+        let startValue = 0;
+        const duration = 1200; // Animation 1.2 seconds tak chalega
+        const frameRate = 60;
+        const totalFrames = Math.round(duration / (1000 / frameRate));
+        const increment = endValue / totalFrames;
+
+        let currentFrame = 0;
+        const timer = setInterval(() => {
+            currentFrame++;
+            startValue += increment;
+            
+            if (isTime) {
+                const hours = Math.floor(startValue);
+                const minutes = Math.round((startValue % 1) * 60);
+                element.textContent = `${hours} hr ${minutes} min`;
+            } else {
+                element.textContent = startValue.toFixed(decimalPlaces);
+            }
+            
+            if (currentFrame === totalFrames) {
+                clearInterval(timer);
+                // Animation ke end mein final value ko bilkul correct set karte hain.
+                if (isTime) {
+                     const hours = Math.floor(endValue);
+                     const minutes = Math.round((endValue % 1) * 60);
+                     element.textContent = `${hours} hr ${minutes} min`;
+                } else {
+                     element.textContent = endValue.toFixed(decimalPlaces);
+                }
+            }
+        }, 1000 / frameRate);
+    }
+
+    /**
+     * Yeh function poore employee code se sirf short code nikalta hai (jaise 'vikas' from 'pbl/dev/vikas').
+     */
+    function getShortCode(fullCode) {
+        if (!fullCode || typeof fullCode !== 'string') return '';
+        const parts = fullCode.split('/');
+        return parts[parts.length - 1];
+    }
+
+    /**
+     * Jab review modal khula ho, tab 'Enter' aur 'Tab' keys ko handle karta hai.
+     */
+    function handleModalKeystrokes(e) {
+        const modal = document.getElementById('confirmation-modal-overlay');
+        if (!modal.classList.contains('visible')) return;
+        const focusableElements = modal.querySelectorAll('button');
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('confirm-submit-btn').click();
+        }
+        if (e.key === 'Tab') {
+            if (e.shiftKey) {
+                if (document.activeElement === firstElement) {
+                    lastElement.focus();
+                    e.preventDefault();
+                }
+            } else {
+                if (document.activeElement === lastElement) {
+                    firstElement.focus();
+                    e.preventDefault();
+                }
+            }
+        }
+    }
+    
+    // ===================================================================
+    // |                  Core Application Functions                     |
+    // |        Yeh form ke main features ko control karne wale functions hain     |
+    // ===================================================================
+
+    /**
+     * Yeh ek normal select box ko ek sundar, searchable dropdown mein badal deta hai.
+     */
+    function setupCustomDropdown(container, options, isUserDropdown = false) {
+        const selectedOptionEl = container.querySelector('.dropdown-selected-option span');
+        const optionsListEl = container.querySelector('.dropdown-options-list');
+        selectedOptionEl.textContent = isUserDropdown ? '-- Select Your Name --' : '-- Select Project --';
+        optionsListEl.innerHTML = '';
+        
+        const searchInput = document.createElement('input');
+        searchInput.type = 'text';
+        searchInput.placeholder = isUserDropdown ? 'Search by Name or Code...' : 'Search by Project...';
+        searchInput.className = 'hidden-search-input';
+        searchInput.style.cssText = "width: calc(100% - 20px); margin: 10px; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; font-family: inherit;";
+        optionsListEl.appendChild(searchInput);
+
+        if (isUserDropdown) {
+            options.forEach(employee => {
+                const item = document.createElement('div');
+                item.className = 'dropdown-option-item';
+                const shortCode = getShortCode(employee.code);
+                const displayText = `${employee.name} (${shortCode})`;
+                item.textContent = displayText;
+                item.dataset.value = employee.name;
+                item.dataset.display = displayText;
+                optionsListEl.appendChild(item);
+            });
+        } else if (options.citrix !== undefined) {
+            const createCategory = (title, items) => {
+                if (!items || items.length === 0) return;
+                const header = document.createElement('div');
+                header.className = 'dropdown-category-header';
+                header.innerHTML = `<i class="fas ${title.toLowerCase().includes('citrix') ? 'fa-server' : 'fa-project-diagram'}"></i> ${title}`;
+                optionsListEl.appendChild(header);
+                items.forEach(option => {
+                    const item = document.createElement('div');
+                    item.className = 'dropdown-option-item';
+                    item.textContent = option;
+                    item.dataset.value = option;
+                    optionsListEl.appendChild(item);
+                });
+            };
+            createCategory('Citrix Projects', options.citrix);
+            createCategory('Non-Citrix Projects', options.nonCitrix);
+        }
+        
+        container.querySelector('.dropdown-selected-option').addEventListener('click', e => {
+            e.stopPropagation();
+            document.querySelectorAll('.custom-dropdown-container.open').forEach(d => { if (d !== container) d.classList.remove('open'); });
+            container.classList.toggle('open');
+            if (container.classList.contains('open')) {
+                searchInput.value = '';
+                optionsListEl.querySelectorAll('.dropdown-option-item').forEach(item => { item.style.display = ''; });
+                searchInput.focus();
+            }
+        });
+
+        optionsListEl.addEventListener('click', e => {
+            if (e.target.classList.contains('dropdown-option-item')) {
+                selectedOptionEl.textContent = e.target.textContent;
+                container.dataset.selectedValue = e.target.dataset.value;
+                container.classList.remove('open');
+                if (isUserDropdown) {
+                    loadDefaults(e.target.dataset.value);
+                    calculateUserStats(e.target.dataset.value);
+                }
+            }
+        });
+
+        searchInput.addEventListener('input', () => {
+            const filter = searchInput.value.toLowerCase();
+            optionsListEl.querySelectorAll('.dropdown-option-item').forEach(item => {
+                const text = (item.dataset.display || item.textContent).toLowerCase();
+                item.style.display = text.includes(filter) ? '' : 'none';
+            });
+        });
+
+        searchInput.addEventListener('keydown', e => {
+            const visibleOptions = Array.from(optionsListEl.querySelectorAll('.dropdown-option-item')).filter(opt => opt.style.display !== 'none');
+            if (visibleOptions.length === 0) return;
+            const activeElement = optionsListEl.querySelector('.dropdown-option-item.active');
+            let currentIndex = activeElement ? visibleOptions.indexOf(activeElement) : -1;
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                currentIndex = (currentIndex + 1) % visibleOptions.length;
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                currentIndex = (currentIndex - 1 + visibleOptions.length) % visibleOptions.length;
+            } else if (e.key === 'Enter' && currentIndex > -1) {
+                e.preventDefault();
+                visibleOptions[currentIndex].click();
+                return;
+            } else if (e.key === 'Tab') {
+                container.classList.remove('open');
+                return;
+            } else {
+                return;
+            }
+            if (activeElement) activeElement.classList.remove('active');
+            visibleOptions[currentIndex].classList.add('active');
+            visibleOptions[currentIndex].scrollIntoView({ block: 'nearest' });
+        });
+    }
+    
+    /**
+     * Google Sheet se saare employee ke naam laata hai aur dropdown mein daalta hai.
+     */
+    async function populateEmployeeList() {
+        try {
+            const response = await fetch(`${SCRIPT_URL}?action=getEmployeeList`);
+            if (!response.ok) throw new Error('Failed to fetch employee list');
+            employeeOptionsCache = await response.json();
+            employeeOptionsCache.sort((a, b) => {
+                if (!a || !a.name) return 1;
+                if (!b || !b.name) return -1;
+                return a.name.localeCompare(b.name);
+            });
+            setupCustomDropdown(userNameDropdown, employeeOptionsCache, true);
+        } catch (error) {
+            console.error("Could not load employee names:", error);
+            userNameDropdown.querySelector('.dropdown-selected-option span').textContent = 'Error loading names';
+        }
+    }
+    
+    /**
+     * Google Sheet se saare projects ke naam laata hai.
+     */
+    async function populateProjectList() {
+        try {
+            const response = await fetch(`${SCRIPT_URL}?action=getProjectList`);
+            if (!response.ok) throw new Error('Failed to fetch project list');
+            const allProjects = await response.json();
+            const citrixProjectNames = ["GDP 116 (DB)", "GDP 116 (RD)", "GDP 116 (POS)", "GDP 116 (Fullna)", "GDP 116 (Base)", "GDP 116 (SVC)", "PDE", "GDP 189 (Main Class)", "GDP 189 (Prio Completion)", "GDP 189 (Completion)", "GDP 200"];
+            projectOptionsCache.citrix = allProjects.filter(p => citrixProjectNames.includes(p)).sort();
+            projectOptionsCache.nonCitrix = allProjects.filter(p => !citrixProjectNames.includes(p)).sort();
+        } catch (error) {
+            console.error("Could not load project names:", error);
+        }
+    }
+
+    /**
+     * Page load hone par, ek hi baar mein saara purana data fetch kar leta hai taaki baar-baar na karna pade.
+     */
+    async function fetchAllDataOnce() {
+        try {
+            const response = await fetch(`${SCRIPT_URL}?action=getOutputs`);
+            if (!response.ok) throw new Error('Failed to fetch all outputs');
+            allUserOutputs = await response.json();
+            allUserOutputs.sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp));
+        } catch (error) {
+            console.error("Could not fetch user outputs:", error);
+        }
+    }
+
+    /**
+     * "Submit" pe click karne ke baad, yeh review wala pop-up dikhata hai.
+     * YEH FUNCTION MODAL OVERLAY PE SHIFT KI CLASS (morning-mode/evening-mode) LAGATA HAI.
+     */
+   function showConfirmationModal(formData) {
+    let hasLowRph = false;
+
+    // Step 1: Check karo ki yeh training entry hai ya nahi.
+    const isTraining = formData[0].comments.includes('-- Training Entry --');
+
+    // Step 2: Naye design ke hisab se ek alag training banner ka HTML banao.
+    const trainingBannerHtml = isTraining 
+        ? `<div class="modal-training-banner">
+               <div class="banner-title"><i class="fas fa-vial"></i> TRAINING MODE</div>
+               <div class="banner-subtitle">This entry will be marked as training.</div>
+           </div>`
+        : '';
+
+    // Step 3: User aur Shift ka grid alag se banao.
+    let summaryHtml = `<div class="summary-grid">
+                           <div class="summary-item"><span class="summary-label"><i class="fas fa-user"></i> User Name</span><span class="summary-value">${formData[0].userName}</span></div>
+                           <div class="summary-item"><span class="summary-label"><i class="fas ${formData[0].shift === 'Morning' ? 'fa-sun' : 'fa-moon'}"></i> Shift</span><span class="summary-value">${formData[0].shift}</span></div>
+                       </div>`;
+
+    // Step 4: Training banner ko grid ke BAAD, aur 'Project Entries' se PEHLE daalo.
+    summaryHtml += trainingBannerHtml;
+
+    summaryHtml += `<hr class="summary-divider"><h4 class="summary-list-title">Project Entries</h4><ul class="summary-project-list">`;
+    
+    formData.forEach(entry => {
+        const hours = parseHours(entry.hoursWorked);
+        const rph = hours > 0 ? (Number(entry.recordsCompleted) / hours) : 0;
+        let rphClass = '';
+        if (rph < 10 && rph > 0) { hasLowRph = true; rphClass = ' low-rph'; }
+        summaryHtml += `<li class="summary-project-item${rphClass}"><strong class="project-name">${entry.projectName}</strong><span class="project-details">${entry.recordsCompleted} Records (${entry.hoursWorked})</span></li>`;
+    });
+    summaryHtml += `</ul>`;
+    if (hasLowRph) { summaryHtml += `<div class="summary-warning"><i class="fas fa-exclamation-triangle"></i> Low RPH detected. Please verify your entry.</div>`; }
+    
+    summaryList.innerHTML = summaryHtml;
+
+    const shiftMode = formData[0].shift === 'Morning' ? 'morning-mode' : 'evening-mode';
+    confirmationModal.classList.remove('morning-mode', 'evening-mode');
+    confirmationModal.classList.add(shiftMode);
+    confirmationModal.classList.add('visible');
+    document.addEventListener('keydown', handleModalKeystrokes);
+    document.getElementById('confirm-submit-btn').focus();
+}
+
+    /**
+     * Finally, data ko Google Sheet mein submit karta hai.
+     * Submit hone ke baad "Great Work!" wala pop-up dikhata hai.
+     * YEH BHI SUCCESS MODAL OVERLAY PE SHIFT KI CLASS LAGATA HAI.
+     */
+    async function submitData() {
+    if (isSubmitting) return;
+    isSubmitting = true;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+    
+    try {
+        const response = await fetch(SCRIPT_URL, { method: 'POST', mode: 'cors', body: JSON.stringify(formDataToSubmit) });
+        if (!response.ok) throw new Error(`Server responded with status: ${response.status}`);
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            let totalRecords = 0, totalHours = 0, projects = [];
+            formDataToSubmit.forEach(entry => { totalRecords += Number(entry.recordsCompleted); totalHours += parseHours(entry.hoursWorked); if (!projects.includes(entry.projectName)) projects.push(entry.projectName); });
+            const avgRph = totalHours > 0 ? (totalRecords / totalHours).toFixed(1) : '0.0';
+            const totalHoursFormatted = `${Math.floor(totalHours)} hr ${Math.round((totalHours % 1) * 60)} min`;
+            const shiftMode = formDataToSubmit[0].shift === 'Morning' ? 'morning-mode' : 'evening-mode';
+            summaryModal.classList.remove('morning-mode', 'evening-mode');
+            summaryModal.classList.add(shiftMode);
+
+            // Naya, simple training message. Iski styling CSS se hogi.
+            const isTraining = formDataToSubmit[0].comments.includes('-- Training Entry --');
+            const trainingMessageHtml = isTraining ? `<p class="training-notice-success"><i class="fas fa-vial"></i> Your training entry has been recorded.</p>` : '';
+
+            summaryBody.innerHTML = `
+                <h2 style="margin-top:0;">Great Work, ${formDataToSubmit[0].userName.split(' ')[0]}! 🔥</h2>
+                <p style="font-size: 1.1em;">Your entry has been submitted successfully.</p>
+                ${trainingMessageHtml}
+                <div class="summary-grid" style="grid-template-columns: repeat(3, 1fr); margin-top: 20px;">
+                    <div class="summary-item"><span class="summary-label">Total Records</span><span class="summary-value">${totalRecords.toLocaleString()}</span></div>
+                    <div class="summary-item"><span class="summary-label">Total Hours</span><span class="summary-value">${totalHoursFormatted}</span></div>
+                    <div class="summary-item"><span class="summary-label">Average RPH</span><span class="summary-value">${avgRph}</span></div>
+                </div>
+                <div style="margin-top: 15px; font-size: 0.9em; color: var(--text-light);">
+                    <strong>Projects Worked On:</strong> ${projects.join(', ')}
+                </div>
+                <p style="margin-top: 20px; color: var(--text-light);">Keep up the excellent work!</p>
+            `;
+            
+            summaryModal.classList.add('visible');
+            setTimeout(() => { confetti({ particleCount: 150, spread: 90, origin: { y: 0.6 }, zIndex: 3000 }); }, 100);
+
+            function closeSummaryPopup() {
+                summaryModal.classList.remove('visible');
+                summaryModal.classList.remove('morning-mode', 'evening-mode');
+                document.removeEventListener('keydown', handleEscKey);
+                document.removeEventListener('keydown', handleEnterKey);
+                outputForm.reset();
+                entriesContainer.innerHTML = '';
+                addProjectEntry(true);
+                userNameDropdown.querySelector('span').textContent = '-- Select Your Name --';
+                delete userNameDropdown.dataset.selectedValue;
+                document.getElementById('personal-stats-card').style.display = 'none';
+                document.getElementById('quick-add-card').style.display = 'none';
+                const timerContainer = document.getElementById('dynamic-shift-timer-hud');
+                if(timerContainer) timerContainer.style.display = 'none';
+            }
+            function handleEscKey(e) { if (e.key === 'Escape') { e.preventDefault(); closeSummaryPopup(); } }
+            function handleEnterKey(e) { if (e.key === 'Enter' && !confirmationModal.classList.contains('visible')) { e.preventDefault(); closeSummaryPopup(); } }
+            summaryCloseBtn.onclick = closeSummaryPopup;
+            document.addEventListener('keydown', handleEscKey);
+            document.addEventListener('keydown', handleEnterKey);
+        } else { 
+            throw new Error(result.message || "Unknown error occurred."); 
+        }
+    } catch (error) {
+        messageBox.className = 'message-box error';
+        messageBox.textContent = `⚠️ An error occurred: ${error.message}`;
+        messageBox.style.display = 'block';
+        setTimeout(() => { messageBox.style.display = 'none'; }, 6000);
+    } finally {
+        isSubmitting = false; 
+        confirmationModal.classList.remove('visible');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Submit Output!';
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = 'Confirm & Submit';
+    }
+}
+    
+    /**
+     * User select karne par, unka is hafte ka Best RPH aur Average RPH calculate karke dikhata hai.
+     * YEH 'animateCountUp' function ka use karta hai.
+     */
+    function calculateUserStats(userName) {
+        const statsCard = document.getElementById('personal-stats-card');
+        const welcomeMessage = document.getElementById('welcome-message');
+        const bestRphEl = document.getElementById('best-rph');
+        const avgRphEl = document.getElementById('avg-rph');
+        const today = new Date();
+        const startOfWeek = new Date(today);
+        startOfWeek.setDate(today.getDate() - today.getDay() + (today.getDay() === 0 ? -6 : 1));
+        startOfWeek.setHours(0, 0, 0, 0);
+        const userEntriesThisWeek = allUserOutputs.filter(entry => entry.UserName === userName && new Date(entry.Timestamp) >= startOfWeek);
+        
+        if (userEntriesThisWeek.length === 0) {
+            statsCard.style.display = 'none';
+            return;
+        }
+
+        let totalRecords = 0, totalHours = 0, bestRph = 0;
+        userEntriesThisWeek.forEach(entry => {
+            const records = Number(entry.RecordsCompleted) || 0;
+            const hours = parseHours(entry.HoursWorked);
+            totalRecords += records;
+            totalHours += hours;
+            if (hours > 0) {
+                const rph = records / hours;
+                if (rph > bestRph) bestRph = rph;
+            }
+        });
+
+        const avgRph = totalHours > 0 ? totalRecords / totalHours : 0;
+        
+        welcomeMessage.innerHTML = `Welcome back, <strong>${userName.split(' ')[0]}</strong>! 🔥`;
+        
+        animateCountUp(bestRphEl, bestRph, false, 1);
+        animateCountUp(avgRphEl, avgRph, false, 1);
+        
+        statsCard.style.display = 'block';
+    }
+    
+    /**
+     * Project entry mein work duration daalne par live RPH calculate karke dikhata hai.
+     */
+    function handleRphCalculation(entryDiv) {
+        const recordsInput = entryDiv.querySelector('.records-completed');
+        const hourDigit = entryDiv.querySelector('.time-group .animated-digit.hours');
+        const minTensDigit = entryDiv.querySelector('.time-group .animated-digit.tens');
+        const minOnesDigit = entryDiv.querySelector('.time-group .animated-digit.ones');
+        const rphPreview = entryDiv.querySelector('.live-rph-preview');
+        const adjustBtns = entryDiv.querySelectorAll('.adjust-btn');
+
+        let hours = 0;
+        let minutes = 0;
+        let intervalId, timeoutId;
+
+        const updateAnimatedDigit = (element, value) => {
+            if (!element) return;
+            const reel = element.querySelector('.digit-reel');
+            if (!reel) return;
+            const digitHeight = element.offsetHeight;
+            reel.style.transform = `translateY(-${value * digitHeight}px)`;
+            element.dataset.value = value;
+        };
+        
+        const calculateAndDisplayRPH = () => {
+            const records = parseFloat(recordsInput.value) || 0;
+            const totalHours = hours + (minutes / 60);
+            if (records > 0 && totalHours > 0) {
+                const rph = (records / totalHours).toFixed(1);
+                let emoji = '🤔';
+                if (rph >= 60) emoji = '🔥';
+                else if (rph >= 40) emoji = '👍';
+                else if (rph >= 20) emoji = '✅';
+                else emoji = '⚠️';
+                rphPreview.innerHTML = `${emoji} Est. RPH: <strong>${rph}</strong>`;
+                rphPreview.style.display = 'block';
+            } else {
+                rphPreview.style.display = 'none';
+            }
+        };
+
+        const updateTime = (target, action) => {
+            if (target === 'hours') {
+                if (action === 'plus' && hours < 12) hours++;
+                if (action === 'minus' && hours > 0) hours--;
+                updateAnimatedDigit(hourDigit, hours);
+            }
+            if (target === 'minutes') {
+                if (action === 'plus') {
+                    minutes = (minutes + 1) % 60;
+                }
+                if (action === 'minus') {
+                    minutes = (minutes - 1 + 60) % 60;
+                }
+                updateAnimatedDigit(minTensDigit, Math.floor(minutes / 10));
+                updateAnimatedDigit(minOnesDigit, minutes % 10);
+            }
+            calculateAndDisplayRPH();
+        };
+
+        adjustBtns.forEach(btn => {
+            const startAccelerating = (e) => {
+                e.preventDefault();
+                const { target, action } = btn.dataset;
+                updateTime(target, action);
+                timeoutId = setTimeout(() => {
+                    intervalId = setInterval(() => updateTime(target, action), 100);
+                }, 400);
+            };
+            const stopAccelerating = () => { clearTimeout(timeoutId); clearInterval(intervalId); };
+            btn.addEventListener('mousedown', startAccelerating);
+            btn.addEventListener('mouseup', stopAccelerating);
+            btn.addEventListener('mouseleave', stopAccelerating);
+            btn.addEventListener('touchstart', startAccelerating);
+            btn.addEventListener('touchend', stopAccelerating);
+        });
+        recordsInput.addEventListener('input', calculateAndDisplayRPH);
+    }
+
+    /**
+     * User select karne par, unki last entry ko ek sundar, interactive card mein dikhata hai.
+     */
+    function showUserSpecificInfo(userName) {
+        const quickAddCard = document.getElementById('quick-add-card');
+        const pickUpTitle = document.getElementById('pick-up-title');
+        const lastProjectNameEl = document.getElementById('last-project-name');
+        const lastProjectDateEl = document.getElementById('last-project-date');
+        const lastProjectRecordsEl = document.getElementById('last-project-records');
+        const lastProjectTimeEl = document.getElementById('last-project-time');
+        const addAgainBtn = document.getElementById('add-again-btn');
+        const otherProjectsWrapper = document.getElementById('other-projects-wrapper');
+        const quickProjectsList = document.getElementById('quick-projects-list');
+
+        const userEntries = allUserOutputs.filter(entry => entry.UserName === userName);
+        
+        if (userEntries.length > 0) {
+            const lastEntry = userEntries[0];
+            const lastEntryDate = new Date(lastEntry.Timestamp);
+            const formattedDate = lastEntryDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+            const records = parseInt(lastEntry.RecordsCompleted, 10);
+            const hoursWorked = parseHours(lastEntry.HoursWorked);
+
+            pickUpTitle.innerHTML = `<i class="fas fa-history"></i> Your Last Entry`;
+            lastProjectDateEl.textContent = `On ${formattedDate}`;
+            lastProjectNameEl.textContent = lastEntry.ProjectName;
+            animateCountUp(lastProjectRecordsEl, records, false, 0);
+            animateCountUp(lastProjectTimeEl, hoursWorked, true);
+            
+            addAgainBtn.onclick = (e) => {
+                const projectName = lastEntry.ProjectName;
+
+                addAgainBtn.classList.add('added');
+                addAgainBtn.innerHTML = `<i class="fas fa-check"></i> Added!`;
+                addAgainBtn.disabled = true;
+
+                const firstEntry = entriesContainer.querySelector('.project-entry');
+                const firstDropdown = firstEntry.querySelector('.project-name-dropdown');
+
+                if (firstDropdown && !firstDropdown.dataset.selectedValue) {
+                    firstDropdown.querySelector('.dropdown-selected-option span').textContent = projectName;
+                    firstDropdown.dataset.selectedValue = projectName;
+                    firstEntry.querySelector('.records-completed').focus();
+                } else {
+                    addProjectEntry(false);
+                    const newEntry = entriesContainer.lastElementChild;
+                    const newDropdown = newEntry.querySelector('.project-name-dropdown');
+                    newDropdown.querySelector('.dropdown-selected-option span').textContent = projectName;
+                    newDropdown.dataset.selectedValue = projectName;
+                    newEntry.querySelector('.records-completed').focus();
+                }
+
+                setTimeout(() => {
+                    addAgainBtn.classList.remove('added');
+                    addAgainBtn.innerHTML = `<i class="fas fa-redo-alt"></i> Add Again`;
+                    addAgainBtn.disabled = false;
+                }, 2000);
+            };
+
+            const otherRecentProjects = [...new Set(userEntries.map(e => e.ProjectName))]
+                                         .filter(p => p && p !== lastEntry.ProjectName)
+                                         .slice(0, 4);
+
+            if (otherRecentProjects.length > 0) {
+                quickProjectsList.innerHTML = otherRecentProjects.map(p => `<button type="button" class="quick-project-btn" data-project="${p}">${p}</button>`).join('');
+                otherProjectsWrapper.style.display = 'block';
+            } else {
+                otherProjectsWrapper.style.display = 'none';
+            }
+            quickAddCard.style.display = 'block';
+        } else {
+            quickAddCard.style.display = 'none';
+        }
+    }
+
+    /**
+     * Submit karne se pehle form ko check karta hai ki RPH ajeeb (bahut zyada ya bahut kam) toh nahi hai.
+     */
+    function validateForm() {
+        let isValid = true;
+        let warnings = [];
+        document.querySelectorAll('.project-entry').forEach(entry => {
+            const records = parseFloat(entry.querySelector('.records-completed').value) || 0;
+            const hours = parseInt(entry.querySelector('.animated-digit:not(.tens):not(.ones)').dataset.value, 10) || 0;
+            const minTens = parseInt(entry.querySelector('.animated-digit.tens').dataset.value, 10) || 0;
+            const minOnes = parseInt(entry.querySelector('.animated-digit.ones').dataset.value, 10) || 0;
+            const minutes = (minTens * 10) + minOnes;
+            const totalHours = hours + (minutes / 60);
+
+            if (totalHours > 0 && records > 0) {
+                const rph = records / totalHours;
+                if (rph > 250) warnings.push(`The RPH for one entry (${rph.toFixed(0)}) seems very high. Is this correct?`);
+                if (rph < 10) warnings.push(`The RPH for one entry (${rph.toFixed(0)}) seems very low. Please double-check.`);
+            }
+        });
+        if (warnings.length > 0) {
+            if (!confirm(warnings.join('\n') + '\n\nDo you still want to proceed?')) {
+                isValid = false;
+            }
+        }
+        return isValid;
+    }
+
+    /**
+     * Current time ke hisab se Morning ya Evening shift automatically select karta hai.
+     */
+    function autoSelectShift(callback) {
+        const now = new Date();
+        const currentTimeDecimal = now.getHours() + (now.getMinutes() / 60);
+        const cutoffTimeDecimal = 16 + (40 / 60); // 4:40 PM
+        let selectedShiftValue = null;
+        if (currentTimeDecimal < cutoffTimeDecimal) {
+            const morningShift = document.querySelector('input[name="Shift"][value="Morning"]');
+            if (morningShift) {
+                morningShift.checked = true;
+                selectedShiftValue = 'Morning';
+            }
+        } else {
+            const eveningShift = document.querySelector('input[name="Shift"][value="Evening"]');
+            if (eveningShift) {
+                eveningShift.checked = true;
+                selectedShiftValue = 'Evening';
+            }
+        }
+        if (selectedShiftValue && typeof callback === 'function') {
+            callback(selectedShiftValue);
+        }
+    }
+    
+    /**
+     * Poore form par shift ke according color styling (pink/purple) apply karta hai.
+     */
+    function applyShiftStyling(shiftValue) {
+        const modeClass = shiftValue === 'Morning' ? 'morning-mode' : 'evening-mode';
+        const formContainer = document.getElementById('output-form');
+        if(formContainer) {
+            formContainer.classList.remove('morning-mode', 'evening-mode');
+            formContainer.classList.add(modeClass);
+        }
+        document.querySelectorAll('.project-entry').forEach(entry => {
+            entry.classList.remove('morning-mode', 'evening-mode');
+            entry.classList.add(modeClass);
+        });
+    }
+
+    /**
+     * Shift select karne par live timer (HUD) ko manage karta hai.
+     */
+    function manageShiftTimer() {
+        const hudContainer = document.getElementById('dynamic-shift-timer-hud');
+        const spentValueEl = document.getElementById('timer-hud-spent-value');
+        const leftValueEl = document.getElementById('timer-hud-left-value');
+        const emojiEl = document.getElementById('timer-hud-emoji');
+        const endTimeEl = document.getElementById('timer-hud-end-time');
+        const progressBarEl = document.getElementById('timer-hud-progress-fill');
+        const shiftRadios = document.querySelectorAll('input[name="Shift"]');
+        let shiftInterval;
+
+        const formatMsToTime = (ms) => {
+            let totalSeconds = Math.floor(ms / 1000);
+            let hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+            let minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+            let seconds = String(totalSeconds % 60).padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
+        };
+
+        function triggerTimerForShift(shiftValue) {
+            clearInterval(shiftInterval);
+            const isMorning = shiftValue === 'Morning';
+            hudContainer.classList.toggle('morning-mode', isMorning);
+            hudContainer.classList.toggle('evening-mode', !isMorning);
+            emojiEl.textContent = isMorning ? '☀️' : '🌙';
+            hudContainer.style.display = 'block';
+
+            const now = new Date();
+            let shiftStartTime, shiftEndTime;
+            const totalShiftDurationMs = 8 * 3600 * 1000;
+
+            if (isMorning) {
+                shiftStartTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 30, 0);
+                shiftEndTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 16, 30, 0);
+            } else {
+                shiftStartTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 14, 15, 0);
+                shiftEndTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 21, 30, 0);
+            }
+
+            endTimeEl.textContent = `Ends at ${shiftEndTime.toLocaleTimeString('en-US', { hour: '2-digit', minute:'2-digit' })}`;
+
+            function updateTimer() {
+                const currentTime = new Date();
+                const elapsedMs = Math.max(0, currentTime - shiftStartTime);
+                const remainingMs = Math.max(0, shiftEndTime - currentTime);
+                spentValueEl.textContent = formatMsToTime(elapsedMs);
+                leftValueEl.textContent = formatMsToTime(remainingMs);
+                const progressPercentage = Math.min((elapsedMs / totalShiftDurationMs) * 100, 100);
+                progressBarEl.style.width = `${progressPercentage}%`;
+            }
+            
+            updateTimer();
+            shiftInterval = setInterval(updateTimer, 1000);
+        }
+
+        shiftRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                triggerTimerForShift(radio.value);
+                applyShiftStyling(radio.value);
+            });
+        });
+
+        return { triggerTimer: triggerTimerForShift };
+    }
+
+    /**
+     * "Add Another Project" button click hone par naya project form add karta hai.
+     * YEH AB SHIFT COLOR KO BHI NAYE FORM PAR APPLY KARTA HAI.
+     */
+    function addProjectEntry(isFirst = false) {
+        const entryWrapper = document.createElement('div');
+        entryWrapper.innerHTML = projectEntryTemplate;
+        const newEntry = entryWrapper.firstElementChild;
+        if (!newEntry) return;
+
+        const selectedShift = document.querySelector('input[name="Shift"]:checked');
+        if (selectedShift) {
+            const modeClass = selectedShift.value === 'Morning' ? 'morning-mode' : 'evening-mode';
+            newEntry.classList.add(modeClass);
+        }
+
+        const dropdown = newEntry.querySelector('.project-name-dropdown');
+        dropdown.setAttribute('tabindex', '0');
+        if (!isFirst) {
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'remove-project-btn';
+            removeBtn.innerHTML = '×';
+            removeBtn.title = 'Remove Project';
+            removeBtn.onclick = () => newEntry.remove();
+            newEntry.appendChild(removeBtn);
+        }
+        entriesContainer.appendChild(newEntry);
+        setupCustomDropdown(dropdown, projectOptionsCache, false);
+        handleRphCalculation(newEntry);
+    }
+    
+    /**
+     * User ki shift choice ko browser mein save karta hai.
+     */
+    function saveDefaults(userName, shift) {
+        try { localStorage.setItem(`pbl_userDefaults_${userName}`, JSON.stringify({ shift })); } 
+        catch (e) { console.warn("Could not save defaults.", e); }
+    }
+
+    /**
+     * User select karne par unki save ki hui shift ko load karta hai.
+     */
+    function loadDefaults(userName) {
+        try {
+            const saved = localStorage.getItem(`pbl_userDefaults_${userName}`);
+            if (saved) {
+                const defaults = JSON.parse(saved);
+                const shiftRadio = document.querySelector(`input[name="Shift"][value="${defaults.shift}"]`);
+                if (shiftRadio) shiftRadio.checked = true;
+            }
+            showUserSpecificInfo(userName);
+        } catch (e) { console.warn("Could not load defaults.", e); }
+    }
+    
+    /**
+     * Project entry form ka HTML template banata hai.
+     */
+    function createProjectEntryTemplate() {
+        projectEntryTemplate = `
+        <div class="project-entry">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="field-label"><i class="fas fa-folder"></i> Project Name</label>
+                    <div class="custom-dropdown-container project-name-dropdown">
+                        <div class="dropdown-selected-option"><span>-- Select Project --</span><i class="fas fa-chevron-down"></i></div>
+                        <div class="dropdown-options-list"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="field-label"><i class="fas fa-chart-bar"></i> Records Completed</label>
+                    <input type="number" class="form-input records-completed" required min="0">
+                </div>
+                <div class="form-group full-width">
+                    <label class="field-label"><i class="fas fa-stopwatch"></i> Work Duration</label>
+                    <div class="unified-stepper-container">
+                        <div class="unified-stepper">
+                            <button type="button" class="adjust-btn" data-target="hours" data-action="minus">-</button>
+                            <div class="time-group">
+                                <div class="animated-digit hours" data-value="0"><div class="digit-reel"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span></div></div>
+                                <span class="time-label">hr</span>
+                            </div>
+                            <button type="button" class="adjust-btn" data-target="hours" data-action="plus">+</button>
+                            <div class="stepper-divider"></div>
+                            <button type="button" class="adjust-btn" data-target="minutes" data-action="minus">-</button>
+                            <div class="time-group">
+                                <div class="animated-digit tens" data-value="0"><div class="digit-reel"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div></div>
+                                <div class="animated-digit ones" data-value="0"><div class="digit-reel"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span></div></div>
+                                <span class="time-label">min</span>
+                            </div>
+                            <button type="button" class="adjust-btn" data-target="minutes" data-action="plus">+</button>
+                        </div>
+                        <div class="live-rph-preview" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    /**
+     * "Live" aur "Training" mode ke switch ko setup karta hai.
+     */
+    function setupWorkModeSwitch() {
+        const workModeToggle = document.getElementById('work-mode-toggle');
+        const commentsTextarea = document.getElementById('comments');
+        const liveLabel = document.querySelector('.mode-label.live');
+        const trainingLabel = document.querySelector('.mode-label.training');
+        
+        function updateWorkMode() {
+            const container = document.querySelector('.work-mode-switch-container');
+            const officialTrainingMarker = "-- Training Entry --";
+            const markerRegex = /--\s*Training Entry\s*--/gi;
+            const isTraining = workModeToggle.checked;
+
+            container.classList.toggle('training-active', isTraining);
+            liveLabel.classList.toggle('active', !isTraining);
+            trainingLabel.classList.toggle('active', isTraining);
+
+            let comments = commentsTextarea.value.replace(markerRegex, '').trim();
+            if (isTraining) {
+                commentsTextarea.value = comments ? `${comments}\n\n${officialTrainingMarker}` : officialTrainingMarker;
+            } else {
+                commentsTextarea.value = comments;
+            }
+        }
+
+        if (workModeToggle && commentsTextarea && liveLabel && trainingLabel) {
+            workModeToggle.addEventListener('change', updateWorkMode);
+            liveLabel.addEventListener('click', () => {
+                if (workModeToggle.checked) { workModeToggle.checked = false; updateWorkMode(); }
+            });
+            trainingLabel.addEventListener('click', () => {
+                if (!workModeToggle.checked) { workModeToggle.checked = true; updateWorkMode(); }
+            });
+        }
+    }
+
+    // ===================================================================
+    // |              Initialization & Event Listeners                   |
+    // |       Page load hone par sabse pehle yeh function chalta hai        |
+    // ===================================================================
+
+    async function initializeForm() {
+        createProjectEntryTemplate();
+        try {
+            const timerControls = manageShiftTimer();
+            await Promise.all([populateEmployeeList(), populateProjectList(), fetchAllDataOnce()]);
+            addProjectEntry(true);
+            userNameDropdown.setAttribute('tabindex', '0');
+            userNameDropdown.focus();
+            
+            autoSelectShift((selectedShift) => {
+                timerControls.triggerTimer(selectedShift);
+                applyShiftStyling(selectedShift);
+            });
+            setupWorkModeSwitch();
+        } catch (error) {
+            messageBox.className = 'message-box error';
+            messageBox.textContent = 'Error loading initial data. Please refresh.';
+            messageBox.style.display = 'block';
+            console.error("Initialization failed:", error);
+        }
+    }
+    
+    // Yahan saare buttons ke click events set kiye jaa rahe hain.
+    addProjectBtn.addEventListener('click', () => addProjectEntry(false));
+    
+    outputForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!validateForm()) return;
+        const userName = userNameDropdown.dataset.selectedValue;
+        const shiftRadio = document.querySelector('input[name="Shift"]:checked');
+        if (!userName || !shiftRadio) {
+            alert('Please select your name and shift.');
+            return;
+        }
+        formDataToSubmit = [];
+        let isValid = true;
+        document.querySelectorAll('.project-entry').forEach(entry => {
+            const projectName = entry.querySelector('.project-name-dropdown').dataset.selectedValue;
+            const records = entry.querySelector('.records-completed').value;
+            const hours = parseInt(entry.querySelector('.animated-digit:not(.tens):not(.ones)').dataset.value, 10) || 0;
+            const minTens = parseInt(entry.querySelector('.animated-digit.tens').dataset.value, 10) || 0;
+            const minOnes = parseInt(entry.querySelector('.animated-digit.ones').dataset.value, 10) || 0;
+            const minutes = (minTens * 10) + minOnes;
+
+            if (!projectName || !records || records < 1 || (hours === 0 && minutes === 0)) {
+                isValid = false;
+            }
+            formDataToSubmit.push({
+                userName, 
+                shift: shiftRadio.value, 
+                projectName, 
+                recordsCompleted: records,
+                hoursWorked: `${hours || 0} hr ${minutes || 0} min`,
+                comments: document.getElementById('comments').value || 'N/A'
+            });
+        });
+        if (!isValid) { 
+            alert('Please fill out Project Name, Records (>0), and Work Duration for all entries.'); 
+            return;
+        }
+        saveDefaults(userName, shiftRadio.value); // Shift choice save karo
+        showConfirmationModal(formDataToSubmit);
+    });
+    
+    confirmBtn.addEventListener('click', () => {
+        document.removeEventListener('keydown', handleModalKeystrokes);
+        submitData();
+    });
+
+    cancelBtn.addEventListener('click', () => {
+        confirmationModal.classList.remove('visible');
+        confirmationModal.classList.remove('morning-mode', 'evening-mode'); // Class saaf karo
+        document.removeEventListener('keydown', handleModalKeystrokes);
+        document.getElementById('submit-btn').focus();
+    });
+
+    document.getElementById('quick-projects-list').addEventListener('click', e => {
+        if (e.target.classList.contains('quick-project-btn')) {
+            const projectName = e.target.dataset.project;
+            const firstEntry = entriesContainer.querySelector('.project-entry');
+            const firstDropdown = firstEntry.querySelector('.project-name-dropdown');
+            if (firstDropdown && !firstDropdown.dataset.selectedValue) {
+                firstDropdown.querySelector('.dropdown-selected-option span').textContent = projectName;
+                firstDropdown.dataset.selectedValue = projectName;
+                firstEntry.querySelector('.records-completed').focus();
+            } else {
+                addProjectEntry(false);
+                const newEntry = entriesContainer.lastElementChild;
+                const newDropdown = newEntry.querySelector('.project-name-dropdown');
+                newDropdown.querySelector('.dropdown-selected-option span').textContent = projectName;
+                newDropdown.dataset.selectedValue = projectName;
+                newEntry.querySelector('.records-completed').focus();
+            }
+        }
+    });
+
+    // Form ko initialize karo
+    initializeForm();
+});
+</script>
+</body>
+</html>

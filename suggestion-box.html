@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suggestion Box - PBL Connect</title>
+    
+    <link rel="icon" href="assets/images/pbl-logo.png" type="image/png"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Global Config & Styles -->
+    <script src="config.js"></script>
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <!-- Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
+    <style>
+        /* =========================================
+           CORE STYLES
+           ========================================= */
+        :root {
+            --theme-primary: #3191d1;
+            --bad-color: #e74c3c;
+            --good-color: #2ecc71;
+        }
+
+    body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow-y: auto;
+    background-color: transparent !important; /* 👈 Transparent taaki dark blur dikhe */
+}
+
+        #particles-js {
+            position: fixed; width: 100%; height: 100%;
+            background-color: transparent !important; /* 👈 Particles transparent background par chalenge */
+            z-index: 0; top: 0; left: 0;
+            pointer-events: none;
+        }
+
+        .main-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 1;
+}
+
+        /* 🚀 Close X Button on Modal Header */
+        .modal-close-btn {
+            position: absolute;
+            top: 22px;
+            right: 24px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 15px;
+            transition: all 0.25s ease;
+            backdrop-filter: blur(8px);
+            z-index: 10;
+        }
+        .modal-close-btn:hover {
+            background: rgba(239, 68, 68, 0.85); /* Red hover */
+            border-color: rgba(239, 68, 68, 1);
+            transform: rotate(90deg) scale(1.05);
+        }
+
+        /* =========================================
+           CARD & FORM
+           ========================================= */
+        /* Card Parent - Ispe Relative hona zaroori hai */
+.suggestion-card {
+    width: 100%;
+    max-width: 900px;
+    background: var(--surface-color);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    
+    /* 👇 SABSE IMPORTANT FIX */
+    position: relative;  
+    overflow: hidden; 
+}
+
+/* Success Message - Isko hawa mein card ke upar tairna chahiye */
+.success-overlay {
+    position: absolute; /* Isse ye card ke upar aayega, neeche nahi */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--surface-color); /* Card ka background match karega */
+    border-radius: 20px;
+    
+    display: none; /* Shuru mein gayab rahega */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    text-align: center;
+}
+
+        @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .card-hero {
+    background: linear-gradient(135deg, var(--theme-primary) 0%, #8e44ad 100%);
+    color: #fff;
+    padding: 30px 35px; /* 👈 Padding bohot kam kar di */
+    border-radius: 20px 20px 0 0;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.5s ease;
+    text-align: center; 
+    box-shadow: inset 0 -10px 20px rgba(0,0,0,0.1);
+}
+
+.card-hero h2 { 
+    margin: 0; 
+    font-size: 1.5em; /* 👈 Font size 2em se 1.5em kar diya */
+    font-weight: 700; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    gap: 10px; 
+    text-shadow: 0 4px 10px rgba(0,0,0,0.2); 
+}
+
+/* 👇 NAYA CODE: Sirf Bulb Icon ko Yellow Glow denge */
+.card-hero h2 i {
+    color: #f1c40f; /* Bright Yellow */
+    text-shadow: 0 0 15px rgba(241, 196, 15, 0.6); /* Glow Effect */
+}
+        .card-hero p { margin: 5px 0 0; opacity: 0.95; font-size: 1em; font-weight: 400; }
+
+        .card-body { 
+    /* Bottom padding ko 30px kar diya */
+    /* Isse button ke neeche white area dikhega */
+    padding: 20px 30px 30px 30px; 
+    z-index: 1; 
+    display: flex;          /* 👇 Ensure layout stays vertical */
+    flex-direction: column; /* 👇 Content flows down */
+}
+
+        .identity-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1.5fr 0.8fr;
+    gap: 15px;
+    margin-bottom: 10px; /* 👈 Gap kam kar diya */
+}
+
+/* 👇 NAYA RULE: Saare form groups ka gap kam karne ke liye */
+.form-group {
+    margin-bottom: 5px !important; /* Forcefully 25px se 15px kar diya */
+    position: relative;
+}
+
+        label { 
+            font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.8px; 
+            color: var(--text-light); font-weight: 700; margin-bottom: 8px; display: block; 
+        }
+
+        .input-box {
+            width: 100%; height: 50px; padding: 0 15px; font-size: 0.95em;
+            border: 1px solid var(--border-color); border-radius: 12px; outline: none;
+            background: #f8f9fa; color: var(--text-dark);
+            font-family: inherit; font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .input-box:focus { background: #fff; border-color: var(--theme-primary); box-shadow: 0 0 0 4px rgba(var(--primary-color-rgb), 0.1); }
+        .input-box[readonly] { background: #e9ecef; color: #6c757d; cursor: not-allowed; border-color: transparent; }
+
+        /* Dropdown */
+        .form-group { position: relative; }
+        .dropdown-list {
+            position: absolute; top: 105%; left: 0; width: 100%;
+            background: var(--surface-color); border-radius: 12px;
+            max-height: 220px; overflow-y: auto; z-index: 9999; display: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15); border: 1px solid var(--border-color);
+        }
+        .dropdown-list.active { display: block; }
+        .dropdown-item { padding: 12px 20px; cursor: pointer; font-size: 0.9em; color: var(--text-dark); border-bottom: 1px solid #f1f1f1; transition: 0.1s; }
+        .dropdown-item:hover, .dropdown-item.focused { background: var(--theme-primary); color: #fff; padding-left: 25px; font-weight: 600; }
+
+        textarea.input-box { height: 60px; padding: 10px 15px; resize: none; line-height: 1.4; }
+
+        /* Chips */
+        .dept-options { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 30px; }
+        .dept-chip input { display: none; }
+        .chip-label {
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 20px; background: var(--surface-color);
+            border: 1px solid var(--border-color); border-radius: 50px;
+            font-size: 0.85em; font-weight: 600; color: var(--text-light);
+            cursor: pointer; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .chip-label:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        
+        /* Chip Colors */
+        .dept-chip input[value="Production"]:checked + .chip-label { background: #fff3e0; color: #e67e22; border-color: #e67e22; }
+        .dept-chip input[value="IT Dept"]:checked + .chip-label { background: #e3f2fd; color: #3498db; border-color: #3498db; }
+        .dept-chip input[value="HR Dept"]:checked + .chip-label { background: #fce4ec; color: #e84393; border-color: #e84393; }
+        .dept-chip input[value="Facility"]:checked + .chip-label { background: #e8f5e9; color: #27ae60; border-color: #27ae60; }
+        .dept-chip input[value="General"]:checked + .chip-label { background: #eceff1; color: #607d8b; border-color: #607d8b; }
+
+        /* Button */
+        .submit-btn {
+            width: 100%; padding: 16px; border: none; border-radius: 12px;
+            background: var(--theme-primary); color: #fff;
+            font-size: 1.1em; font-weight: 600; cursor: pointer;
+            transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        .submit-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(0,0,0,0.2); filter: brightness(1.1); }
+
+        .footer { 
+    padding: 5px 10px 15px 10px; /* 👈 Padding bohot kam kar di */
+    margin-top: 0; 
+    font-size: 0.85em; /* Font thoda chhota kiya taaki fit aaye */
+    z-index: 1000; 
+    background: transparent; 
+    border: none; 
+    text-align: center; 
+    flex-shrink: 0;
+    color: var(--text-light);
+}
+
+        /* THEME SWITCHER FIXES */
+        .theme-switcher { position: fixed; bottom: 30px; right: 30px; z-index: 10000 !important; }
+        
+        .theme-fab {
+            width: 60px; height: 60px;
+            background-color: var(--theme-primary);
+            color: #fff; border-radius: 50%; border: none;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 1.8em; box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .theme-fab:hover { transform: scale(1.1) rotate(20deg); }
+        
+        .theme-options {
+            position: absolute; bottom: 80px; right: 0;
+            background-color: var(--surface-color);
+            padding: 20px; border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            opacity: 0; visibility: hidden; pointer-events: none;
+            transform: translateY(20px); transition: all 0.3s ease;
+            width: 240px; border: 1px solid var(--border-color);
+        }
+        
+        .theme-switcher.active .theme-options { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0); }
+        .theme-options h4 { margin: 0 0 15px; text-align: center; font-size: 1em; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+        .color-bar-container { display: flex; width: 100%; height: 30px; border-radius: 15px; overflow: hidden; margin-bottom: 20px; border: 1px solid var(--border-color); }
+        .color-segment { flex: 1; height: 100%; cursor: pointer; transition: transform 0.2s; }
+        .color-segment:hover { transform: scaleY(1.2); }
+
+        @media (max-width: 768px) {
+            .identity-grid { grid-template-columns: 1fr; gap: 10px; }
+            body { overflow-y: auto; height: auto; }
+        }
+		/* --- FEEDBACK TYPE SPECIFIC COLORS --- */
+        
+        /* Improvement (Green) */
+        .dept-chip input[value="Improvement"]:checked + .chip-label { 
+            background: #e8f5e9; 
+            color: #2ecc71; 
+            border-color: #2ecc71; 
+            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.2); 
+        }
+
+        /* Complaint (Red) */
+        .dept-chip input[value="Complaint"]:checked + .chip-label { 
+            background: #fdedec; 
+            color: #e74c3c; 
+            border-color: #e74c3c; 
+            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.2); 
+        }
+
+        /* Appreciation (Yellow/Gold) */
+        .dept-chip input[value="Appreciation"]:checked + .chip-label { 
+            background: #fef9e7; 
+            color: #f1c40f; 
+            border-color: #f1c40f; 
+            box-shadow: 0 4px 10px rgba(241, 196, 15, 0.2); 
+        }
+    </style>
+</head>
+<body data-theme="light">
+
+    <div id="particles-js"></div>
+
+    
+    <!-- Theme Switcher -->
+    <div class="theme-switcher" id="theme-switcher">
+        <button class="theme-fab" id="theme-fab-btn"><i class="fas fa-palette"></i></button>
+        <div class="theme-options" id="theme-options-panel">
+            <h4>Color Palette</h4>
+            <div class="color-bar-container" id="color-bar-container"></div>
+            <div class="mode-toggle"><span id="mode-toggle-label">Light Mode</span><label class="switch"><span class="sun"><svg viewBox="0 0 24 24"><g fill="#ffd43b"><circle r="5" cy="12" cx="12"></circle><path d="m21 13h-1a1 1 0 0 1 0-2h1a1 1 0 0 1 0 2zm-17 0h-1a1 1 0 0 1 0-2h1a1 1 0 0 1 0 2zm13.66-5.66a1 1 0 0 1-.66-.29 1 1 0 0 1 0-1.41l.71-.71a1 1 0 1 1 1.41 1.41l-.71.71a1 1 0 0 1-.75.29zm-12.02 12.02a1 1 0 0 1-.71-.29 1 1 0 0 1 0-1.41l.71-.66a1 1 0 0 1 1.41 1.41l-.71.71a1 1 0 0 1-.7.24zm6.36-14.36a1 1 0 0 1-1-1v-1a1 1 0 0 1 2 0v1a1 1 0 0 1-1 1zm0 17a1 1 0 0 1-1-1v-1a1 1 0 0 1 2 0v1a1 1 0 0 1-1 1zm-5.66-14.66a1 1 0 0 1-.7-.29l-.71-.71a1 1 0 0 1 1.41-1.41l.71.71a1 1 0 0 1 0 1.41 1 1 0 0 1-.71.29zm12.02 12.02a1 1 0 0 1-.7-.29l-.66-.71a1 1 0 0 1 1.36-1.36l.71.71a1 1 0 0 1 0 1.41 1 1 0 0 1-.71.24z"></path></g></svg></span><span class="moon"><svg viewBox="0 0 384 512"><path d="m223.5 32c-123.5 0-223.5 100.3-223.5 224s100 224 223.5 224c60.6 0 115.5-24.2 155.8-63.4 5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6-96.9 0-175.5-78.8-175.5-176 0-65.8 36-123.1 89.3-153.3 6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.5c-6.3-.5-12.6-.8-19-.8z"></path></svg></span><input type="checkbox" class="input" id="dark-mode-toggle"><span class="slider"></span></label></div>
+        </div>
+    </div>
+
+    <div class="main-container" onclick="if(event.target === this) closeModalWindow()">
+        <form id="suggestionForm" class="suggestion-card" onclick="event.stopPropagation()">
+            
+            <div class="card-hero" style="position: relative;">
+                <!-- 🚀 Top Right Close 'X' Button -->
+                <button type="button" onclick="closeModalWindow()" class="modal-close-btn" title="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+
+                <h2><i class="fas fa-lightbulb"></i> The Digital Suggestion Box</h2>
+                <p>Share without hesitation. We are digitizing transparency to build a smarter, faster, and better PBL.</p>
+            </div>
+
+            <div class="card-body">
+                <div class="identity-grid">
+                    <div class="form-group">
+                        <label>Employee Name <span style="color:var(--bad-color)">*</span></label>
+                        <input type="text" id="searchBox" class="input-box" placeholder="Search name..." autocomplete="off" required>
+                        <div id="dropdown" class="dropdown-list"></div>
+                        <input type="hidden" id="fullName" name="Name">
+                    </div>
+                    <div class="form-group">
+					<label>Department</label>
+					<input type="text" id="department" name="UserDepartment" class="input-box" readonly placeholder="--">
+					</div>
+                    <div class="form-group">
+                        <label>PF Code</label>
+                        <input type="text" id="pfCode" name="PF Code" class="input-box" readonly placeholder="--">
+                    </div>
+                </div>
+				<!-- ⭐ NEW: FEEDBACK TYPE SECTION START ⭐ -->
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label style="margin-bottom: 10px;">Type of Feedback</label>
+                    <div class="dept-options" style="gap: 10px;">
+                        <label class="dept-chip">
+                            <input type="radio" name="SuggestionType" value="Improvement">
+                            <span class="chip-label"><i class="fas fa-lightbulb"></i> Improvement</span>
+                        </label>
+                        <label class="dept-chip">
+                            <input type="radio" name="SuggestionType" value="Complaint">
+                            <span class="chip-label"><i class="fas fa-exclamation-circle"></i> Complaint</span>
+                        </label>
+                        <label class="dept-chip">
+                            <input type="radio" name="SuggestionType" value="Appreciation">
+                            <span class="chip-label"><i class="fas fa-heart"></i> Appreciation</span>
+                        </label>
+                    </div>
+                </div>
+                <!-- ⭐ NEW SECTION END ⭐ -->
+
+                <div class="form-group" style="margin-bottom: 25px;">
+                    <label>Your Suggestion / Idea <span style="color:var(--bad-color)">*</span></label>
+                    <textarea id="suggestion" name="Suggestion" class="input-box" placeholder="Describe your idea in detail..." required></textarea>
+                    <div style="text-align:right; font-size:0.75em; margin-top:5px; font-weight:600;">
+                        <span id="charCount" style="color:var(--bad-color); transition:0.3s;">0 / 20 chars</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label style="margin-bottom: 12px;">Which Department Does This Concern?</label>
+                    <div class="dept-options">
+                        <label class="dept-chip"><input type="radio" name="TargetDept" value="Production"><span class="chip-label"><i class="fas fa-cogs"></i> Production Dept</span></label>
+                        <label class="dept-chip"><input type="radio" name="TargetDept" value="IT Dept"><span class="chip-label"><i class="fas fa-laptop-code"></i> IT Dept</span></label>
+                        <label class="dept-chip"><input type="radio" name="TargetDept" value="HR Dept"><span class="chip-label"><i class="fas fa-users"></i> HR Dept</span></label>
+                        <label class="dept-chip"><input type="radio" name="TargetDept" value="Facility"><span class="chip-label"><i class="fas fa-building"></i> Facility Dept</span></label>
+                        <label class="dept-chip"><input type="radio" name="TargetDept" value="General"><span class="chip-label"><i class="fas fa-globe"></i> Overall</span></label>
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn" class="submit-btn">
+                    <i class="fas fa-paper-plane"></i> Submit Suggestion
+                </button>
+            </div>
+
+            <!-- Success Overlay -->
+            <div id="successOverlay" class="success-overlay">
+                <div class="success-icon-animate"><i class="fas fa-check-circle"></i></div>
+                <h3 style="color:var(--text-dark); font-size: 1.8em;">Thank You!</h3>
+                <p style="color:var(--text-light); opacity:0.8;">Your suggestion has been successfully recorded.</p>
+                <button type="button" class="submit-btn" style="width:auto; margin-top:20px; padding:10px 30px;" onclick="location.reload()">Submit Another</button>
+                <a href="index.html" style="margin-top:15px; font-size:0.9em; color:var(--theme-primary); text-decoration:none; font-weight:600;">Back to Home</a>
+            </div>
+
+        </form>
+    </div>
+
+
+    <script src="assets/js/config.js"></script>
+    <!-- NOTE: Removing the external script.js reference to avoid conflicts with inline theme logic. 
+         We will include the necessary logic inline. -->
+    <!-- <script src="assets/js/script.js"></script> -->
+
+    <script>
+        // SCRIPT_URL ab config.js se auto-load hoga
+
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // 1. PARTICLES INIT
+            if (window.particlesJS) {
+                particlesJS("particles-js", {
+                    "particles": {
+                        "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+                        "color": { "value": "#3191d1" },
+                        "shape": { "type": "circle" },
+                        "opacity": { "value": 0.5, "random": false },
+                        "size": { "value": 3, "random": true },
+                        "line_linked": { "enable": true, "distance": 150, "color": "#3191d1", "opacity": 0.4, "width": 1 },
+                        "move": { "enable": true, "speed": 3, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false }
+                    },
+                    "interactivity": {
+                        "detect_on": "canvas",
+                        "events": { "onhover": { "enable": true, "mode": "repulse" }, "onclick": { "enable": true, "mode": "push" }, "resize": true },
+                        "modes": { "grab": { "distance": 400, "line_linked": { "opacity": 1 } }, "bubble": { "distance": 400, "size": 40, "duration": 2, "opacity": 8, "speed": 3 }, "repulse": { "distance": 200, "duration": 0.4 }, "push": { "particles_nb": 4 }, "remove": { "particles_nb": 2 } }
+                    },
+                    "retina_detect": true
+                });
+            }
+
+            // 2. THEME & CLOCK LOGIC
+            function setupThemeSwitcher() {
+                const themeSwitcher = document.getElementById('theme-switcher');
+                const colorBarContainer = document.getElementById('color-bar-container');
+                const darkModeToggle = document.getElementById('dark-mode-toggle');
+                const themeFabBtn = document.getElementById('theme-fab-btn');
+                const root = document.documentElement;
+
+                if (!themeSwitcher) return;
+
+                const colorThemes = [ 
+    { name: 'Default Blue', color: '#3191d1', rgb: '49, 145, 209' }, 
+    { name: 'Teal', color: '#008080', rgb: '0, 128, 128' }, 
+    { name: 'Purple', color: '#8e44ad', rgb: '142, 68, 173'}, 
+    { name: 'PBL Green', color: '#27ae60', rgb: '39, 174, 96' }, 
+    { name: 'Modern Orange', color: '#d35400', rgb: '211, 84, 0' }, 
+    { name: 'Professional Indigo', color: '#34495e', rgb: '52, 73, 94' }, 
+    { name: 'Crimson Red', color: '#c0392b', rgb: '192, 57, 43'}, 
+    { name: 'Magenta', color: '#d81b60', rgb: '216, 27, 96' } 
+];
+                
+                const applyTheme = (color, rgb) => { 
+                    root.style.setProperty('--theme-primary', color); 
+                    root.style.setProperty('--primary-color', color); 
+                    root.style.setProperty('--primary-color-rgb', rgb); 
+                    localStorage.setItem('pbl-theme-color', color); 
+                    localStorage.setItem('pbl-theme-rgb', rgb); 
+                };
+                
+                colorBarContainer.innerHTML = colorThemes.map(t => `<div class="color-segment" onclick="applyTheme('${t.color}', '${t.rgb}')" style="background-color: ${t.color};" title="${t.name}"></div>`).join('');
+                
+                // Force Assign onclick via JS to ensure it works
+                const segments = colorBarContainer.querySelectorAll('.color-segment');
+                segments.forEach((seg, index) => {
+                    const theme = colorThemes[index];
+                    seg.onclick = (e) => {
+                        e.stopPropagation();
+                        applyTheme(theme.color, theme.rgb);
+                    };
+                });
+
+                themeFabBtn.addEventListener('click', (e) => { 
+                    e.stopPropagation(); 
+                    themeSwitcher.classList.toggle('active'); 
+                });
+                
+                document.addEventListener('click', (e) => { 
+                    if (!themeSwitcher.contains(e.target)) themeSwitcher.classList.remove('active'); 
+                });
+                
+                darkModeToggle.addEventListener('change', () => { 
+                    const mode = darkModeToggle.checked ? 'dark' : 'light';
+                    root.setAttribute('data-theme', mode); 
+                    localStorage.setItem('pbl-theme-mode', mode); 
+                });
+
+                // Load Saved Settings
+                const savedColor = localStorage.getItem('pbl-theme-color'), savedRgb = localStorage.getItem('pbl-theme-rgb'), savedMode = localStorage.getItem('pbl-theme-mode');
+                if (savedColor && savedRgb) applyTheme(savedColor, savedRgb);
+                if (savedMode) { root.setAttribute('data-theme', savedMode); darkModeToggle.checked = (savedMode === 'dark'); }
+            }
+
+            function updateClocks() {
+                const now = new Date();
+                const indiaTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
+                document.getElementById('india-hour').textContent = indiaTime.getHours().toString().padStart(2, '0');
+                document.getElementById('india-minute').textContent = indiaTime.getMinutes().toString().padStart(2, '0');
+                document.getElementById('india-ampm').textContent = indiaTime.getHours() >= 12 ? 'PM' : 'AM';
+                document.querySelector('#india-clock .date').textContent = indiaTime.toLocaleDateString('en-GB');
+                
+                const germanTime = new Date(now.toLocaleString("en-US", {timeZone: "Europe/Berlin"}));
+                document.getElementById('german-hour').textContent = germanTime.getHours().toString().padStart(2, '0');
+                document.getElementById('german-minute').textContent = germanTime.getMinutes().toString().padStart(2, '0');
+                document.getElementById('german-ampm').textContent = germanTime.getHours() >= 12 ? 'PM' : 'AM';
+                document.querySelector('#german-clock .date').textContent = germanTime.toLocaleDateString('en-GB');
+            }
+
+            // 3. CHARACTER COUNTER LOGIC
+            const suggestionInput = document.getElementById('suggestion');
+            const charCountDisplay = document.getElementById('charCount');
+            const minLength = 20;
+
+            suggestionInput.addEventListener('input', function() {
+                const currentLength = this.value.length;
+                charCountDisplay.textContent = `${currentLength} / ${minLength} chars`;
+
+                if (currentLength < minLength) {
+                    charCountDisplay.style.color = "#e74c3c"; // Red
+                } else {
+                    charCountDisplay.style.color = "#2ecc71"; // Green
+                }
+            });
+
+            // 4. SEARCH & KEYBOARD NAV LOGIC
+            const searchBox = document.getElementById('searchBox'), dropdown = document.getElementById('dropdown');
+            let employeeList = [];
+            let currentFocus = -1;
+
+            // 🚀 Safe Employee Data Fetcher
+            async function loadEmployeeData() {
+                try {
+                    const res = await fetch(`${SCRIPT_URL}?action=getEmployeeList`);
+                    const data = await res.json();
+                    const raw = Array.isArray(data) ? data : (data.employees || data.data || []);
+                    // Object ho ya string, safe readable string me convert karna
+                    employeeList = raw.map(item => (typeof item === 'object' && item !== null) ? (item.name || item.fullName || '') : String(item)).filter(Boolean);
+                } catch (e) { 
+                    console.error("Failed to load employees", e); 
+                }
+            }
+
+            searchBox.addEventListener('input', function() {
+                const val = this.value.toLowerCase().trim();
+                dropdown.innerHTML = '';
+                currentFocus = -1;
+                if (val.length > 0) {
+                    if (!Array.isArray(employeeList)) return;
+                    // Safe filter jo kabhi crash nahi hoga
+                    const matches = employeeList.filter(n => {
+                        const str = (typeof n === 'object' && n !== null) ? (n.name || '') : String(n);
+                        return str.toLowerCase().includes(val);
+                    });
+
+                    if (matches.length > 0) {
+                        dropdown.classList.add('active');
+                        matches.forEach(item => {
+                            const nameStr = (typeof item === 'object' && item !== null) ? (item.name || '') : String(item);
+                            const div = document.createElement('div');
+                            div.className = 'dropdown-item';
+                            const parts = nameStr.split(' (PF:');
+                            div.innerHTML = parts.length > 1 ? `${parts[0]} <span style="font-size:0.8em;color:#888;">PF: ${parts[1].replace(')', '')}</span>` : nameStr;
+                            div.onclick = () => selectEmployee(nameStr);
+                            dropdown.appendChild(div);
+                        });
+                    } else dropdown.classList.remove('active');
+                } else dropdown.classList.remove('active');
+            });
+
+            // 🚀 Universal Bulletproof Auto-Fill for PF & Dept
+            async function selectEmployee(nameStr) {
+                // 1. Dropdown string se Name aur PF Code extract karna: "Ramesh Kumar (PF: DL/25629/xxx)"
+                const parts = nameStr.split(/\s*\(PF:\s*/i);
+                const cleanName = parts[0].trim();
+                const extractedPf = parts[1] ? parts[1].replace(")", "").trim() : "";
+
+                searchBox.value = cleanName;
+                document.getElementById('fullName').value = cleanName;
+                dropdown.classList.remove('active');
+                document.getElementById('suggestion').focus();
+
+                // 2. Instant UI populate (Network delay se pehle hi PF fill ho jayega)
+                document.getElementById('pfCode').value = extractedPf || "Fetching...";
+                document.getElementById('department').value = "Fetching...";
+
+                // 3. API se Department aur verify kiya hua PF Code fetch karna
+                try {
+                    const res = await fetch(`${SCRIPT_URL}?action=getEmployeeDetails&name=${encodeURIComponent(cleanName)}`);
+                    const data = await res.json();
+                    const emp = (data && data.data) ? data.data : data;
+
+                    if (emp && (emp.name || emp.department || emp.pfCode)) {
+                        document.getElementById('department').value = emp.department || emp.dept || "Production";
+                        // Kisi bhi key me PF code mile (pfCode / empId / pf), use karo ya extractedPf fallback
+                        const resolvedPf = emp.pfCode || emp.empId || emp.employeeId || emp.pf || emp.PF || extractedPf;
+                        document.getElementById('pfCode').value = (resolvedPf && resolvedPf !== "undefined") ? resolvedPf : (extractedPf || "--");
+                    } else {
+                        if (extractedPf) document.getElementById('pfCode').value = extractedPf;
+                        document.getElementById('department').value = "Production";
+                    }
+                } catch(e) {
+                    console.warn("Details fetch failed, using fallback:", e);
+                    document.getElementById('pfCode').value = extractedPf || "--";
+                    document.getElementById('department').value = "Production";
+                }
+            }
+
+            // Keyboard Navigation (Single & Clean)
+            searchBox.addEventListener('keydown', function(e) {
+                let items = dropdown.getElementsByClassName('dropdown-item');
+                if (e.key === 'ArrowDown') {
+                    currentFocus++;
+                    addActive(items);
+                } else if (e.key === 'ArrowUp') {
+                    currentFocus--;
+                    addActive(items);
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (currentFocus > -1 && items[currentFocus]) {
+                        items[currentFocus].click();
+                    }
+                }
+            });
+
+            function addActive(x) {
+                if (!x) return false;
+                removeActive(x);
+                if (currentFocus >= x.length) currentFocus = 0;
+                if (currentFocus < 0) currentFocus = x.length - 1;
+                x[currentFocus].classList.add('focused');
+                x[currentFocus].scrollIntoView({ block: 'nearest' });
+            }
+
+            function removeActive(x) {
+                for (let i = 0; i < x.length; i++) {
+                    x[i].classList.remove('focused');
+                }
+            }
+
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.form-group')) dropdown.classList.remove('active');
+            });
+
+            // 5. SUBMIT LOGIC
+            document.getElementById('suggestionForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('submitBtn');
+                const name = document.getElementById('searchBox').value;
+                // ... (Variables section)
+const suggestion = document.getElementById('suggestion').value;
+const department = document.querySelector('input[name="TargetDept"]:checked');
+// 👇 NEW VARIABLE
+const feedbackType = document.querySelector('input[name="SuggestionType"]:checked');
+
+// ... (Validation section)
+if (!name) { 
+    alert("Please select your Employee Name."); 
+    return; 
+}
+// 👇 NEW CHECK ADDED HERE
+if (!feedbackType) {
+    alert("Please select a Type of Feedback (Improvement, Complaint, etc).");
+    return;
+}
+if (suggestion.length < 20) { 
+    alert("Suggestion is too short (min 20 chars). Please explain more."); 
+    return; 
+}
+if (!department) { 
+    alert("Please select a Department."); 
+    return; 
+}
+// ...
+
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData.entries());
+                data['Department'] = data['TargetDept']; 
+
+                fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) })
+                .then(res => res.json())
+                .then(result => {
+                    if (result.status === 'success') {
+                        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                        document.getElementById('successOverlay').style.display = 'flex';
+                    } else {
+                        alert("Error: " + result.message);
+                        btn.disabled = false; btn.innerHTML = 'Submit Suggestion';
+                    }
+                })
+                .catch(err => {
+                    alert("Network Error.");
+                    btn.disabled = false; btn.innerHTML = 'Submit Suggestion';
+                });
+            });
+
+            // 🚀 CLEAN INIT (Crash-Free: Dead clock & missing footer calls removed)
+            setupThemeSwitcher();
+            loadEmployeeData();
+        });
+      		
+		function closeModalWindow() {
+            try {
+                if (window.parent) {
+                    const parentApp = window.parent.Alpine && window.parent.document.querySelector('[x-data]') 
+                        ? window.parent.Alpine.$data(window.parent.document.querySelector('[x-data]')) 
+                        : null;
+                    if (parentApp && typeof parentApp.closeApp === 'function') {
+                        parentApp.closeApp();
+                        return;
+                    }
+                }
+            } catch (e) {}
+            window.close();
+        }
+		
+    </script>
+</body>
+</html>

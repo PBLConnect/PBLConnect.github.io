@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply Leave - PBL Connect</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="assets/images/pbl-logo.png" type="image/png"> 
+    
+    <!-- Icons & Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Global Styles -->
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <!-- Config & Libraries -->
+    <script src="config.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- 🌌 Particles.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
+    <style>
+        /* =========================================
+           1. DASHBOARD VARIABLES & THEME
+           ========================================= */
+        :root {
+            /* Default Violet Theme */
+            --primary: #6c5ce7; 
+            --primary-light: #a29bfe;
+            --bg-body: transparent; /* 👈 NAYA: Transparent for parent iframe blending */
+            --surface: #ffffff;
+            --text-main: #2d3436;
+            --text-muted: #636e72;
+            --border: #e2e8f0;
+            
+            --shadow-soft: 0 10px 40px rgba(0,0,0,0.08);
+            --inner-shadow: inset 2px 2px 5px rgba(0,0,0,0.03);
+            
+            /* Leave Colors */
+            --casual-color: #00b894;
+            --sick-color: #ff7675;
+            --privilege-color: #fdcb6e;
+            --lwp-color: #74b9ff;
+            
+            /* Wallet Gradients */
+            --grad-default: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            --grad-casual: linear-gradient(135deg, #00b894, #55efc4);
+            --grad-sick: linear-gradient(135deg, #ff7675, #fab1a0);
+            --grad-privilege: linear-gradient(135deg, #fdcb6e, #ffeaa7);
+            --grad-lwp: linear-gradient(135deg, #74b9ff, #0984e3);
+        }
+
+        [data-theme="dark"] {
+            --surface: #0f172a;
+            --text-main: #f1f1f1;
+            --text-muted: #94a3b8;
+            --border: #1e293b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        /* 🚀 BACKGROUND LOCK & CENTER FIX (Makes it look like a Popup) */
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            align-items: center;    
+            justify-content: center; 
+            overflow: hidden; 
+            padding: 15px;
+            position: relative;
+        }
+
+        /* 🌌 Particles Canvas */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        [data-theme="dark"] ::-webkit-scrollbar-thumb { background: #334155; }
+
+        /* 🚀 NAYA POPUP CONTAINER (Same as IT Ticket) */
+        .popup-modal-container {
+            width: 100%;
+            max-width: 1000px;
+            max-height: 90vh;  
+            background: var(--surface);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.3), 0 0 0 1px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; 
+            animation: modalPop 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+        [data-theme="dark"] .popup-modal-container { box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.1); }
+
+        @keyframes modalPop {
+            0% { transform: scale(0.95) translateY(20px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        /* HEADER INSIDE POPUP */
+        .page-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(125, 125, 125, 0.03);
+            flex-shrink: 0;
+        }
+
+        .header-left { display: flex; align-items: center; gap: 15px; }
+
+        .header-icon {
+            width: 45px; height: 45px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4em; box-shadow: 0 8px 16px rgba(108, 92, 231, 0.3);
+        }
+
+        .page-header h2 { font-size: 1.3em; font-weight: 800; line-height: 1.2; letter-spacing: -0.5px; margin: 0; color: var(--text-main); }
+        .page-header p { font-size: 0.8em; color: var(--text-muted); font-weight: 500; margin-top: 2px;}
+
+        /* Close Button for parent iframe */
+        .close-app-btn {
+            width: 35px; height: 35px; border-radius: 50%; background: var(--border);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted); cursor: pointer; border: none;
+            transition: 0.2s; font-size: 1.2em;
+        }
+        .close-app-btn:hover { background: #e74c3c; color: white; transform: rotate(90deg); }
+
+        /* SCROLLABLE FORM AREA */
+        .form-scroll-area {
+            padding: 20px 25px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .dashboard-grid {
+    display: grid;
+    grid-template-columns: 1.8fr 1fr; 
+    gap: 25px;
+    align-items: start; /* 👈 NAYA: Ye line boxes ko stretch hone aur khali space banne se rokegi */
+}
+
+        /* === LEFT COLUMN: APPLICATION FORM === */
+        .application-card {
+            background: rgba(125, 125, 125, 0.02);
+            border-radius: 20px;
+            padding: 20px 25px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .section-heading {
+            font-size: 0.8em; font-weight: 700; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .section-heading i { color: var(--primary); font-size: 1.2em; }
+
+        /* Identity Row */
+        .identity-row {
+            display: grid; grid-template-columns: 1.5fr 1fr 0.8fr; gap: 15px;
+            padding-bottom: 20px; border-bottom: 1px dashed var(--border);
+        }
+
+        .input-group label { display: block; font-size: 0.7em; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+        .modern-input {
+            width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border);
+            background: var(--surface); color: var(--text-main); font-weight: 500; font-size: 0.85em;
+            transition: all 0.3s ease; height: 40px; outline: none;
+        }
+        .modern-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1); }
+        .modern-input.locked { background: rgba(125, 125, 125, 0.03); cursor: default; border-color: transparent; color: var(--text-muted); pointer-events: none; }
+
+        /* Leave Grid */
+        .leave-selector {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 10px;
+        }
+        .leave-btn {
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+            height: 110px; padding: 15px; border-radius: 16px; background: var(--surface);
+            border: 2px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .leave-option:hover .leave-btn { transform: translateY(-3px); border-color: #cbd5e1; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+
+        .leave-btn .icon-box {
+            width: 45px; height: 45px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4em; color: #fff; transition: transform 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .leave-label { font-size: 0.85em; font-weight: 600; color: var(--text-main); text-align: center; transition: color 0.3s ease; }
+
+        .leave-option:nth-child(1) .icon-box { background: var(--grad-casual); }
+        .leave-option:nth-child(2) .icon-box { background: var(--grad-sick); }
+        .leave-option:nth-child(3) .icon-box { background: var(--grad-privilege); }
+        .leave-option:nth-child(4) .icon-box { background: var(--grad-lwp); }
+
+        .leave-option input { display: none; }
+
+        .leave-option:nth-child(1) input:checked + .leave-btn { background-color: #ecfdf5; border-color: var(--casual-color); }
+        .leave-option:nth-child(2) input:checked + .leave-btn { background-color: #fef2f2; border-color: var(--sick-color); }
+        .leave-option:nth-child(3) input:checked + .leave-btn { background-color: #fffbeb; border-color: var(--privilege-color); }
+        .leave-option:nth-child(4) input:checked + .leave-btn { background-color: #eff6ff; border-color: var(--lwp-color); }
+
+        .leave-option input:checked + .leave-btn { box-shadow: 0 8px 20px rgba(0,0,0,0.05); transform: translateY(-3px); }
+        .leave-option input:checked + .leave-btn .icon-box { transform: scale(1.1) rotate(5deg); }
+        .leave-option:nth-child(1) input:checked + .leave-btn { color: var(--casual-color); }
+        .leave-option:nth-child(2) input:checked + .leave-btn { color: var(--sick-color); }
+        .leave-option:nth-child(3) input:checked + .leave-btn { color: var(--privilege-color); }
+        .leave-option:nth-child(4) input:checked + .leave-btn { color: var(--lwp-color); }
+        .leave-option input:checked + .leave-btn .leave-label { color: currentColor; }
+
+        /* Schedule Section */
+        .date-section {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 14px; padding: 15px 20px;
+            border-left: 5px solid var(--primary); transition: border-color 0.3s ease;
+        }
+        .date-row { display: grid; grid-template-columns: 1.5fr 1fr; gap: 15px; }
+        .date-wrapper { position: relative; }
+        .date-wrapper i { position: absolute; left: 12px; top: 52%; transform: translateY(-50%); color: var(--primary); font-size: 1em; pointer-events: none; }
+        .date-wrapper input { padding-left: 35px; cursor: pointer; }
+
+        /* === RIGHT COLUMN: SIDEBAR WIDGETS === */
+        .sidebar-stack { display: flex; flex-direction: column; gap: 20px; }
+
+        /* Dynamic Leave Wallet */
+        .balance-wallet {
+            background: var(--grad-default); border-radius: 16px; padding: 20px; color: #fff;
+            position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.15); overflow: hidden; 
+            display: none; animation: slideInRight 0.5s ease; transition: background 0.5s ease;
+        }
+        .balance-wallet::before { content:''; position:absolute; top:-40px; right:-40px; width:120px; height:120px; background:rgba(255,255,255,0.15); border-radius:50%; backdrop-filter: blur(5px); }
+        .wallet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; position: relative; z-index: 2; }
+        .wallet-header h3 { margin: 0; font-size: 0.85em; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .wallet-main { text-align: center; margin-bottom: 15px; position: relative; z-index: 2; }
+        .wallet-main .days { font-size: 3em; font-weight: 800; line-height: 0.9; text-shadow: 2px 2px 10px rgba(0,0,0,0.1); }
+        .wallet-main .label { font-size: 0.65em; opacity: 0.9; font-weight: 600; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px;}
+
+        .balance-pills { display: flex; justify-content: space-between; gap: 8px; position: relative; z-index: 2; }
+        .bal-pill { 
+            background: rgba(0,0,0,0.2); padding: 10px 5px; border-radius: 10px; flex: 1; text-align: center; 
+            backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.1);
+        }
+        .bal-pill strong { display: block; font-size: 1.2em; font-weight: 800; line-height: 1; margin-bottom: 2px; }
+        .bal-pill span { font-size: 0.6em; text-transform: uppercase; opacity: 0.9; font-weight: 700; }
+
+        /* Action Card */
+        .action-card {
+            background: rgba(125, 125, 125, 0.02); border-radius: 16px; padding: 20px;
+            border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: space-between; gap: 15px;
+        }
+        textarea.modern-input { height: 90px; resize: none; }
+
+        /* Summary Ticket */
+        .summary-ticket {
+            background: var(--surface); border: 1px dashed var(--border);
+            padding: 12px 15px; border-radius: 12px;
+            display: none; align-items: center; justify-content: space-between;
+        }
+        .st-left { display: flex; align-items: center; gap: 10px; }
+        .st-icon { font-size: 1.2em; color: var(--text-muted); }
+        .st-text h4 { margin: 0; font-size: 0.7em; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
+        .st-text p { margin: 2px 0 0; font-size: 0.85em; font-weight: 600; color: var(--text-main); }
+        .st-right { background: rgba(125, 125, 125, 0.05); padding: 6px 10px; border-radius: 8px; font-weight: 700; font-size: 0.9em; }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%; padding: 12px; border: none; border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff;
+            font-size: 1em; font-weight: 700; cursor: pointer;
+            box-shadow: 0 8px 16px rgba(108, 92, 231, 0.3);
+            transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 8px;
+            flex-shrink: 0;
+        }
+        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(108, 92, 231, 0.4); }
+        .submit-btn:disabled { background: #b2bec3; cursor: not-allowed; box-shadow: none; transform: none; }
+
+        /* Success Card (Compact) */
+        .success-card {
+            background: var(--surface); border-left: 5px solid #00b894; border-radius: 10px;
+            padding: 12px 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            display: none; align-items: center; justify-content: space-between;
+            animation: fadeIn 0.4s ease; border-top: 1px solid var(--border); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border);
+        }
+        .success-left { display: flex; align-items: center; gap: 10px; }
+        .success-icon { width: 30px; height: 30px; border-radius: 50%; background: #eef2ff; color: #00b894; display: flex; align-items: center; justify-content: center; font-size: 1em; }
+        .success-text h3 { margin: 0; font-size: 0.9em; color: var(--text-main); font-weight: 800;}
+        .success-text p { margin: 0; font-size: 0.7em; color: var(--text-muted); }
+        .compact-btn { padding: 6px 12px; border-radius: 6px; font-size: 0.75em; font-weight: 700; cursor: pointer; border: 1px solid var(--border); background: var(--bg-body); transition: 0.2s; color: var(--text-main); }
+        .compact-btn:hover { background: #00b894; color: white; border-color: #00b894;}
+
+        /* Dropdown & Utils */
+        .dropdown-wrapper { position: relative; }
+        .dropdown-list {
+            position: absolute; top: 105%; left: 0; width: 100%;
+            background: var(--surface); border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 1000;
+            max-height: 180px; overflow-y: auto; display: none; padding: 5px; border: 1px solid var(--border);
+        }
+        .dropdown-list.active { display: block; }
+        .dropdown-item { padding: 8px 12px; cursor: pointer; border-bottom: 1px solid var(--border); font-size: 0.85em; border-radius: 6px; }
+        .dropdown-item:hover { background: rgba(125, 125, 125, 0.05); color: var(--primary); }
+        .clear-btn { position: absolute; right: 12px; top: 12px; color: #e74c3c; cursor: pointer; display: none; z-index: 10; font-size: 1.1em; }
+
+        @keyframes slideInRight { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Toast */
+        .toast-notification {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: var(--surface); padding: 10px 20px; border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-left: 5px solid #e74c3c;
+            display: flex; align-items: center; gap: 12px; z-index: 9999; opacity: 0; transition: 0.4s; pointer-events: none;
+        }
+
+        /* Mobile */
+        @media (max-width: 900px) {
+            body { padding: 10px; }
+            .popup-modal-container { max-height: 95vh; border-radius: 16px; }
+            .dashboard-grid { grid-template-columns: 1fr; gap: 15px; }
+            .identity-row { grid-template-columns: 1fr; gap: 10px; padding-bottom: 15px; }
+            .leave-selector { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .date-row { grid-template-columns: 1fr; gap: 10px; }
+            .page-header { padding: 15px 20px; }
+            .form-scroll-area { padding: 15px 20px; }
+            .leave-btn { height: 90px; padding: 10px; }
+            .leave-btn .icon-box { width: 35px; height: 35px; font-size: 1.1em; }
+        }
+        
+        #page-loader { display: none !important; } /* Hidden inside iframe to prevent weird overlays */
+    </style>
+</head>
+<body data-theme="light"> 
+    
+    <!-- 🌌 Particles Background Canvas -->
+    <div id="particles-js"></div>
+
+    <!-- 🚀 NAYA POPUP CONTAINER -->
+    <div class="popup-modal-container" style="position: relative; z-index: 10;">
+        
+        <!-- Header -->
+        <div class="page-header">
+            <div class="header-left">
+                <div class="header-icon"><i class="fa-solid fa-umbrella-beach"></i></div>
+                <div>
+                    <h2>Apply Leave</h2>
+                    <p>Request time off, track approvals, and manage balance.</p>
+                </div>
+            </div>
+            <!-- X Button for closing iframe safely (Alpine 3 Direct Logic) -->
+			<button type="button" class="close-app-btn" onclick="try { window.parent.Alpine.$data(window.parent.document.body).closeApp(); } catch(e) { window.location.href='index.html'; }">
+				<i class="fa-solid fa-xmark"></i>
+			</button>
+        </div>
+
+        <div class="form-scroll-area custom-scroll">
+            <form id="leaveForm" class="dashboard-grid">
+                <input type="hidden" name="formType" value="leave">
+
+                <!-- LEFT COLUMN: APPLICATION FORM -->
+                <div class="application-card">
+                    
+                    <div class="section-heading"><i class="fas fa-user-circle"></i> Identity</div>
+                    
+                    <div class="identity-row">
+                        <div class="input-group">
+                            <label>Employee Name <span style="color:red">*</span></label>
+                            <div class="dropdown-wrapper">
+                                <input type="text" id="searchBox" class="modern-input" placeholder="Search your name..." autocomplete="off">
+                                <i class="fas fa-times-circle clear-btn" id="clearNameBtn"></i>
+                                <div id="dropdown" class="dropdown-list custom-scroll"></div>
+                            </div>
+                            <input type="hidden" id="fullName" name="FullName">
+                        </div>
+                        <div class="input-group">
+                            <label>Department</label>
+                            <input type="text" id="department" name="Department" class="modern-input locked" readonly placeholder="--">
+                        </div>
+                        <div class="input-group">
+                            <label>PF Code</label>
+                            <input type="text" id="pfCode" name="EmployeeID" class="modern-input locked" readonly placeholder="--">
+                        </div>
+                    </div>
+
+                    <div class="section-heading"><i class="fas fa-layer-group"></i> Select Leave Type</div>
+
+                    <div class="leave-selector">
+                        <label class="leave-option"><input type="radio" name="LeaveType" value="Casual"><div class="leave-btn"><div class="icon-box"><i class="fas fa-umbrella-beach"></i></div><span class="leave-label">Casual</span></div></label>
+                        <label class="leave-option"><input type="radio" name="LeaveType" value="Sick"><div class="leave-btn"><div class="icon-box"><i class="fas fa-pills"></i></div><span class="leave-label">Sick</span></div></label>
+                        <label class="leave-option"><input type="radio" name="LeaveType" value="Privilege"><div class="leave-btn"><div class="icon-box"><i class="fas fa-plane"></i></div><span class="leave-label">Privilege</span></div></label>
+                        <label class="leave-option"><input type="radio" name="LeaveType" value="LWP"><div class="leave-btn"><div class="icon-box"><i class="fas fa-ban"></i></div><span class="leave-label">LWP</span></div></label>
+                    </div>
+
+                    <div class="section-heading"><i class="fas fa-clock"></i> Schedule</div>
+                    
+                    <div class="date-section">
+                        <div class="date-row">
+                            <div class="input-group date-wrapper">
+                                <label>Select Dates <span style="color:red">*</span></label>
+                                <i class="far fa-calendar-alt"></i>
+                                <input type="text" id="dateRange" class="modern-input" placeholder="Start Date  ➝  End Date" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Duration</label>
+                                <select id="durationType" name="DurationType" class="modern-input" style="cursor: pointer;">
+                                    <option value="Full Day">Full Day</option>
+                                    <option value="Half Day - Morning">Half Day (Morning)</option>
+                                    <option value="Half Day - Evening">Half Day (Evening)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <input type="hidden" id="startDate" name="StartDate">
+                    <input type="hidden" id="endDate" name="EndDate">
+                </div>
+
+                <!-- RIGHT COLUMN: SIDEBAR WIDGETS -->
+                <div class="sidebar-stack">
+                    
+                    <!-- 1. Modern Balance Wallet -->
+                    <div id="leaveBalanceBox" class="balance-wallet">
+                        <div class="wallet-header">
+                            <h3>Leave Wallet</h3>
+                            <i class="fas fa-wallet" style="opacity:0.6;"></i>
+                        </div>
+                        <div class="wallet-main">
+                            <div class="days" id="val_total">0</div>
+                            <div class="label">TOTAL DAYS AVAILABLE</div>
+                        </div>
+                        <div class="balance-pills">
+                            <div class="bal-pill"><strong><span id="val_cl">--</span></strong><span>Casual</span></div>
+                            <div class="bal-pill"><strong><span id="val_sl">--</span></strong><span>Sick</span></div>
+                            <div class="bal-pill"><strong><span id="val_pl">--</span></strong><span>Paid</span></div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Action Card -->
+                    <div class="action-card">
+                        
+                        <!-- Dynamic Summary Ticket -->
+                        <div id="summaryBox" class="summary-ticket">
+                            <div class="st-left">
+                                <div class="st-icon"><i class="fas fa-calendar-check"></i></div>
+                                <div class="st-text"><h4>Selected Duration</h4><p id="summaryDates">--</p></div>
+                            </div>
+                            <div class="st-right"><span id="summaryCount">0</span> Days</div>
+                        </div>
+
+                        <div class="input-group" style="flex: 1;">
+                            <label>Reason for Leave <span style="color:red">*</span></label>
+                            <textarea name="Reason" class="modern-input custom-scroll" placeholder="e.g. Attending a wedding, Doctor appointment..." required></textarea>
+                        </div>
+
+                        <div style="flex-shrink: 0;">
+                            <button type="submit" id="submitBtn" class="submit-btn">
+                                Apply for Leave <i class="fas fa-paper-plane"></i>
+                            </button>
+                            
+                            <!-- Success Modal -->
+                            <div id="successContainer" class="success-card">
+                                <div class="success-left">
+                                    <div class="success-icon"><i class="fas fa-check"></i></div>
+                                    <div class="success-text">
+                                        <h3>Submitted!</h3>
+                                        <p>Sent to HR.</p>
+                                    </div>
+                                </div>
+                                <button type="button" class="compact-btn" onclick="location.reload()">New</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Error Toast inside Modal -->
+        <div id="errorToast" class="toast-notification">
+            <i class="fas fa-exclamation-circle toast-icon"></i>
+            <span id="toastMessage" class="toast-content">Error</span>
+        </div>
+    </div> <!-- / popup-modal-container -->
+
+    <!-- Script -->
+    <script>
+        // Parent Theme Sync
+        function syncTheme() {
+            const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', currentTheme);
+        }
+        syncTheme(); window.addEventListener('storage', (e) => { if (e.key === 'theme') syncTheme(); });
+
+    // MASTER_API_URL aur LEAVE_API_URL dono config.js se auto-load honge
+
+    const themeConfig = {
+            "Casual": { color: "#00b894", bg: "#e0f2f1", border: "#80e27e", wallet: "linear-gradient(135deg, #00b894, #55efc4)" },
+            "Sick": { color: "#ff7675", bg: "#ffebee", border: "#ef9a9a", wallet: "linear-gradient(135deg, #ff7675, #fab1a0)" },
+            "Privilege": { color: "#f39c12", bg: "#fff8e1", border: "#ffe082", wallet: "linear-gradient(135deg, #fdcb6e, #ffeaa7)" },
+            "LWP": { color: "#3498db", bg: "#e3f2fd", border: "#90caf9", wallet: "linear-gradient(135deg, #74b9ff, #0984e3)" }
+        };
+
+        window.onload = async () => {
+            // 🌌 Initialize Particles.js (Violet/Purple Glow)
+            if (window.particlesJS) {
+                particlesJS("particles-js", {
+                    "particles": {
+                        "number": { "value": 75, "density": { "enable": true, "value_area": 800 } },
+                        "color": { "value": "#a29bfe" },
+                        "shape": { "type": "circle" },
+                        "opacity": { "value": 0.45, "random": false },
+                        "size": { "value": 3, "random": true },
+                        "line_linked": { "enable": true, "distance": 140, "color": "#a29bfe", "opacity": 0.35, "width": 1 },
+                        "move": { "enable": true, "speed": 2.2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false }
+                    },
+                    "interactivity": {
+                        "detect_on": "window",
+                        "events": { "onhover": { "enable": true, "mode": "repulse" }, "onclick": { "enable": true, "mode": "push" }, "resize": true },
+                        "modes": { "repulse": { "distance": 120, "duration": 0.4 }, "push": { "particles_nb": 4 } }
+                    },
+                    "retina_detect": true
+                });
+            }
+
+            const sessionData = sessionStorage.getItem('userData');
+            if (sessionData) {
+                const user = JSON.parse(sessionData);
+                const sBox = document.getElementById('searchBox');
+                sBox.value = user.name; sBox.readOnly = true; sBox.classList.add('locked');
+                document.getElementById('fullName').value = user.name;
+                document.getElementById('department').value = user.role || 'Employee';
+                document.getElementById('pfCode').value = user.empId || 'N/A';
+                document.getElementById('clearNameBtn').style.display = 'none'; 
+                fetchBalances(user.name);
+            } else {
+                loadEmployeeData();
+                document.getElementById('searchBox').focus();
+            }
+
+            // Init Datepicker
+            flatpickr("#dateRange", {
+                mode: "range",
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                showMonths: window.innerWidth > 768 ? 2 : 1,
+                onChange: function(selectedDates) {
+                    if (selectedDates.length === 2) {
+                        document.getElementById('startDate').value = flatpickr.formatDate(selectedDates[0], "Y-m-d");
+                        document.getElementById('endDate').value = flatpickr.formatDate(selectedDates[1], "Y-m-d");
+                        
+                        document.getElementById('summaryDates').textContent = 
+                            flatpickr.formatDate(selectedDates[0], "d M Y") + " to " + flatpickr.formatDate(selectedDates[1], "d M Y");
+                        
+                        let days = Math.round((selectedDates[1] - selectedDates[0]) / (1000 * 60 * 60 * 24)) + 1;
+                        if(document.getElementById('durationType').value.includes('Half Day') && days === 1) days = 0.5;
+                        document.getElementById('summaryCount').textContent = days;
+                        document.getElementById('summaryBox').style.display = 'flex';
+                    }
+                }
+            });
+            
+            // Dynamic Color Change on Leave Type Select
+            document.querySelectorAll('input[name="LeaveType"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const theme = themeConfig[this.value];
+                    if (theme) {
+                        document.documentElement.style.setProperty('--primary', theme.color);
+                        const wallet = document.getElementById('leaveBalanceBox');
+                        if (wallet.style.display !== 'none') wallet.style.background = theme.wallet;
+                        document.querySelector('.date-section').style.borderColor = theme.color;
+                    }
+                });
+            });
+
+            document.getElementById('durationType').addEventListener('change', function() {
+                const dates = document.getElementById('dateRange')._flatpickr.selectedDates;
+                if(dates.length === 2) {
+                    let days = Math.round((dates[1] - dates[0]) / (1000 * 60 * 60 * 24)) + 1;
+                    if(this.value.includes('Half Day') && days === 1) days = 0.5;
+                    document.getElementById('summaryCount').textContent = days;
+                }
+            });
+        };
+
+        async function fetchBalances(empName, extractedPf = "") {
+            try {
+                const res = await fetch(`${MASTER_API_URL}?action=getEmployeeDetails&name=${encodeURIComponent(empName)}`);
+                const data = await res.json();
+                const empData = data.data || data;
+
+                if (empData) {
+                    // 🚀 1. DEPARTMENT FILL KAREIN
+                    document.getElementById('department').value = empData.department || "Production";
+
+                    // 🚀 2. PF CODE FILL KAREIN (API se ya Dropdown fallback se)
+                    document.getElementById('pfCode').value = empData.pfCode || extractedPf || "N/A";
+
+                    // 🚀 3. LEAVE WALLET UPDATE KAREIN
+                    if (empData.cl !== undefined) { 
+                        const balanceBox = document.getElementById('leaveBalanceBox');
+                        document.getElementById('val_cl').textContent = empData.cl;
+                        document.getElementById('val_sl').textContent = empData.sl;
+                        document.getElementById('val_pl').textContent = empData.pl;
+                        document.getElementById('val_total').textContent = Number(empData.cl) + Number(empData.sl) + Number(empData.pl);
+                        balanceBox.style.display = 'block';
+                        
+                        const checkedLeave = document.querySelector('input[name="LeaveType"]:checked');
+                        if(checkedLeave && themeConfig[checkedLeave.value]) {
+                            balanceBox.style.background = themeConfig[checkedLeave.value].wallet;
+                        }
+                    }
+                }
+            } catch(e) { 
+                console.error(e);
+                if (extractedPf) document.getElementById('pfCode').value = extractedPf;
+                document.getElementById('department').value = "Production";
+            }
+        }
+
+        async function selectEmployee(fullString) {
+            // Dropdown string se Name aur PF Code dono nikalna: "Pushpa (PF: DL/25629/420)"
+            const parts = fullString.split(" (PF:");
+            const cleanName = parts[0].trim();
+            const extractedPf = parts[1] ? parts[1].replace(")", "").trim() : "";
+
+            searchBox.value = cleanName; 
+            document.getElementById('fullName').value = cleanName;
+            dropdown.classList.remove('active'); 
+            searchBox.readOnly = true; 
+            searchBox.classList.add('locked');
+            document.getElementById('clearNameBtn').style.display = 'block';
+
+            // Instant UI Feedback
+            if (extractedPf) {
+                document.getElementById('pfCode').value = extractedPf;
+            } else {
+                document.getElementById('pfCode').value = "Fetching...";
+            }
+            document.getElementById('department').value = "Fetching...";
+
+            fetchBalances(cleanName, extractedPf);
+        }
+
+        let employeeList = [];
+        async function loadEmployeeData() {
+            try {
+                const res = await fetch(`${MASTER_API_URL}?action=getEmployeeList`);
+                const data = await res.json();
+                // 🚀 Object array ko safe strings mein convert karna
+                const raw = Array.isArray(data) ? data : (data.employees || data.data || []);
+                employeeList = raw.map(item => (typeof item === 'object' && item !== null) ? (item.name || item.fullName || '') : String(item)).filter(Boolean);
+            } catch (e) { }
+        }
+
+        const searchBox = document.getElementById('searchBox'), dropdown = document.getElementById('dropdown');
+        let currentFocus = -1;
+
+        searchBox.addEventListener('input', function() {
+            const val = this.value.toLowerCase(); dropdown.innerHTML = ''; currentFocus = -1;
+            if (val.length > 0) {
+                if (!Array.isArray(employeeList)) return;
+                // 🚀 Safe string extraction taaki n.toLowerCase() kabhi crash na ho
+                const matches = employeeList.filter(n => {
+                    const str = (typeof n === 'object' && n !== null) ? (n.name || '') : String(n);
+                    return str.toLowerCase().includes(val);
+                });
+                if (matches.length > 0) {
+                    dropdown.classList.add('active');
+                    matches.forEach(item => {
+                        const nameStr = (typeof item === 'object' && item !== null) ? (item.name || '') : String(item);
+                        const div = document.createElement('div'); div.className = 'dropdown-item';
+                        const parts = nameStr.split(' (PF:');
+                        div.innerHTML = parts.length > 1 ? `${parts[0]} <span style="font-size:0.8em;color:#888;">PF: ${parts[1].replace(')', '')}</span>` : nameStr;
+                        div.onclick = () => selectEmployee(nameStr); dropdown.appendChild(div);
+                    });
+                } else dropdown.classList.remove('active');
+            } else dropdown.classList.remove('active');
+        });
+
+        searchBox.addEventListener('keydown', function(e) {
+            let items = dropdown.getElementsByClassName('dropdown-item');
+            if (!items.length) return;
+            if (e.key === 'ArrowDown') { e.preventDefault(); currentFocus++; addActive(items); }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); currentFocus--; addActive(items); }
+            else if (e.key === 'Enter') { e.preventDefault(); if (currentFocus > -1) { items[currentFocus].click(); searchBox.blur(); } }
+        });
+
+        function addActive(x) {
+            if (!x) return false;
+            for (let i = 0; i < x.length; i++) x[i].style.backgroundColor = "";
+            if (currentFocus >= x.length) currentFocus = 0;
+            if (currentFocus < 0) currentFocus = x.length - 1;
+            x[currentFocus].style.backgroundColor = "rgba(125,125,125,0.05)";
+            x[currentFocus].scrollIntoView({ block: 'nearest' });
+        }
+
+        
+        document.getElementById('clearNameBtn').onclick = () => {
+            searchBox.value = ''; searchBox.readOnly = false; searchBox.classList.remove('locked');
+            document.getElementById('clearNameBtn').style.display = 'none';
+            document.getElementById('department').value = ''; document.getElementById('pfCode').value = '';
+            document.getElementById('leaveBalanceBox').style.display = 'none';
+            searchBox.focus();
+        };
+
+        // Click outside dropdown
+        document.addEventListener('click', (e) => {
+            if(!e.target.closest('.dropdown-wrapper')) document.querySelectorAll('.dropdown-list').forEach(l=>l.classList.remove('active'));
+        });
+
+        // Submit Form
+        const form = document.getElementById('leaveForm'), submitBtn = document.getElementById('submitBtn');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!document.getElementById('fullName').value) return showToast("Select Employee Name");
+            if (!document.querySelector('input[name="LeaveType"]:checked')) return showToast("Select Leave Type");
+            if (!document.getElementById('startDate').value) return showToast("Select Dates");
+
+            submitBtn.disabled = true; 
+            submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Applying...';
+            
+            const formData = new FormData(form); const data = {};
+            formData.forEach((val, key) => data[key] = val);
+            if (!data['DurationType']) data['DurationType'] = document.getElementById('durationType').value || "Full Day";
+            data['action'] = 'applyLeave';
+
+            fetch(LEAVE_API_URL, { method: 'POST', body: JSON.stringify(data) })
+            .then(res => res.json()).then(result => {
+                if (result.status === 'success') {
+                    if(typeof confetti !== "undefined") confetti({ particleCount: 200, spread: 70, origin: { y: 0.6 }, zIndex: 99999 });
+                    document.getElementById('successContainer').style.display = 'flex';
+                    submitBtn.style.display = 'none';
+                    disableForm(); 
+                } else { 
+                    showToast("Error: " + (result.message || "Submission Failed")); 
+                    submitBtn.disabled = false; submitBtn.innerHTML = 'Apply for Leave <i class="fas fa-paper-plane"></i>'; 
+                }
+            })
+            .catch(err => { 
+                showToast("Network Error: " + err.message); 
+                submitBtn.disabled = false; submitBtn.innerHTML = 'Apply for Leave <i class="fas fa-paper-plane"></i>'; 
+            });
+        });
+
+        function disableForm() {
+            document.querySelectorAll('input, textarea, select').forEach(el => el.disabled = true);
+            document.getElementById('searchBox').classList.add('locked');
+            document.getElementById('dateRange').classList.add('locked');
+            document.querySelectorAll('.leave-btn').forEach(btn => {
+                btn.style.pointerEvents = 'none'; btn.style.opacity = '0.7';
+            });
+            document.querySelectorAll('.clear-btn').forEach(b => b.style.display = 'none');
+            document.querySelector('.application-card').style.opacity = '0.5';
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('errorToast');
+            document.getElementById('toastMessage').textContent = msg;
+            t.style.opacity = '1'; t.style.transform = 'translateX(-50%) translateY(0)';
+            setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateX(-50%) translateY(100px)'; }, 3000);
+        }
+    </script>
+</body>
+</html>

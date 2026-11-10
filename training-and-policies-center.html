@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Training & SOP Center - PBL Connect</title>
+    <script src="config.js"></script>
+    <link rel="icon" type="image/x-icon" href="assets/images/pbl-logo.png">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    },
+                    colors: {
+                        brand: '#0d9488',
+                        brand_glow: '#2dd4bf',
+                        dark_surface: '#0f172a',
+                        dark_card: '#1e293b'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- FontAwesome & Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- Particles.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
+    <style>
+        /* Transparent body so parent iframe modal backdrop shines through */
+        body {
+            background-color: transparent !important;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark .custom-scroll::-webkit-scrollbar-thumb { background: #334155; }
+
+        /* Floating Particles Canvas */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            pointer-events: none;
+            background: transparent !important;
+        }
+
+        /* Smooth Accordion */
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .accordion-item.active .accordion-content {
+            max-height: 480px;
+        }
+        .accordion-item.active .arrow-icon {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+
+<body onclick="if(event.target === this) closeModalWindow()" class="min-h-screen flex items-center justify-center p-2 sm:p-4 text-slate-800 dark:text-slate-100 antialiased select-none cursor-pointer relative">
+
+    <!-- 🌌 Floating Teal Constellation Particles -->
+    <div id="particles-js"></div>
+
+    <!-- 🌟 MODAL CARD CONTAINER (EXACT IT TICKET STANDARD) -->
+    <div onclick="event.stopPropagation()" class="w-full max-w-5xl bg-white dark:bg-[#0c1322] rounded-[2rem] border border-slate-200/90 dark:border-white/10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)] dark:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)] overflow-hidden flex flex-col relative z-10 transition-all duration-300 cursor-default">
+        
+        <!-- 🔹 HEADER SECTION -->
+        <div class="px-5 sm:px-8 py-5 border-b border-slate-100 dark:border-white/10 flex items-center justify-between bg-gradient-to-r from-teal-50/70 via-white to-cyan-50/40 dark:from-[#0f172a] dark:via-[#0c1322] dark:to-[#0f2427] relative shrink-0">
+            
+            <!-- Left: Icon & Title -->
+            <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-teal-500 via-emerald-600 to-cyan-500 text-white flex items-center justify-center text-xl shadow-[0_8px_16px_rgba(20,184,166,0.3)] shrink-0">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div class="flex flex-col">
+                    <div class="flex items-center gap-2">
+                        <h2 class="font-heading font-black text-xl sm:text-2xl tracking-tight text-slate-900 dark:text-white leading-none">
+                            Training & Policies <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-cyan-500 dark:from-teal-400 dark:to-cyan-300">Center</span>
+                        </h2>
+                        <span class="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-teal-50 dark:bg-teal-950/60 text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800 uppercase">
+                            COMPLIANCE
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
+                        Standard operating procedures, cybersecurity best practices, and POSH guidelines.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Right: Close Button -->
+            <button onclick="closeModalWindow()" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-500/20 dark:hover:text-rose-300 text-slate-400 flex items-center justify-center transition-all duration-200 active:scale-95 border border-slate-200/60 dark:border-slate-700 shrink-0" title="Close">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+        </div>
+
+        <!-- 🔹 QUICK VITAL PILL RIBBON -->
+        <div class="px-5 sm:px-8 py-3 bg-slate-50/70 dark:bg-slate-900/40 border-b border-slate-100 dark:border-white/5 grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 shrink-0 text-xs">
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-teal-500 shadow-[0_0_8px_rgba(20,184,166,0.5)]"></span>
+                <span class="text-slate-500 dark:text-slate-400 font-medium">Password Rotation:</span>
+                <span class="font-bold font-mono text-slate-800 dark:text-white">90 Days</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-sky-500 shadow-[0_0_8px_rgba(14,165,233,0.5)]"></span>
+                <span class="text-slate-500 dark:text-slate-400 font-medium">Desk Lock:</span>
+                <span class="font-bold font-mono text-slate-800 dark:text-white">Win + L</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]"></span>
+                <span class="text-slate-500 dark:text-slate-400 font-medium">Data Storage:</span>
+                <span class="font-bold font-mono text-slate-800 dark:text-white">Server / Cloud</span>
+            </div>
+            <div class="flex items-center gap-2 justify-end">
+                <span class="text-[10.5px] font-mono text-slate-500 dark:text-slate-400">
+                    <i class="fa-solid fa-shield-halved text-rose-500 mr-1"></i> POSH: <strong>Zero Tolerance</strong>
+                </span>
+            </div>
+        </div>
+
+        <!-- 🔹 MAIN BODY CONTENT -->
+        <div class="p-5 sm:p-8 flex-1 overflow-y-auto max-h-[calc(88vh-140px)] custom-scroll">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                
+                <!-- 👈 LEFT SECTION (7 COLS): INTERACTIVE ACCORDION MODULES -->
+                <div class="lg:col-span-7 flex flex-col gap-3">
+                    
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
+                            <i class="fa-solid fa-book-bookmark text-teal-500"></i> Official Training Modules
+                        </span>
+                        <span class="text-[10px] font-mono text-slate-400">Click to expand</span>
+                    </div>
+
+                    <div class="flex flex-col gap-2.5" id="training-accordion">
+                        
+                        <!-- Module 1 -->
+                        <div class="accordion-item active rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800/40 overflow-hidden transition-all duration-200">
+                            <button type="button" class="accordion-header w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-800/70 transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-xl bg-teal-50 text-teal-600 dark:bg-teal-950/40 dark:text-teal-400 flex items-center justify-center text-sm shrink-0">
+                                        <i class="fa-solid fa-shield-halved"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-xs sm:text-sm text-slate-800 dark:text-white leading-tight">Password, Access & Physical Security</h4>
+                                        <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Password entropy, rotation schedule & workstation hygiene</p>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-chevron-down arrow-icon text-xs text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="accordion-content">
+                                <div class="p-4 pt-1 border-t border-slate-100 dark:border-slate-800/80 text-xs text-slate-600 dark:text-slate-300 leading-relaxed space-y-3">
+                                    <div>
+                                        <h5 class="font-bold text-[11px] uppercase tracking-wider text-teal-600 dark:text-teal-400 mb-1 flex items-center gap-1.5">
+                                            <i class="fa-solid fa-key text-[10px]"></i> Password Policy (SOP)
+                                        </h5>
+                                        <ul class="space-y-1.5 pl-2 text-[11.5px]">
+                                            <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-teal-500 mt-1 text-[10px]"></i> <span>Must be minimum <strong>12 characters</strong> with uppercase, lowercase, numbers, and special symbols (e.g., !, @, #, $).</span></li>
+                                            <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-teal-500 mt-1 text-[10px]"></i> <span>Mandatory rotation every <strong>90 days</strong> via automated system prompt.</span></li>
+                                            <li class="flex items-start gap-2"><i class="fa-solid fa-circle-xmark text-rose-500 mt-1 text-[10px]"></i> <span><strong>Never share credentials</strong> with anyone. IT personnel will never request your password.</span></li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <h5 class="font-bold text-[11px] uppercase tracking-wider text-teal-600 dark:text-teal-400 mb-1 flex items-center gap-1.5">
+                                            <i class="fa-solid fa-desktop text-[10px]"></i> Physical Security (SOP)
+                                        </h5>
+                                        <ul class="space-y-1.5 pl-2 text-[11.5px]">
+                                            <li class="flex items-start gap-2"><i class="fa-solid fa-lock text-amber-500 mt-1 text-[10px]"></i> <span>Always lock your terminal (<strong>Windows Key + L</strong>) whenever stepping away from your workspace.</span></li>
+                                            <li class="flex items-start gap-2"><i class="fa-solid fa-usb text-amber-500 mt-1 text-[10px]"></i> <span>Do not attach personal flash drives, external HDDs, or mobile devices without written IT authorization.</span></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Module 2 -->
+                        <div class="accordion-item rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800/40 overflow-hidden transition-all duration-200">
+                            <button type="button" class="accordion-header w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-800/70 transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-xl bg-sky-50 text-sky-600 dark:bg-sky-950/40 dark:text-sky-400 flex items-center justify-center text-sm shrink-0">
+                                        <i class="fa-solid fa-at"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-xs sm:text-sm text-slate-800 dark:text-white leading-tight">Email, Internet & Anti-Phishing Defense</h4>
+                                        <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Spotting deceptive emails and permitted web utilization</p>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-chevron-down arrow-icon text-xs text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="accordion-content">
+                                <div class="p-4 pt-1 border-t border-slate-100 dark:border-slate-800/80 text-xs text-slate-600 dark:text-slate-300 leading-relaxed space-y-3">
+                                    <div>
+                                        <h5 class="font-bold text-[11px] uppercase tracking-wider text-sky-600 dark:text-sky-400 mb-1 flex items-center gap-1.5">
+                                            <i class="fa-solid fa-fish-fins text-[10px]"></i> Phishing Awareness (SOP)
+                                        </h5>
+                                        <ul class="space-y-1.5 pl-2 text-[11.5px]">
+                                            <li class="flex items-start gap-2"><i class="fa-solid fa-triangle-exclamation text-amber-500 mt-1 text-[10px]"></i> <span>Do not click unexpected links or download unverified attachments from unfamiliar senders.</span></li>
+                                            <li class="flex items-start gap-2"><i class="fa-solid fa-envelope text-sky-500 mt-1 text-[10px]"></i> <span>Inspect sender headers carefully for spoofed domains (e.g. <code>@pbl-support.com</code> instead of official PBL).</span></li>
+                                            <li class="flex items-start gap-2"><i class="fa-solid fa-share text-sky-500 mt-1 text-[10px]"></i> <span>Forward suspected phishing emails directly to the IT Department for domain isolation.</span></li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <h5 class="font-bold text-[11px] uppercase tracking-wider text-sky-600 dark:text-sky-400 mb-1 flex items-center gap-1.5">
+                                            <i class="fa-solid fa-globe text-[10px]"></i> Web Usage Policy (SOP)
+                                        </h5>
+                                        <ul class="space-y-1.5 pl-2 text-[11.5px]">
+                                            <li class="flex items-start gap-2"><i class="fa-solid fa-check text-sky-500 mt-1 text-[10px]"></i> <span>Bandwidth is reserved exclusively for business and client production workloads.</span></li>
+                                            <li class="flex items-start gap-2"><i class="fa-solid fa-ban text-rose-500 mt-1 text-[10px]"></i> <span>Accessing unauthorized streaming platforms, torrents, or gaming servers triggers security alerts.</span></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Module 3 -->
+                        <div class="accordion-item rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800/40 overflow-hidden transition-all duration-200">
+                            <button type="button" class="accordion-header w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-800/70 transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400 flex items-center justify-center text-sm shrink-0">
+                                        <i class="fa-solid fa-database"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-xs sm:text-sm text-slate-800 dark:text-white leading-tight">Data Handling, Backups & Incident Reporting</h4>
+                                        <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Approved storage repositories and immediate escalation protocols</p>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-chevron-down arrow-icon text-xs text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="accordion-content">
+                                <div class="p-4 pt-1 border-t border-slate-100 dark:border-slate-800/80 text-xs text-slate-600 dark:text-slate-300 leading-relaxed space-y-3">
+                                    <div>
+                                        <h5 class="font-bold text-[11px] uppercase tracking-wider text-indigo-600 dark:text-indigo-400 mb-1 flex items-center gap-1.5">
+                                            <i class="fa-solid fa-hard-drive text-[10px]"></i> Data Storage & Backup (SOP)
+                                        </h5>
+                                        <ul class="space-y-1.5 pl-2 text-[11.5px]">
+                                            <li class="flex items-start gap-2"><i class="fa-solid fa-cloud text-indigo-500 mt-1 text-[10px]"></i> <span>Store all operational files on company <strong>Server Shares or OneDrive Cloud ONLY</strong>.</span></li>
+                                            <li class="flex items-start gap-2"><i class="fa-solid fa-circle-exclamation text-amber-500 mt-1 text-[10px]"></i> <span>Local Desktop or C: drive data is <strong>NOT backed up</strong> and will be unrecoverable during disk failure.</span></li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <h5 class="font-bold text-[11px] uppercase tracking-wider text-rose-600 dark:text-rose-400 mb-1 flex items-center gap-1.5">
+                                            <i class="fa-solid fa-triangle-exclamation text-[10px]"></i> Incident Response (SOP)
+                                        </h5>
+                                        <ul class="space-y-1.5 pl-2 text-[11.5px]">
+                                            <li class="flex items-start gap-2"><i class="fa-solid fa-phone-volume text-rose-500 mt-1 text-[10px]"></i> <span>Immediately report lost or stolen hardware (laptops, security dongles) to IT Management.</span></li>
+                                            <li class="flex items-start gap-2"><i class="fa-solid fa-network-wired text-rose-500 mt-1 text-[10px]"></i> <span>If ransomware or malware is suspected, <strong>unplug LAN cable immediately</strong> and report in person.</span></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Module 4 -->
+                        <div class="accordion-item rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800/40 overflow-hidden transition-all duration-200">
+                            <button type="button" class="accordion-header w-full p-4 flex items-center justify-between text-left hover:bg-slate-50/50 dark:hover:bg-slate-800/70 transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400 flex items-center justify-center text-sm shrink-0">
+                                        <i class="fa-solid fa-scale-balanced"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-xs sm:text-sm text-slate-800 dark:text-white leading-tight">Workplace Ethics & POSH Policy</h4>
+                                        <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Zero tolerance for harassment and confidential grievance channels</p>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-chevron-down arrow-icon text-xs text-slate-400 transition-transform duration-300"></i>
+                            </button>
+                            <div class="accordion-content">
+                                <div class="p-4 pt-1 border-t border-slate-100 dark:border-slate-800/80 text-xs text-slate-600 dark:text-slate-300 leading-relaxed space-y-2">
+                                    <p>PBL maintains an uncompromised <strong>Zero Tolerance Policy</strong> for any form of harassment, discrimination, or verbal misconduct in the office environment.</p>
+                                    <ul class="space-y-1.5 pl-2 text-[11.5px]">
+                                        <li class="flex items-start gap-2"><i class="fa-solid fa-shield text-purple-500 mt-1 text-[10px]"></i> <span>Employees can report grievances without apprehension of retaliation directly to HR or POSH committee members.</span></li>
+                                        <li class="flex items-start gap-2"><i class="fa-solid fa-user-lock text-purple-500 mt-1 text-[10px]"></i> <span>Every complaint is logged under strict non-disclosure protocols and investigated by an internal committee.</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 👉 RIGHT SECTION (5 COLS): SECURITY GOLDEN RULES & ACTION CARDS -->
+                <div class="lg:col-span-5 flex flex-col gap-4">
+                    
+                    <!-- 🎯 SECURITY GOLDEN RULES CARD -->
+                    <div class="p-5 rounded-3xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col gap-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-7 h-7 rounded-lg bg-teal-500/10 text-teal-500 flex items-center justify-center text-xs">
+                                    <i class="fa-solid fa-star"></i>
+                                </div>
+                                <h3 class="font-heading font-black text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300">Security Golden Rules</h3>
+                            </div>
+                            <span class="text-[9px] font-mono text-teal-600 dark:text-teal-400 font-bold">5 PILLARS</span>
+                        </div>
+
+                        <div class="flex flex-col gap-2 pt-1 text-xs">
+                            <div class="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/70 dark:border-slate-700/60 flex items-center gap-3">
+                                <span class="text-base select-none">💻</span>
+                                <div><strong class="text-slate-800 dark:text-white block font-bold leading-tight">Lock Before You Walk</strong><span class="text-[10px] text-slate-500">Always press Win + L at your desk.</span></div>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/70 dark:border-slate-700/60 flex items-center gap-3">
+                                <span class="text-base select-none">🤔</span>
+                                <div><strong class="text-slate-800 dark:text-white block font-bold leading-tight">Doubt? Don't Click</strong><span class="text-[10px] text-slate-500">Report suspicious emails to IT.</span></div>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/70 dark:border-slate-700/60 flex items-center gap-3">
+                                <span class="text-base select-none">🔑</span>
+                                <div><strong class="text-slate-800 dark:text-white block font-bold leading-tight">Protect Your Password</strong><span class="text-[10px] text-slate-500">Never share credentials with anyone.</span></div>
+                            </div>
+                            <div class="p-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/70 dark:border-slate-700/60 flex items-center gap-3">
+                                <span class="text-base select-none">💾</span>
+                                <div><strong class="text-slate-800 dark:text-white block font-bold leading-tight">Server is Safer</strong><span class="text-[10px] text-slate-500">Save all work on company OneDrive/Server.</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 🚨 CRITICAL INCIDENT REPORT CARD -->
+                    <div class="p-5 rounded-3xl bg-gradient-to-br from-rose-50/90 via-orange-50/50 to-white dark:from-rose-950/40 dark:via-slate-900 dark:to-slate-900 border border-rose-300/60 dark:border-rose-500/30 shadow-md flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-[10px] font-mono font-black uppercase text-rose-600 dark:text-rose-400 tracking-wider flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span> IMMEDIATE ESCALATION
+                                </span>
+                                <i class="fa-solid fa-triangle-exclamation text-rose-500 text-sm"></i>
+                            </div>
+                            <h4 class="font-bold text-slate-800 dark:text-white text-sm mb-1">Suspect a Security Threat?</h4>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
+                                If you spot unauthorized data access, a virus warning, or a compromised account, report it instantly.
+                            </p>
+                        </div>
+                        <a href="https://forms.gle/L2VxBKYvva7aTmLE7" target="_blank" class="w-full py-2.5 px-4 rounded-xl text-white font-bold text-xs uppercase tracking-wider bg-rose-600 hover:bg-rose-700 transition active:scale-95 shadow-md flex items-center justify-center gap-2">
+                            <span>🚨</span> <span>Report Incident Now</span>
+                        </a>
+                    </div>
+
+                    <!-- 🎫 NEED IT ASSISTANCE SHORTCUT -->
+                    <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
+                        <div class="flex items-center gap-3 text-xs">
+                            <div class="w-8 h-8 rounded-xl bg-teal-50 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400 flex items-center justify-center text-sm">
+                                <i class="fa-solid fa-headset"></i>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-slate-800 dark:text-white leading-tight">Hardware or OS issue?</h5>
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400">Raise a direct IT Ticket</p>
+                            </div>
+                        </div>
+                        <button onclick="openItTicket()" class="px-3 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-[11px] transition shadow-sm active:scale-95">
+                            Raise Ticket
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 🔹 SCRIPT LOGIC -->
+    <script>
+        // Sync theme with parent
+        function syncTheme() {
+            if (localStorage.getItem('theme') === 'dark' || 
+                (window.parent && window.parent.document && window.parent.document.documentElement.classList.contains('dark'))) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            syncTheme();
+
+            // 🌌 Initialize Floating Teal Constellation Particles
+            if (window.particlesJS) {
+                particlesJS("particles-js", {
+                    "particles": {
+                        "number": { "value": 75, "density": { "enable": true, "value_area": 800 } },
+                        "color": { "value": "#14b8a6" },
+                        "shape": { "type": "circle" },
+                        "opacity": { "value": 0.45, "random": false },
+                        "size": { "value": 3, "random": true },
+                        "line_linked": { "enable": true, "distance": 140, "color": "#14b8a6", "opacity": 0.35, "width": 1 },
+                        "move": { "enable": true, "speed": 2.2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false }
+                    },
+                    "interactivity": {
+                        "detect_on": "window",
+                        "events": { "onhover": { "enable": true, "mode": "repulse" }, "onclick": { "enable": true, "mode": "push" }, "resize": true },
+                        "modes": { "repulse": { "distance": 120, "duration": 0.4 }, "push": { "particles_nb": 4 } }
+                    },
+                    "retina_detect": true
+                });
+            }
+
+            setupAccordion();
+        });
+
+        // Smooth Accordion Mechanism
+        function setupAccordion() {
+            const items = document.querySelectorAll('.accordion-item');
+            items.forEach(item => {
+                const header = item.querySelector('.accordion-header');
+                header.addEventListener('click', () => {
+                    const isActive = item.classList.contains('active');
+                    items.forEach(other => other.classList.remove('active'));
+                    if (!isActive) item.classList.add('active');
+                });
+            });
+        }
+
+        // Open IT Ticket Modal Handshake
+        function openItTicket() {
+            try {
+                if (window.parent && window.parent.Alpine) {
+                    const parentApp = window.parent.Alpine.$data(window.parent.document.querySelector('[x-data]'));
+                    if (parentApp && typeof parentApp.openApp === 'function') {
+                        parentApp.openApp('submit-ticket.html', 'Raise IT Ticket');
+                        return;
+                    }
+                }
+            } catch(e) {}
+            window.location.href = 'submit-ticket.html';
+        }
+
+        // Close Modal Window Handshake
+        function closeModalWindow() {
+            try {
+                if (window.parent && window.parent.Alpine) {
+                    const parentApp = window.parent.Alpine.$data(window.parent.document.querySelector('[x-data]'));
+                    if (parentApp && typeof parentApp.closeApp === 'function') {
+                        parentApp.closeApp();
+                        return;
+                    }
+                }
+            } catch (e) {}
+            window.close();
+        }
+    </script>
+</body>
+</html>
